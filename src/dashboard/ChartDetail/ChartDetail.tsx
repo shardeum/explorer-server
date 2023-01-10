@@ -21,7 +21,7 @@ export const ChartDetail: React.FC = () => {
     <div className={styles.ChartDetail}>
       <div className={styles.item}>
         <LineChart
-          title="SHARDEUM TRANSACTION HISTORY IN 14 DAYS"
+          title="SHARDEUM TRANSACTION HISTORY IN 14 DAYS (Mock Data)"
           data={transactionData}
         />
       </div>
