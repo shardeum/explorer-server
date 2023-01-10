@@ -1,0 +1,33 @@
+@import "../../../styles/index.scss";
+
+.CycleDetail {
+  .card {
+    @extend %card;
+    padding: spacing(16);
+  }
+
+  .item {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    border-bottom: border(gray1);
+    padding: spacing(12) spacing(8);
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+
+    .title {
+      @include fontStyle(small, bold);
+      @include singleLineEllipsis();
+
+      @include tablet {
+        margin-bottom: spacing(8);
+      }
+    }
+
+    .value {
+      @include fontStyle(small);
+      @include singleLineEllipsis();
+    }
+  }
+}

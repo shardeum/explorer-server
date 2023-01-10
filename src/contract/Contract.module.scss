@@ -1,0 +1,23 @@
+@import "../../styles/index.scss";
+
+.Contract {
+  .dropdown {
+    margin-bottom: spacing(16);
+  }
+
+  .button {
+    @include fontStyle(small);
+  }
+
+  .paginationWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: spacing(32) 0;
+  }
+
+  .title {
+    @include fontStyle(body, bold);
+    color: color(gray4);
+  }
+}

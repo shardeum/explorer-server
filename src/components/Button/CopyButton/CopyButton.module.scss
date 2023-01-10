@@ -1,0 +1,16 @@
+@import "../../../../styles/index.scss";
+
+.CopyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: spacing(8);
+  border-radius: 50%;
+  box-shadow: shadow(gray5);
+  border: border(gray1);
+  background-color: color(white);
+
+  &:hover {
+    background-color: color(secondary1);
+  }
+}

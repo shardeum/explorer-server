@@ -1,0 +1,21 @@
+@import "functions";
+@import "mixins";
+@import "variables";
+
+%spacer {
+  height: spacing(16);
+}
+
+%card {
+  box-shadow: shadow(gray5);
+  border-radius: borderRadius(4);
+  padding: spacing(8);
+  border: border(gray1);
+}
+
+%divider {
+  border: none;
+  border-top: border(gray1);
+  opacity: 0.75;
+  margin: spacing(8) 0;
+}

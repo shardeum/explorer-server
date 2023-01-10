@@ -1,0 +1,53 @@
+@import "../../../styles/index.scss";
+
+.Header {
+  display: flex;
+  align-items: center;
+  height: $header-height;
+  border-bottom: border(gray1);
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .logoWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo {
+    border-radius: borderRadius(8);
+    margin-right: spacing(8);
+  }
+
+  .name {
+    @include fontStyle(heading-5, bold);
+  }
+
+  .list {
+    display: flex;
+    @include tablet {
+      display: none;
+    }
+  }
+
+  .list_item {
+    @include fontStyle(small);
+    margin-left: spacing(12);
+  }
+
+  .dropdown {
+    @include fontStyle(small, bold);
+    margin-left: spacing(8);
+    padding: spacing(4) 0;
+    box-shadow: none;
+
+    &[data-active="true"] {
+      color: color(info);
+    }
+  }
+}

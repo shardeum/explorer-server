@@ -1,0 +1,28 @@
+@import "../../../../styles/index.scss";
+
+.IconButton {
+  background-color: color(gray1);
+  border-radius: borderRadius(8);
+  padding: spacing(4) spacing(8);
+  color: color(gray1);
+  @include fontStyle(body, bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.disabled {
+    background-color: color(gray1);
+    &:hover {
+      background-color: color(gray1);
+    }
+  }
+
+  &.round {
+    padding: spacing(8);
+    border-radius: 50%;
+  }
+
+  &:hover {
+    background-color: color(secondary1);
+  }
+}

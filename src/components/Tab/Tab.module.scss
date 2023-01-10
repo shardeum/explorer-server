@@ -1,0 +1,45 @@
+@import "../../../styles/index.scss";
+
+.Tab {
+  @extend %card;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: border(gray1);
+
+    .tab {
+      @include fontStyle(small, bold);
+      padding: spacing(12) spacing(16);
+      cursor: pointer;
+      position: relative;
+      color: color(gray4);
+
+      &:hover {
+        color: color(secondary1);
+      }
+
+      &.active {
+        color: color(secondary1);
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: spacing(16);
+          right: 0;
+          height: spacing(4);
+          border-top-left-radius: spacing(8);
+          border-top-right-radius: spacing(8);
+
+          background-color: color(secondary1);
+        }
+      }
+    }
+  }
+
+  .content {
+    padding: spacing(16);
+  }
+}

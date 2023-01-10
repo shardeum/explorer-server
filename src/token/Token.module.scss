@@ -1,0 +1,70 @@
+@import "../../styles/index.scss";
+
+.Token {
+  .header {
+    display: flex;
+
+    .title {
+      @include fontStyle(heading-5, bold);
+
+      span {
+        @include fontStyle(small);
+        @include singleLineEllipsis();
+      }
+    }
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: spacing(32);
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .buttonWrapper {
+    display: flex;
+
+    .btn {
+      @include fontStyle(small);
+      margin-left: spacing(8);
+    }
+  }
+
+  .tableHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title {
+      @include fontStyle(heading-5, bold);
+    }
+
+    .search {
+      display: flex;
+    }
+
+    .input {
+      @include fontStyle(small);
+      background-color: inherit;
+      border: border(gray1);
+      border-radius: borderRadius(4);
+      padding: spacing(8);
+      margin-right: spacing(8);
+      min-width: 350px;
+
+      &::placeholder {
+        color: color(gray4);
+      }
+      &:focus {
+        outline: none;
+      }
+
+      @include tablet {
+        min-width: auto;
+      }
+    }
+  }
+}

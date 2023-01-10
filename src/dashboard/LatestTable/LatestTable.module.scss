@@ -1,0 +1,47 @@
+@import "../../../styles/index.scss";
+
+.LatestTable {
+  border: border(gray1);
+  border-radius: borderRadius(4);
+  padding: spacing(16);
+  margin-bottom: spacing(16);
+  box-shadow: shadow(gray5);
+  background-color: color(white);
+
+  .title {
+    @include fontStyle(heading-6, bold);
+    color: color(gray4);
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: spacing(8);
+    border-radius: borderRadius(4);
+
+
+    &:hover {
+      background-color: color(gray3);
+      cursor: pointer;
+    }
+  }
+
+  .count {
+    @include fontStyle(small);
+    @include singleLineEllipsis();
+  }
+
+  .date {
+    @include fontStyle(small, bold);
+    @include singleLineEllipsis();
+
+    @include tablet {
+      max-width: 200px;
+    }
+  }
+
+  .button {
+    width: 100%;
+  }
+}

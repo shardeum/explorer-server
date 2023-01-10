@@ -1,0 +1,39 @@
+{
+  "name": "shardeum-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@svgr/webpack": "^6.5.1",
+    "@types/node": "18.11.9",
+    "@types/react": "18.0.25",
+    "@types/react-dom": "18.0.9",
+    "axios": "^1.2.0",
+    "classnames": "^2.3.2",
+    "eslint": "8.28.0",
+    "eslint-config-next": "13.0.5",
+    "highcharts": "^10.3.2",
+    "highcharts-react-official": "^3.1.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "next": "13.0.2",
+    "node-sass": "^7.0.3",
+    "qs": "^6.11.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-tooltip": "^4.5.1",
+    "sass": "^1.56.1",
+    "swr": "^1.3.0",
+    "typescript": "4.9.3",
+    "web3": "1.8.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.191",
+    "@types/qs": "^6.9.7"
+  }
+}

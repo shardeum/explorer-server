@@ -1,0 +1,11 @@
+@import "../../../styles/index.scss";
+
+.ChartDetail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: spacing(32);
+
+  @include tabletPro {
+    grid-template-columns: 1fr;
+  }
+}

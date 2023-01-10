@@ -1,0 +1,82 @@
+@import "../../../styles/index.scss";
+
+.Footer {
+  border-top: border(gray1);
+  padding: spacing(16) 0;
+
+  span {
+    @include fontStyle(heading-6, bold);
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    column-gap: spacing(32);
+    padding: spacing(16) 0;
+
+    @include tabletPro {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+
+    .logoItem {
+      display: flex;
+      align-items: center;
+
+      .icon {
+        border-radius: borderRadius(4);
+        margin-right: spacing(8);
+      }
+
+      .name {
+        @include fontStyle(large);
+      }
+    }
+
+    .label {
+      @include fontStyle(small);
+    }
+
+    .title {
+      @include fontStyle(body);
+      margin-bottom: spacing(16);
+
+      @include tablet {
+        margin: spacing(16) 0;
+      }
+    }
+
+    .link {
+      @include fontStyle(small);
+    }
+  }
+
+  .social {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: spacing(16) 0;
+
+    .wrapper {
+      display: flex;
+    }
+
+    .socialBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: border(gray1);
+      margin-left: spacing(8);
+
+      &:hover {
+        background-color: color(secondary1);
+      }
+    }
+  }
+}

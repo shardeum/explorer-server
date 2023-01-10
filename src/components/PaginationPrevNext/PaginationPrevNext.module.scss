@@ -1,0 +1,29 @@
+@import "../../../styles/index";
+
+.PaginationPrevNext {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: border(gray1);
+  border-radius: borderRadius(4);
+  box-shadow: shadow(gray5);
+
+  .button {
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .leftborder {
+    border-left: border(gray1);
+  }
+
+  .rightborder {
+    border-right: border(gray1);
+  }
+
+  .label {
+    @include fontStyle(small, bold);
+    min-width: 50px;
+    text-align: center;
+  }
+}

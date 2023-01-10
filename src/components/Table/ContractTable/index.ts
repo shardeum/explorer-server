@@ -1,0 +1,1 @@
+export { ContractTable } from "./ContractTable";

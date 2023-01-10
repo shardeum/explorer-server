@@ -1,0 +1,15 @@
+@import "../../../../styles/index.scss";
+
+.SortButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .iconUp {
+    margin-bottom: -2px;
+  }
+  .iconDown {
+    margin-top: -2px;
+  }
+}

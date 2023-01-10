@@ -1,0 +1,51 @@
+@import "../../../styles/index.scss";
+
+.Chip {
+  border-radius: borderRadius(16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: color(white);
+  text-transform: capitalize;
+  @include singleLineEllipsis();
+
+  &.primary {
+    background-color: color(primary1);
+  }
+
+  &.secondary {
+    background-color: color(secondary1);
+  }
+
+  &.warn {
+    background-color: color(warn);
+  }
+
+  &.success {
+    background-color: color(success);
+  }
+
+  &.error {
+    background-color: color(danger);
+  }
+
+  &.info {
+    background-color: color(info);
+  }
+
+  &.large {
+    padding: spacing(8) spacing(16);
+    @include fontStyle(small);
+  }
+
+  &.medium {
+    padding: spacing(4) spacing(8);
+    @include fontStyle(tiny, bold);
+  }
+
+  &.small {
+    padding: spacing(2) spacing(4);
+    @include fontStyle(tiny);
+  }
+}

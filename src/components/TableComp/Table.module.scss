@@ -1,0 +1,34 @@
+@import "../../../styles/index.scss";
+
+.Table {
+  max-width: $maxWidth;
+  border: border(gray1);
+  border-radius: borderRadius(4);
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border-bottom: border(gray1);
+    padding: spacing(8);
+  }
+
+  th {
+    @include fontStyle(bold, bold);
+    color: color(gray4);
+  }
+
+  tr {
+    &:hover {
+      background-color: color(gray3);
+    }
+  }
+
+  thead {
+    text-align: left;
+    height: 48px;
+  }
+}

@@ -1,0 +1,35 @@
+@import "../../../styles/index.scss";
+
+.MenuItem {
+  border-radius: borderRadius(4);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  padding: spacing(4) spacing(8);
+  margin: spacing(4);
+
+  &:hover,
+  &:focus,
+  &:focus-within {
+    border: border(gray1);
+    box-shadow: shadow(gray5);
+  }
+
+  &.active {
+    background-color: color(secondary1);
+    color: color(white);
+  }
+
+  .label {
+    margin-left: spacing(8);
+    @include singleLineEllipsis();
+    @include fontStyle(small);
+  }
+
+  .label1 {
+    margin-left: spacing(8);
+    @include singleLineEllipsis();
+    @include fontStyle(small);
+  }
+}

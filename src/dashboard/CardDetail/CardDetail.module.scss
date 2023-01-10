@@ -1,0 +1,24 @@
+@import "../../../styles/index.scss";
+
+.CardDetail {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  column-gap: spacing(32);
+  row-gap: spacing(8);
+
+  @include laptop {
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: spacing(16);
+  }
+
+  @include tabletPro {
+    grid-template-columns: 1fr 1fr;
+    column-gap: spacing(16);
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    row-gap: spacing(16);
+
+  }
+}

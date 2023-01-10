@@ -1,0 +1,51 @@
+@import "../../../styles/index.scss";
+
+.Icon {
+  $extraLargeSize: 48px;
+  $largeSize: 24px;
+  $mediumSize: 20px;
+  $smallSize: 16px;
+  $tinySize: 12px;
+
+  &.tiny {
+    height: $tinySize;
+    width: $tinySize;
+  }
+
+  &.small {
+    height: $smallSize;
+    width: $smallSize;
+  }
+
+  &.medium {
+    height: $mediumSize;
+    width: $mediumSize;
+  }
+
+  &.large {
+    height: $largeSize;
+    width: $largeSize;
+  }
+
+  &.extraLarge {
+    height: $extraLargeSize;
+    width: $extraLargeSize;
+  }
+
+  &.primary {
+    fill: color(primary1);
+  }
+  &.secondary {
+    fill: color(secondary1);
+  }
+  &.black {
+    fill: color(gray4);
+  }
+
+  &.white {
+    fill: color(white);
+  }
+  &.disabled {
+    fill: color(gray1);
+  }
+}

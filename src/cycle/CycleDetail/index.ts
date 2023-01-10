@@ -1,0 +1,1 @@
+export { CycleDetail } from "./CycleDetail";

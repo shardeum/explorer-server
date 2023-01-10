@@ -1,0 +1,42 @@
+@import "../../../styles/index";
+
+.Pagination {
+  display: flex;
+  align-items: center;
+
+  .label {
+    @include fontStyle(small, bold);
+    position: relative;
+    margin: 0 spacing(8);
+    padding: 0 spacing(8);
+    text-align: center;
+    cursor: pointer;
+
+    &:hover {
+      color: color(secondary1);
+    }
+
+    &.active {
+      color: color(secondary1);
+    }
+
+    .underline {
+      position: absolute;
+      right: 0;
+      bottom: -5px;
+      left: 0;
+      width: spacing(28);
+      height: spacing(2);
+      background-color: color(secondary1);
+      border-top-left-radius: borderRadius(4);
+      border-top-right-radius: borderRadius(4);
+    }
+  }
+
+  .button {
+    $size: 36px;
+    width: $size;
+    height: $size;
+    border-radius: borderRadius(8);
+  }
+}

@@ -1,0 +1,51 @@
+@import "../../../styles/index.scss";
+
+.DetailCard {
+  @extend %card;
+  padding: 0;
+
+  @include tablet {
+    margin-bottom: spacing(8);
+  }
+
+  .header {
+    @include fontStyle(body, bold);
+    border-bottom: border(gray1);
+    color: color(gray4);
+    padding: spacing(8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: baseline;
+    margin: spacing(8);
+    padding-bottom: spacing(8);
+    border-bottom: border(gray1);
+
+    &.last {
+      border-bottom: none;
+    }
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .title {
+    @include fontStyle(body);
+
+    @include tablet {
+      margin-bottom: spacing(4);
+    }
+  }
+
+  .value {
+    @include fontStyle(small, bold);
+    color: color(gray4);
+    width: 100%;
+  }
+}

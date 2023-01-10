@@ -1,0 +1,77 @@
+@import "../../../styles/index.scss";
+
+.TokenDropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  @include tablet {
+    justify-content: flex-start;
+  }
+
+  .button {
+    @include fontStyle(small, bold);
+    justify-content: space-between;
+    width: 250px;
+
+    span {
+      @include fontStyle(body, bold);
+    }
+
+    @include tabletPro {
+      width: 200px;
+    }
+
+    @include tablet {
+      width: 200px;
+    }
+  }
+
+  .walletButton {
+    padding: spacing(8);
+    margin-left: spacing(8);
+  }
+
+  .item {
+    border-radius: borderRadius(4);
+    border: border(gray1);
+    padding: spacing(4) spacing(8);
+    margin-bottom: spacing(16);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .label {
+      @include fontStyle(small, bold);
+      width: 200px;
+
+      span {
+        @include fontStyle(tiny);
+      }
+    }
+  }
+
+  .search {
+    background-color: color(bg3);
+    border: border(gray1);
+    outline: none;
+    border-radius: borderRadius(4);
+    padding: spacing(4) spacing(8);
+    margin: spacing(8) 0;
+    // color: color(white);
+
+    &::placeholder {
+      @include fontStyle(small);
+      color: color(gray2);
+    }
+  }
+
+  .menuItem {
+    margin: 0;
+  }
+
+  .empty {
+    padding: 0 spacing(8);
+  }
+}

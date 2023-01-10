@@ -1,0 +1,87 @@
+@import "../../../styles/index.scss";
+
+.Card {
+  border-radius: borderRadius(8);
+  padding: spacing(16);
+  margin-bottom: spacing(16);
+  min-width: 230px;
+  cursor: pointer;
+  flex-wrap: wrap;
+  box-shadow: shadow(gray5);
+  border: border(gray1);
+  background-color: color(white);
+
+  &:hover {
+    border: border(secondary1);
+    transition: 0.3s ease-out;
+  }
+
+  &.primary {
+    border-top: solid 3px color(primary1);
+  }
+
+  &.secondary {
+    border-top: solid 3px color(secondary1);
+  }
+
+  &.warn {
+    border-top: solid 3px color(warn);
+  }
+
+  &.success {
+    border-top: solid 3px color(success);
+  }
+
+  &.error {
+    border-top: solid 3px color(danger);
+  }
+
+  &.info {
+    border-top: solid 3px color(info);
+  }
+
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: spacing(8);
+
+    &.primary {
+      background-color: color(primary1);
+    }
+
+    &.secondary {
+      background-color: color(secondary1);
+    }
+
+    &.warn {
+      background-color: color(warn);
+    }
+
+    &.success {
+      background-color: color(success);
+    }
+
+    &.error {
+      background-color: color(danger);
+    }
+
+    &.info {
+      background-color: color(info);
+    }
+  }
+
+  .title {
+    @include fontStyle(heading-6, bold);
+    color: color(gray4);
+    margin-bottom: spacing(4);
+  }
+
+  .count {
+    @include fontStyle(body);
+    color: color(black);
+  }
+}

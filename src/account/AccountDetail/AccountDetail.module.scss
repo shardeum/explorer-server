@@ -1,0 +1,36 @@
+@import "../../../styles/index.scss";
+
+.AccountDetail {
+  .header {
+    display: flex;
+
+    .title {
+      @include fontStyle(heading-5, bold);
+      color: color(gray4);
+
+      span {
+        @include fontStyle(small);
+        @include singleLineEllipsis();
+      }
+    }
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: spacing(32);
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .buttonWrapper {
+    display: flex;
+
+    .btn {
+      @include fontStyle(small);
+      margin-left: spacing(8);
+    }
+  }
+}

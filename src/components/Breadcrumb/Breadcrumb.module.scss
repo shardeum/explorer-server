@@ -1,0 +1,22 @@
+@import "../../../styles/index.scss";
+
+.Breadcrumb {
+  display: flex;
+
+  .item {
+    margin-right: spacing(8);
+    color: color(gray4);
+  }
+
+  .inactive {
+    color: color(gray1);
+  }
+
+  .active {
+    color: color(primary1);
+  }
+
+  .link {
+    @include fontStyle(body, bold);
+  }
+}

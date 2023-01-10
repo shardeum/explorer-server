@@ -1,0 +1,27 @@
+@import "../../../styles/index.scss";
+
+.Menu {
+  // position: absolute;
+  // top: 0;
+  // left: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 286px;
+  padding: spacing(4) spacing(8);
+  overflow-y: auto;
+  background-color: color(white);
+  border: border(gray1);
+  border-radius: borderRadius(4);
+  box-shadow: shadow(gray5);
+  transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+  z-index: 9999;
+
+  &[data-active="false"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}

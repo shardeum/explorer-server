@@ -1,0 +1,20 @@
+@import "../../../styles/index.scss";
+
+.Dashboard {
+  .hero {
+    background-color: color(bg1);
+    .cardWrapper {
+    }
+  }
+
+  .tableGrid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    column-gap: spacing(32);
+
+    @include tabletPro {
+      grid-template-columns: 1fr;
+      column-gap: spacing(8);
+    }
+  }
+}

@@ -1,0 +1,36 @@
+@import "../../styles/index.scss";
+
+.Log {
+  .main {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 0.5fr;
+    column-gap: spacing(32);
+
+    @include tablet {
+      grid-template-columns: 1fr;
+      row-gap: spacing(16);
+    }
+  }
+
+  .input {
+    @include fontStyle(small);
+    background-color: inherit;
+    border: border(gray1);
+    border-radius: borderRadius(4);
+    padding: spacing(12) spacing(8);
+
+    &::placeholder {
+      color: color(gray4);
+    }
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .paginationWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: spacing(32) 0;
+  }
+}

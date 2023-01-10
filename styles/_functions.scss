@@ -1,0 +1,78 @@
+@import "variables";
+
+@function mapGet($map, $args...) {
+  @if not map-has-key($map, $args...) {
+    @error '#{$name} #{$args} does NOT exist in #{map}';
+  }
+
+  @return map-get($map, $args...);
+}
+
+@function _mapGet($name, $map, $args...) {
+  @if not map-has-key($map, $args...) {
+    @error '#{$name} #{$args} does NOT exist in the style guide';
+  }
+
+  @return map-get($map, $args...);
+}
+
+@function color($name) {
+  $resolved-name: if($name == "primary", "brand-500", $name);
+
+  @return _mapGet("Color", $colors, $resolved-name);
+}
+
+@function spacing($size) {
+  @if not map-has-key($spacing, $size) {
+    @warn "Spacing " + $size + " does NOT match with style guide";
+  }
+
+  @return $size * 1px;
+}
+
+@function layoutGrid($size, $field: false) {
+  @if not map-has-key($layout-grids, $size) {
+    @error "Layout Grid " + $size + " does NOT exist in the style guide";
+  }
+
+  @if $field {
+    @if not map-has-key($layout-grids, $size, $field) {
+      @error "Layout Grid " + $size + " does NOT have a field called " + $field;
+    }
+
+    @if $field == "margin" or $field == "gutter" {
+      @return spacing(map-get($layout-grids, $size, $field));
+    }
+
+    @return map-get($layout-grids, $size, $field);
+  }
+
+  @return map-get($layout-grids, $size);
+}
+
+@function breakpoint($layout-grid-size) {
+  @return layoutGrid($layout-grid-size, "maxWidth");
+}
+
+@function border($type) {
+  @if map-has-key($borders, $type) {
+    $thickness: map-get($borders, $type, "thickness");
+    $color: map-get($borders, $type, "color");
+
+    @return solid $thickness $color;
+  }
+
+  @error "Border " + $type + " does NOT exist in the style guide";
+}
+
+@function borderRadius($size) {
+  @return _mapGet("Border radius", $border-radiuses, $size);
+}
+
+@function overlay($type) {
+  @return _mapGet("Overlay", $overlays, $type);
+}
+
+@function shadow($type) {
+  @return _mapGet("Shadow", $shadows, $type);
+}

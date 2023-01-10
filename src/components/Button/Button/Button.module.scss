@@ -1,0 +1,47 @@
+@import "../../../../styles/index.scss";
+
+.Button {
+  @include fontStyle(body);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  outline: none;
+  border-radius: borderRadius(4);
+  box-shadow: shadow(gray5);
+  color: color(black);
+  cursor: pointer;
+
+  &.default {
+  }
+
+  &.primary {
+    background-color: color(primary1);
+    color: color(white);
+  }
+
+  &.secondary {
+    background-color: color(secondary1);
+    color: color(white);
+  }
+
+  &.outlined {
+    border: border(gray1);
+  }
+
+  &.large {
+    padding: spacing(8) spacing(16);
+    @include fontStyle(large, bold);
+  }
+
+  &.medium {
+    padding: spacing(4) spacing(8);
+    @include fontStyle(body, bold);
+  }
+
+  &.small {
+    padding: spacing(2) spacing(4);
+    @include fontStyle(small, bold);
+  }
+}

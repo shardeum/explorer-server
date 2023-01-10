@@ -1,0 +1,28 @@
+@import "../../../styles/index";
+
+.Layout {
+  padding: 0 spacing(8);
+  max-width: $maxWidth;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+
+  .content {
+    padding: spacing(16) 0;
+  }
+
+  .button {
+    $size: 36px;
+
+    width: $size;
+    height: $size;
+    position: fixed;
+    bottom: spacing(8);
+    right: spacing(8);
+    background-color: color(white);
+
+    &:hover {
+      box-shadow: shadow(gray5);
+    }
+  }
+}

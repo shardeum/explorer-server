@@ -1,0 +1,69 @@
+@import "../../../../styles/index.scss";
+
+.Logs {
+  padding-top: spacing(16);
+
+  .logItem {
+    display: grid;
+    grid-template-columns: 10% 90%;
+    // border-bottom: border(indigo);
+    margin-bottom: spacing(16);
+
+    @include tablet {
+      grid-template-columns: 100%;
+    }
+  }
+
+  .count {
+    width: 40px;
+    height: 40px;
+    @include fontStyle(small);
+
+    @include tablet {
+      margin-bottom: spacing(8);
+    }
+  }
+
+  .item {
+    display: grid;
+    grid-template-columns: 20% 80%;
+    margin-bottom: spacing(8);
+
+    @include tablet {
+      grid-template-columns: 100%;
+    }
+  }
+
+  .title {
+    @include fontStyle(body, bold);
+    text-align: left;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: spacing(8);
+
+    @include tablet {
+      margin-top: spacing(8);
+    }
+  }
+
+  .btn {
+    width: 30px;
+    height: 30px;
+    @include fontStyle(small);
+    margin-right: spacing(8);
+  }
+
+  .dropdown {
+    @include fontStyle(small);
+    margin-right: spacing(8);
+  }
+
+  .link {
+    @include fontStyle(small);
+    @include singleLineEllipsis();
+  }
+}

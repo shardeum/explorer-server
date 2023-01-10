@@ -1,0 +1,105 @@
+@import "../../../../styles/index.scss";
+
+.Ovewview {
+  padding-top: spacing(16);
+
+  .item {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    border-bottom: border(gray1);
+    padding-bottom: spacing(8);
+    margin-bottom: spacing(16);
+
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .title {
+    @include fontStyle(small, bold);
+    @include singleLineEllipsis();
+
+    @include tablet {
+      margin-bottom: spacing(8);
+    }
+  }
+
+  .value {
+    @include fontStyle(small);
+    @include singleLineEllipsis();
+  }
+
+  .chip {
+    width: 120px;
+  }
+
+  .card {
+    @extend %card;
+    // min-height: 160px;
+    // max-height: 400px;
+    overflow-y: auto;
+
+    .row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: spacing(4);
+    }
+
+    .anchor {
+      max-width: 180px;
+      color: color(info);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    span {
+      @include fontStyle(small, bold);
+      margin-right: spacing(8);
+      margin-left: spacing(8);
+    }
+  }
+
+  .link {
+    color: color(info);
+  }
+}
+
+.Overivew_Item {
+  @extend %card;
+
+  .listItem {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .listItemRow {
+    display: flex;
+
+    @include mobile {
+      display: grid;
+    }
+  }
+
+  .listItemCol {
+    display: flex;
+    margin-right: spacing(4);
+    margin-bottom: spacing(4);
+  }
+
+  .listTitle {
+    @include fontStyle(small, bold);
+    margin-right: spacing(4);
+  }
+
+  .listLink {
+    @include singleLineEllipsis();
+    color: color(info);
+    max-width: 180px;
+  }
+
+  span {
+    @include fontStyle(small);
+    color: color(gray2);
+  }
+}
