@@ -48,19 +48,19 @@ export interface Result {
 }
 
 export interface Transaction {
-  accountId: string;
-  cycle: number;
-  originTxData: string;
-  partition: any;
-  result: Result;
-  timestamp: number;
-  transactionType: number;
-  txFrom: string;
-  txHash: string;
   txId: string;
+  result: Result;
+  cycle: number;
+  partition: number;
+  timestamp: number;
+  wrappedEVMAccount: WrappedEVMAccount;
+  accountId: string;
+  transactionType: TransactionType;
+  txHash: string;
+  txFrom: string;
   txTo: string;
-  wrappedEVMAccount?: WrappedEVMAccount;
-  tokenTxs?: TokenTxs[];
+  nominee?: string;
+  originTxData: any;
 }
 
 export interface TransactionQuery {
@@ -73,6 +73,8 @@ export enum TransactionSearchType {
   All, // Receipt + NodeRewardReceipt
   Receipt,
   NodeRewardReceipt,
+  StakeReceipt,
+  UnstakeReceipt,
   Internal,
   ERC_20,
   ERC_721,
@@ -80,25 +82,31 @@ export enum TransactionSearchType {
   TokenTransfer, // token txs of a contract
 }
 
-export const transactionTypes: { key: TransactionSearchType; value: string }[] =
-  [
-    { key: TransactionSearchType.All, value: "All Transactions" },
-    {
-      key: TransactionSearchType.NodeRewardReceipt,
-      value: "Node Reward Transactions",
-    },
-    { key: TransactionSearchType.Internal, value: "Internal Transactions" },
-    { key: TransactionSearchType.ERC_20, value: "ERC 20 Token Transactions" },
-    { key: TransactionSearchType.ERC_721, value: "ERC 721 Token Transactions" },
-    {
-      key: TransactionSearchType.ERC_1155,
-      value: "ERC 1155 Token Transactions",
-    },
-  ];
+export const TransactionSearchList: {
+  key: TransactionSearchType;
+  value: string;
+}[] = [
+  { key: TransactionSearchType.All, value: "All Transactions" },
+  // {
+  //   key: TransactionSearchType.NodeRewardReceipt,
+  //   value: "Node Reward Transactions",
+  // },
+  { key: TransactionSearchType.StakeReceipt, value: "Stake Transactions" },
+  { key: TransactionSearchType.UnstakeReceipt, value: "Unstake Transactions" },
+  { key: TransactionSearchType.Internal, value: "Internal Transactions" },
+  { key: TransactionSearchType.ERC_20, value: "ERC 20 Token Transactions" },
+  { key: TransactionSearchType.ERC_721, value: "ERC 721 Token Transactions" },
+  {
+    key: TransactionSearchType.ERC_1155,
+    value: "ERC 1155 Token Transactions",
+  },
+];
 
 export enum TransactionType {
   Receipt,
   NodeRewardReceipt,
+  StakeReceipt,
+  UnstakeReceipt,
   Internal,
   ERC_20,
   ERC_721,

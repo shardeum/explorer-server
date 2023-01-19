@@ -199,6 +199,22 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
         </div>
       </div>
 
+      {
+        transaction?.nominee && (
+          <div className={styles.item}>
+        <div className={styles.title}>Node Address:</div>
+        <div className={styles.value}>
+            <Link
+              href={`/account/${transaction?.nominee}`}
+              className={styles.link}
+            >
+              {transaction?.nominee}
+            </Link>
+        </div>
+      </div>
+        )
+      }
+
       {/* TODO: calculate value */}
       <div className={styles.item}>
         <div className={styles.title}>Value:</div>

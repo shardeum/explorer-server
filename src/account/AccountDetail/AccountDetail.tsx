@@ -16,6 +16,7 @@ import { useAccountDetailHook } from "./useAccountDetailHook";
 
 import styles from "./AccountDetail.module.scss";
 import {
+  AccountType,
   breadcrumbsList,
   ContractType,
   TransactionSearchType,
@@ -29,11 +30,17 @@ export const AccountDetail: React.FC = () => {
   const id = router?.query?.id;
   const txType = router?.query?.txType as unknown as TransactionSearchType;
 
-  const { account, total, tokens, transactions, setTransactionType } =
-    useAccountDetailHook({
-      id: id as string,
-      txType: txType,
-    });
+  const {
+    account,
+    accountType,
+    total,
+    tokens,
+    transactions,
+    setTransactionType,
+  } = useAccountDetailHook({
+    id: id as string,
+    txType: txType,
+  });
 
   const tabs = [
     {
@@ -114,56 +121,120 @@ export const AccountDetail: React.FC = () => {
         {account ? (
           <>
             <div className={styles.row}>
-              <DetailCard
-                title="Overview"
-                titleRight={
-                  account?.contractType && account?.contractType !== ContractType.GENERIC && (
-                    <div className={styles.buttonWrapper}>
-                      <Button
-                        apperance="outlined"
-                        className={styles.btn}
-                        onClick={() => router.push(`/token/${id}`)}
-                      >
-                        Token Tracker
-                      </Button>
-                      <Button
-                        apperance="outlined"
-                        className={styles.btn}
-                        onClick={() => router.push(`/log?address=${id}`)}
-                      >
-                        Filter By Logs
-                      </Button>
-                    </div>
-                  )
-                }
-                items={[
-                  { key: "Balance :", value: Web3Utils.fromWei(account?.account?.balance, "ether") + "   SHM"},
-                  { key: "Nonce :", value: Web3Utils.hexToNumber('0x' + account?.account?.nonce) },
-                  { key: "Tokens :", value: <TokenDropdown tokens={tokens} /> },
-                ]}
-              />
-              {
-                account?.contractType && account?.contractType !== ContractType.GENERIC &&
+              {accountType === AccountType.Account ? (
+                <DetailCard
+                  title="Overview"
+                  titleRight={
+                    account?.contractType &&
+                    account?.contractType !== ContractType.GENERIC && (
+                      <div className={styles.buttonWrapper}>
+                        <Button
+                          apperance="outlined"
+                          className={styles.btn}
+                          onClick={() => router.push(`/token/${id}`)}
+                        >
+                          Token Tracker
+                        </Button>
+                        <Button
+                          apperance="outlined"
+                          className={styles.btn}
+                          onClick={() => router.push(`/log?address=${id}`)}
+                        >
+                          Filter By Logs
+                        </Button>
+                      </div>
+                    )
+                  }
+                  items={[
+                    {
+                      key: "Balance :",
+                      value:
+                        Web3Utils.fromWei(account?.account?.balance, "ether") +
+                        "   SHM",
+                    },
+                    {
+                      key: "Nonce :",
+                      value: Web3Utils.hexToNumber(
+                        "0x" + account?.account?.nonce
+                      ),
+                    },
+                    {
+                      key: "Tokens :",
+                      value: <TokenDropdown tokens={tokens} />,
+                    },
+                  ]}
+                />
+              ) : (
+                <DetailCard
+                  title="Overview"
+                  items={[
+                    {
+                      key: "Node status",
+                      value: account?.account?.rewardStartTime
+                        ? "Active"
+                        : "Non-Active",
+                    },
+                    {
+                      key: "Nominator",
+                      value:
+                        account?.account?.nominator &&
+                        account?.account?.nominator,
+                    },
+                    {
+                      key: "StakeLock",
+                      value:
+                        account?.account?.stakeLock &&
+                        account?.account?.stakeLock,
+                    },
+                  ]}
+                />
+              )}
+              {accountType !== AccountType.Account ? (
                 <DetailCard
                   title="More Info"
                   items={[
-                    { key: "Name", value: account?.contractInfo?.name },
-                    { key: "Symbol :", value: account?.contractInfo?.symbol },
-                    { key: "Total Supply :", value: account?.contractInfo?.totalSupply },
+                    { key: "Reward Start Time", value: account?.account?.rewardStartTime },
+                    { key: "Reward End Time", value: account?.account?.rewardEndTime },
+                    {
+                      key: "Reward",
+                      value: account?.account?.reward,
+                    },
                   ]}
                 />
-
-              }
+              ) : (
+                account?.contractType &&
+                account?.contractType !== ContractType.GENERIC && (
+                  <DetailCard
+                    title="More Info"
+                    items={[
+                      { key: "Name : ", value: account?.contractInfo?.name },
+                      { key: "Symbol :", value: account?.contractInfo?.symbol },
+                      {
+                        key: "Total Supply :",
+                        value: account?.contractInfo?.totalSupply,
+                      },
+                    ]}
+                  />
+                )
+              )}
             </div>
             <Spacer space="64" />
-            <Tab
-              tabs={tabs}
-              activeTab={activeTab}
-              onClick={(tab) => {
-                setActiveTab(tab);
-                setTransactionType(tab);
-              }}
-            />
+            {accountType === AccountType.Account ? (
+              <Tab
+                tabs={tabs}
+                activeTab={activeTab}
+                onClick={(tab) => {
+                  setActiveTab(tab);
+                  setTransactionType(tab);
+                }}
+              />
+            ) : (
+              <TransactionTable
+                loading={false}
+                data={transactions}
+                txType={TransactionSearchType.All}
+              />
+            )}
           </>
         ) : (
           <>

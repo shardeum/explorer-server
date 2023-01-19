@@ -1,6 +1,6 @@
-// const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
-const BASE_URL = "https://explorer-liberty20.shardeum.org";
+// const BASE_URL = "https://explorer-liberty20.shardeum.org";
 
 export const PATHS = {
   BASE_URL,

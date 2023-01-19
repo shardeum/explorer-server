@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, PATHS } from "../../api";
 import {
   Account,
-  AccountSearchType,
+  AccountType,
   Token,
   Transaction,
   TransactionSearchType,
@@ -24,9 +24,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
   );
 
   const accountType =
-    id && id.length === 64
-      ? AccountSearchType.NodeAccount
-      : AccountSearchType.All; // TODO: I think it has to be EOA
+    id && id.length === 64 ? AccountType.NodeAccount2 : AccountType.Account; // TODO: I think it has to be EOA
 
   const getAddress = useCallback(async () => {
     const data = await api.get(
@@ -71,12 +69,14 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
         setAccount(accounts[0]);
       }
 
-      if (
-        (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
-        (accounts && accounts.length > 0 && accounts[0].accountId)
-      ) {
-        const { tokens } = await getToken();
-        setTokens(tokens);
+      if (accountType === AccountType.Account) {
+        if (
+          (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
+          (accounts && accounts.length > 0 && accounts[0].accountId)
+        ) {
+          const { tokens } = await getToken();
+          setTokens(tokens);
+        }
       }
     }
 
@@ -85,6 +85,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
 
   return {
     account,
+    accountType,
     transactions,
     tokens,
     total,

@@ -1,4 +1,4 @@
-import { Transaction, TokenTxs } from "../types";
+import { Transaction, TokenTxs, TransactionType } from "../types";
 
 export const showTxMethod = (tx: Transaction | TokenTxs) => {
   const data = tx?.wrappedEVMAccount?.readableReceipt.data;
@@ -9,6 +9,12 @@ export const showTxMethod = (tx: Transaction | TokenTxs) => {
     ? tx.tokenEvent
     : tx?.wrappedEVMAccount?.readableReceipt.from.length === 64
     ? "Node Reward"
+    : tx?.transactionType &&
+      tx?.transactionType === TransactionType.StakeReceipt
+    ? "Stake"
+    : tx?.transactionType &&
+      tx?.transactionType === TransactionType.UnstakeReceipt
+    ? "Unstake"
     : tx?.wrappedEVMAccount?.readableReceipt.to
     ? ERC_TOKEN_METHOD_DIC[methodCode]
       ? ERC_TOKEN_METHOD_DIC[methodCode]

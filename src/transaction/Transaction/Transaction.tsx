@@ -10,7 +10,7 @@ import {
   PaginationPrevNext,
   TransactionTable,
 } from "../../components";
-import { breadcrumbsList, transactionTypes } from "../../types";
+import { breadcrumbsList, TransactionSearchList } from "../../types";
 
 import styles from "./Transaction.module.scss";
 
@@ -20,8 +20,8 @@ export const Transaction: React.FC = () => {
   const txType = Number(router?.query?.txType);
 
   const tType = txType
-    ? transactionTypes.filter((t) => t.key === txType)[0]
-    : transactionTypes[0];
+    ? TransactionSearchList.filter((t) => t.key === txType)[0]
+    : TransactionSearchList[0];
 
   const [transactionType, setTransactionType] = useState(tType);
 
@@ -57,11 +57,11 @@ export const Transaction: React.FC = () => {
           <Dropdown
             apperance="outlined"
             size="medium"
-            items={transactionTypes.map((t) => t.value)}
+            items={TransactionSearchList.map((t) => t.value)}
             selected={transactionType.value}
             onSelect={(t) => {
               setTransactionType(
-                transactionTypes.filter((i) => i.value === t)[0]
+                TransactionSearchList.filter((i) => i.value === t)[0]
               );
               setCurrentPage(1);
             }}

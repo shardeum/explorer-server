@@ -1,10 +1,7 @@
 import Link from "next/link";
 import moment from "moment";
 
-import {
-  Transaction,
-  TransactionSearchType,
-} from "../../../types";
+import { Transaction, TransactionSearchType } from "../../../types";
 
 import { Chip } from "../../Chip";
 
@@ -13,7 +10,7 @@ import { showTxMethod } from "../../../utils/showMethod";
 import {
   calculateValue,
   calculateTokenValue,
-  short
+  short,
 } from "../../../utils/calculateValue";
 
 import { useEffect, useState } from "react";
@@ -47,7 +44,9 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
     if (
       txType === TransactionSearchType.All ||
       txType === TransactionSearchType.NodeRewardReceipt ||
-      txType === TransactionSearchType.Internal
+      txType === TransactionSearchType.Internal ||
+      txType === TransactionSearchType.StakeReceipt ||
+      txType === TransactionSearchType.UnstakeReceipt
     ) {
       setHeader([
         "Txn Hash",
@@ -135,7 +134,9 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   const renderColumn = (row: any) => {
     if (
       txType === TransactionSearchType.All ||
-      txType === TransactionSearchType.NodeRewardReceipt
+      txType === TransactionSearchType.NodeRewardReceipt ||
+      txType === TransactionSearchType.StakeReceipt ||
+      txType === TransactionSearchType.UnstakeReceipt
     ) {
       return (
         <>
@@ -148,7 +149,14 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             </Link>
           </td>
           <td>
-            {row?.wrappedEVMAccount?.readableReceipt?.to ? (
+            {row?.nominee ? (
+              <Link
+                href={`/account/${row?.nominee}`}
+                className={styles.link}
+              >
+                {row?.nominee}{" "}
+              </Link>
+            ) : row?.wrappedEVMAccount?.readableReceipt?.to ? (
               <Link
                 href={`/account/${row?.wrappedEVMAccount?.readableReceipt?.to}`}
                 className={styles.link}
@@ -234,7 +242,9 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             <span>{calculateTokenValue(row, row.tokenType)}</span>
           </td>
           <td>
-            <span>{row?.contractInfo?.name || short(row?.contractAddress)}</span>
+            <span>
+              {row?.contractInfo?.name || short(row?.contractAddress)}
+            </span>
           </td>
           <td>
             <span>{calculateValue(row?.transactionFee)}</span>
