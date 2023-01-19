@@ -2,6 +2,7 @@ import React from "react";
 import { useTotalData } from "../../api";
 
 import { Card, Icon } from "../../components";
+import { TransactionSearchType } from "../../types";
 
 import styles from "./CardDetail.module.scss";
 
@@ -10,6 +11,8 @@ export interface CardDetailProps {
   totalNodes: string | number;
   totalTransactions: string;
   totalRewardTxs: string;
+  totalStakeTxs: string;
+  totalUnstakeTxs: string;
   totalAccounts: string;
   totalContracts: string;
 }
@@ -56,12 +59,33 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
         icon={<Icon name="transaction" size="medium" color="white" />}
         href="/transaction"
       />
-      <Card
+      {/* <Card
         title="Total Reward Transactions"
         count={data?.totalRewardTxs}
         color="error"
         icon={<Icon name="reward" size="medium" color="white" />}
         href="/transaction?txType=2"
+      /> */}
+      <Card
+        title="Total Stake Transactions"
+        count={data?.totalStakeTxs}
+        color="primary"
+        icon={<Icon name="cycle" size="medium" color="white" />}
+        href={`/transaction?txType=${TransactionSearchType.StakeReceipt}`}
+      />
+      <Card
+        title="Total Unstake Transactions"
+        count={data?.totalUnstakeTxs}
+        color="primary"
+        icon={<Icon name="cycle" size="medium" color="white" />}
+        href={`/transaction?txType=${TransactionSearchType.UnstakeReceipt}`}
+      />
+      <Card
+        title="Total Stake Amount"
+        count={'WIP'}
+        color="primary"
+        icon={<Icon name="cycle" size="medium" color="white" />}
+        href={`/transaction`}
       />
     </div>
   );

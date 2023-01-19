@@ -14,8 +14,8 @@ import { TransactionSearchType, AccountSearchType } from "../../types";
 
 export const Dashboard: React.FC = () => {
   const { data: cycles, loading: cycleLoading } = useCycle({ count: 10 });
-  const { transactions, totalRewardTxs, totalTransactions, loading: transactionLoading } = useTransaction({
-    count: 10, txType: TransactionSearchType.NodeRewardReceipt
+  const { transactions, totalRewardTxs, totalStakeTxs, totalUnstakeTxs, totalTransactions, loading: transactionLoading } = useTransaction({
+    count: 10, txType: TransactionSearchType.StakeReceipt
   });
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA });
@@ -24,6 +24,7 @@ export const Dashboard: React.FC = () => {
     return {
       key: row?.cycleRecord?.counter || "",
       value: moment(row?.cycleRecord?.start * 1000).calendar(),
+      activeNodes: (row?.cycleRecord?.active) || 0
     };
   });
 
@@ -42,7 +43,7 @@ export const Dashboard: React.FC = () => {
       </session>
       <Spacer space="64" />
       <session>
-        <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.key} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs}/>
+        <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.activeNodes} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs} totalStakeTxs={totalStakeTxs} totalUnstakeTxs={totalUnstakeTxs}/>
       </session>
       <Spacer space="64" />
       <section>

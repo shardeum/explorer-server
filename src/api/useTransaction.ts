@@ -27,6 +27,8 @@ export const useTransaction = (query: TransactionQuery) => {
     totalPages: data?.totalPages || 0,
     totalTransactions: data?.totalTransactions || 0,
     totalRewardTxs: data?.totalRewardTxs || 0,
+    totalStakeTxs: data?.totalStakeTxs || 0,
+    totalUnstakeTxs: data?.totalUnStakeTxs || 0,
     loading: !data,
   };
 
