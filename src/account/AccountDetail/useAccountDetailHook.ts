@@ -55,6 +55,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
 
   useEffect(() => {
     setTransactions([]);
+    setAccount(undefined);
     async function fetchData() {
       const accounts = await getAddress();
 
@@ -81,7 +82,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
     }
 
     fetchData();
-  }, [getAddress, getTransaction]);
+  }, [id, getAddress, getTransaction]);
 
   return {
     account,

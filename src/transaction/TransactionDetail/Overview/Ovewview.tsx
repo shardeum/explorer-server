@@ -218,13 +218,13 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
       {/* TODO: calculate value */}
       <div className={styles.item}>
         <div className={styles.title}>Value:</div>
-        <div className={styles.value}>1</div>
+        <div className={styles.value}>{calculateValue(transaction?.wrappedEVMAccount?.readableReceipt?.value)}</div>
       </div>
 
       {/* TODO: calculate fee */}
       <div className={styles.item}>
         <div className={styles.title}>Transaction Fee:</div>
-        <div className={styles.value}>0</div>
+        <div className={styles.value}>{calculateValue(transaction?.wrappedEVMAccount?.amountSpent)}</div>
       </div>
 
       {renderErc20Tokens()}

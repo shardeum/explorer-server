@@ -21,6 +21,7 @@ import {
   ContractType,
   TransactionSearchType,
 } from "../../types";
+import { calculateValue } from "../../utils/calculateValue";
 
 //http://localhost:3000/account/0xb246b7d28b0f9a3c0ce9e8e15590aeb837bc9392
 
@@ -121,7 +122,7 @@ export const AccountDetail: React.FC = () => {
         {account ? (
           <>
             <div className={styles.row}>
-              {accountType === AccountType.Account ? (
+              {accountType === AccountType.Account && account ? (
                 <DetailCard
                   title="Overview"
                   titleRight={
@@ -149,7 +150,7 @@ export const AccountDetail: React.FC = () => {
                     {
                       key: "Balance :",
                       value:
-                        Web3Utils.fromWei(account?.account?.balance, "ether") +
+                        calculateValue(account?.account?.balance) +
                         "   SHM",
                     },
                     {

@@ -40,6 +40,7 @@ export interface WrappedEVMAccount {
   timestamp: number;
   txFrom: string;
   txId: string;
+  amountSpent?: string;
 }
 
 export interface Result {
