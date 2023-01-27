@@ -21,11 +21,11 @@ export const TransactionDetail: React.FC = () => {
       value: "Overview",
       content: <Ovewview transaction={data} />,
     },
-    {
-      key: "logs",
-      value: "Logs",
-      content: <Logs transaction={data} />,
-    },
+    // {
+    //   key: "logs",
+    //   value: "Logs",
+    //   content: <Logs transaction={data} />,
+    // },
     {
       key: "jsonview",
       value: "Json View",

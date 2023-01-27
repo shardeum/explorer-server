@@ -201,17 +201,37 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
 
       {
         transaction?.nominee && (
-          <div className={styles.item}>
-        <div className={styles.title}>Node Address:</div>
-        <div className={styles.value}>
-            <Link
-              href={`/account/${transaction?.nominee}`}
-              className={styles.link}
-            >
-              {transaction?.nominee}
-            </Link>
-        </div>
-      </div>
+          <>
+            <div className={styles.item}>
+              <div className={styles.title}>Node Address:</div>
+              <div className={styles.value}>
+                <Link
+                  href={`/account/${transaction?.nominee}`}
+                  className={styles.link}
+                >
+                  {transaction?.nominee}
+                </Link>
+              </div>
+            </div>
+            {
+              transaction?.transactionType === TransactionType.StakeReceipt ? (
+                <div className={styles.item}>
+                  <div className={styles.title}>Total Stake:</div>
+                  <div className={styles.value}>
+                    {calculateValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stakeAmount)} SHM
+                  </div>
+                </div>
+
+              ) : (
+                <div className={styles.item}>
+                  <div className={styles.title}>Reward:</div>
+                  <div className={styles.value}>
+                    {calculateValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward)} SHM
+                  </div>
+                </div>
+              )
+            }
+          </>
         )
       }
 
@@ -230,6 +250,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
       {renderErc20Tokens()}
       {renderErc721Tokens()}
       {renderErc1155Tokens()}
-    </div>
+    </div >
   );
 };
