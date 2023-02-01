@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Web3Utils from "web3-utils";
+import moment from "moment";
 import {
   Button,
   ContentLayout,
@@ -171,9 +172,9 @@ export const AccountDetail: React.FC = () => {
                   items={[
                     {
                       key: "Node status",
-                      value: account?.account?.rewardStartTime
+                      value: account?.account?.rewardStartTime > 0 && account?.account?.rewardEndTime === 0
                         ? "Active"
-                        : "Non-Active",
+                        : "Inactive",
                     },
                     {
                       key: "Nominator",
@@ -185,7 +186,7 @@ export const AccountDetail: React.FC = () => {
                       key: "StakeLock",
                       value:
                         account?.account?.stakeLock &&
-                        account?.account?.stakeLock,
+                        calculateValue(account?.account?.stakeLock),
                     },
                   ]}
                 />
@@ -194,11 +195,11 @@ export const AccountDetail: React.FC = () => {
                 <DetailCard
                   title="More Info"
                   items={[
-                    { key: "Reward Start Time", value: account?.account?.rewardStartTime },
-                    { key: "Reward End Time", value: account?.account?.rewardEndTime },
+                    { key: "Reward Start Time", value: account?.account?.rewardStartTime && moment(account?.account?.rewardStartTime * 1000).calendar() },
+                    { key: "Reward End Time", value: account?.account?.rewardEndTime && moment(account?.account?.rewardEndTime * 1000).calendar()},
                     {
                       key: "Reward",
-                      value: account?.account?.reward,
+                      value: account?.account?.reward && calculateValue(account?.account?.reward),
                     },
                   ]}
                 />
