@@ -14,6 +14,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -35,3 +36,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+db.sqlite3
+db.sqlite3-shm
+db.sqlite3-wal
+collector.log
+server.log
+rpc_data_server.log
