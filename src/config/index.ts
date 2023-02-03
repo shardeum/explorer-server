@@ -7,7 +7,7 @@ export const config = {
     rpc_data_collector: process.env.RPCDCPORT || '4445',
   },
   archiverInfo: {
-    ip: process.env.ARCHIVERIP || '3.70.230.159',
+    ip: process.env.ARCHIVERIP || 'localhost',
     port: process.env.ARCHIVERPORT || '4000',
     publicKey: process.env.ARCHIVERPK || '758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
   },

@@ -23,10 +23,12 @@ const resources = [
 ];
 
 const socials = [
-  { iconName: "twitter", title: "Twitter", href: "https://www.twitter.com" },
-  { iconName: "facebook", title: "Facebook", href: "https://www.facebook.com" },
-  { iconName: "medium", title: "Medium", href: "https://www.medium.com" },
-  { iconName: "reddit", title: "Reddit", href: "https://www.reddit.com" },
+  { iconName: "discord", title: "Discord", href: "https://discord.gg/shardeum" },
+  { iconName: "twitter", title: "Twitter", href: "https://twitter.com/shardeum" },
+  // { iconName: "facebook", title: "Facebook", href: "https://www.facebook.com" },
+  // { iconName: "medium", title: "Medium", href: "https://www.medium.com" },
+  { iconName: "telegram", title: "Telegram", href: "https://telegram.me/shardeum" },
+  { iconName: "reddit", title: "Reddit", href: "https://www.reddit.com/r/shardeum/" },
 ];
 
 export const Footer: React.FC = () => {

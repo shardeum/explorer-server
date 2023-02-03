@@ -16,8 +16,9 @@ interface detailProps {
 export const useAccountDetailHook = ({ id, txType }: detailProps) => {
   const [account, setAccount] = useState<Account>();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalTransactions, setTotalTransactions] = useState<number>(0);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const [total, setTotal] = useState<number>();
   const [page, setPage] = useState<number>(1);
   const [transactionType, setTransactionType] = useState<TransactionSearchType>(
     txType || TransactionSearchType.All
@@ -41,7 +42,8 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
 
     return {
       transactions: data?.data?.transactions as Transaction[],
-      total: data?.data?.totalTransactions,
+      totalTransactions: data?.data?.totalTransactions,
+      totalPages: data?.data?.totalPages,
     };
   }, [id, page, transactionType]);
 
@@ -63,11 +65,12 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
-        const { total, transactions } = await getTransaction();
+        const { totalTransactions, transactions } = await getTransaction();
 
         setTransactions(transactions as Transaction[]);
-        setTotal(total);
+        setTotalTransactions(totalTransactions);
         setAccount(accounts[0]);
+        setTotalPages(totalPages);
       }
 
       if (accountType === AccountType.Account) {
@@ -89,7 +92,8 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
     accountType,
     transactions,
     tokens,
-    total,
+    totalTransactions,
+    totalPages,
     page,
     setPage,
     transactionType,

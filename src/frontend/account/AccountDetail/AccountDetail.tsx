@@ -8,6 +8,8 @@ import {
   CopyButton,
   Spacer,
   TransactionTable,
+  Pagination,
+  PaginationPrevNext,
 } from "../../components";
 import { Tab } from "../../components/Tab";
 import { DetailCard } from "../DetailCard";
@@ -32,13 +34,19 @@ export const AccountDetail: React.FC = () => {
   const id = router?.query?.id;
   const txType = router?.query?.txType as unknown as TransactionSearchType;
 
+  const siblingCount = 3;
+  const pageSize = 10;
+
   const {
     account,
     accountType,
-    total,
+    totalTransactions,
+    totalPages,
+    page,
     tokens,
     transactions,
     setTransactionType,
+    setPage,
   } = useAccountDetailHook({
     id: id as string,
     txType: txType,
@@ -49,55 +57,110 @@ export const AccountDetail: React.FC = () => {
       key: TransactionSearchType.All,
       value: "Transactions",
       content: (
-        <TransactionTable
-          loading={false}
-          data={transactions}
-          txType={TransactionSearchType.All}
-        />
+        <>
+          <TransactionTable
+            loading={false}
+            data={transactions}
+            txType={TransactionSearchType.All}
+          />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setPage(p)}
+              totalCount={totalTransactions}
+              siblingCount={siblingCount}
+              currentPage={page}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
       ),
     },
     {
       key: TransactionSearchType.Internal,
       value: "Internal Txns",
       content: (
-        <TransactionTable
-          loading={false}
-          data={transactions}
-          txType={TransactionSearchType.Internal}
-        />
+        <>
+          <TransactionTable
+            loading={false}
+            data={transactions}
+            txType={TransactionSearchType.Internal}
+          />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setPage(p)}
+              totalCount={totalTransactions}
+              siblingCount={siblingCount}
+              currentPage={page}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
       ),
     },
     {
       key: TransactionSearchType.ERC_20,
       value: "ERC-20 Token Txns",
       content: (
-        <TransactionTable
-          loading={false}
-          data={transactions}
-          txType={TransactionSearchType.ERC_20}
-        />
+        <>
+          <TransactionTable
+            loading={false}
+            data={transactions}
+            txType={TransactionSearchType.ERC_20}
+          />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setPage(p)}
+              totalCount={totalTransactions}
+              siblingCount={siblingCount}
+              currentPage={page}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
       ),
     },
     {
       key: TransactionSearchType.ERC_721,
       value: "ERC-721 Token Txns",
       content: (
-        <TransactionTable
-          loading={false}
-          data={transactions}
-          txType={TransactionSearchType.ERC_721}
-        />
+        <>
+          <TransactionTable
+            loading={false}
+            data={transactions}
+            txType={TransactionSearchType.ERC_721}
+          />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setPage(p)}
+              totalCount={totalTransactions}
+              siblingCount={siblingCount}
+              currentPage={page}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
       ),
     },
     {
       key: TransactionSearchType.ERC_1155,
       value: "ERC-1155 Token Txns",
       content: (
-        <TransactionTable
-          loading={false}
-          data={transactions}
-          txType={TransactionSearchType.ERC_1155}
-        />
+        <>
+          <TransactionTable
+            loading={false}
+            data={transactions}
+            txType={TransactionSearchType.ERC_1155}
+          />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setPage(p)}
+              totalCount={totalTransactions}
+              siblingCount={siblingCount}
+              currentPage={page}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
       ),
     },
   ];
@@ -105,6 +168,14 @@ export const AccountDetail: React.FC = () => {
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account];
 
   const [activeTab, setActiveTab] = useState(tabs[0].key);
+
+  const onNext = () => {
+    setPage(page < totalPages ? page + 1 : totalPages);
+  };
+
+  const onPrev = () => {
+    setPage(page > 1 ? page - 1 : 1);
+  };
 
   return (
     <div className={styles.AccountDetail}>
@@ -137,13 +208,13 @@ export const AccountDetail: React.FC = () => {
                         >
                           Token Tracker
                         </Button>
-                        <Button
+                        {/* <Button
                           apperance="outlined"
                           className={styles.btn}
                           onClick={() => router.push(`/log?address=${id}`)}
                         >
                           Filter By Logs
-                        </Button>
+                        </Button> */}
                       </div>
                     )
                   }
@@ -196,7 +267,7 @@ export const AccountDetail: React.FC = () => {
                   title="More Info"
                   items={[
                     { key: "Reward Start Time", value: account?.account?.rewardStartTime && moment(account?.account?.rewardStartTime * 1000).calendar() },
-                    { key: "Reward End Time", value: account?.account?.rewardEndTime && moment(account?.account?.rewardEndTime * 1000).calendar()},
+                    { key: "Reward End Time", value: account?.account?.rewardEndTime && moment(account?.account?.rewardEndTime * 1000).calendar() },
                     {
                       key: "Reward",
                       value: account?.account?.reward && calculateValue(account?.account?.reward),

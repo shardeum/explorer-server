@@ -31,6 +31,8 @@ import Reddit from "./svgs/reddit.svg";
 import Log from "./svgs/log.svg";
 import RightArrow from "./svgs/right_arrow.svg";
 import Nft from "./svgs/nft.svg";
+import Discord from "./svgs/discord.svg";
+import Telegram from "./svgs/telegram.svg";
 
 export const iconTypes = {
   logo: Logo,
@@ -58,6 +60,8 @@ export const iconTypes = {
   facebook: Facebook,
   medium: Medium,
   reddit: Reddit,
+  discord: Discord,
+  telegram: Telegram,
   log: Log,
   right_arrow: RightArrow,
   nft: Nft,

@@ -11,6 +11,7 @@ export { MenuItem } from "./MenuItem";
 export { Chip } from "./Chip";
 export { CycleTable, TransactionTable } from "./Table";
 export { Dropdown } from "./Dropdown";
+export { TopBarDropdown } from "./TopBarDropdown";
 export { ContentLayout } from "./ContentLayout";
 export { Spacer } from "./Spacer";
 export { Breadcrumb } from "./Breadcrumb";
