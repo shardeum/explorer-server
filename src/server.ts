@@ -19,7 +19,7 @@ import { AccountSearchType, AccountType, TransactionSearchType } from "./@type";
 crypto.init("69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc");
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL } from "./config";
+import { config as CONFIG, ARCHIVER_URL, RPC_DATA_SERVER_URL } from "./config";
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT;
 }
@@ -611,8 +611,11 @@ const start = async () => {
       let acceptedTx = false;
       let result;
       try {
+        // result = await axios.get(
+        //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
+        // );
         result = await axios.get(
-          `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
+          `${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`
         );
       } catch (e) {
         console.log(`RPC Data Collector is not responding`, e);
@@ -728,8 +731,11 @@ const start = async () => {
     let acceptedTx = false;
     let result;
     try {
+      // result = await axios.get(
+      //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
+      // );
       result = await axios.get(
-        `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
+        `${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`
       );
     } catch (e) {
       console.log(`RPC Data Collector is not responding`, e);
