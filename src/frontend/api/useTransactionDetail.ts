@@ -6,7 +6,7 @@ import { fetcher } from "./fetcher";
 import { PATHS } from "./paths";
 
 export const useTransactionDetail = (id: string) => {
-  const { data } = useSWR(`${PATHS.TRANSACTION_DETAIL}?txHash=${id}`, fetcher);
+  const { data } = useSWR(`${PATHS.TRANSACTION_DETAIL}?txHash=${id}&type=requery`, fetcher);
 
   const transactions = data?.transactions;
 

@@ -438,6 +438,7 @@ const start = async () => {
       startCycle: "s?",
       endCycle: "s?",
       txId: "s?",
+      type: "s?", // This is sent with txHash. To query from db again and update the cache!
     });
     if (err) {
       reply.send({ success: false, error: err });
@@ -608,6 +609,22 @@ const start = async () => {
         });
         return;
       }
+      if (query.type === "requery") {
+        let transaction = await Transaction.queryTransactionByHash(
+          query.txHash.toLowerCase(),
+          true
+        );
+        if (transaction) {
+          transactions = [transaction];
+          txHashQueryCache.set(query.txHash, { success: true, transactions });
+          const res: any = {
+            success: true,
+            transactions,
+          };
+          reply.send(res);
+          return;
+        }
+      }
       let acceptedTx = false;
       let result;
       try {
@@ -707,9 +724,11 @@ const start = async () => {
     reply.send(res);
   });
 
+  // Seems we can remove this endpoint now.
   server.get("/api/tx", async (_request, reply) => {
     const err = utils.validateTypes(_request.query, {
       txHash: "s?",
+      type: "s?",
     });
     if (err) {
       reply.send({ success: false, error: err });
@@ -728,15 +747,26 @@ const start = async () => {
       });
       return;
     }
+    if (query.type === "requery") {
+      let transaction = await Transaction.queryTransactionByHash(
+        query.txHash.toLowerCase(),
+        true
+      );
+      if (transaction) {
+        transactions = [transaction];
+        txHashQueryCache.set(query.txHash, { success: true, transactions });
+        res.transactions = transactions;
+        reply.send(res);
+        return;
+      }
+    }
     let acceptedTx = false;
     let result;
     try {
       // result = await axios.get(
       //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
       // );
-      result = await axios.get(
-        `${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`
-      );
+      result = await axios.get(`${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`);
     } catch (e) {
       console.log(`RPC Data Collector is not responding`, e);
     }
@@ -755,7 +785,7 @@ const start = async () => {
       }
       let transaction = await Transaction.queryTransactionByHash(
         query.txHash.toLowerCase(),
-        false
+        true
       );
       // console.log('transaction result', query.txHash, transactions)
       if (transaction) {

@@ -27,7 +27,8 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     if (
       items &&
       items.length > 0 &&
-      (items[0].tokenType === TransactionType.Internal || items[0].tokenType === TransactionType.ERC_20)
+      (items[0].tokenType === TransactionType.Internal ||
+        items[0].tokenType === TransactionType.ERC_20)
     ) {
       return (
         <div className={styles.item}>
@@ -55,10 +56,12 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   {/* TODO: calculate amount and token*/}
                   <div>{calculateTokenValue(item, item.tokenType)}&nbsp;</div>
                   <Link
-                    href={`/account/${item.tokenTo}`}
+                    href={`/account/${item.contractAddress}`}
                     className={styles.anchor}
                   >
-                    {item.tokenType === TransactionType.Internal ? 'SHM' : item.contractInfo.name || item.contractAddress}
+                    {item.tokenType === TransactionType.Internal
+                      ? "SHM"
+                      : item.contractInfo.name || item.contractAddress}
                   </Link>
                 </div>
               ))}
@@ -73,7 +76,11 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     const items = transaction?.tokenTxs;
 
     // TODO: have to fix TransactionType enum
-    if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_721) {
+    if (
+      items &&
+      items.length > 0 &&
+      items[0].tokenType === TransactionType.ERC_721
+    ) {
       return (
         <div className={styles.item}>
           <div className={styles.title}>ERC-721 Tokens Transferred :</div>
@@ -95,7 +102,11 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     const items = transaction?.tokenTxs;
 
     // TODO: have to fix TransactionType enum
-    if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_1155) {
+    if (
+      items &&
+      items.length > 0 &&
+      items[0].tokenType === TransactionType.ERC_1155
+    ) {
       return (
         <div className={styles.item}>
           <div className={styles.title}>ERC-1155 Tokens Transferred :</div>
@@ -115,92 +126,92 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     }
   };
 
-  return (
-    <div className={styles.Ovewview}>
-      <div className={styles.item}>
-        <div className={styles.title}>Transaction Hash:</div>
-        <div className={styles.value}>{transaction?.txHash}</div>
-      </div>
-
-      <div className={styles.item}>
-        <div className={styles.title}>Status:</div>
-        <div className={styles.value}>
-          <Chip
-            title={
-              transaction?.wrappedEVMAccount?.readableReceipt?.status === 1
-                ? "success"
-                : "failed"
-            }
-            color={
-              transaction?.wrappedEVMAccount?.readableReceipt?.status === 1
-                ? "success"
-                : "error"
-            }
-            className={styles.chip}
-          />
+  if (transaction) {
+    return (
+      <div className={styles.Ovewview}>
+        <div className={styles.item}>
+          <div className={styles.title}>Transaction Hash:</div>
+          <div className={styles.value}>{transaction?.txHash}</div>
         </div>
-      </div>
 
-      <div className={styles.item}>
-        <div className={styles.title}>Type:</div>
-        <div className={styles.value}>
-          <Chip
-            title={showTxMethod(transaction)}
-            color="info"
-            className={styles.chip}
-          />
+        <div className={styles.item}>
+          <div className={styles.title}>Status:</div>
+          <div className={styles.value}>
+            <Chip
+              title={
+                transaction?.wrappedEVMAccount?.readableReceipt?.status === 1
+                  ? "success"
+                  : "failed"
+              }
+              color={
+                transaction?.wrappedEVMAccount?.readableReceipt?.status === 1
+                  ? "success"
+                  : "error"
+              }
+              className={styles.chip}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className={styles.item}>
-        <div className={styles.title}>Cycle:</div>
-        <div className={styles.value}>{transaction?.cycle}</div>
-      </div>
-
-      <div className={styles.item}>
-        <div className={styles.title}>Timestamp:</div>
-        <div className={styles.value}>
-          {moment(transaction?.timestamp).fromNow()}
+        <div className={styles.item}>
+          <div className={styles.title}>Type:</div>
+          <div className={styles.value}>
+            <Chip
+              title={showTxMethod(transaction)}
+              color="info"
+              className={styles.chip}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className={styles.item}>
-        <div className={styles.title}>Nonce:</div>
-        <div className={styles.value}>
-          {transaction?.wrappedEVMAccount?.readableReceipt?.nonce}
+        <div className={styles.item}>
+          <div className={styles.title}>Cycle:</div>
+          <div className={styles.value}>{transaction?.cycle}</div>
         </div>
-      </div>
 
-      <div className={styles.item}>
-        <div className={styles.title}>From:</div>
-        <div className={styles.value}>
-          <Link
-            href={`/account/${transaction?.txFrom}`}
-            className={styles.link}
-          >
-            {transaction?.txFrom}
-          </Link>
+        <div className={styles.item}>
+          <div className={styles.title}>Timestamp:</div>
+          <div className={styles.value}>
+            {moment(transaction?.timestamp).fromNow()}
+          </div>
         </div>
-      </div>
 
-      <div className={styles.item}>
-        <div className={styles.title}>To:</div>
-        <div className={styles.value}>
-          {transaction?.wrappedEVMAccount?.readableReceipt?.to ? (
+        <div className={styles.item}>
+          <div className={styles.title}>Nonce:</div>
+          <div className={styles.value}>
+            {transaction?.wrappedEVMAccount?.readableReceipt?.nonce}
+          </div>
+        </div>
+
+        <div className={styles.item}>
+          <div className={styles.title}>From:</div>
+          <div className={styles.value}>
             <Link
-              href={`/account/${transaction?.txTo}`}
+              href={`/account/${transaction?.txFrom}`}
               className={styles.link}
             >
-              {transaction?.txTo}
+              {transaction?.txFrom}
             </Link>
-          ) : (
-            <div>Contract Creation</div>
-          )}
+          </div>
         </div>
-      </div>
 
-      {
-        transaction?.nominee && (
+        <div className={styles.item}>
+          <div className={styles.title}>To:</div>
+          <div className={styles.value}>
+            {transaction?.wrappedEVMAccount?.readableReceipt?.to ? (
+              <Link
+                href={`/account/${transaction?.txTo}`}
+                className={styles.link}
+              >
+                {transaction?.txTo}
+              </Link>
+            ) : (
+              <div>Contract Creation</div>
+            )}
+          </div>
+        </div>
+
+        {transaction?.nominee && (
           <>
             <div className={styles.item}>
               <div className={styles.title}>Node Address:</div>
@@ -213,43 +224,58 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 </Link>
               </div>
             </div>
-            {
-              transaction?.transactionType === TransactionType.StakeReceipt ? (
-                <div className={styles.item}>
-                  <div className={styles.title}>Total Stake:</div>
-                  <div className={styles.value}>
-                    {calculateValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stakeAmount)} SHM
-                  </div>
+            {transaction?.transactionType === TransactionType.StakeReceipt ? (
+              <div className={styles.item}>
+                <div className={styles.title}>Total Stake:</div>
+                <div className={styles.value}>
+                  {calculateValue(
+                    transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo
+                      ?.stakeAmount
+                  )}{" "}
+                  SHM
                 </div>
-
-              ) : (
-                <div className={styles.item}>
-                  <div className={styles.title}>Reward:</div>
-                  <div className={styles.value}>
-                    {calculateValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward)} SHM
-                  </div>
+              </div>
+            ) : (
+              <div className={styles.item}>
+                <div className={styles.title}>Reward:</div>
+                <div className={styles.value}>
+                  {calculateValue(
+                    transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo
+                      ?.reward
+                  )}{" "}
+                  SHM
                 </div>
-              )
-            }
+              </div>
+            )}
           </>
-        )
-      }
+        )}
 
-      {/* TODO: calculate value */}
-      <div className={styles.item}>
-        <div className={styles.title}>Value:</div>
-        <div className={styles.value}>{calculateValue(transaction?.wrappedEVMAccount?.readableReceipt?.value)}</div>
+        {/* TODO: calculate value */}
+        <div className={styles.item}>
+          <div className={styles.title}>Value:</div>
+          <div className={styles.value}>
+            {calculateValue(
+              transaction?.wrappedEVMAccount?.readableReceipt?.value
+            )}
+          </div>
+        </div>
+
+        {/* TODO: calculate fee */}
+        <div className={styles.item}>
+          <div className={styles.title}>Transaction Fee:</div>
+          <div className={styles.value}>
+            {calculateValue(transaction?.wrappedEVMAccount?.amountSpent)}
+          </div>
+        </div>
+
+        {renderErc20Tokens()}
+        {renderErc721Tokens()}
+        {renderErc1155Tokens()}
       </div>
-
-      {/* TODO: calculate fee */}
-      <div className={styles.item}>
-        <div className={styles.title}>Transaction Fee:</div>
-        <div className={styles.value}>{calculateValue(transaction?.wrappedEVMAccount?.amountSpent)}</div>
-      </div>
-
-      {renderErc20Tokens()}
-      {renderErc721Tokens()}
-      {renderErc1155Tokens()}
-    </div >
-  );
+    );
+  } else {
+    return (
+      <div> No Data</div>
+    )
+  }
 };

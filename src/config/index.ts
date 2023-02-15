@@ -15,6 +15,7 @@ export const config = {
     ip: process.env.RPCIP || 'localhost',
     port: process.env.RPCPORT || '8080',
   },
+  rpcUrl: 'http://localhost:8080',
   EXPLORER_DB: 'explorer-db',
   TRANSACTION_DB: 'transaction-db',
   ACCOUNT_DB: 'account-db',
