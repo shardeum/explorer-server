@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import moment from "moment";
+import Web3Utils from "web3-utils";
 
 import { Chip, Icon } from "../../../components";
 import { Item } from "./Item";
@@ -179,7 +180,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
         <div className={styles.item}>
           <div className={styles.title}>Nonce:</div>
           <div className={styles.value}>
-            {transaction?.wrappedEVMAccount?.readableReceipt?.nonce}
+            {Web3Utils.hexToNumber("0x" + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
           </div>
         </div>
 

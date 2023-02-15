@@ -393,11 +393,12 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
                 ? contractStorage.account.value
                 : storageKeyValueMap[calculatedKey + log.address].value
               const decode = rlp.decode(toBuffer(bufferToHex(value.data))).toString('hex')
-              if (tokenTx.tokenType === TransactionType.ERC_20) {
-                tokenValue = Web3.utils.fromWei(decode, 'ether')
-              } else if (tokenTx.tokenType === TransactionType.ERC_721) {
-                tokenValue = Web3.utils.hexToNumberString('0x' + decode)
-              }
+              // if (tokenTx.tokenType === TransactionType.ERC_20) {
+              //   tokenValue = Web3.utils.fromWei(decode, 'ether')
+              // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
+              //   tokenValue = Web3.utils.hexToNumberString('0x' + decode)
+              // }
+              tokenValue = Web3.utils.hexToNumberString('0x' + decode)
               // console.log(calculatedKey, tokenValue)
             }
             tokens.push({
@@ -451,11 +452,12 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
                 : storageKeyValueMap[calculatedKey + log.address].value
               // console.log(storageKeyValueMap[calculatedKey + log.address].value)
               const decode = rlp.decode(toBuffer(bufferToHex(value.data))).toString('hex')
-              if (tokenTx.tokenType === TransactionType.ERC_20) {
-                tokenValue = Web3.utils.fromWei(decode, 'ether')
-              } else if (tokenTx.tokenType === TransactionType.ERC_721) {
-                tokenValue = Web3.utils.hexToNumberString('0x' + decode)
-              }
+              // if (tokenTx.tokenType === TransactionType.ERC_20) {
+              //   tokenValue = Web3.utils.fromWei(decode, 'ether')
+              // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
+              //   tokenValue = Web3.utils.hexToNumberString('0x' + decode)
+              // }
+              tokenValue = Web3.utils.hexToNumberString('0x' + decode)
               // console.log(calculatedKey, tokenValue)
             }
             tokens.push({

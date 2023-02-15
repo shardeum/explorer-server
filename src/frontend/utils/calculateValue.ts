@@ -1,4 +1,5 @@
 import Web3Utils from "web3-utils";
+import { formatUnits } from "ethers";
 import { TokenTxs, TransactionType, TransactionSearchType } from "../types";
 
 export const calculateValue = (value: any) => {
@@ -19,12 +20,22 @@ export const calculateTokenValue = (
       txType === TransactionType.ERC_20 ||
       txType === TransactionType.Internal
     ) {
+      let decimalsValue = 18;
+      if (tokenTx.contractInfo.decimals)
+        decimalsValue = parseInt(tokenTx.contractInfo.decimals);
       return tokenTx.tokenEvent === "Approval"
         ? tokenTx.tokenValue ===
           "0x0000000000000000000000000000000000000000000000000000000000000001"
           ? "True"
           : "False"
-        : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
+        : round(
+            formatUnits(
+              Web3Utils.hexToNumberString(tokenTx.tokenValue),
+              decimalsValue
+            )
+          );
+
+      // : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
     } else if (txType === TransactionType.ERC_721) {
       return tokenTx.tokenEvent === "Approval For All"
         ? tokenTx.tokenValue ===

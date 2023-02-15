@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Web3Utils from "web3-utils";
+import { formatUnits } from "ethers";
 import moment from "moment";
 import {
   Button,
@@ -283,8 +284,11 @@ export const AccountDetail: React.FC = () => {
                       { key: "Name : ", value: account?.contractInfo?.name },
                       { key: "Symbol :", value: account?.contractInfo?.symbol },
                       {
-                        key: "Total Supply :",
-                        value: account?.contractInfo?.totalSupply,
+                        key: "Max Total Supply :",
+                        value: account?.contractInfo?.totalSupply ? formatUnits(
+                          account?.contractInfo?.totalSupply,
+                          account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                        ).toString() : '',
                       },
                     ]}
                   />

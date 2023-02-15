@@ -39,7 +39,7 @@ export const AccountTable: React.FC<AccountTableProps> = ({
           <tr key={`${index}`}>
             <td>
               <Link href={`/account/${row?.ethAddress}`} className={styles.link}>
-                {row?.accountId}
+                {row?.ethAddress}
               </Link>
             </td>
             <td>

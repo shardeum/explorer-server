@@ -3,10 +3,13 @@ import { api, PATHS } from "../../api";
 import {
   Account,
   AccountType,
+  ContractType,
   Token,
   Transaction,
   TransactionSearchType,
 } from "../../types";
+import Web3Utils from "web3-utils";
+import { formatUnits } from "ethers";
 
 interface detailProps {
   id: string;
@@ -78,7 +81,18 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
           (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
           (accounts && accounts.length > 0 && accounts[0].accountId)
         ) {
-          const { tokens } = await getToken();
+          let { tokens } = await getToken();
+          if (tokens.length > 0) {
+            tokens.forEach((item) => {
+              if (item.contractType === ContractType.ERC_20) {
+                let decimalsValue = 18;
+                if (item.contractInfo.decimals) {
+                  decimalsValue = parseInt(item.contractInfo.decimals);
+                }
+                item.balance = formatUnits(item.balance, decimalsValue);
+              }
+            });
+          }
           setTokens(tokens);
         }
       }

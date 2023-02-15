@@ -12,7 +12,7 @@ export const useCycle = (query: CycleQuery) => {
   console.log(fetcher, `${PATHS.CYCLE}?count=${count}`);
 
   const { data } = useSWR(`${PATHS.CYCLE}?count=${count}`, fetcher);
-  console.log("data", data);
+  // console.log("data", data);
 
   const cycles: Cycle[] = data?.cycles || [];
 

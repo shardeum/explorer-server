@@ -39,7 +39,7 @@ export const ContractTable: React.FC<ContractTableProps> = ({
                 href={`/account/${row?.ethAddress}`}
                 className={styles.link}
               >
-                {row.accountId}
+                {row?.ethAddress}
               </Link>
             </td>
             <td>
