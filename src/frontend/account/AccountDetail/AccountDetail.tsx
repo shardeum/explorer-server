@@ -228,7 +228,7 @@ export const AccountDetail: React.FC = () => {
                     },
                     {
                       key: "Nonce :",
-                      value: Web3Utils.hexToNumber(
+                      value: account?.account?.nonce && Web3Utils.hexToNumber(
                         "0x" + account?.account?.nonce
                       ),
                     },

@@ -67,9 +67,11 @@ export const calculateTokenValue = (
   return "error in calculating tokenValue";
 };
 
-export const short = (str: string): string => str.slice(0, 20) + "...";
+export const short = (str: string): string =>
+  str ? str.slice(0, 20) + "..." : "";
 
 export const shortTokenValue = (str: string): string => {
+  if (!str) return "";
   if (str.length < 10) return str;
   else return str.slice(0, 10) + "...";
 };

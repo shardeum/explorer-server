@@ -202,7 +202,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Nonce:</div>
             <div className={styles.value}>
-              {Web3Utils.hexToNumber("0x" + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
+              {transaction?.wrappedEVMAccount?.readableReceipt?.nonce && Web3Utils.hexToNumber("0x" + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
             </div>
           </div>
 
