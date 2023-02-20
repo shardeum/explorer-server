@@ -15,6 +15,8 @@ import { Server, IncomingMessage, ServerResponse } from "http";
 import fastifyNextjs from "@fastify/nextjs";
 import axios from "axios";
 import { AccountSearchType, AccountType, TransactionSearchType } from "./@type";
+import * as StatsStorage from './stats';
+import * as Validator from './stats/validators';
 
 crypto.init("69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc");
 
@@ -59,6 +61,7 @@ interface RequestQuery {
   topic1: string;
   topic2: string;
   topic3: string;
+  responseType: string;
 }
 
 console.log(ARCHIVER_URL);
@@ -69,6 +72,7 @@ const txHashQueryCacheSize = 1000;
 // Setup Log Directory
 const start = async () => {
   await Storage.initializeDB();
+  await StatsStorage.initializeStatsDB();
 
   const server: Fastify.FastifyInstance<
     Server,
@@ -1183,6 +1187,63 @@ const start = async () => {
       res.transactions = transactions;
     }
     res.totalLogs = totalLogs;
+    reply.send(res);
+  });
+
+  server.get("/api/stats/validator", async (_request, reply) => {
+    const err = utils.validateTypes(_request.query, {
+      count: "s?",
+      startCycle: "s?",
+      endCycle: "s?",
+      responseType: 's?'
+    });
+    if (err) {
+      reply.send({ success: false, error: err });
+      return;
+    }
+    const query = _request.query as RequestQuery;
+    let validators = [];
+    if (query.count) {
+      let count: number = parseInt(query.count);
+      if (count <= 0 || Number.isNaN(count)) {
+        reply.send({ success: false, error: "Invalid count" });
+        return;
+      }
+      if (count > 1000) count = 1000; // set to show max 1000 cycles
+      validators = await Validator.queryLatestValidators(count);
+    } else if (query.startCycle && query.endCycle) {
+      const startCycle = parseInt(query.startCycle);
+      const endCycle = parseInt(query.endCycle);
+      if (
+        !(startCycle >= 0 && endCycle >= startCycle) ||
+        Number.isNaN(startCycle) ||
+        Number.isNaN(endCycle)
+      ) {
+        console.log("Invalid start and end counters for cycleinfo");
+        reply.send({
+          success: false,
+          error: "Invalid startCycle and endCycle counter for cycleinfo",
+        });
+        return;
+      }
+      validators = await Validator.queryValidatorsBetween(startCycle, endCycle);
+      // console.log('validators', validators);
+    } else {
+      reply.send({
+        success: false,
+        error: "not specified which validators stats to show",
+      });
+      return;
+    }
+    if (query.responseType && query.responseType === 'array') {
+      let temp_array = []
+      validators.forEach(item => temp_array.push([item.timestamp * 1000, item.active, item.cycle]))
+      validators = temp_array
+    }
+    const res = {
+      success: true,
+      validators,
+    };
     reply.send(res);
   });
 

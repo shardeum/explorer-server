@@ -16,13 +16,17 @@ const transactionData = [
   [1508112000000, 0.8473],
 ];
 
-export const ChartDetail: React.FC = () => {
+export interface ChartDetailProps {
+  validators: [];
+}
+
+export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
   return (
     <div className={styles.ChartDetail}>
       <div className={styles.item}>
         <LineChart
           title="SHARDEUM TRANSACTION HISTORY IN 14 DAYS (Mock Data)"
-          data={transactionData}
+          data={data.validators}
         />
       </div>
       <div className={styles.item}>

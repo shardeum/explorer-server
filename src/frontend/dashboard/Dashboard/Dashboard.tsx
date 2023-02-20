@@ -6,7 +6,7 @@ import { LatestTable } from "../LatestTable";
 import { SearchBox } from "../SearchBox";
 import { Spacer } from "../../components";
 
-import { useCycle, useTransaction, useAccount } from "../../api";
+import { useCycle, useTransaction, useAccount, useStats } from "../../api";
 
 import styles from "./Dashboard.module.scss";
 import { ChartDetail } from "../ChartDetail";
@@ -19,6 +19,8 @@ export const Dashboard: React.FC = () => {
   });
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA });
+
+  // const { validators } = useStats({ count: 1000});
 
   const cyclesList = cycles.map((row) => {
     return {
@@ -47,7 +49,7 @@ export const Dashboard: React.FC = () => {
       </session>
       <Spacer space="64" />
       {/* <section>
-        <ChartDetail />
+        <ChartDetail validators={validators}/>
       </section>
       <Spacer space="64" /> */}
       <session>

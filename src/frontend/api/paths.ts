@@ -1,7 +1,7 @@
-// const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 // const BASE_URL = "https://explorer-liberty20.shardeum.org";
-const BASE_URL = "https://explorer-sphinx.shardeum.org";
+// const BASE_URL = "https://explorer-sphinx.shardeum.org";
 
 // import { config as CONFIG } from "../../config";
 
@@ -27,4 +27,5 @@ export const PATHS = {
   ADDRESS: BASE_URL + "/api/address",
   TOKEN: BASE_URL + "/api/token",
   LOG: BASE_URL + "/api/log",
+  STATS_VALIDATOR: BASE_URL + "/api/stats/validator",
 };

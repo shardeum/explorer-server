@@ -40,6 +40,10 @@ next-env.d.ts
 db.sqlite3
 db.sqlite3-shm
 db.sqlite3-wal
+statsDB.sqlite3
+statsDB.sqlite3-shm
+statsDB.sqlite3-wal
 collector.log
 server.log
 rpc_data_server.log
+aggregator.log

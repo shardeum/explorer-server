@@ -10,3 +10,4 @@ export { useCycleDetail } from "./useCycleDetail";
 export { useAccount } from "./useAccount";
 export { useAccountDetail } from "./useAccountDetail";
 export { useContract } from "./useContract";
+export { useStats } from "./useStats";
