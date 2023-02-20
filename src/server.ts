@@ -16,7 +16,8 @@ import fastifyNextjs from "@fastify/nextjs";
 import axios from "axios";
 import { AccountSearchType, AccountType, TransactionSearchType } from "./@type";
 import * as StatsStorage from './stats';
-import * as Validator from './stats/validators';
+import * as ValidatorStats from './stats/validatorStats';
+import * as TransactionStats from './stats/transactionStats';
 
 crypto.init("69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc");
 
@@ -1210,7 +1211,7 @@ const start = async () => {
         return;
       }
       if (count > 1000) count = 1000; // set to show max 1000 cycles
-      validators = await Validator.queryLatestValidators(count);
+      validators = await ValidatorStats.queryLatestValidatorStats(count);
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle);
       const endCycle = parseInt(query.endCycle);
@@ -1226,7 +1227,7 @@ const start = async () => {
         });
         return;
       }
-      validators = await Validator.queryValidatorsBetween(startCycle, endCycle);
+      validators = await ValidatorStats.queryValidatorStatsBetween(startCycle, endCycle);
       // console.log('validators', validators);
     } else {
       reply.send({
@@ -1243,6 +1244,63 @@ const start = async () => {
     const res = {
       success: true,
       validators,
+    };
+    reply.send(res);
+  });
+
+  server.get("/api/stats/transaction", async (_request, reply) => {
+    const err = utils.validateTypes(_request.query, {
+      count: "s?",
+      startCycle: "s?",
+      endCycle: "s?",
+      responseType: 's?'
+    });
+    if (err) {
+      reply.send({ success: false, error: err });
+      return;
+    }
+    const query = _request.query as RequestQuery;
+    let transactions = [];
+    if (query.count) {
+      let count: number = parseInt(query.count);
+      if (count <= 0 || Number.isNaN(count)) {
+        reply.send({ success: false, error: "Invalid count" });
+        return;
+      }
+      if (count > 1000) count = 1000; // set to show max 1000 cycles
+      transactions = await TransactionStats.queryLatestTransactionStats(count);
+    } else if (query.startCycle && query.endCycle) {
+      const startCycle = parseInt(query.startCycle);
+      const endCycle = parseInt(query.endCycle);
+      if (
+        !(startCycle >= 0 && endCycle >= startCycle) ||
+        Number.isNaN(startCycle) ||
+        Number.isNaN(endCycle)
+      ) {
+        console.log("Invalid start and end counters for cycleinfo");
+        reply.send({
+          success: false,
+          error: "Invalid startCycle and endCycle counter for cycleinfo",
+        });
+        return;
+      }
+      transactions = await TransactionStats.queryTransactionStatsBetween(startCycle, endCycle);
+      // console.log('transactions', transactions);
+    } else {
+      reply.send({
+        success: false,
+        error: "not specified which transactions stats to show",
+      });
+      return;
+    }
+    if (query.responseType && query.responseType === 'array') {
+      let temp_array = []
+      transactions.forEach(item => temp_array.push([item.timestamp * 1000, item.totalTxs, item.cycle]))
+      transactions = temp_array
+    }
+    const res = {
+      success: true,
+      transactions,
     };
     reply.send(res);
   });

@@ -167,10 +167,10 @@ export async function processTransactionData(transactions: any) {
           transaction.data.accountType === AccountType.Receipt
             ? TransactionType.Receipt
             : transaction.data.accountType === AccountType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : transaction.data.accountType === AccountType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : TransactionType.UnstakeReceipt,
+              ? TransactionType.NodeRewardReceipt
+              : transaction.data.accountType === AccountType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : TransactionType.UnstakeReceipt,
         txHash: transaction.data.ethAddress,
         txFrom: transaction.data.readableReceipt.from,
         txTo: transaction.data.readableReceipt.to
@@ -513,10 +513,10 @@ export async function queryTransactionCount(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txType === TransactionSearchType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : TransactionType.UnstakeReceipt
+              ? TransactionType.NodeRewardReceipt
+              : txType === TransactionSearchType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : TransactionType.UnstakeReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) && transactionType=?`
         transactions = await db.get(sql, [address, address, address, txType])
       } else if (
@@ -529,10 +529,10 @@ export async function queryTransactionCount(
           txType === TransactionSearchType.Internal
             ? TransactionType.Internal
             : txType === TransactionSearchType.ERC_20
-            ? TransactionType.ERC_20
-            : txType === TransactionSearchType.ERC_721
-            ? TransactionType.ERC_721
-            : TransactionType.ERC_1155
+              ? TransactionType.ERC_20
+              : txType === TransactionSearchType.ERC_721
+                ? TransactionType.ERC_721
+                : TransactionType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=?`
         transactions = await db.get(sql, [address, address, address, txType])
       } else if (txType === TransactionSearchType.TokenTransfer) {
@@ -558,10 +558,10 @@ export async function queryTransactionCount(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txType === TransactionSearchType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : TransactionType.UnstakeReceipt
+              ? TransactionType.NodeRewardReceipt
+              : txType === TransactionSearchType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : TransactionType.UnstakeReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE transactionType=?`
         transactions = await db.get(sql, [txType])
       } else if (
@@ -574,10 +574,10 @@ export async function queryTransactionCount(
           txType === TransactionSearchType.Internal
             ? TransactionType.Internal
             : txType === TransactionSearchType.ERC_20
-            ? TransactionType.ERC_20
-            : txType === TransactionSearchType.ERC_721
-            ? TransactionType.ERC_721
-            : TransactionType.ERC_1155
+              ? TransactionType.ERC_20
+              : txType === TransactionSearchType.ERC_721
+                ? TransactionType.ERC_721
+                : TransactionType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE tokenType=?`
         transactions = await db.get(sql, [txType])
       }
@@ -617,10 +617,10 @@ export async function queryTransactions(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txType === TransactionSearchType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : TransactionType.UnstakeReceipt
+              ? TransactionType.NodeRewardReceipt
+              : txType === TransactionSearchType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : TransactionType.UnstakeReceipt
         const sql = `SELECT * FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) AND transactionType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [address, address, address, txType])
       } else if (
@@ -633,10 +633,10 @@ export async function queryTransactions(
           txType === TransactionSearchType.Internal
             ? TransactionType.Internal
             : txType === TransactionSearchType.ERC_20
-            ? TransactionType.ERC_20
-            : txType === TransactionSearchType.ERC_721
-            ? TransactionType.ERC_721
-            : TransactionType.ERC_1155
+              ? TransactionType.ERC_20
+              : txType === TransactionSearchType.ERC_721
+                ? TransactionType.ERC_721
+                : TransactionType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [address, address, address, txType])
       } else if (txType === TransactionSearchType.TokenTransfer) {
@@ -659,10 +659,10 @@ export async function queryTransactions(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txType === TransactionSearchType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : TransactionType.UnstakeReceipt
+              ? TransactionType.NodeRewardReceipt
+              : txType === TransactionSearchType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : TransactionType.UnstakeReceipt
         const sql = `SELECT * FROM transactions WHERE transactionType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [txType])
       } else if (
@@ -675,10 +675,10 @@ export async function queryTransactions(
           txType === TransactionSearchType.Internal
             ? TransactionType.Internal
             : txType === TransactionSearchType.ERC_20
-            ? TransactionType.ERC_20
-            : txType === TransactionSearchType.ERC_721
-            ? TransactionType.ERC_721
-            : TransactionType.ERC_1155
+              ? TransactionType.ERC_20
+              : txType === TransactionSearchType.ERC_721
+                ? TransactionType.ERC_721
+                : TransactionType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE tokenType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [txType])
       }
@@ -801,5 +801,23 @@ export async function queryTransactionCountBetweenCycles(
   if (config.verbose) console.log('transactions', transactions)
   if (transactions) transactions = transactions['COUNT(*)']
   else transactions = 0
+  return transactions
+}
+
+export async function queryTransactionCountByCycles(start: number, end: number) {
+  let transactions
+  try {
+    const sql = `SELECT cycle, COUNT(*) FROM transactions GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
+    transactions = await db.all(sql, [start, end])
+  } catch (e) {
+    console.log(e)
+  }
+  if (config.verbose) console.log('Transaction count by cycles', transactions)
+  if (transactions.length > 0) {
+    transactions.forEach((receipt) => {
+      receipt['transactions'] = receipt['COUNT(*)']
+      delete receipt['COUNT(*)']
+    })
+  }
   return transactions
 }

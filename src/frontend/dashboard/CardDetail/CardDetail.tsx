@@ -32,7 +32,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
         href="/cycle"
       />
       <Card
-        title="Active Nodes"
+        title="Active Validators"
         count={data?.totalNodes}
         color="warn"
         icon={<Icon name="node" size="medium" color="white" />}
