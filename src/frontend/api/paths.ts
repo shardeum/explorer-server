@@ -28,4 +28,5 @@ export const PATHS = {
   TOKEN: BASE_URL + "/api/token",
   LOG: BASE_URL + "/api/log",
   STATS_VALIDATOR: BASE_URL + "/api/stats/validator",
+  STATS_TRANSACTION: BASE_URL + "/api/stats/transaction",
 };

@@ -14,12 +14,13 @@ interface LineChartProps {
   subTitle?: string;
   data: any;
   height?: number;
+  name: string;
 }
 
 export const LineChart: React.FC<LineChartProps> = (props) => {
   const router = useRouter();
 
-  const { title, centerTitle, subTitle, data, height = 300 } = props;
+  const { title, centerTitle, subTitle, data, height = 300, name } = props;
 
   const option = {
     title: {
@@ -37,7 +38,7 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     },
     series: [
       {
-        name: "Transactions:",
+        name: name,
         data: data,
       },
     ],
@@ -58,8 +59,8 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       zoomEnabled: true,
     },
     tooltip: {
-      pointFormat:
-        "<span>Transactions: <b>{point.y}</b></span><br/><br /><span>Prices: <b>$123,456</b></span>",
+      pointFormat: name === 'Validators' ?
+        "<span>Number of Validators: <b>{point.y}</b></span><br/><br /><span>CycleNumber: <b></b></span>" : "<span>Total Transactions: <b>{point.y}</b></span><br/><br /><span>CycleNumber: <b></b></span>",
       borderColor: "#dedede",
       borderRadius: 4,
     },

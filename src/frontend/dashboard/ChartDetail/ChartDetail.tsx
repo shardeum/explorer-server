@@ -17,7 +17,8 @@ const transactionData = [
 ];
 
 export interface ChartDetailProps {
-  validators: [];
+  validatorStats: [];
+  transactionStats: []
 }
 
 export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
@@ -25,13 +26,21 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
     <div className={styles.ChartDetail}>
       <div className={styles.item}>
         <LineChart
-          title="SHARDEUM TRANSACTION HISTORY IN 14 DAYS (Mock Data)"
-          data={data.validators}
+          title="ACTIVE VALIDATORS HISTORY IN LAST 5000 CYCLES"
+          data={data.validatorStats}
+          name="Validators"
         />
       </div>
       <div className={styles.item}>
-        <BarChart title="CYCLES (This chart will be changed)" data={transactionData} />
+        <LineChart
+          title="TOTAL TRANSACTION HISTORY IN LAST 5000 CYCLES"
+          data={data.transactionStats}
+          name="Transactions"
+        />
       </div>
+      {/* <div className={styles.item}>
+        <BarChart title="CYCLES (This chart will be changed)" data={transactionData} />
+      </div> */}
     </div>
   );
 };

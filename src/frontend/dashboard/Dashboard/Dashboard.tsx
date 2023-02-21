@@ -20,7 +20,7 @@ export const Dashboard: React.FC = () => {
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA });
 
-  // const { validators } = useStats({ count: 1000});
+  const { validatorStats, transactionStats } = useStats({ count: 5000});
 
   const cyclesList = cycles.map((row) => {
     return {
@@ -48,10 +48,10 @@ export const Dashboard: React.FC = () => {
         <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.activeNodes} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs} totalStakeTxs={totalStakeTxs} totalUnstakeTxs={totalUnstakeTxs}/>
       </session>
       <Spacer space="64" />
-      {/* <section>
-        <ChartDetail validators={validators}/>
+      <section>
+        <ChartDetail validatorStats={validatorStats} transactionStats={transactionStats}/>
       </section>
-      <Spacer space="64" /> */}
+      <Spacer space="64" />
       <session>
         <div className={styles.tableGrid}>
           <LatestTable

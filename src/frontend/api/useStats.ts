@@ -13,10 +13,16 @@ export const useStats = (query: any) => {
     const { data } = useSWR(`${PATHS.STATS_VALIDATOR}?count=${count}&responseType=array`, fetcher);
     // console.log("data", data);
 
-    const validators: any[] = data?.validators || [];
+    const validatorStats: any[] = data?.validatorStats || [];
+
+    const response = useSWR(`${PATHS.STATS_TRANSACTION}?count=${count}&responseType=array`, fetcher);
+    // console.log("data", data);
+
+    const transactionStats: any[] = response?.data?.transactionStats || [];
 
     return {
-        validators,
+        validatorStats,
+        transactionStats,
         loading: !data,
     };
 };

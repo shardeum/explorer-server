@@ -1203,15 +1203,15 @@ const start = async () => {
       return;
     }
     const query = _request.query as RequestQuery;
-    let validators = [];
+    let validatorStats = [];
     if (query.count) {
       let count: number = parseInt(query.count);
       if (count <= 0 || Number.isNaN(count)) {
         reply.send({ success: false, error: "Invalid count" });
         return;
       }
-      if (count > 1000) count = 1000; // set to show max 1000 cycles
-      validators = await ValidatorStats.queryLatestValidatorStats(count);
+      if (count > 10000) count = 10000; // set to show max 10000 cycles
+      validatorStats = await ValidatorStats.queryLatestValidatorStats(count);
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle);
       const endCycle = parseInt(query.endCycle);
@@ -1227,7 +1227,7 @@ const start = async () => {
         });
         return;
       }
-      validators = await ValidatorStats.queryValidatorStatsBetween(startCycle, endCycle);
+      validatorStats = await ValidatorStats.queryValidatorStatsBetween(startCycle, endCycle);
       // console.log('validators', validators);
     } else {
       reply.send({
@@ -1238,12 +1238,12 @@ const start = async () => {
     }
     if (query.responseType && query.responseType === 'array') {
       let temp_array = []
-      validators.forEach(item => temp_array.push([item.timestamp * 1000, item.active, item.cycle]))
-      validators = temp_array
+      validatorStats.forEach(item => temp_array.push([item.timestamp * 1000, item.active, item.cycle]))
+      validatorStats = temp_array
     }
     const res = {
       success: true,
-      validators,
+      validatorStats,
     };
     reply.send(res);
   });
@@ -1260,15 +1260,15 @@ const start = async () => {
       return;
     }
     const query = _request.query as RequestQuery;
-    let transactions = [];
+    let transactionStats = [];
     if (query.count) {
       let count: number = parseInt(query.count);
       if (count <= 0 || Number.isNaN(count)) {
         reply.send({ success: false, error: "Invalid count" });
         return;
       }
-      if (count > 1000) count = 1000; // set to show max 1000 cycles
-      transactions = await TransactionStats.queryLatestTransactionStats(count);
+      if (count > 10000) count = 10000; // set to show max 10000 cycles
+      transactionStats = await TransactionStats.queryLatestTransactionStats(count);
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle);
       const endCycle = parseInt(query.endCycle);
@@ -1284,7 +1284,7 @@ const start = async () => {
         });
         return;
       }
-      transactions = await TransactionStats.queryTransactionStatsBetween(startCycle, endCycle);
+      transactionStats = await TransactionStats.queryTransactionStatsBetween(startCycle, endCycle);
       // console.log('transactions', transactions);
     } else {
       reply.send({
@@ -1295,12 +1295,12 @@ const start = async () => {
     }
     if (query.responseType && query.responseType === 'array') {
       let temp_array = []
-      transactions.forEach(item => temp_array.push([item.timestamp * 1000, item.totalTxs, item.cycle]))
-      transactions = temp_array
+      transactionStats.forEach(item => temp_array.push([item.timestamp * 1000, item.totalTxs, item.cycle]))
+      transactionStats = temp_array
     }
     const res = {
       success: true,
-      transactions,
+      transactionStats,
     };
     reply.send(res);
   });
