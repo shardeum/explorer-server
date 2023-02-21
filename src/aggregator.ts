@@ -60,7 +60,7 @@ const start = async () => {
             lastCheckedCycleForValidators = latestCycleCounter
         }
         // console.log(latestCycleCounter - waitCycleForTxs, lastCheckedCycleForTxs)
-        if (latestCycleCounter - waitCycleForTxs >= lastCheckedCycleForTxs) {
+        if (latestCycleCounter - waitCycleForTxs > lastCheckedCycleForTxs) {
             recordTransactionsStats(latestCycleCounter - waitCycleForTxs, lastCheckedCycleForTxs)
             lastCheckedCycleForTxs = latestCycleCounter - waitCycleForTxs
         }
