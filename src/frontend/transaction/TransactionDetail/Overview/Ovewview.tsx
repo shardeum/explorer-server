@@ -13,6 +13,7 @@ import styles from "./Ovewview.module.scss";
 
 import {
   calculateValue,
+  calculateFullValue,
   calculateTokenValue,
 } from "../../../utils/calculateValue";
 
@@ -251,7 +252,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div className={styles.item}>
                   <div className={styles.title}>Total Stake:</div>
                   <div className={styles.value}>
-                    {calculateValue(
+                    {calculateFullValue(
                       transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo
                         ?.stakeAmount
                     )}{" "}
@@ -262,7 +263,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div className={styles.item}>
                   <div className={styles.title}>Reward:</div>
                   <div className={styles.value}>
-                    {calculateValue(
+                    {calculateFullValue(
                       transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo
                         ?.reward
                     )}{" "}
@@ -277,7 +278,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Value:</div>
             <div className={styles.value}>
-              {calculateValue(
+              {calculateFullValue(
                 transaction?.wrappedEVMAccount?.readableReceipt?.value
               )}
             </div>
@@ -287,7 +288,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Transaction Fee:</div>
             <div className={styles.value}>
-              {calculateValue(transaction?.wrappedEVMAccount?.amountSpent)}
+              {calculateFullValue(transaction?.wrappedEVMAccount?.amountSpent)}
             </div>
           </div>
 

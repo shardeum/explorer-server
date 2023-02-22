@@ -7,19 +7,21 @@ import { Spacer } from "../Spacer";
 import styles from "./Footer.module.scss";
 
 const company = [
-  { href: "", label: "About Us" },
-  { href: "", label: "Contact Us" },
-  { href: "", label: "Brand Assets" },
-  { href: "", label: "Careers Join Us" },
-  { href: "", label: "Terms of Service" },
-  { href: "", label: "Bug Bounty" },
+  // { href: "http://shardeum.org", label: "About Shardeum" },
+  // { href: "", label: "Contact Us" },
+  // { href: "", label: "Brand Assets" },
+  // { href: "", label: "Careers Join Us" },
+  // { href: "", label: "Terms of Service" },
+  // { href: "", label: "Bug Bounty" },
 ];
 
 const resources = [
-  { href: "", label: "API Documentation" },
-  { href: "", label: "Knowledge Base" },
-  { href: "", label: "Newsletter" },
-  { href: "", label: "Network Status" },
+  { href: "https://shardeum.org", label: "About Shardeum" },
+  { href: "https://docs.shardeum.org", label: "Shardeum Docs" },
+  { href: "https://docs.shardeum.org/faucet/claim", label: "Testnet SHM Claim" },
+  // { href: "", label: "Knowledge Base" },
+  // { href: "", label: "Newsletter" },
+  // { href: "", label: "Network Status" },
 ];
 
 const socials = [
@@ -48,7 +50,8 @@ export const Footer: React.FC = () => {
           </div>
         </div>
         <div></div>
-        <div>
+        <div></div>
+        {/* <div>
           <div className={styles.title}>Company</div>
           <hr />
           {company.map((item, index) => (
@@ -59,7 +62,7 @@ export const Footer: React.FC = () => {
               <Spacer space="8" />
             </div>
           ))}
-        </div>
+        </div> */}
         <div>
           <div className={styles.title}>Resources</div>
           <hr />

@@ -8,18 +8,18 @@ export const showTxMethod = (tx: Transaction | TokenTxs) => {
   return tx?.tokenEvent
     ? tx.tokenEvent
     : tx?.wrappedEVMAccount?.readableReceipt.from.length === 64
-    ? "Node Reward"
-    : tx?.transactionType &&
-      tx?.transactionType === TransactionType.StakeReceipt
-    ? "Stake"
-    : tx?.transactionType &&
-      tx?.transactionType === TransactionType.UnstakeReceipt
-    ? "Unstake"
-    : tx?.wrappedEVMAccount?.readableReceipt.to
-    ? ERC_TOKEN_METHOD_DIC[methodCode]
-      ? ERC_TOKEN_METHOD_DIC[methodCode]
-      : "Transfer"
-    : "Contract";
+      ? "Node Reward"
+      : tx?.transactionType &&
+        tx?.transactionType === TransactionType.StakeReceipt
+        ? "Stake"
+        : tx?.transactionType &&
+          tx?.transactionType === TransactionType.UnstakeReceipt
+          ? "Unstake"
+          : tx?.wrappedEVMAccount?.readableReceipt.to
+            ? ERC_TOKEN_METHOD_DIC[methodCode]
+              ? ERC_TOKEN_METHOD_DIC[methodCode]
+              : "Transfer"
+            : "Contract";
 };
 
 export const ERC_TOKEN_METHOD_DIC = {
@@ -38,8 +38,8 @@ export const ERC_TOKEN_METHOD_DIC = {
   "0xc9c65396": "Create Pair",
   "0x02751cec": "Remove Liquidity ETH",
   "0x1249c58b": "Mint",
-  "0x7ff36ab5": "Swap Exact ETH For Tokens",
-  "0x18cbafe5": "Swap Exact Tokens For ETH",
+  "0x7ff36ab5": "Swap Exact SHM For Tokens",
+  "0x18cbafe5": "Swap Exact Tokens For SHM",
   "0x38ed1739": "Swap Exact Tokens For Tokens",
   "0x2e1a7d4d": "Withdraw",
   "0xd0e30db0": "Deposit",

@@ -10,6 +10,14 @@ export const calculateValue = (value: any) => {
   }
 };
 
+export const calculateFullValue = (value: any) => {
+  try {
+    return Web3Utils.fromWei(value, "ether");
+  } catch (e) {
+    return "error in calculating Value";
+  }
+};
+
 export const calculateTokenValue = (
   tokenTx: TokenTxs,
   txType: TransactionType,
@@ -23,17 +31,15 @@ export const calculateTokenValue = (
       let decimalsValue = 18;
       if (tokenTx.contractInfo.decimals)
         decimalsValue = parseInt(tokenTx.contractInfo.decimals);
-      return tokenTx.tokenEvent === "Approval"
-        ? tokenTx.tokenValue ===
-          "0x0000000000000000000000000000000000000000000000000000000000000001"
-          ? "True"
-          : "False"
+      return tokenTx.tokenValue ===
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        ? round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"))
         : round(
-            formatUnits(
-              Web3Utils.hexToNumberString(tokenTx.tokenValue),
-              decimalsValue
-            )
-          );
+          formatUnits(
+            Web3Utils.hexToNumberString(tokenTx.tokenValue),
+            decimalsValue
+          )
+        );
 
       // : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
     } else if (txType === TransactionType.ERC_721) {
@@ -50,16 +56,16 @@ export const calculateTokenValue = (
           ? "True"
           : "False"
         : tokenTx.tokenValue.length != 130
-        ? tokenTx.tokenValue
-        : tokenId
-        ? shortTokenValue(
-            Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66))
-          )
-        : shortTokenValue(
-            Web3Utils.hexToNumberString(
-              "0x" + tokenTx.tokenValue.substring(66, 130)
+          ? tokenTx.tokenValue
+          : tokenId
+            ? shortTokenValue(
+              Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66))
             )
-          );
+            : shortTokenValue(
+              Web3Utils.hexToNumberString(
+                "0x" + tokenTx.tokenValue.substring(66, 130)
+              )
+            );
     }
   } catch (e) {
     return "error in calculating tokenValue";

@@ -47,3 +47,7 @@ collector.log
 server.log
 rpc_data_server.log
 aggregator.log
+
+# currently, in order to work well, tsconfig is being overrided when compiled
+# can be removed once we sort out currently tsconfig issues
+tsconfig.json

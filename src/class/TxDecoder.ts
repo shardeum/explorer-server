@@ -28,8 +28,8 @@ const ERC_TOKEN_METHOD_DIC = {
   '0xc9c65396': 'Create Pair',
   '0x02751cec': 'Remove Liquidity ETH',
   '0x1249c58b': 'Mint',
-  '0x7ff36ab5': 'Swap Exact ETH For Tokens',
-  '0x18cbafe5': 'Swap Exact Tokens For ETH',
+  '0x7ff36ab5': 'Swap Exact SHM For Tokens',
+  '0x18cbafe5': 'Swap Exact Tokens For SHM',
   '0x38ed1739': 'Swap Exact Tokens For Tokens',
   '0x2e1a7d4d': 'Withdraw',
   '0xd0e30db0': 'Deposit',
@@ -351,8 +351,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
             tokenTx.tokenType === TransactionType.ERC_20
               ? ERC_20_BALANCE
               : tokenTx.tokenType === TransactionType.ERC_721
-              ? ERC_721_BALANCE
-              : ERC_1155_BALANCE
+                ? ERC_721_BALANCE
+                : ERC_1155_BALANCE
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
             let calculatedKey = Web3.utils
