@@ -44,7 +44,7 @@
     "eslint": "8.28.0",
     "eslint-config-next": "13.0.5",
     "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.0.3",
+    "ethers": "^5.7.2",
     "fast-stable-stringify": "^1.0.0",
     "fastify": "^4.10.2",
     "gts": "^3.1.1",

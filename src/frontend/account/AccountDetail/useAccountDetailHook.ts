@@ -8,8 +8,7 @@ import {
   Transaction,
   TransactionSearchType,
 } from "../../types";
-import Web3Utils from "web3-utils";
-import { formatUnits } from "ethers";
+import { utils } from "ethers";
 
 interface detailProps {
   id: string;
@@ -85,11 +84,8 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
           if (tokens.length > 0) {
             tokens.forEach((item) => {
               if (item.contractType === ContractType.ERC_20) {
-                let decimalsValue = 18;
-                if (item.contractInfo.decimals) {
-                  decimalsValue = parseInt(item.contractInfo.decimals);
-                }
-                item.balance = formatUnits(item.balance, decimalsValue);
+                const decimalsValue = item.contractInfo.decimals ? parseInt(item.contractInfo.decimals) : 18
+                item.balance = utils.formatUnits(item.balance, decimalsValue);
               }
             });
           }
