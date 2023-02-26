@@ -981,8 +981,8 @@ export async function queryTransactionCountByCycles(start: number, end: number, 
             : txType === TransactionSearchType.StakeReceipt
               ? TransactionType.StakeReceipt
               : TransactionType.UnstakeReceipt
-      const sql = `SELECT cycle, COUNT(*) FROM transactions GROUP BY cycle HAVING cycle BETWEEN ? AND ? WHERE transactionType=? ORDER BY cycle ASC`
-      transactions = await db.all(sql, [start, end, txType])
+      const sql = `SELECT cycle, COUNT(*) FROM transactions WHERE transactionType=? GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
+      transactions = await db.all(sql, [txType, start, end])
     } else {
       const sql = `SELECT cycle, COUNT(*) FROM transactions GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
       transactions = await db.all(sql, [start, end])

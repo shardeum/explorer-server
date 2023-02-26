@@ -18,6 +18,7 @@ crypto.init("69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc");
 
 // config variables
 import { config as CONFIG, ARCHIVER_URL, RPC_DATA_SERVER_URL } from "./config";
+import { TransactionSearchType } from "./@type";
 if (process.env.PORT) {
     CONFIG.port.server = process.env.PORT;
 }
@@ -116,11 +117,17 @@ const recordTransactionsStats = async (latestCycle: number, lastStoredCycle: num
         const cycles = await Cycle.queryCycleRecordsBetween(startCycle, endCycle)
         if (cycles.length > 0) {
             const transactions = await Transaction.queryTransactionCountByCycles(startCycle, endCycle)
+            const stakeTransactions = await Transaction.queryTransactionCountByCycles(startCycle, endCycle, TransactionSearchType.StakeReceipt)
+            const unstakeTransactions = await Transaction.queryTransactionCountByCycles(startCycle, endCycle, TransactionSearchType.UnstakeReceipt)
             for (let j = 0; j < cycles.length; j++) {
-                const filterCycle = transactions.filter(a => a.cycle === cycles[j].counter)
+                const txsCycle = transactions.filter(a => a.cycle === cycles[j].counter)
+                const stakeTxsCycle = stakeTransactions.filter(a => a.cycle === cycles[j].counter)
+                const unstakeTxsCycle = unstakeTransactions.filter(a => a.cycle === cycles[j].counter)
                 combineTransactionStats.push({
                     'cycle': cycles[j].counter,
-                    'totalTxs': filterCycle.length > 0 ? filterCycle[0].transactions : 0,
+                    'totalTxs': txsCycle.length > 0 ? txsCycle[0].transactions : 0,
+                    'totalStakeTxs': stakeTxsCycle.length > 0 ? stakeTxsCycle[0].transactions : 0,
+                    'totalUnstakeTxs': unstakeTxsCycle.length > 0 ? unstakeTxsCycle[0].transactions : 0,
                     'timestamp': cycles[j].cycleRecord.start,
                 })
             }
