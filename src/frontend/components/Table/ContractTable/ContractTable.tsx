@@ -2,6 +2,7 @@ import styles from "./ContractTable.module.scss";
 import Link from "next/link";
 import { Account } from "../../../types";
 import moment from "moment";
+import { toReadableDateFromMillis } from "../../../../utils/time";
 
 interface ContractTableProps {
   contracts: Account[];
@@ -35,19 +36,16 @@ export const ContractTable: React.FC<ContractTableProps> = ({
         {contracts.map((row, index) => (
           <tr key={`${index}`}>
             <td>
-              <Link
-                href={`/account/${row?.ethAddress}`}
-                className={styles.link}
-              >
+              <Link href={`/account/${row?.ethAddress}`} className={styles.link}>
                 {row?.ethAddress}
               </Link>
             </td>
-            <td>
+            <td title={toReadableDateFromMillis(row?.timestamp)}>
               <span>{moment(row?.timestamp).fromNow()}</span>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
-  );
+  )
 };

@@ -16,6 +16,7 @@ import {
   calculateFullValue,
   calculateTokenValue,
 } from "../../../utils/calculateValue";
+import { toReadableDateFromMillis } from "../../../../utils/time";
 
 interface OvewviewProps {
   transaction: Transaction;
@@ -162,16 +163,8 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.title}>Status:</div>
             <div className={styles.value}>
               <Chip
-                title={
-                  transaction?.wrappedEVMAccount?.readableReceipt?.status === 1
-                    ? "success"
-                    : "failed"
-                }
-                color={
-                  transaction?.wrappedEVMAccount?.readableReceipt?.status === 1
-                    ? "success"
-                    : "error"
-                }
+                title={transaction?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'failed'}
+                color={transaction?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'}
                 className={styles.chip}
               />
             </div>
@@ -180,11 +173,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Type:</div>
             <div className={styles.value}>
-              <Chip
-                title={showTxMethod(transaction)}
-                color="info"
-                className={styles.chip}
-              />
+              <Chip title={showTxMethod(transaction)} color="info" className={styles.chip} />
             </div>
           </div>
 
@@ -196,24 +185,22 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Timestamp:</div>
             <div className={styles.value}>
-              {moment(transaction?.timestamp).fromNow()}
+              {moment(transaction?.timestamp).fromNow()} ({toReadableDateFromMillis(transaction?.timestamp)})
             </div>
           </div>
 
           <div className={styles.item}>
             <div className={styles.title}>Nonce:</div>
             <div className={styles.value}>
-              {transaction?.wrappedEVMAccount?.readableReceipt?.nonce && Web3Utils.hexToNumber("0x" + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
+              {transaction?.wrappedEVMAccount?.readableReceipt?.nonce &&
+                Web3Utils.hexToNumber('0x' + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
             </div>
           </div>
 
           <div className={styles.item}>
             <div className={styles.title}>From:</div>
             <div className={styles.value}>
-              <Link
-                href={`/account/${transaction?.txFrom}`}
-                className={styles.link}
-              >
+              <Link href={`/account/${transaction?.txFrom}`} className={styles.link}>
                 {transaction?.txFrom}
               </Link>
             </div>
@@ -223,10 +210,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.title}>To:</div>
             <div className={styles.value}>
               {transaction?.wrappedEVMAccount?.readableReceipt?.to ? (
-                <Link
-                  href={`/account/${transaction?.txTo}`}
-                  className={styles.link}
-                >
+                <Link href={`/account/${transaction?.txTo}`} className={styles.link}>
                   {transaction?.txTo}
                 </Link>
               ) : (
@@ -240,10 +224,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
               <div className={styles.item}>
                 <div className={styles.title}>Node Address:</div>
                 <div className={styles.value}>
-                  <Link
-                    href={`/account/${transaction?.nominee}`}
-                    className={styles.link}
-                  >
+                  <Link href={`/account/${transaction?.nominee}`} className={styles.link}>
                     {transaction?.nominee}
                   </Link>
                 </div>
@@ -253,9 +234,8 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   <div className={styles.title}>Total Stake:</div>
                   <div className={styles.value}>
                     {calculateFullValue(
-                      transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo
-                        ?.stakeAmount
-                    )}{" "}
+                      transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stakeAmount
+                    )}{' '}
                     SHM
                   </div>
                 </div>
@@ -263,10 +243,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div className={styles.item}>
                   <div className={styles.title}>Reward:</div>
                   <div className={styles.value}>
-                    {calculateFullValue(
-                      transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo
-                        ?.reward
-                    )}{" "}
+                    {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward)}{' '}
                     SHM
                   </div>
                 </div>
@@ -278,9 +255,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Value:</div>
             <div className={styles.value}>
-              {calculateFullValue(
-                transaction?.wrappedEVMAccount?.readableReceipt?.value
-              )}
+              {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.value)}
             </div>
           </div>
 
@@ -296,7 +271,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           {renderErc721Tokens()}
           {renderErc1155Tokens()}
         </div>
-      );
+      )
     }
   } else {
     return (

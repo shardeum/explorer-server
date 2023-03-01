@@ -5,6 +5,7 @@ import Web3Utils from "web3-utils";
 import { Account } from "../../../types";
 
 import styles from "./AccountTable.module.scss";
+import { toReadableDateFromMillis } from "../../../../utils/time";
 
 interface AccountTableProps {
   accounts: Account[];
@@ -43,24 +44,17 @@ export const AccountTable: React.FC<AccountTableProps> = ({
               </Link>
             </td>
             <td>
-              <span>
-                {Number(
-                  Web3Utils.fromWei(row?.account?.balance, "ether")
-                ).toFixed()}{" "}
-                SHM
-              </span>
+              <span>{Number(Web3Utils.fromWei(row?.account?.balance, 'ether')).toFixed()} SHM</span>
             </td>
-            <td>
+            <td title={toReadableDateFromMillis(row?.timestamp)}>
               <span>{moment(row?.timestamp).fromNow()}</span>
             </td>
             <td>
-              <span>
-                {row?.contractInfo ? "Contract Account" : "User Account"}
-              </span>
+              <span>{row?.contractInfo ? 'Contract Account' : 'User Account'}</span>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
-  );
+  )
 };

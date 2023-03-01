@@ -15,6 +15,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { Spacer } from "../../Spacer";
+import { toReadableDateFromMillis } from "../../../../utils/time";
 
 interface TransactionTableProps {
   data: Transaction[];
@@ -327,7 +328,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             <td>
               <span>{row.cycle}</span>
             </td>
-            <td>
+            <td title={toReadableDateFromMillis(row.timestamp)}>
               <span>{moment(row.timestamp).fromNow()}</span>
             </td>
             {renderColumn(row)}
@@ -335,5 +336,5 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
         ))}
       </tbody>
     </table>
-  );
+  )
 };
