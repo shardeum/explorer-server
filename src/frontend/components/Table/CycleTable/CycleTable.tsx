@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Cycle } from "../../../types";
 import moment from "moment";
 import { Table } from "../../TableComp";
+import { toReadableDateFromMillis } from "../../../../utils/time";
 
 interface CycleTableProps {
   cycles: Cycle[];
@@ -48,12 +49,12 @@ export const CycleTable: React.FC<CycleTableProps> = ({ cycles, loading }) => {
                 {row?.cycleRecord?.counter}
               </Link>
             </td>
-            <td>
+            <td title={toReadableDateFromMillis(row?.cycleRecord?.start * 1000)}>
               <span>{moment(row?.cycleRecord?.start * 1000).calendar()}</span>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
-  );
+  )
 };
