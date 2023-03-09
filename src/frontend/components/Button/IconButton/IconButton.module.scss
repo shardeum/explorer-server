@@ -1,19 +1,19 @@
 @import "../../../../styles/index.scss";
 
 .IconButton {
-  background-color: color(gray1);
+  background-color: color(gray-300);
   border-radius: borderRadius(8);
   padding: spacing(4) spacing(8);
-  color: color(gray1);
+  color: color(gray-300);
   @include fontStyle(body, bold);
   display: flex;
   align-items: center;
   justify-content: center;
 
   &.disabled {
-    background-color: color(gray1);
+    background-color: color(gray-300);
     &:hover {
-      background-color: color(gray1);
+      background-color: color(gray-300);
     }
   }
 
@@ -23,6 +23,6 @@
   }
 
   &:hover {
-    background-color: color(secondary1);
+    background-color: color(primary);
   }
 }

@@ -11,7 +11,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({}) => {
 
   return (
     <div className={styles.SearchBox}>
-      <h4 className={styles.title}>The Shardeum Blockchain Explorer</h4>
+      <h4 className={styles.title}>The Shardeum Betanet Explorer</h4>
       <div className={styles.box}>
         <input
           className={styles.input}
@@ -25,10 +25,9 @@ export const SearchBox: React.FC<SearchBoxProps> = ({}) => {
           }}
         />
         <div className={styles.iconWrapper} onClick={onSearch}>
-          <Icon name="search" size="small" color="white" />
+          <Icon name="search" size="medium" color="white" />
         </div>
       </div>
-      
     </div>
   );
 };

@@ -33,14 +33,7 @@ export const TransactionDetail: React.FC = () => {
     },
   ];
 
-  const breadcrumbs = [
-    breadcrumbsList.dashboard,
-    breadcrumbsList.transaction,
-    {
-      to: String(router?.query?.id),
-      label: String(router?.query?.id),
-    },
-  ];
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction];
 
   const [activeTab, setActiveTab] = useState(tabs[0].key);
 

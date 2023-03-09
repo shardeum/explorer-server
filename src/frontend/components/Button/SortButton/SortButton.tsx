@@ -44,7 +44,7 @@ export const SortButton: React.FC<SortButtonProps> = ({
           className={styles.iconDown}
         />
       </button>
-      <ReactTooltip effect="solid" backgroundColor="#3498db" id="sb" />
+      <ReactTooltip effect="solid" backgroundColor="#6610f2" id="sb" />
     </>
   );
 };

@@ -13,11 +13,11 @@
     cursor: pointer;
 
     &:hover {
-      color: color(secondary1);
+      color: color(primary);
     }
 
     &.active {
-      color: color(secondary1);
+      color: color(primary);
     }
 
     .underline {
@@ -27,7 +27,7 @@
       left: 0;
       width: spacing(28);
       height: spacing(2);
-      background-color: color(secondary1);
+      background-color: color(primary);
       border-top-left-radius: borderRadius(4);
       border-top-right-radius: borderRadius(4);
     }

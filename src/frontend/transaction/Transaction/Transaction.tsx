@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { useRouter } from "next/router";
 
 import { useTransaction } from "../../api";
@@ -6,13 +6,17 @@ import { useTransaction } from "../../api";
 import {
   ContentLayout,
   Dropdown,
+  Dropdownt,
   Pagination,
   PaginationPrevNext,
-  TransactionTable,
 } from "../../components";
+import { TransactionTable } from "../TransactionTable";
+
 import { breadcrumbsList, TransactionSearchList } from "../../types";
 
 import styles from "./Transaction.module.scss";
+
+const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction];
 
 export const Transaction: React.FC = () => {
   const router = useRouter();
@@ -33,8 +37,6 @@ export const Transaction: React.FC = () => {
     page: currentPage,
     txType: transactionType.key,
   });
-
-  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction];
 
   const onNext = () => {
     const totalPage = Math.ceil(totalTransactions / 10);
@@ -74,20 +76,27 @@ export const Transaction: React.FC = () => {
             page={currentPage}
           />
         </div>
-        <TransactionTable
-          loading={loading}
-          data={transactions}
-          txType={transactionType.key}
-        />
-        <div className={styles.paginationWrapper}>
-          <Pagination
-            onPageChange={(p) => setCurrentPage(p)}
-            totalCount={totalTransactions}
-            siblingCount={siblingCount}
-            currentPage={currentPage}
-            pageSize={pageSize}
-          />
-        </div>
+        {loading ? (
+          <div>Loading...</div>
+        ) : transactions && transactions.length > 0 ? (
+          <Fragment>
+            <TransactionTable
+              data={transactions}
+              txType={transactionType.key}
+            />
+            <div className={styles.paginationWrapper}>
+              <Pagination
+                onPageChange={(p) => setCurrentPage(p)}
+                totalCount={totalTransactions}
+                siblingCount={siblingCount}
+                currentPage={currentPage}
+                pageSize={pageSize}
+              />
+            </div>
+          </Fragment>
+        ) : (
+          <div>No Data.</div>
+        )}
       </ContentLayout>
     </div>
   );

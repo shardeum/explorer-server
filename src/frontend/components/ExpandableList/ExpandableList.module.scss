@@ -1,0 +1,33 @@
+@import "../../../styles/index.scss";
+
+.ExpandableList {
+  .button {
+    @include fontStyle(small);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    cursor: pointer;
+
+    &:hover,
+    &[data-active="true"] {
+      color: color(primary);
+    }
+  }
+
+  .list {
+    border-left: 1px solid color(primary);
+    padding-left: spacing(8);
+    transition: border-left 3s ease-in-out;
+
+    li {
+      @include fontStyle(small);
+      margin: spacing(8) 0;
+      cursor: pointer;
+
+      &:hover {
+        color: color(primary);
+      }
+    }
+  }
+}

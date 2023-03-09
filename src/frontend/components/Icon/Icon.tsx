@@ -70,7 +70,7 @@ export const iconTypes = {
 export interface IconProps {
   name: keyof typeof iconTypes;
   className?: string;
-  color?: "primary" | "secondary" | "black" | "white" | "disabled" | undefined;
+  color?: "primary" | "black" | "white" | "disabled" | undefined;
   size?: "tiny" | "small" | "medium" | "large" | "extraLarge";
 }
 

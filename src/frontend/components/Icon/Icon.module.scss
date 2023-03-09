@@ -33,19 +33,18 @@
   }
 
   &.primary {
-    fill: color(primary1);
+    fill: color(primary);
   }
-  &.secondary {
-    fill: color(secondary1);
-  }
+
   &.black {
-    fill: color(gray4);
+    fill: color(gray-700);
   }
 
   &.white {
     fill: color(white);
   }
+
   &.disabled {
-    fill: color(gray1);
+    fill: color(gray-300);
   }
 }

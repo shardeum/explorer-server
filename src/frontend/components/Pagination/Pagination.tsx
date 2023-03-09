@@ -1,4 +1,5 @@
 import cx from "classnames";
+import ReactTooltip from "react-tooltip";
 import { Button, IconButton } from "../Button";
 import { Icon } from "../Icon";
 
@@ -57,6 +58,8 @@ export const Pagination: React.FC<PaginationProps> = (props) => {
         disabled={currentPage === 1}
         onClick={onPrevious}
         className={styles.button}
+        data-tip={"Go To Prev"}
+        data-for="prev"
       >
         <Icon
           name="arrow_left"
@@ -93,12 +96,16 @@ export const Pagination: React.FC<PaginationProps> = (props) => {
         disabled={currentPage === lastPage}
         onClick={onNext}
         className={styles.button}
+        data-tip={"Go To Next"}
+        data-for="next"
       >
         <Icon
           name="arrow_right"
           color={currentPage === lastPage ? "disabled" : "black"}
         />
       </Button>
+      <ReactTooltip effect="solid" backgroundColor="#6610f2" id="prev" />
+      <ReactTooltip effect="solid" backgroundColor="#6610f2" id="next" />
     </div>
   );
 };

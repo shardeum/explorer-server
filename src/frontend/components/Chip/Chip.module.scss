@@ -1,7 +1,7 @@
 @import "../../../styles/index.scss";
 
 .Chip {
-  border-radius: borderRadius(16);
+  border-radius: borderRadius(4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,29 +9,31 @@
   color: color(white);
   text-transform: capitalize;
   @include singleLineEllipsis();
+  display: inline-block;
 
   &.primary {
-    background-color: color(primary1);
-  }
-
-  &.secondary {
-    background-color: color(secondary1);
+    background-color: color(bg);
+    color: color(primary);
   }
 
   &.warn {
-    background-color: color(warn);
+    background-color: color(warning-tint);
+    color: color(warning);
   }
 
   &.success {
-    background-color: color(success);
+    background-color: color(success-tint);
+    color: color(success);
   }
 
   &.error {
-    background-color: color(danger);
+    background-color: color(danger-tint);
+    color: color(danger);
   }
 
   &.info {
-    background-color: color(info);
+    background-color: color(info-tint);
+    color: color(info);
   }
 
   &.large {
@@ -41,7 +43,7 @@
 
   &.medium {
     padding: spacing(4) spacing(8);
-    @include fontStyle(tiny, bold);
+    @include fontStyle(tiny);
   }
 
   &.small {

@@ -9,6 +9,7 @@ import { Spacer } from "../Spacer";
 import styles from "./ContentLayout.module.scss";
 import { Breadcrumb } from "../Breadcrumb";
 import { breadcrumbsList } from "../../types";
+import ReactTooltip from "react-tooltip";
 
 interface ContentLayoutProps {
   className?: string;
@@ -40,6 +41,8 @@ export const ContentLayout: React.FC<ContentLayoutProps> = ({
             size="medium"
             onClick={goBack}
             className={styles.button}
+            data-tip={"Go Back"}
+            data-for="back"
           >
             <Icon name="arrow_left" size="medium" color="black" />
           </Button>
@@ -47,6 +50,7 @@ export const ContentLayout: React.FC<ContentLayoutProps> = ({
         {breadcrumbItems && breadcrumbItems.length > 0 && (
           <Breadcrumb items={breadcrumbItems || []} />
         )}
+        <ReactTooltip effect="solid" backgroundColor="#6610f2" id="back" />
       </div>
       <div className={styles.titleWrapper}>
         {typeof title === "string" ? (
@@ -56,8 +60,6 @@ export const ContentLayout: React.FC<ContentLayoutProps> = ({
         )}
         {titleRight && titleRight}
       </div>
-      <hr />
-      <Spacer space="16" />
       {children}
     </div>
   );

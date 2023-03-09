@@ -18,6 +18,6 @@
 
   .title {
     @include fontStyle(body, bold);
-    color: color(gray4);
+    color: color(gray-800);
   }
 }

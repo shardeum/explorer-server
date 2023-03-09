@@ -1,7 +1,7 @@
 @import "../../../styles/index";
 
 .Layout {
-  padding: 0 spacing(8);
+  padding: 0 spacing(16);
   max-width: $maxWidth;
   margin: 0 auto;
   position: relative;
@@ -22,7 +22,7 @@
     background-color: color(white);
 
     &:hover {
-      box-shadow: shadow(gray5);
+      box-shadow: shadow(shadow1);
     }
   }
 }

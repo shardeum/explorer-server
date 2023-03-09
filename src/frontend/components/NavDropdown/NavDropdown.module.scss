@@ -1,0 +1,43 @@
+@import "../../../styles/index.scss";
+
+.NavDropdown {
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+      .title {
+        color: color(primary);
+      }
+    }
+
+    .title {
+      &[data-active="true"] {
+        color: color(primary);
+      }
+    }
+
+    .icon {
+      margin: 0 spacing(4);
+    }
+  }
+
+  .menu {
+    border-top: 1px solid color(primary);
+  }
+
+  .menuItem {
+    margin: spacing(8) spacing(4);
+    cursor: pointer;
+
+    &:hover {
+      color: color(primary);
+    }
+
+    &.active {
+      color: color(primary);
+    }
+  }
+}

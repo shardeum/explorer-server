@@ -9,6 +9,7 @@ interface BarChartProps {
   data: any;
 }
 
+
 // TODO: have to refactor the code
 
 export const BarChart: React.FC<BarChartProps> = ({ title, data }) => {
@@ -16,9 +17,9 @@ export const BarChart: React.FC<BarChartProps> = ({ title, data }) => {
     chart: {
       type: "column",
       backgroundColor: "#ffffff",
-      borderColor: "#dedede",
+      borderColor: "#e9ecef",
       borderWidth: 1,
-      borderRadius: 4,
+      borderRadius: 8,
       spacingTop: 20,
       height: 300,
     },
@@ -26,7 +27,9 @@ export const BarChart: React.FC<BarChartProps> = ({ title, data }) => {
       text: title,
       align: "left",
       style: {
-        fontSize: "18px",
+        fontSize: "12px",
+        fontWeight: "600",
+        color: "#495057",
       },
     },
     xAxis: {

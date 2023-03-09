@@ -2,9 +2,8 @@
 
 .TokenDropdown {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  // align-items: center;
+  // justify-content: space-between;
 
   @include tablet {
     justify-content: flex-start;
@@ -12,11 +11,12 @@
 
   .button {
     @include fontStyle(small, bold);
+    color: color(gray-800);
     justify-content: space-between;
     width: 250px;
 
     span {
-      @include fontStyle(body, bold);
+      @include fontStyle(small);
     }
 
     @include tabletPro {
@@ -35,7 +35,7 @@
 
   .item {
     border-radius: borderRadius(4);
-    border: border(gray1);
+    border: border(gray);
     padding: spacing(4) spacing(8);
     margin-bottom: spacing(16);
     display: flex;
@@ -43,7 +43,7 @@
     justify-content: space-between;
 
     .label {
-      @include fontStyle(small, bold);
+      @include fontStyle(small, semi-bold);
       width: 200px;
 
       span {
@@ -53,17 +53,16 @@
   }
 
   .search {
-    background-color: color(bg3);
-    border: border(gray1);
+    // background-color: color(bg3);
+    border: border(gray);
     outline: none;
     border-radius: borderRadius(4);
     padding: spacing(4) spacing(8);
     margin: spacing(8) 0;
-    // color: color(white);
 
     &::placeholder {
       @include fontStyle(small);
-      color: color(gray2);
+      color: color(gray-600);
     }
   }
 

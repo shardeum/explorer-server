@@ -1,8 +1,6 @@
-import { useRef, useState } from "react";
-
+import { useCallback, useRef, useState } from "react";
 import styles from "./TokenDropdown.module.scss";
-import { Button, Icon, Menu, MenuItem } from "../../components";
-import { SortButton } from "../../components/Button";
+import { Button, Icon, Menu, MenuItem, SortButton } from "../../components";
 import ReactTooltip from "react-tooltip";
 import { Token } from "../../types";
 
@@ -17,12 +15,12 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const open = () => {
+  const open = useCallback(() => {
     setIsFilterOpen(true);
     inputRef?.current?.focus();
-  };
+  }, []);
 
-  const close = () => setIsFilterOpen(false);
+  const close = useCallback(() => setIsFilterOpen(false), []);
 
   return (
     <div className={styles.TokenDropdown}>
@@ -35,9 +33,7 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
             className={styles.button}
             data-active={isFilterOpen}
           >
-            <div>
-              <span>{ tokens.length }&nbsp;Tokens</span>
-            </div>
+            <span>{tokens.length}&nbsp;Tokens</span>
             {isFilterOpen ? (
               <Icon name="arrow_up" color="black" className={styles.icon} />
             ) : (
@@ -45,7 +41,6 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
             )}
           </Button>
         }
-        horizontalPosition="left"
         isMenuOpen={isFilterOpen}
         onClose={close}
         onOpen={open}
@@ -53,8 +48,6 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
           e.preventDefault();
           open();
         }}
-        top={0}
-        left={0}
       >
         <input
           placeholder="Search for Token Name"
@@ -91,7 +84,7 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
       >
         <Icon name="wallet" color="black" />
       </Button>
-      <ReactTooltip effect="solid" backgroundColor="#3498db" id="tdd" />
+      <ReactTooltip effect="solid" backgroundColor="#6610f2" id="tdd" />
     </div>
   );
 };

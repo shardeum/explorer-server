@@ -8,39 +8,38 @@
   }
 
   .title {
+    @include fontStyle(heading, semi-bold);
     margin-bottom: spacing(8);
-    color: color(gray4);
+    color: color(gray-800);
   }
 
   .box {
-    overflow: hidden;
+    position: relative;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    border: border(gray);
+    border-radius: borderRadius(8);
+    box-shadow: shadow(shadow1);
+    overflow: hidden;
     height: 50px;
   }
 
   .input {
-    border: border(gray1);
-    border-radius: borderRadius(4);
-    background-color: color(white);
-    box-shadow: shadow(gray5);
     @include fontStyle(small);
-    height: 100%;
     width: 90%;
     padding: 0 spacing(8) 0 spacing(16);
   }
 
   .iconWrapper {
-    background-color: color(primary1);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    height: 100%;
-    width: 10%;
-    border-radius: borderRadius(4);
-    margin-left: spacing(8);
+    background-color: color(primary);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 8%;
   }
 }

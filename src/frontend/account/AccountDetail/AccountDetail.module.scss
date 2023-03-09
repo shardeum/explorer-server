@@ -5,8 +5,8 @@
     display: flex;
 
     .title {
-      @include fontStyle(heading-5, bold);
-      color: color(gray4);
+      @include fontStyle(large, semi-bold);
+      color: color(gray-700);
 
       span {
         @include fontStyle(small);
@@ -32,12 +32,5 @@
       @include fontStyle(small);
       margin-left: spacing(8);
     }
-  }
-
-  .paginationWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: spacing(8) 0;
   }
 }

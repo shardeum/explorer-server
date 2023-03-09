@@ -4,4 +4,9 @@
   .icon {
     margin: 0 spacing(4);
   }
+
+  .btn {
+    @include fontStyle(small, semi-bold);
+    color: color(gray-800);
+  }
 }

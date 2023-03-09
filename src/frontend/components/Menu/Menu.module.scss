@@ -1,18 +1,17 @@
 @import "../../../styles/index.scss";
 
 .Menu {
-  // position: absolute;
-  // top: 0;
-  // left: 0;
+  position: absolute;
   display: flex;
   flex-direction: column;
   max-height: 286px;
   padding: spacing(4) spacing(8);
+  margin-top: spacing(8);
   overflow-y: auto;
   background-color: color(white);
-  border: border(gray1);
+  border: border(gray);
   border-radius: borderRadius(4);
-  box-shadow: shadow(gray5);
+  box-shadow: shadow(shadow2);
   transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
   z-index: 9999;
 

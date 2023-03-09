@@ -2,9 +2,7 @@
 
 .Dashboard {
   .hero {
-    background-color: color(bg1);
-    .cardWrapper {
-    }
+    background-color: color(gray-100);
   }
 
   .tableGrid {
@@ -15,6 +13,7 @@
     @include tabletPro {
       grid-template-columns: 1fr;
       column-gap: spacing(8);
+      overflow-x: auto;
     }
   }
 }

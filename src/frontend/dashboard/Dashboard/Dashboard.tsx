@@ -2,15 +2,16 @@ import React from "react";
 import moment from "moment";
 
 import { CardDetail } from "../CardDetail";
-import { LatestTable } from "../LatestTable";
 import { SearchBox } from "../SearchBox";
 import { Spacer } from "../../components";
 
 import { useCycle, useTransaction, useAccount, useStats } from "../../api";
-
 import styles from "./Dashboard.module.scss";
 import { ChartDetail } from "../ChartDetail";
 import { TransactionSearchType, AccountSearchType } from "../../types";
+
+import { LatestTransactions } from "../LatestTransaction";
+import { LatestCycle } from "../LatestCycle";
 
 export const Dashboard: React.FC = () => {
   const { data: cycles, loading: cycleLoading } = useCycle({ count: 10 });
@@ -20,7 +21,7 @@ export const Dashboard: React.FC = () => {
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA });
 
-  // const { validatorStats, transactionStats } = useStats({ count: 5000});
+  const { validatorStats, transactionStats } = useStats({ validatorStatsCount: 1000, transactionStatsCount: 1000});
 
   const cyclesList = cycles.map((row) => {
     return {
@@ -43,33 +44,22 @@ export const Dashboard: React.FC = () => {
       <session>
         <SearchBox />
       </session>
-      <Spacer space="64" />
+      <Spacer space="48" />
       <session>
         <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.activeNodes} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs} totalStakeTxs={totalStakeTxs} totalUnstakeTxs={totalUnstakeTxs}/>
       </session>
-      <Spacer space="64" />
-      {/* <section>
+      <Spacer space="48" />
+      <section>
         <ChartDetail validatorStats={validatorStats} transactionStats={transactionStats}/>
-      </section> */}
-      <Spacer space="64" />
+      </section>
+      <Spacer space="48" />
       <session>
         <div className={styles.tableGrid}>
-          <LatestTable
-            title="Latest Cycles"
-            name="View All Cycles"
-            data={cyclesList}
-            type="cycle"
-            loading={cycleLoading}
-          />
-          <LatestTable
-            title="Latest Transactions"
-            name="View All Transactions"
-            data={transactionsList}
-            type="transaction"
-            loading={transactionLoading}
-          />
+          <LatestCycle cycles={cycles} />
+          <LatestTransactions transactions={transactions} />
         </div>
       </session>
+      <Spacer space="48" />
     </div>
   );
 };

@@ -8,7 +8,6 @@ import {
   ContentLayout,
   CopyButton,
   Spacer,
-  TransactionTable,
   Pagination,
   PaginationPrevNext,
 } from "../../components";
@@ -27,7 +26,7 @@ import {
 } from "../../types";
 import { calculateValue } from "../../utils/calculateValue";
 
-//http://localhost:3000/account/0xb246b7d28b0f9a3c0ce9e8e15590aeb837bc9392
+import { TransactionTable } from "../../transaction";
 
 export const AccountDetail: React.FC = () => {
   const router = useRouter();
@@ -60,7 +59,6 @@ export const AccountDetail: React.FC = () => {
       content: (
         <>
           <TransactionTable
-            loading={false}
             data={transactions}
             txType={TransactionSearchType.All}
           />
@@ -82,7 +80,6 @@ export const AccountDetail: React.FC = () => {
       content: (
         <>
           <TransactionTable
-            loading={false}
             data={transactions}
             txType={TransactionSearchType.Internal}
           />
@@ -104,7 +101,6 @@ export const AccountDetail: React.FC = () => {
       content: (
         <>
           <TransactionTable
-            loading={false}
             data={transactions}
             txType={TransactionSearchType.ERC_20}
           />
@@ -126,7 +122,6 @@ export const AccountDetail: React.FC = () => {
       content: (
         <>
           <TransactionTable
-            loading={false}
             data={transactions}
             txType={TransactionSearchType.ERC_721}
           />

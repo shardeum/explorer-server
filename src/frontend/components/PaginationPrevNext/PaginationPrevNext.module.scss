@@ -4,25 +4,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: border(gray1);
+  border: border(gray);
   border-radius: borderRadius(4);
-  box-shadow: shadow(gray5);
+  box-shadow: shadow(shadow1);
+  // background-color: color(bg3);
 
   .button {
     box-shadow: none;
     border-radius: 0;
+    padding: spacing(6);
+
+    &:hover {
+      background-color: color(bg);
+    }
   }
 
   .leftborder {
-    border-left: border(gray1);
+    border-left: 1px solid color(gray-300);
   }
 
   .rightborder {
-    border-right: border(gray1);
+    border-right: 1px solid color(gray-300);
   }
 
   .label {
-    @include fontStyle(small, bold);
+    @include fontStyle(small, semi-bold);
     min-width: 50px;
     text-align: center;
   }

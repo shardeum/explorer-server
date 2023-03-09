@@ -14,7 +14,7 @@ interface LineChartProps {
   subTitle?: string;
   data: any;
   height?: number;
-  name: string;
+  name?: string;
 }
 
 export const LineChart: React.FC<LineChartProps> = (props) => {
@@ -27,7 +27,9 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       text: title,
       align: centerTitle ? "center" : "left",
       style: {
-        fontSize: "18px",
+        fontSize: "12px",
+        fontWeight: "600",
+        color: "#495057",
       },
     },
     subtitle: {
@@ -59,16 +61,54 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       zoomEnabled: true,
     },
     tooltip: {
-      pointFormat: name === 'Validators' ?
-        "<span>Number of Validators: <b>{point.y}</b></span><br/><br /><span>CycleNumber: <b></b></span>" : "<span>Total Transactions: <b>{point.y}</b></span><br/><br /><span>CycleNumber: <b></b></span>",
-      borderColor: "#dedede",
+      // @ts-ignore
+      formatter:
+        name === "Validators"
+          ? function () {
+              // @ts-ignore
+              const timestamp = this?.x;
+
+              // @ts-ignore
+              const data = this?.series?.options?.data;
+
+              // @ts-ignore
+              const item = data?.filter((d) => d[0] === this?.x);
+              return `<span><b>${Highcharts.dateFormat(
+                "%A, %B %d, %Y",
+                //@ts-ignore
+                new Date(timestamp)
+              )}</b></span><br /><br />
+      <span>Active Validators: <b>${item[0][1]}</b></span><br />
+      <span>Cycle Number: <b>${item[0][2]}</b></span>`;
+            }
+          : function () {
+              // @ts-ignore
+              const timestamp = this?.x;
+
+              // @ts-ignore
+              const data = this?.series?.options?.data;
+
+              // @ts-ignore
+              const item = data?.filter((d) => d[0] === this?.x);
+              if (item)
+                return `<span><b>${Highcharts.dateFormat(
+                  "%A, %B %d, %Y",
+                  //@ts-ignore
+                  new Date(timestamp)
+                )}</b></span><br /><br />
+        <span>Total Txs: <b>${item[0][1]}</b></span><br />
+        <span>Total Stake Txs: <b>${item[0][2]}</b></span><br />
+        <span>Total Unstake Txs: <b>${item[0][3]}</b></span><br />
+        <span>Cycle Number: <b>${item[0][4]}</b></span>`;
+            },
+      borderColor: "#e9ecef",
       borderRadius: 4,
     },
     chart: {
       backgroundColor: "#ffffff",
-      borderColor: "#dedede",
+      borderColor: "#e9ecef",
       borderWidth: 1,
-      borderRadius: 4,
+      borderRadius: 8,
       spacingTop: 20,
       height: height,
       zoomType: "x",
@@ -81,7 +121,8 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       menuItemDefinitions: {
         viewFullscreen: {
           onclick: function () {
-            router.push("/transaction_line_chart");
+            name === "Validators" ? router.push("/validator_line_chart") :
+            router.push("/transaction_line_chart")
           },
           text: "View Detail",
         },
@@ -94,12 +135,12 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     },
     navigation: {
       menuStyle: {
-        border: "1px solid #dedede",
+        border: "1px solid #e9ecef",
         background: "#ffffff",
         padding: "5px 0",
       },
       menuItemStyle: {
-        color: "#000000",
+        color: "#343a40",
       },
     },
     rangeSelector: {
@@ -115,13 +156,18 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       },
       selected: 1,
     },
+    // plotOptions: {
+    //   series: {
+    //     color: "#555555",
+    //   },
+    // },
   };
 
   return (
     <HighchartsReact
       highcharts={Highcharts}
       options={option}
-      allowChartUpdate={true}
+      // allowChartUpdate={true}
     />
   );
 };

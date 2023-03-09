@@ -1,1 +1,0 @@
-export { ContractTable } from "./ContractTable";

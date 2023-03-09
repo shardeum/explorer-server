@@ -11,30 +11,26 @@ import { breadcrumbsList } from "../../types";
 export const CycleDetail: React.FC = () => {
   const router = useRouter();
 
-  const id = router?.query?.id ? Number(router.query.id) : 0;
+  const id = router?.query?.id ? router.query.id : '0' as String;
 
   const { data } = useCycleDetail(id);
 
-  const breadcrumbs = [
-    breadcrumbsList.dashboard,
-    breadcrumbsList.cycle,
-    { to: String(id), label: String(id) },
-  ];
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.cycle];
 
   const onPrev = () => {
-    router.query.id = String(id - 1);
+    router.query.id = String(Number(id) - 1);
     router.push(router);
   };
 
   const onNext = () => {
-    router.query.id = String(id + 1);
+    router.query.id = String(Number(id) + 1);
     router.push(router);
   };
 
   return (
     <div className={styles.CycleDetail}>
       <ContentLayout
-        title={`Cycle - ${id}`}
+        title={"Cycle"}
         titleRight={
           <PaginationPrevNext page={id} onPrev={onPrev} onNext={onNext} />
         }
@@ -52,6 +48,11 @@ export const CycleDetail: React.FC = () => {
             <div className={styles.value}>
               {data?.cycleRecord?.networkStateHash || "-"}
             </div>
+          </div>
+
+          <div className={styles.item}>
+            <div className={styles.title}>Cycle Number</div>
+            <div className={styles.value}>{data?.cycleRecord?.counter}</div>
           </div>
 
           <div className={styles.item}>

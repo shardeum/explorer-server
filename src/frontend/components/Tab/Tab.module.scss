@@ -7,21 +7,21 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    border-bottom: border(gray1);
+    border-bottom: border(gray);
 
     .tab {
       @include fontStyle(small, bold);
       padding: spacing(12) spacing(16);
       cursor: pointer;
       position: relative;
-      color: color(gray4);
+      color: color(gray-800);
 
       &:hover {
-        color: color(secondary1);
+        color: color(primary);
       }
 
       &.active {
-        color: color(secondary1);
+        color: color(primary);
 
         &::after {
           content: "";
@@ -33,7 +33,7 @@
           border-top-left-radius: spacing(8);
           border-top-right-radius: spacing(8);
 
-          background-color: color(secondary1);
+          background-color: color(primary);
         }
       }
     }

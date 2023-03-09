@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import cx from "classnames";
 import { Button } from "../Button";
 import { Icon } from "../Icon";
@@ -11,7 +11,7 @@ export interface DropdownProps {
   onSelect?: (i: any) => void;
   selected?: string;
   disabled?: boolean;
-  apperance?: "primary" | "secondary" | "outlined" | "default";
+  apperance?: "primary" | "outlined" | "default";
   size?: "large" | "medium" | "small";
   className?: string;
   buttonClassName?: string;
@@ -31,13 +31,16 @@ export const Dropdown: React.FC<DropdownProps> = ({
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const open = () => setIsFilterOpen(true);
-  const close = () => setIsFilterOpen(false);
+  const open = useCallback(() => setIsFilterOpen(true), []);
+  const close = useCallback(() => setIsFilterOpen(false), []);
 
-  const onPress = (d: string) => {
-    onSelect?.(d);
-    close();
-  };
+  const onPress = useCallback(
+    (d: string) => {
+      onSelect?.(d);
+      close();
+    },
+    [close, onSelect]
+  );
 
   return (
     <div className={cx(styles.Dropdown, className)}>
@@ -48,7 +51,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
             size={size}
             onClick={open}
             disabled={disabled}
-            className={buttonClassName}
+            className={cx(buttonClassName, styles.btn)}
             data-active={isFilterOpen}
             onMouseEnter={() => {
               onHoverOpen && open();
@@ -62,7 +65,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
             )}
           </Button>
         }
-        horizontalPosition="left"
         isMenuOpen={isFilterOpen}
         onClose={close}
         onOpen={open}
@@ -70,7 +72,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
           e.preventDefault();
           open();
         }}
-        top={8}
       >
         {items.map((item, index) => (
           <MenuItem

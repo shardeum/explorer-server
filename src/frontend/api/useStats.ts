@@ -6,23 +6,38 @@ import { fetcher } from "./fetcher";
 import { PATHS } from "./paths";
 
 export const useStats = (query: any) => {
-    const { count } = query;
+  const { validatorStatsCount, transactionStatsCount } = query;
 
-    // console.log(fetcher, `${PATHS.STATS_VALIDATOR}?count=${count}&responseType=array`);
+  // console.log(fetcher, `${PATHS.STATS_VALIDATOR}?count=${count}&responseType=array`);
+  let loading = true;
 
-    const { data } = useSWR(`${PATHS.STATS_VALIDATOR}?count=${count}&responseType=array`, fetcher);
+  let response;
+  let validatorStats: any[] = [];
+  let transactionStats: any[] = [];
+
+  if (validatorStatsCount) {
+    response = useSWR(
+      `${PATHS.STATS_VALIDATOR}?count=${validatorStatsCount}&responseType=array`,
+      fetcher
+    );
     // console.log("data", data);
 
-    const validatorStats: any[] = data?.validatorStats || [];
+    validatorStats = response?.data?.validatorStats || [];
+  }
 
-    const response = useSWR(`${PATHS.STATS_TRANSACTION}?count=${count}&responseType=array`, fetcher);
+  if (transactionStatsCount) {
+    response = useSWR(
+      `${PATHS.STATS_TRANSACTION}?count=${transactionStatsCount}&responseType=array`,
+      fetcher
+    );
     // console.log("data", data);
 
-    const transactionStats: any[] = response?.data?.transactionStats || [];
+    transactionStats = response?.data?.transactionStats || [];
+  }
 
-    return {
-        validatorStats,
-        transactionStats,
-        loading: !data,
-    };
+  return {
+    validatorStats,
+    transactionStats,
+    loading: !loading,
+  };
 };

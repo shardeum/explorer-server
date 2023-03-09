@@ -17,7 +17,7 @@
 }
 
 @function color($name) {
-  $resolved-name: if($name == "primary", "brand-500", $name);
+  $resolved-name: if($name == "primary", "primary", $name);
 
   @return _mapGet("Color", $colors, $resolved-name);
 }

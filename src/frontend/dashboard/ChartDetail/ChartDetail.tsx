@@ -1,5 +1,8 @@
 import React from "react";
+
 import { LineChart, BarChart } from "../../components";
+
+import { useCycleChart } from "../../api";
 
 import styles from "./ChartDetail.module.scss";
 
@@ -26,14 +29,14 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
     <div className={styles.ChartDetail}>
       <div className={styles.item}>
         <LineChart
-          title="ACTIVE VALIDATORS HISTORY IN LAST 5000 CYCLES"
+          title="ACTIVE VALIDATORS HISTORY IN LAST 1000 CYCLES"
           data={data.validatorStats}
           name="Validators"
         />
       </div>
       <div className={styles.item}>
         <LineChart
-          title="TOTAL TRANSACTION HISTORY IN LAST 5000 CYCLES"
+          title="TOTAL TRANSACTION HISTORY IN LAST 1000 CYCLES"
           data={data.transactionStats}
           name="Transactions"
         />

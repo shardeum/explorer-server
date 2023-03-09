@@ -5,18 +5,22 @@
 
   .item {
     margin-right: spacing(8);
-    color: color(gray4);
+    color: color(gray-800);
   }
 
   .inactive {
-    color: color(gray1);
+    color: color(gray-300);
   }
 
   .active {
-    color: color(primary1);
+    color: color(primary);
   }
 
   .link {
-    @include fontStyle(body, bold);
+    @include fontStyle(medium, semi-bold);
+
+    &:hover {
+      color: color(primary);
+    }
   }
 }

@@ -1,11 +1,11 @@
 @import "../../../styles/index.scss";
 
 .Footer {
-  border-top: border(gray1);
+  border-top: border(gray);
   padding: spacing(16) 0;
 
   span {
-    @include fontStyle(heading-6, bold);
+    @include fontStyle(heading, bold);
   }
 
   .main {
@@ -65,17 +65,18 @@
     }
 
     .socialBtn {
+      $size: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      width: $size;
+      height: $size;
       border-radius: 20px;
-      border: border(gray1);
+      border: border(gray);
       margin-left: spacing(8);
 
       &:hover {
-        background-color: color(secondary1);
+        background-color: color(bg);
       }
     }
   }

@@ -5,7 +5,8 @@
     display: flex;
 
     .title {
-      @include fontStyle(heading-5, bold);
+      @include fontStyle(heading, bold);
+      color: color(gray-700);
 
       span {
         @include fontStyle(small);
@@ -39,7 +40,8 @@
     justify-content: space-between;
 
     .title {
-      @include fontStyle(heading-5, bold);
+      @include fontStyle(heading, bold);
+      color: color(gray-700);
     }
 
     .search {
@@ -49,14 +51,14 @@
     .input {
       @include fontStyle(small);
       background-color: inherit;
-      border: border(gray1);
+      border: border(gray);
       border-radius: borderRadius(4);
       padding: spacing(8);
       margin-right: spacing(8);
       min-width: 350px;
 
       &::placeholder {
-        color: color(gray4);
+        color: color(gray-800);
       }
       &:focus {
         outline: none;
@@ -65,6 +67,32 @@
       @include tablet {
         min-width: auto;
       }
+    }
+  }
+
+  .filter {
+    @extend %card;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: spacing(8);
+    padding: spacing(16) spacing(16);
+
+    :first-child {
+      width: 50%;
+    }
+
+    .title {
+      @include fontStyle(tiny, bold);
+      margin-bottom: spacing(8);
+    }
+
+    .divider {
+      @extend %verticalDivider;
+      margin: 0 16px;
+    }
+
+    .value {
+      @include fontStyle(small);
     }
   }
 }

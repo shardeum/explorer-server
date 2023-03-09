@@ -24,6 +24,7 @@ const resources = [
   // { href: "", label: "Network Status" },
 ];
 
+
 const socials = [
   { iconName: "discord", title: "Discord", href: "https://discord.gg/shardeum" },
   { iconName: "twitter", title: "Twitter", href: "https://twitter.com/shardeum" },
@@ -95,7 +96,7 @@ export const Footer: React.FC = () => {
               <Icon name={social.iconName as keyof typeof iconTypes} color="black" />
             </a>
           ))}
-          <ReactTooltip effect="solid" backgroundColor="#3498db" id="fsb" />
+          <ReactTooltip effect="solid" backgroundColor="#6610f2" id="fsb" />
         </div>
       </div>
     </div>

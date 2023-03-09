@@ -1,0 +1,56 @@
+@import "../../../styles/index.scss";
+
+.Dropdownt {
+  position: relative;
+
+  $btnHeight: 40px;
+
+  .button {
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+
+    &:hover,
+    &[data-active="true"] {
+      color: color(primary);
+    }
+
+    .icon {
+      margin: 0 spacing(4);
+    }
+  }
+
+  .menu {
+    position: absolute;
+    top: 18;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 286px;
+    min-width: 200px;
+    padding: spacing(8);
+    overflow-y: auto;
+    background-color: color(white);
+    border: border(gray);
+    border-radius: borderRadius(4);
+    box-shadow: shadow(shadow1);
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    z-index: 9999;
+
+    &[data-active="false"] {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .menuItem {
+      @include fontStyle(small);
+      margin: spacing(4) 0;
+      cursor: pointer;
+
+      &:hover,
+      &.active {
+        color: color(primary);
+      }
+    }
+  }
+}

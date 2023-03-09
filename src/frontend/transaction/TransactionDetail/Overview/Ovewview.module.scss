@@ -6,7 +6,7 @@
   .item {
     display: grid;
     grid-template-columns: 1fr 3fr;
-    border-bottom: border(gray1);
+    border-bottom: border(gray);
     padding-bottom: spacing(8);
     margin-bottom: spacing(16);
 
@@ -27,10 +27,6 @@
   .value {
     @include fontStyle(small);
     @include singleLineEllipsis();
-  }
-
-  .chip {
-    max-width: 160px;
   }
 
   .card {
@@ -100,6 +96,6 @@
 
   span {
     @include fontStyle(small);
-    color: color(gray2);
+    color: color(gray-600);
   }
 }

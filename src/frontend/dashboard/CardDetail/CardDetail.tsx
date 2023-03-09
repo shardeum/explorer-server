@@ -1,8 +1,7 @@
+import Link from "next/link";
 import React from "react";
-import { useTotalData } from "../../api";
 
-import { Card, Icon } from "../../components";
-import { TransactionSearchType } from "../../types";
+import { Icon } from "../../components";
 
 import styles from "./CardDetail.module.scss";
 
@@ -18,75 +17,106 @@ export interface CardDetailProps {
 }
 
 export const CardDetail: React.FC<CardDetailProps> = (data) => {
-  // const { data } = useTotalData();
-
-  // TODO: Active Node Data, Total Reward Transactions, Total Contracts
-
   return (
     <div className={styles.CardDetail}>
-      <Card
-        title="Total Cycles"
-        count={data?.totalCycles}
-        color="primary"
-        icon={<Icon name="cycle" size="medium" color="white" />}
-        href="/cycle"
-      />
-      <Card
-        title="Active Validators"
-        count={data?.totalNodes}
-        color="warn"
-        icon={<Icon name="node" size="medium" color="white" />}
-        href="/"
-      />
-      <Card
-        title="Total Accounts"
-        count={data?.totalAccounts}
-        color="info"
-        icon={<Icon name="account" size="medium" color="white" />}
-        href="/account"
-      />
-      <Card
-        title="Total Contracts"
-        count={data?.totalContracts}
-        color="success"
-        icon={<Icon name="contract" size="medium" color="white" />}
-        href="/contract"
-      />
-      <Card
-        title="Total Transactions"
-        count={data?.totalTransactions}
-        color="secondary"
-        icon={<Icon name="transaction" size="medium" color="white" />}
-        href="/transaction"
-      />
-      {/* <Card
-        title="Total Reward Transactions"
-        count={data?.totalRewardTxs}
-        color="error"
-        icon={<Icon name="reward" size="medium" color="white" />}
-        href="/transaction?txType=2"
-      /> */}
-      <Card
-        title="Total Stake Transactions"
-        count={data?.totalStakeTxs}
-        color="primary"
-        icon={<Icon name="cycle" size="medium" color="white" />}
-        href={`/transaction?txType=${TransactionSearchType.StakeReceipt}`}
-      />
-      <Card
-        title="Total Unstake Transactions"
-        count={data?.totalUnstakeTxs}
-        color="primary"
-        icon={<Icon name="cycle" size="medium" color="white" />}
-        href={`/transaction?txType=${TransactionSearchType.UnstakeReceipt}`}
-      />
-      <Card
-        title="Total Stake Amount"
-        count={'WIP'}
-        color="primary"
-        icon={<Icon name="cycle" size="medium" color="white" />}
-        href={`/transaction`}
-      />
+      <div className={styles.column}>
+        <div className={styles.item}>
+          <Link href="/cycle">
+            <div className={styles.icon}>
+              <Icon name="cycle" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total Cycles</p>
+            <p>{data?.totalCycles?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+        <hr />
+        <div className={styles.item}>
+          <div className={styles.icon}>
+            <Icon name="node" size="medium" color="primary" />
+          </div>
+          <div>
+            <p className={styles.title}>Active Validators</p>
+            <p>{data?.totalNodes?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+      </div>
+      <div className={styles.column}>
+        <div className={styles.item}>
+          <Link href="/account">
+            <div className={styles.icon}>
+              <Icon name="account" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total Accounts</p>
+            <p>{data?.totalAccounts?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+        <hr />
+        <div className={styles.item}>
+          <Link href="/contract">
+            <div className={styles.icon}>
+              <Icon name="contract" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total Contracts</p>
+            <p>{data?.totalContracts?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+      </div>
+      <div className={styles.column}>
+        <div className={styles.item}>
+          <Link href="/transaction">
+            <div className={styles.icon}>
+              <Icon name="transaction" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total Transactions</p>
+            <p>{data?.totalTransactions?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+        <hr />
+        <div className={styles.item}>
+          <Link href="/transaction">
+            <div className={styles.icon}>
+              <Icon name="transaction" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total Stake / Unstake Transactions</p>
+            <p>{data?.totalStakeTxs?.toLocaleString("en-US")} / {data?.totalUnstakeTxs?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+      </div>
+      <div className={styles.column}>
+        <div className={styles.item}>
+          <Link href="/transaction">
+            <div className={styles.icon}>
+              <Icon name="reward" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total SHM</p>
+            <p>{data?.totalRewardTxs?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+        <hr />
+        <div className={styles.item}>
+          <Link href="/transaction">
+            <div className={styles.icon}>
+              <Icon name="reward" size="medium" color="primary" />
+            </div>
+          </Link>
+          <div>
+            <p className={styles.title}>Total Stake SHM</p>
+            <p>{data?.totalRewardTxs?.toLocaleString("en-US")}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

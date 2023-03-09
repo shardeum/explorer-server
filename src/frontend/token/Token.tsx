@@ -1,20 +1,23 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Web3Utils from "web3-utils";
+
 import {
+  AnchorLink,
   Button,
   ContentLayout,
   CopyButton,
   Spacer,
-  TransactionTable,
+  Tab,
+  Table,
 } from "../components";
 import { DetailCard } from "../account/DetailCard";
-import { TokenDropdown } from "../account/TokenDropdown";
+import { TransactionTable } from "../transaction";
+import { breadcrumbsList, ContractType, TransactionSearchType } from "../types";
 
 import { useTokenHook } from "./useTokenHook";
 
 import styles from "./Token.module.scss";
-import { breadcrumbsList, ContractType, TransactionSearchType } from "../types";
 
 export const Token: React.FC = () => {
   const router = useRouter();
@@ -22,19 +25,62 @@ export const Token: React.FC = () => {
   const id = router?.query?.id;
   const address = router?.query?.a;
 
-  const { account, total, transactions, tokenHolders} = useTokenHook({
+  const {
+    account,
+    total,
+    transactions,
+    tokenHolders,
+    tokens,
+    filteredAddress,
+    onAddressChange,
+    activeTab,
+    onTabChange,
+    tokenBalance,
+  } = useTokenHook({
     id: String(id),
-    address: String(address),
+    address: address?.toString(),
   });
 
-  const tokenType = account?.contractType === ContractType.ERC_20 ? TransactionSearchType.ERC_20 : account?.contractType === ContractType.ERC_721 ? TransactionSearchType.ERC_721 : account?.contractType === ContractType.ERC_1155 ? TransactionSearchType.ERC_1155 : TransactionSearchType.All
+  const tokenType =
+    account?.contractType === ContractType.ERC_20
+      ? TransactionSearchType.ERC_20
+      : account?.contractType === ContractType.ERC_721
+      ? TransactionSearchType.ERC_721
+      : account?.contractType === ContractType.ERC_1155
+      ? TransactionSearchType.ERC_1155
+      : TransactionSearchType.All;
 
-  console.log('tokenType', tokenType)
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account];
 
-  const breadcrumbs = [
-    breadcrumbsList.dashboard,
-    breadcrumbsList.account,
-    { to: String(id), label: String(id) },
+  const header = [
+    {
+      key: "ethAddress",
+      value: "Address",
+      render: (val: unknown) => (
+        <AnchorLink
+          href={`/token/${id}/?a=${val}`}
+          label={val as unknown as string}
+          size="small"
+        />
+      ),
+    },
+    {
+      key: "tokenValue",
+      value: "Quantity",
+    },
+  ];
+
+  const tabs = [
+    {
+      key: TransactionSearchType.All,
+      value: "Transfer",
+      content: <TransactionTable data={transactions} txnType={tokenType} />,
+    },
+    {
+      key: "holder",
+      value: "Holder",
+      content: <Table columns={header} data={tokens} />,
+    },
   ];
 
   return (
@@ -43,7 +89,7 @@ export const Token: React.FC = () => {
         title={
           <div className={styles.header}>
             <div className={styles.title}>
-              Address - <span>&nbsp;&nbsp;{id}&nbsp;&nbsp;</span>
+              Address <span>&nbsp;&nbsp;{id}&nbsp;&nbsp;</span>
             </div>
             <CopyButton text={id as string} title="Copy address to clipboard" />
           </div>
@@ -51,51 +97,55 @@ export const Token: React.FC = () => {
         breadcrumbItems={breadcrumbs}
         showBackButton
       >
-        { account && (
-            <div className={styles.row}>
-              <DetailCard
-                title="Contract Info"
-                titleRight={
-                  account?.contractType === ContractType.GENERIC && (
-                    <div className={styles.buttonWrapper}>
-                      <Button
-                        apperance="outlined"
-                        className={styles.btn}
-                        onClick={() => router.push(`/token/${id}?a=${id}`)}
-                      >
-                        Token Tracker
-                      </Button>
-                      <Button
-                        apperance="outlined"
-                        className={styles.btn}
-                        onClick={() => router.push(`/log?address=${id}`)}
-                      >
-                        Filter By Logs
-                      </Button>
-                    </div>
-                  )
-                }
-                items={[
-                  { key: "Balance :", value: Web3Utils.fromWei(account?.account?.balance, "ether") },
-                  { key: "Holders :", value: tokenHolders },
-                  { key: "Transfers :", value: total},
-                ]}
-              />
-              {
-                account?.contractType && account?.contractType !== ContractType.GENERIC &&
+        {account && (
+          <div className={styles.row}>
+            <DetailCard
+              title="Contract Info"
+              titleRight={
+                account?.contractType === ContractType.GENERIC && (
+                  <div className={styles.buttonWrapper}>
+                    <Button
+                      apperance="outlined"
+                      className={styles.btn}
+                      onClick={() => router.push(`/token/${id}?a=${id}`)}
+                    >
+                      Token Tracker
+                    </Button>
+                    <Button
+                      apperance="outlined"
+                      className={styles.btn}
+                      onClick={() => router.push(`/log?address=${id}`)}
+                    >
+                      Filter By Logs
+                    </Button>
+                  </div>
+                )
+              }
+              items={[
+                {
+                  key: "Balance :",
+                  value: Web3Utils.fromWei(account?.account?.balance, "ether"),
+                },
+                { key: "Holders :", value: tokenHolders },
+                { key: "Transfers :", value: total },
+              ]}
+            />
+            {account?.contractType &&
+              account?.contractType !== ContractType.GENERIC && (
                 <DetailCard
                   title="More Info"
                   items={[
                     { key: "Name", value: account?.contractInfo?.name },
                     { key: "Symbol :", value: account?.contractInfo?.symbol },
-                    { key: "Total Supply :", value: account?.contractInfo?.totalSupply },
+                    {
+                      key: "Total Supply :",
+                      value: account?.contractInfo?.totalSupply,
+                    },
                   ]}
                 />
-
-              }
-            </div>
-        )
-      }
+              )}
+          </div>
+        )}
         <Spacer space="64" />
         <div className={styles.tableHeader}>
           <div className={styles.title}>Token Transactions</div>
@@ -104,15 +154,32 @@ export const Token: React.FC = () => {
               type="text"
               placeholder="Filter token txs of by address"
               className={styles.input}
-            // value={address}
-            // onChange={onAddressChange}
+              value={filteredAddress}
+              onChange={onAddressChange}
             />
             <Button apperance="primary">Search</Button>
           </div>
         </div>
-        <hr />
+
+        {filteredAddress && (
+          <div className={styles.filter}>
+            <div>
+              <div className={styles.title}>FILTERED BY TOKEN HOLDER</div>
+              <AnchorLink
+                href={`/address/${filteredAddress}`}
+                label={filteredAddress}
+                size="small"
+              />
+            </div>
+            <div className={styles.divider} />
+            <div>
+              <div className={styles.title}>BALANCE</div>
+              <div className={styles.value}>{tokenBalance}</div>
+            </div>
+          </div>
+        )}
         <Spacer space="16" />
-        <TransactionTable loading={false} data={transactions} txType={tokenType} />
+        <Tab tabs={tabs} activeTab={activeTab} onClick={onTabChange} />
       </ContentLayout>
     </div>
   );

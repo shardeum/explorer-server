@@ -2,33 +2,49 @@
 
 .Table {
   max-width: $maxWidth;
-  border: border(gray1);
-  border-radius: borderRadius(4);
+  border: border(gray);
+  border-radius: borderRadius(8);
+  box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 
   table {
     border-collapse: collapse;
     width: 100%;
   }
 
-  th,
-  td {
-    border-bottom: border(gray1);
-    padding: spacing(8);
-  }
-
-  th {
-    @include fontStyle(bold, bold);
-    color: color(gray4);
-  }
-
-  tr {
-    &:hover {
-      background-color: color(gray3);
-    }
-  }
-
   thead {
     text-align: left;
     height: 48px;
+  }
+
+  th,
+  td {
+    border-bottom: border(gray);
+    padding: spacing(8);
+
+    &:first-child {
+      padding-left: spacing(16);
+    }
+  }
+
+  th {
+    @include fontStyle(small, bold);
+    color: color(gray-800);
+    vertical-align: middle;
+  }
+
+  td {
+    @include fontStyle(small);
+    @include singleLineEllipsis();
+  }
+
+  tbody {
+    tr {
+      &:hover {
+        background-color: color(gray-200);
+      }
+    }
   }
 }

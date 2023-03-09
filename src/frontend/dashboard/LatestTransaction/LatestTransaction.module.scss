@@ -1,0 +1,55 @@
+@import "../../../styles/index.scss";
+
+.LatestTransactions {
+  border: border(gray);
+  border-radius: borderRadius(8);
+  margin-bottom: spacing(16);
+  box-shadow: shadow(shadow1);
+  background-color: color(white);
+
+  .title {
+    @include fontStyle(small, semi-bold);
+    color: color(gray-800);
+    margin: spacing(8) spacing(16);
+  }
+
+  .content {
+    height: 500px;
+    overflow-y: auto;
+  }
+
+  .item {
+    display: grid;
+    grid-template-columns: 10% 45% 45%;
+    align-items: center;
+    grid-row-gap: spacing(8);
+    padding: spacing(8) spacing(16);
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: color(bg);
+    }
+
+    span {
+      @include fontStyle(small);
+      @include singleLineEllipsis();
+      margin-right: spacing(4);
+    }
+
+    .row {
+      display: flex;
+    }
+  }
+
+  .button {
+    $size: spacing(16);
+    width: calc(100% - $size - $size);
+    margin: spacing(8) $size;
+    padding: spacing(7) 0;
+  }
+}

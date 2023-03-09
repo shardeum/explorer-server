@@ -1,100 +1,43 @@
 $colors: (
-  bg1: #1a2151,
-  bg2: #e3e8ff,
-  bg3: #f8f9fa,
-
-  black: #000000,
+  primary: #6610f2,
+  bg: #8247e51a,
   white: #ffffff,
-  caption: #f2f6ff,
+  success: #00a186,
+  success-tint: #00c9a71a,
 
-  primary1: #8352fd,
-  primary2: #3913b8,
-  secondary1: #00cffd,
-  secondary2: #2fb5fc,
+  info: #0784c3,
+  info-tint: #0784c31a,
+  
+  warning: #ffc107,
+  warning-tint: #ffc1071a,
+  
+  danger: #dc3545,
+  danger-tint: #dc35451a,
 
-  success: #00c9a7,
-  info: #3498db,
-  warn: #db9a04,
-  danger: #de4437,
-
-  gray1: #dedede,
-  gray2: #818181,
-  gray3: #e7eaf3,
-  gray4: #4a4f55,
+  gray-100: #f8f9fa,
+  gray-200: #e9ecef,
+  gray-300: #dee2e6,
+  gray-400: #ced4da,
+  gray-500: #adb5bd,
+  gray-600: #6c757d,
+  gray-700: #495057,
+  gray-800: #343a40,
+  gray-900: #212529,
 );
 
 $font-weights: (
   regular: 400,
+  normal: 500,
   semi-bold: 600,
   bold: 700,
 );
 
 $font-sizes: (
-  display-1: (
-    desktop: 66px,
-    mobile: 39px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  display-2: (
-    desktop: 58px,
-    mobile: 36px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  display-3: (
-    desktop: 52px,
-    mobile: 34px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  display-4: (
-    desktop: 46px,
-    mobile: 32px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  display-5: (
-    desktop: 41px,
-    mobile: 29px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  heading-1: (
-    desktop: 32px,
-    mobile: 26px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  heading-2: (
-    desktop: 29px,
-    mobile: 24px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  heading-3: (
-    desktop: 26px,
-    mobile: 22px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  heading-4: (
-    desktop: 23px,
-    mobile: 21px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  heading-5: (
+  heading: (
     desktop: 20px,
-    mobile: 19px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
-  ),
-  heading-6: (
-    desktop: 16px,
-    mobile: 16px,
-    defaultWeight: bold,
-    lineHeight: 1.38,
+    mobile: 20px,
+    defaultWeight: regular,
+    lineHeight: 1.54,
   ),
   large: (
     desktop: 18px,
@@ -102,7 +45,7 @@ $font-sizes: (
     defaultWeight: regular,
     lineHeight: 1.54,
   ),
-  body: (
+  medium: (
     desktop: 16px,
     mobile: 16px,
     defaultWeight: regular,
@@ -124,6 +67,7 @@ $font-sizes: (
 
 $spacing: (
   4: 4px,
+  6: 6px,
   8: 8px,
   12: 12px,
   16: 16px,
@@ -136,25 +80,13 @@ $spacing: (
 );
 
 $borders: (
-  gray1: (
+  gray: (
     thickness: 1px,
-    color: map-get($colors, gray3),
+    color: map-get($colors, gray-200),
   ),
-  primary1: (
+  primary: (
     thickness: 1px,
-    color: map-get($colors, primary1),
-  ),
-  primary2: (
-    thickness: 1px,
-    color: map-get($colors, primary1),
-  ),
-  secondary1: (
-    thickness: 1px,
-    color: map-get($colors, secondary1),
-  ),
-  secondary2: (
-    thickness: 1px,
-    color: map-get($colors, secondary2),
+    color: map-get($colors, primary),
   ),
 );
 
@@ -166,19 +98,17 @@ $border-radiuses: (
 );
 
 $overlays: (
-  80: rgba(map-get($colors, black), 0.8),
-  50: rgba(map-get($colors, black), 0.5),
-  30: rgba(map-get($colors, black), 0.3),
-  20: rgba(map-get($colors, black), 0.2),
-  10: rgba(map-get($colors, black), 0.1),
+  80: rgba(map-get($colors, gray-900), 0.8),
+  50: rgba(map-get($colors, gray-900), 0.5),
+  30: rgba(map-get($colors, gray-900), 0.3),
+  20: rgba(map-get($colors, gray-900), 0.2),
+  10: rgba(map-get($colors, gray-900), 0.1),
   0: transparent,
 );
 
 $shadows: (
-  gray5: 0px 5px 14px rgba(#979797, 0.05),
-  gray10: 0px 8px 16px rgba(#979797, 0.1),
-  gray15: 0px 8px 16px rgba(#979797, 0.15),
-  gray25: 0px 4px 24px rgba(#979797, 0.25),
+  shadow1: 0px 5px 14px rgba(#979797, 0.09),
+  shadow2: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px,
 );
 
 $layout-grids: (

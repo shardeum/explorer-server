@@ -4,7 +4,7 @@ import styles from "./Chip.module.scss";
 
 interface ChipProps {
   className?: string;
-  color?: "primary" | "secondary" | "warn" | "success" | "error" | "info";
+  color?: "primary" | "warn" | "success" | "error" | "info";
   size?: "large" | "medium" | "small";
   title: string;
 }

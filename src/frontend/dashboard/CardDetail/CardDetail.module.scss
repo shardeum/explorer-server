@@ -1,24 +1,52 @@
 @import "../../../styles/index.scss";
 
 .CardDetail {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  column-gap: spacing(32);
-  row-gap: spacing(8);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  border: border(gray);
+  border-radius: borderRadius(8);
+  box-shadow: shadow(shadow1);
+  padding: spacing(16) 0;
 
-  @include laptop {
-    grid-template-columns: 1fr 1fr 1fr;
-    column-gap: spacing(16);
+  .column {
+    flex: 0 0 auto;
+    width: 25%;
+    border-right: border(gray);
+
+    @include tablet {
+      width: 45%;
+      border-right: none;
+    }
+
+    @include mobile {
+      width: 90%;
+    }
   }
 
-  @include tabletPro {
-    grid-template-columns: 1fr 1fr;
-    column-gap: spacing(16);
+  .item {
+    @extend %row;
+    margin: spacing(16);
   }
 
-  @include tablet {
-    grid-template-columns: 1fr;
-    row-gap: spacing(16);
+  .icon {
+    $size: 40px;
+    @extend %center;
+    width: $size;
+    height: $size;
+    background-color: color(bg);
+    border-radius: borderRadius(8);
+    margin-right: spacing(12);
+    cursor: pointer;
+  }
 
+  .title {
+    @include fontStyle(tiny, semi-bold);
+    color: color(gray-700);
+    text-transform: uppercase;
+  }
+
+  hr {
+    margin: 8px 32px;
   }
 }

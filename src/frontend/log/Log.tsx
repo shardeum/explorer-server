@@ -1,18 +1,14 @@
 import React from "react";
 import { useRouter } from "next/router";
 
-import {
-  Button,
-  ContentLayout,
-  Pagination,
-  TransactionTable,
-} from "../components";
+import { Button, ContentLayout, Pagination } from "../components";
 
-import { breadcrumbsList } from "../types";
+import { breadcrumbsList, TransactionSearchType } from "../types";
 
 import { useLogHook } from "./useLogHook";
 
 import styles from "./Log.module.scss";
+import { TransactionTable } from "../transaction";
 
 const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.log];
 
@@ -55,7 +51,10 @@ export const Log: React.FC = () => {
             Search
           </Button>
         </div>
-        <TransactionTable data={transactions} loading={false} />
+        <TransactionTable
+          data={transactions}
+          txnType={TransactionSearchType.All}
+        />
         <Pagination
           currentPage={page}
           onPageChange={(p) => setPage(p)}
