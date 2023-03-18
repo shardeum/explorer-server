@@ -1,3 +1,41 @@
 {
-  "extends": "next/core-web-vitals"
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    //"browser": true,
+    "node": true
+  },
+  "plugins": ["@typescript-eslint", "security", "xss"],
+  "extends": [
+    "next/core-web-vitals", // nextjs
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:security/recommended",
+    "plugin:no-unsanitized/DOM",
+    "prettier"
+  ],
+  "ignorePatterns": [
+    "**/storage/*.ts",
+    "**/utils/*.ts",
+    "**/stats/*.ts",
+    "**/frontend/**/*.ts",
+    "**/class/**/*.ts",
+    "server.ts",
+    "rpc_data_server.ts",
+    "collector.ts",
+    "aggregator.ts",
+    "**/@type/index.ts"
+  ],
+  "rules": {
+    "no-empty": [
+      1,
+      {
+        "allowEmptyCatch": true
+      }
+    ],
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/member-delimiter-style": "off",
+    "@typescript-eslint/no-non-null-assertion": "off"
+  }
 }
