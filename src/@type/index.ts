@@ -15,6 +15,7 @@ export enum AccountType {
   NodeAccount2,
   StakeReceipt,
   UnstakeReceipt,
+  InternalTxReceipt,
 }
 
 export enum TransactionType {

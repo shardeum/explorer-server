@@ -201,110 +201,112 @@ export async function processReceiptData(receipts: any) {
         txReceipt = account
     }
     if (txReceipt) {
-      const txObj = {
-        txId: tx.txId,
-        result,
-        cycle: cycle,
-        // partition: Number(partition), // We don't know the partition now
-        timestamp: tx.timestamp,
-        wrappedEVMAccount: txReceipt.data,
-        accountId: txReceipt.accountId,
-        transactionType:
-          txReceipt.data.accountType === AccountType.Receipt
-            ? TransactionType.Receipt
-            : txReceipt.data.accountType === AccountType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txReceipt.data.accountType === AccountType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : TransactionType.UnstakeReceipt,
-        txHash: txReceipt.data.ethAddress,
-        txFrom: txReceipt.data.readableReceipt.from,
-        txTo: txReceipt.data.readableReceipt.to
-          ? txReceipt.data.readableReceipt.to
-          : txReceipt.data.readableReceipt.contractAddress,
-        originTxData: tx.data.tx || {},
-      } as Transaction.Transaction
-      if (txReceipt.data.readableReceipt.stakeInfo) {
-        txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
-      }
-      const transactionExist = await Transaction.queryTransactionByTxId(tx.txId)
-      if (config.verbose) console.log('transactionExist', transactionExist)
-      if (!transactionExist) {
-        if (txObj.nominee) await Transaction.insertTransaction(txObj)
-        else combineTransactions.push(txObj)
-      } else {
-        if (
-          transactionExist.cycle <= txObj.cycle &&
-          transactionExist.wrappedEVMAccount.timestamp < txObj.wrappedEVMAccount.timestamp
-        ) {
-          await Transaction.updateTransaction(tx.txId, txObj)
-          continue
+      if (txReceipt.data.accountType !== AccountType.InternalTxReceipt) {
+        const txObj = {
+          txId: tx.txId,
+          result,
+          cycle: cycle,
+          // partition: Number(partition), // We don't know the partition now
+          timestamp: tx.timestamp,
+          wrappedEVMAccount: txReceipt.data,
+          accountId: txReceipt.accountId,
+          transactionType:
+            txReceipt.data.accountType === AccountType.Receipt
+              ? TransactionType.Receipt
+              : txReceipt.data.accountType === AccountType.NodeRewardReceipt
+                ? TransactionType.NodeRewardReceipt
+                : txReceipt.data.accountType === AccountType.StakeReceipt
+                  ? TransactionType.StakeReceipt
+                  : TransactionType.UnstakeReceipt,
+          txHash: txReceipt.data.ethAddress,
+          txFrom: txReceipt.data.readableReceipt.from,
+          txTo: txReceipt.data.readableReceipt.to
+            ? txReceipt.data.readableReceipt.to
+            : txReceipt.data.readableReceipt.contractAddress,
+          originTxData: tx.originalTxData || {},
+        } as Transaction.Transaction
+        if (txReceipt.data.readableReceipt.stakeInfo) {
+          txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
         }
-      }
-      const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap)
-      // console.log('txs', txs)
-      // console.log('accs', accs)
-      // console.log('tokens', tokens)
-      for (let i = 0; i < accs.length; i++) {
-        if (accs[i] === ZERO_ETH_ADDRESS) continue
-        if (!combineAccounts1.some((a) => a.ethAddress === accs[i])) {
-          const addressToCreate = accs[i]
-          const accountExist = await Account.queryAccountByAccountId(
-            addressToCreate.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
-          )
-          if (config.verbose) console.log('addressToCreate', addressToCreate, accountExist)
-          if (!accountExist) {
-            // Account is not created in the EVM yet
-            // Make a sample account with that address to show the account info in the explorer
-            const accObj = {
-              accountId: addressToCreate.slice(2).toLowerCase() + '0'.repeat(24),
-              cycle: txObj.cycle,
-              timestamp: txObj.timestamp,
-              ethAddress: addressToCreate,
-              account: {
-                nonce: '0',
-                balance: '0',
-              },
-              hash: 'Ox',
-              accountType: AccountType.Account,
-            }
-            combineAccounts1.push(accObj)
+        const transactionExist = await Transaction.queryTransactionByTxId(tx.txId)
+        if (config.verbose) console.log('transactionExist', transactionExist)
+        if (!transactionExist) {
+          if (txObj.nominee) await Transaction.insertTransaction(txObj)
+          else combineTransactions.push(txObj)
+        } else {
+          if (
+            transactionExist.cycle <= txObj.cycle &&
+            transactionExist.wrappedEVMAccount.timestamp < txObj.wrappedEVMAccount.timestamp
+          ) {
+            await Transaction.updateTransaction(tx.txId, txObj)
+            continue
           }
         }
-      }
-      for (let i = 0; i < txs.length; i++) {
-        let accountExist
-        if (txs[i].tokenType !== TransactionType.Internal)
-          accountExist = await Account.queryAccountByAccountId(
-            txs[i].contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
-          )
-        let contractInfo = {}
-        if (accountExist && accountExist.contractInfo) {
-          contractInfo = accountExist.contractInfo
+        const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap)
+        // console.log('txs', txs)
+        // console.log('accs', accs)
+        // console.log('tokens', tokens)
+        for (let i = 0; i < accs.length; i++) {
+          if (accs[i] === ZERO_ETH_ADDRESS) continue
+          if (!combineAccounts1.some((a) => a.ethAddress === accs[i])) {
+            const addressToCreate = accs[i]
+            const accountExist = await Account.queryAccountByAccountId(
+              addressToCreate.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
+            )
+            if (config.verbose) console.log('addressToCreate', addressToCreate, accountExist)
+            if (!accountExist) {
+              // Account is not created in the EVM yet
+              // Make a sample account with that address to show the account info in the explorer
+              const accObj = {
+                accountId: addressToCreate.slice(2).toLowerCase() + '0'.repeat(24),
+                cycle: txObj.cycle,
+                timestamp: txObj.timestamp,
+                ethAddress: addressToCreate,
+                account: {
+                  nonce: '0',
+                  balance: '0',
+                },
+                hash: 'Ox',
+                accountType: AccountType.Account,
+              }
+              combineAccounts1.push(accObj)
+            }
+          }
         }
-        if (txs[i].tokenType === TransactionType.ERC_1155) {
-          combineTokenTransactions2.push({
-            txId: txObj.txId,
-            txHash: txObj.txHash,
-            cycle: txObj.cycle,
-            timestamp: txObj.timestamp,
-            transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
-            contractInfo,
-            ...txs[i],
-          })
-        } else {
-          combineTokenTransactions.push({
-            txId: txObj.txId,
-            txHash: txObj.txHash,
-            cycle: txObj.cycle,
-            timestamp: txObj.timestamp,
-            contractInfo,
-            transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
-            ...txs[i],
-          })
+        for (let i = 0; i < txs.length; i++) {
+          let accountExist
+          if (txs[i].tokenType !== TransactionType.Internal)
+            accountExist = await Account.queryAccountByAccountId(
+              txs[i].contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
+            )
+          let contractInfo = {}
+          if (accountExist && accountExist.contractInfo) {
+            contractInfo = accountExist.contractInfo
+          }
+          if (txs[i].tokenType === TransactionType.ERC_1155) {
+            combineTokenTransactions2.push({
+              txId: txObj.txId,
+              txHash: txObj.txHash,
+              cycle: txObj.cycle,
+              timestamp: txObj.timestamp,
+              transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
+              contractInfo,
+              ...txs[i],
+            })
+          } else {
+            combineTokenTransactions.push({
+              txId: txObj.txId,
+              txHash: txObj.txHash,
+              cycle: txObj.cycle,
+              timestamp: txObj.timestamp,
+              contractInfo,
+              transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
+              ...txs[i],
+            })
+          }
         }
+        combineTokens = [...combineTokens, ...tokens]
       }
-      combineTokens = [...combineTokens, ...tokens]
     }
     // Receipts size can be big, better to save per 100
     if (combineReceipts.length >= 100) {
