@@ -38,6 +38,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
     series: [
       {
         name: name,
+        keys: name === "Validators" ? ['x', 'y', 'cycleNumber'] : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
         data: data,
         type: "line",
         threshold: null,
@@ -65,7 +66,11 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
     },
     tooltip: {
       pointFormat: name === "Validators" ?
-      "<span>Validator: <b>{point.y}</b></span><br/><br /><span>Cycle Number <b>Not working</b></span>" : "<span>Total Txs: <b>{point.y}</b></span><br/><br /><span>Cycle Number <b>Not working</b></span>",
+      "<span>Validator: <b>{point.y}</b></span><br/><br /><span>Cycle Number <b>{point.cycleNumber}</b></span>" 
+      : `<span>Total Txs: <b>{point.y}</b></span><br />
+        <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
+        <span>Total UnstakeTxs: <b>{point.totalUnstakeTxs}</b></span><br />
+        <span>Cycle Number: <b>{point.cycleNumber}</b></span><br />`,
       // @ts-ignore
       // formatter:
       //   name === "Validators"
@@ -107,6 +112,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       //   <span>Total Unstake Txs: <b>${item[0][3]}</b></span><br />
       //   <span>Cycle Number: <b>${item[0][4]}</b></span>`;
       //       },
+      split: true,
       borderColor: "#e9ecef",
       borderRadius: 4,
     },
@@ -162,7 +168,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
         },
         {
           type: "day",
-          count: 1,
+          count: 5,
           text: "5d",
         },
         {
