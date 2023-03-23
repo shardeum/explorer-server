@@ -18,6 +18,7 @@ import { AccountSearchType, AccountType, TransactionSearchType } from "./@type";
 import * as StatsStorage from './stats';
 import * as ValidatorStats from './stats/validatorStats';
 import * as TransactionStats from './stats/transactionStats';
+import * as CoinStats from './stats/coinStats'
 
 crypto.init("69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc");
 
@@ -73,21 +74,17 @@ const txHashQueryCacheSize = 1000;
 // Setup Log Directory
 const start = async () => {
   await Storage.initializeDB();
-  await StatsStorage.initializeStatsDB();
+  await StatsStorage.initializeStatsDB()
 
-  const server: Fastify.FastifyInstance<
-    Server,
-    IncomingMessage,
-    ServerResponse
-  > = Fastify.fastify({
-    logger: false,
-  });
+  const server: Fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = Fastify.fastify({
+    logger: true,
+  })
 
-  server.register(fastifyCors);
+  server.register(fastifyCors)
 
   server
     .register(fastifyNextjs, {
-      dev: process.env.NODE_ENV !== "production",
+      dev: true,
       logLevel: "debug",
       noServeAssets: false,
     })
@@ -1304,6 +1301,18 @@ const start = async () => {
     };
     reply.send(res);
   });
+
+  server.get('/api/stats/coin', async (_request, reply) => {
+    console.log('hi')
+    const coinStats = await CoinStats.queryAggregatedCoinStats()
+    console.log('coinStats', coinStats)
+    const res = {
+      success: true,
+      totalSupply: coinStats.totalSupplyChange + CONFIG.genesisSHMSupply,
+      totalStaked: coinStats.totalStakeChange,
+    }
+    reply.send(res)
+  })
 
   server.get("/totalData", async (_request, reply) => {
     const totalCycles = await Cycle.queryCyleCount();

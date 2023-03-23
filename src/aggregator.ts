@@ -1,24 +1,21 @@
 // require("dotenv").config();
 
-import * as Storage from "./storage";
-import * as Transaction from "./storage/transaction";
-import * as Account from "./storage/account";
-import * as Cycle from "./storage/cycle";
-import * as Receipt from "./storage/receipt";
-import * as Log from "./storage/log";
 import * as crypto from "@shardus/crypto-utils";
-import * as utils from "./utils";
 import cron from 'node-cron';
 import * as StatsStorage from './stats';
-import * as ValidatorStats from './stats/validatorStats';
+import * as CoinStats from './stats/coinStats';
 import * as TransactionStats from './stats/transactionStats';
+import * as ValidatorStats from './stats/validatorStats';
+import * as Storage from "./storage";
+import * as Cycle from "./storage/cycle";
+import * as Transaction from "./storage/transaction";
 
 
 crypto.init("69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc");
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL, RPC_DATA_SERVER_URL } from "./config";
-import { TransactionSearchType } from "./@type";
+import { TransactionSearchType, TransactionType } from "./@type";
+import { config as CONFIG } from "./config";
 if (process.env.PORT) {
     CONFIG.port.server = process.env.PORT;
 }
@@ -33,13 +30,17 @@ const start = async () => {
     await StatsStorage.initializeStatsDB()
     let lastCheckedCycleForValidators = 0
     let lastCheckedCycleForTxs = 0
-    let waitCycleForTxs = 5 // Calculate transactions count per Cycle after 5 cycles
+    let lastCheckedCycleForCoinStats = 0
+    let waitCycleForStats = 5 // Calculate transactions count per Cycle after 5 cycles
 
     let lastStoredValidators = await ValidatorStats.queryLatestValidatorStats(1)
     if (lastStoredValidators.length > 0) lastCheckedCycleForValidators = lastStoredValidators[0].cycle
 
     let lastStoredTransactions = await TransactionStats.queryLatestTransactionStats(1)
     if (lastStoredTransactions.length > 0) lastCheckedCycleForTxs = lastStoredTransactions[0].cycle
+
+    let lastStoredCoinStats = await CoinStats.queryLatestCoinStats(1)
+    if (lastStoredCoinStats.length > 0) lastCheckedCycleForTxs = lastStoredCoinStats[0].cycle
 
     console.log('lastCheckedCycleForValidators', lastCheckedCycleForValidators)
     if (measure_time)
@@ -61,9 +62,14 @@ const start = async () => {
             lastCheckedCycleForValidators = latestCycleCounter
         }
         // console.log(latestCycleCounter - waitCycleForTxs, lastCheckedCycleForTxs)
-        if (latestCycleCounter - waitCycleForTxs > lastCheckedCycleForTxs) {
-            recordTransactionsStats(latestCycleCounter - waitCycleForTxs, lastCheckedCycleForTxs)
-            lastCheckedCycleForTxs = latestCycleCounter - waitCycleForTxs
+        if (latestCycleCounter - waitCycleForStats > lastCheckedCycleForTxs) {
+            recordTransactionsStats(latestCycleCounter - waitCycleForStats, lastCheckedCycleForTxs)
+            lastCheckedCycleForTxs = latestCycleCounter - waitCycleForStats
+        }
+
+        if (latestCycleCounter - waitCycleForStats > lastCheckedCycleForCoinStats) {
+            recordCoinStats(latestCycleCounter - waitCycleForStats, lastCheckedCycleForCoinStats)
+            lastCheckedCycleForCoinStats = latestCycleCounter - waitCycleForStats
         }
     });
 
@@ -140,5 +146,69 @@ const recordTransactionsStats = async (latestCycle: number, lastStoredCycle: num
         startCycle = endCycle + 1
         endCycle = startCycle + bucketSize;
     }
+}
+
+const recordCoinStats = async (latestCycle: number, lastStoredCycle: number) => {
+  let bucketSize = 50
+  let startCycle = lastStoredCycle + 1
+  let endCycle = startCycle + bucketSize
+  while (startCycle <= latestCycle) {
+    if (endCycle > latestCycle) endCycle = latestCycle
+    const cycles = await Cycle.queryCycleRecordsBetween(startCycle, endCycle)
+    if (cycles.length > 0) {
+      // Fetch transactions
+      const transactions = await Transaction.queryTransactionsForCycles(startCycle, endCycle)
+
+      for (let i = 0; i < cycles.length; i++) {
+        // Filter transactions
+        const stakeTransactions = transactions.filter(
+          (a) => a.transactionType === TransactionType.StakeReceipt && a.cycle === cycles[i].counter
+        )
+        const unstakeTransactions = transactions.filter(
+          (a) => a.transactionType === TransactionType.UnstakeReceipt && a.cycle === cycles[i].counter
+        )
+        const nodeRewardTransactions = transactions.filter(
+          (a) => a.transactionType === TransactionType.NodeRewardReceipt && a.cycle === cycles[i].counter
+        )
+
+        try {
+          // Calculate total staked amount in cycle
+          const stakeAmount = stakeTransactions.reduce(
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.value, 16),
+            0
+          )
+          // Calculate total unstaked amount in cycle
+          const unStakeAmount = unstakeTransactions.reduce(
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.value, 16),
+            0
+          )
+          // Calculate total node rewards in cycle
+          const nodeRewardAmount = nodeRewardTransactions.reduce(
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.value, 16),
+            0
+          )
+          // Calculate total gas burnt in cycle
+          const gasBurnt = transactions.reduce(
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.cumulativeGasUsed, 16),
+            0
+          )
+
+          const coinStatsForCycle = {
+            cycle: cycles[i].counter,
+            totalSupplyChange: nodeRewardAmount - gasBurnt,
+            totalStakeChange: stakeAmount - unStakeAmount,
+            timestamp: cycles[i].cycleRecord.start,
+          }
+          await CoinStats.insertCoinStats(coinStatsForCycle)
+        } catch (e) {
+          console.log(`Failed to record coin stats for cycle ${cycles[i].counter}`, e)
+        }
+      }
+    } else {
+      console.log(`Fail to fetch cycleRecords between ${startCycle} and ${endCycle}`)
+    }
+    startCycle = endCycle + 1
+    endCycle = startCycle + bucketSize
+  }
 }
 

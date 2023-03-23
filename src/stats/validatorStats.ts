@@ -1,8 +1,7 @@
 /* eslint-disable no-empty */
+import { config } from '../config/index'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
-import { config } from '../config/index'
-import { P2P, StateManager } from '@shardus/types'
 
 
 export interface ValidatorStats {
