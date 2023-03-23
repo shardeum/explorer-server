@@ -77,14 +77,14 @@ const start = async () => {
   await StatsStorage.initializeStatsDB()
 
   const server: Fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = Fastify.fastify({
-    logger: true,
+    logger: false,
   })
 
-  server.register(fastifyCors)
+  server.register(fastifyCors);
 
   server
     .register(fastifyNextjs, {
-      dev: true,
+      dev: process.env.NODE_ENV !== "production",
       logLevel: "debug",
       noServeAssets: false,
     })
@@ -1303,14 +1303,13 @@ const start = async () => {
   });
 
   server.get('/api/stats/coin', async (_request, reply) => {
-    console.log('hi')
     const coinStats = await CoinStats.queryAggregatedCoinStats()
-    console.log('coinStats', coinStats)
     const res = {
       success: true,
       totalSupply: coinStats.totalSupplyChange + CONFIG.genesisSHMSupply,
       totalStaked: coinStats.totalStakeChange,
     }
+    console.log('CoinStats response', coinStats)
     reply.send(res)
   })
 

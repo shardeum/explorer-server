@@ -16,4 +16,11 @@ export const initializeStatsDB = async () => {
   await db.runCreate(
     'CREATE TABLE if not exists `coin_stats` (`cycle` NUMBER NOT NULL UNIQUE PRIMARY KEY, `totalSupplyChange` BIGINT NOT NULL, `totalStakeChange` BIGINT NOT NULL, `timestamp` BIGINT NOT NULL)'
   )
+
+  await db.runCreate(
+    'CREATE INDEX if not exists `coin_stats_totalSupplyChange` ON `coin_stats` (`totalSupplyChange`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `coin_stats_totalStakeChange` ON `coin_stats` (`totalStakeChange`)'
+  )
 }
