@@ -14,6 +14,8 @@ export interface CardDetailProps {
   totalUnstakeTxs: string;
   totalAccounts: string;
   totalContracts: string;
+  totalStakedSHM: number;
+  totalSHM: number;
 }
 
 export const CardDetail: React.FC<CardDetailProps> = (data) => {
@@ -101,7 +103,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total SHM</p>
-            <p>{data?.totalRewardTxs?.toLocaleString("en-US")}</p>
+            <p>{data?.totalSHM?.toLocaleString("en-US")}</p>
           </div>
         </div>
         <hr />
@@ -113,7 +115,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Stake SHM</p>
-            <p>{data?.totalRewardTxs?.toLocaleString("en-US")}</p>
+            <p>{data?.totalStakedSHM?.toLocaleString("en-US")}</p>
           </div>
         </div>
       </div>

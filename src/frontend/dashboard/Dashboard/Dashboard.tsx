@@ -21,7 +21,11 @@ export const Dashboard: React.FC = () => {
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA });
 
-  const { validatorStats, transactionStats } = useStats({ validatorStatsCount: 1000, transactionStatsCount: 1000});
+  const { validatorStats, transactionStats, totalSHM, totalStakedSHM } = useStats({
+    validatorStatsCount: 1000,
+    transactionStatsCount: 1000,
+    fetchCoinStats: true,
+  })
 
   const cyclesList = cycles.map((row) => {
     return {
@@ -46,7 +50,7 @@ export const Dashboard: React.FC = () => {
       </session>
       <Spacer space="48" />
       <session>
-        <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.activeNodes} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs} totalStakeTxs={totalStakeTxs} totalUnstakeTxs={totalUnstakeTxs}/>
+        <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.activeNodes} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs} totalStakeTxs={totalStakeTxs} totalUnstakeTxs={totalUnstakeTxs} totalSHM={totalSHM} totalStakedSHM={totalStakedSHM}  />
       </session>
       <Spacer space="48" />
       <section>
