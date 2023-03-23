@@ -53,7 +53,7 @@ export const Log: React.FC = () => {
         </div>
         <TransactionTable
           data={transactions}
-          txnType={TransactionSearchType.All}
+          txType={TransactionSearchType.All}
         />
         <Pagination
           currentPage={page}

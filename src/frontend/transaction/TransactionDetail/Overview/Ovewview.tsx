@@ -231,7 +231,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
               </div>
               {transaction?.transactionType === TransactionType.StakeReceipt ? (
                 <div className={styles.item}>
-                  <div className={styles.title}>Total Stake:</div>
+                  <div className={styles.title}>Stake Amount:</div>
                   <div className={styles.value}>
                     {calculateFullValue(
                       transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stakeAmount
@@ -240,13 +240,22 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   </div>
                 </div>
               ) : (
-                <div className={styles.item}>
-                  <div className={styles.title}>Reward:</div>
-                  <div className={styles.value}>
-                    {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward)}{' '}
-                    SHM
+                <>
+                  <div className={styles.item}>
+                    <div className={styles.title}>Reward:</div>
+                    <div className={styles.value}>
+                      {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward)}{' '}
+                      SHM
+                    </div>
                   </div>
-                </div>
+                  <div className={styles.item}>
+                    <div className={styles.title}>Unstake Amount:</div>
+                    <div className={styles.value}>
+                      {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.totalUnstakeAmount)}{' '}
+                      SHM
+                    </div>
+                  </div>
+                </>
               )}
             </>
           )}

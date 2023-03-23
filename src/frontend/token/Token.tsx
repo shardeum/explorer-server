@@ -74,7 +74,7 @@ export const Token: React.FC = () => {
     {
       key: TransactionSearchType.All,
       value: "Transfer",
-      content: <TransactionTable data={transactions} txnType={tokenType} />,
+      content: <TransactionTable data={transactions} txType={tokenType} />,
     },
     {
       key: "holder",

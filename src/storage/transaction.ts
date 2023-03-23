@@ -537,11 +537,11 @@ export async function queryTransactionCount(
         transactions = await db.get(sql, [address, address, address, txType])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
-          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?)`
-          transactions = await db.get(sql, [address, filterAddress, filterAddress, filterAddress])
+          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT tokenType=?`
+          transactions = await db.get(sql, [address, filterAddress, filterAddress, filterAddress, TransactionType.Internal])
         } else {
-          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE contractAddress=?`
-          transactions = await db.get(sql, [address])
+          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE contractAddress=? AND NOT tokenType=?`
+          transactions = await db.get(sql, [address, TransactionType.Internal])
         }
       }
     } else if (txType || txType === TransactionSearchType.All) {
@@ -641,11 +641,11 @@ export async function queryTransactions(
         transactions = await db.all(sql, [address, address, address, txType])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
-          const sql = `SELECT * FROM tokenTxs WHERE contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-          transactions = await db.all(sql, [address, filterAddress, filterAddress, filterAddress])
+          const sql = `SELECT * FROM tokenTxs WHERE contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+          transactions = await db.all(sql, [address, filterAddress, filterAddress, filterAddress, TransactionType.Internal])
         } else {
-          const sql = `SELECT * FROM tokenTxs WHERE contractAddress=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-          transactions = await db.all(sql, [address])
+          const sql = `SELECT * FROM tokenTxs WHERE contractAddress=? AND NOT (tokenType=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+          transactions = await db.all(sql, [address, TransactionType.Internal])
         }
       }
     } else if (txType) {
@@ -794,11 +794,11 @@ export async function queryTransactionsBetweenCycles(skip = 0, limit = 10, start
         transactions = await db.all(sql, [start, end, address, address, address, txType])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
-          const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-          transactions = await db.all(sql, [start, end, address, filterAddress, filterAddress, filterAddress])
+          const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
+          transactions = await db.all(sql, [start, end, address, filterAddress, filterAddress, filterAddress, TransactionType.Internal])
         } else {
-          const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-          transactions = await db.all(sql, [start, end, address])
+          const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND NOT (tokenType=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
+          transactions = await db.all(sql, [start, end, address, TransactionType.Internal])
         }
       }
     } else if (txType) {
@@ -905,11 +905,11 @@ export async function queryTransactionCountBetweenCycles(
         transactions = await db.get(sql, [start, end, address, address, address, txType])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
-          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?)`
-          transactions = await db.get(sql, [start, end, address, filterAddress, filterAddress, filterAddress])
+          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT tokenType=?`
+          transactions = await db.get(sql, [start, end, address, filterAddress, filterAddress, filterAddress, TransactionType.Internal])
         } else {
-          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=?`
-          transactions = await db.get(sql, [start, end, address])
+          const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND NOT tokenType=?`
+          transactions = await db.get(sql, [start, end, address, TransactionType.Internal])
         }
       }
     } else if (txType || txType === TransactionSearchType.All) {
