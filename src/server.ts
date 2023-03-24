@@ -1304,12 +1304,20 @@ const start = async () => {
 
   server.get('/api/stats/coin', async (_request, reply) => {
     const coinStats = await CoinStats.queryAggregatedCoinStats()
-    const res = {
-      success: true,
-      totalSupply: coinStats.totalSupplyChange + CONFIG.genesisSHMSupply,
-      totalStaked: coinStats.totalStakeChange,
+    let res: any
+    if (coinStats) {
+      res = {
+        success: true,
+        totalSupply: coinStats.totalSupplyChange + CONFIG.genesisSHMSupply,
+        totalStaked: coinStats.totalStakeChange,
+      }
+      // console.log('CoinStats response', coinStats)
+    } else {
+      res = {
+        success: false,
+        error: 'No coin stats found'
+      }
     }
-    console.log('CoinStats response', coinStats)
     reply.send(res)
   })
 

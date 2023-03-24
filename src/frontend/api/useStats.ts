@@ -31,10 +31,9 @@ export const useStats = (query: any) => {
   }
 
   if (fetchCoinStats) {
-    const response = useSWR(`${PATHS.STATS_COIN}`, fetcher)
-    totalSHM = response?.data?.totalSupply || {}
-    totalStakedSHM = response?.data?.totalStaked || {}
-    console.log('data', response)
+    response = useSWR(`${PATHS.STATS_COIN}`, fetcher)
+    totalSHM = response?.data?.totalSupply || 0
+    totalStakedSHM = response?.data?.totalStaked || 0
   }
 
   return {
