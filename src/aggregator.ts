@@ -41,7 +41,7 @@ const start = async () => {
     if (lastStoredTransactions.length > 0) lastCheckedCycleForTxs = lastStoredTransactions[0].cycle
 
     let lastStoredCoinStats = await CoinStats.queryLatestCoinStats(1)
-    if (lastStoredCoinStats.length > 0) lastCheckedCycleForTxs = lastStoredCoinStats[0].cycle
+    if (lastStoredCoinStats.length > 0) lastCheckedCycleForCoinStats = lastStoredCoinStats[0].cycle
 
     console.log('lastCheckedCycleForValidators', lastCheckedCycleForValidators)
     if (measure_time)
