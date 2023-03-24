@@ -88,6 +88,7 @@ export interface ReadableReceipt {
     stakeAmount?: string
     totalStakeAmount?: string
     totalUnstakeAmount?: string
+    stake?: string
     reward?: string
     penalty?: string
   }

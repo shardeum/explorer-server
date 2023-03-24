@@ -177,8 +177,7 @@ const recordCoinStats = async (latestCycle: number, lastStoredCycle: number) => 
           )
           // Calculate total unstaked amount in cycle
           const unStakeAmount = unstakeTransactions.reduce(
-            (sum, current) =>
-              sum + parseInt(current.wrappedEVMAccount.readableReceipt.stakeInfo.totalUnstakeAmount, 16),
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake, 16),
             0
           )
           // Calculate total node rewards in cycle
