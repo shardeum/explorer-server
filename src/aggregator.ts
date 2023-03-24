@@ -193,7 +193,7 @@ const recordCoinStats = async (latestCycle: number, lastStoredCycle: number) => 
           )
           // Calculate total gas burnt in cycle
           const gasBurnt = transactions.reduce(
-            (sum, current) => sum + parseInt(current.wrappedEVMAccount.amountSpent, 16),
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.amountSpent, 10),
             0
           )
 
