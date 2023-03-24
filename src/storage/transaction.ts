@@ -751,11 +751,11 @@ export async function queryTransactionByHash(txHash: string, detail = false) {
   }
 }
 
-export async function queryTransactionsForCycles(start, end): Promise<Transaction[]> {
+export async function queryTransactionsForCycle(cycleNumber): Promise<Transaction[]> {
   let transactions
   try {
-    const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? ORDER BY timestamp ASC`
-    transactions = await db.all(sql, [start, end])
+    const sql = `SELECT * FROM transactions WHERE cycle=? ORDER BY timestamp ASC`
+    transactions = await db.all(sql, [cycleNumber])
     if (transactions.length > 0) {
       transactions.map((transaction: any) => {
         if (transaction.wrappedEVMAccount)
@@ -765,9 +765,9 @@ export async function queryTransactionsForCycles(start, end): Promise<Transactio
         return transaction
       })
     }
-    if (config.verbose) console.log('transactions for cycles between', start, end, transactions)
+    if (config.verbose) console.log('transactions for cycle', cycleNumber, transactions)
   } catch (e) {
-    console.log('exception when querying transactions for cycles between', start, end, e)
+    console.log('exception when querying transactions for cycle', cycleNumber, e)
   }
   return transactions
 }

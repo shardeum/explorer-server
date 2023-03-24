@@ -83,6 +83,14 @@ export interface ReadableReceipt {
   to: string
   value: string
   data: string
+  stakeInfo?: {
+    nominee?: string
+    stakeAmount?: string
+    totalStakeAmount?: string
+    totalUnstakeAmount?: string
+    reward?: string
+    penalty?: string
+  }
 }
 
 export interface ERC20ContractDetail {

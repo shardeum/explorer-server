@@ -156,46 +156,50 @@ const recordCoinStats = async (latestCycle: number, lastStoredCycle: number) => 
     if (endCycle > latestCycle) endCycle = latestCycle
     const cycles = await Cycle.queryCycleRecordsBetween(startCycle, endCycle)
     if (cycles.length > 0) {
-      // Fetch transactions
-      const transactions = await Transaction.queryTransactionsForCycles(startCycle, endCycle)
-
       for (let i = 0; i < cycles.length; i++) {
+        // Fetch transactions
+        const transactions = await Transaction.queryTransactionsForCycle(cycles[i].counter)
+
         // Filter transactions
         const stakeTransactions = transactions.filter(
-          (a) => a.transactionType === TransactionType.StakeReceipt && a.cycle === cycles[i].counter
+          (a) => a.transactionType === TransactionType.StakeReceipt
         )
         const unstakeTransactions = transactions.filter(
-          (a) => a.transactionType === TransactionType.UnstakeReceipt && a.cycle === cycles[i].counter
-        )
-        const nodeRewardTransactions = transactions.filter(
-          (a) => a.transactionType === TransactionType.NodeRewardReceipt && a.cycle === cycles[i].counter
+          (a) => a.transactionType === TransactionType.UnstakeReceipt
         )
 
         try {
           // Calculate total staked amount in cycle
           const stakeAmount = stakeTransactions.reduce(
-            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.value, 16),
+            (sum, current) =>
+              sum + parseInt(current.wrappedEVMAccount.readableReceipt.stakeInfo.stakeAmount, 10),
             0
           )
           // Calculate total unstaked amount in cycle
           const unStakeAmount = unstakeTransactions.reduce(
-            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.value, 16),
+            (sum, current) =>
+              sum + parseInt(current.wrappedEVMAccount.readableReceipt.stakeInfo.totalUnstakeAmount, 16),
             0
           )
           // Calculate total node rewards in cycle
-          const nodeRewardAmount = nodeRewardTransactions.reduce(
-            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.value, 16),
+          const nodeRewardAmount = unstakeTransactions.reduce(
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.stakeInfo.reward, 16),
+            0
+          )
+          // Calculate total reward penalties in cycle
+          const nodePenaltyAmount = unstakeTransactions.reduce(
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.stakeInfo.penalty, 16),
             0
           )
           // Calculate total gas burnt in cycle
           const gasBurnt = transactions.reduce(
-            (sum, current) => sum + parseInt(current.wrappedEVMAccount.readableReceipt.cumulativeGasUsed, 16),
+            (sum, current) => sum + parseInt(current.wrappedEVMAccount.amountSpent, 16),
             0
           )
 
           const coinStatsForCycle = {
             cycle: cycles[i].counter,
-            totalSupplyChange: nodeRewardAmount - gasBurnt,
+            totalSupplyChange: nodeRewardAmount - nodePenaltyAmount - gasBurnt,
             totalStakeChange: stakeAmount - unStakeAmount,
             timestamp: cycles[i].cycleRecord.start,
           }
