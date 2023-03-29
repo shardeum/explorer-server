@@ -84,7 +84,13 @@ export const TopBarDropdown: React.FC<TopBarDropdownProps> = (props) => {
             // >
             //   {item.value}
             // </p>
-            <a key={item.key} target="_blank" href={item.key} className={cx(styles.menuItem)}>
+            <a
+              key={item.key}
+              target="_blank"
+              rel="noreferrer"
+              href={item.key.toString()}
+              className={cx(styles.menuItem)}
+            >
               {item.value}
             </a>
           ))}
