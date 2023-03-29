@@ -1,1 +1,1 @@
-export { ValidatorLineChart } from "./ValidatorLineChart";
+export { ValidatorLineChart } from './ValidatorLineChart'

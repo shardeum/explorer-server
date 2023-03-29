@@ -1,60 +1,48 @@
-import React, { Fragment, useState } from "react";
-import { useRouter } from "next/router";
+import React, { Fragment, useState } from 'react'
+import { useRouter } from 'next/router'
 
-import { useTransaction } from "../../api";
+import { useTransaction } from '../../api'
 
-import {
-  ContentLayout,
-  Dropdown,
-  Dropdownt,
-  Pagination,
-  PaginationPrevNext,
-} from "../../components";
-import { TransactionTable } from "../TransactionTable";
+import { ContentLayout, Dropdown, Dropdownt, Pagination, PaginationPrevNext } from '../../components'
+import { TransactionTable } from '../TransactionTable'
 
-import { breadcrumbsList, TransactionSearchList } from "../../types";
+import { breadcrumbsList, TransactionSearchList } from '../../types'
 
-import styles from "./Transaction.module.scss";
+import styles from './Transaction.module.scss'
 
-const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction];
+const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction]
 
 export const Transaction: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const txType = Number(router?.query?.txType);
+  const txType = Number(router?.query?.txType)
 
-  const tType = txType
-    ? TransactionSearchList.filter((t) => t.key === txType)[0]
-    : TransactionSearchList[0];
+  const tType = txType ? TransactionSearchList.filter((t) => t.key === txType)[0] : TransactionSearchList[0]
 
-  const [transactionType, setTransactionType] = useState(tType);
+  const [transactionType, setTransactionType] = useState(tType)
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const siblingCount = 3;
-  const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1)
+  const siblingCount = 3
+  const pageSize = 10
 
   const { transactions, totalTransactions, loading } = useTransaction({
     page: currentPage,
     txType: transactionType.key,
-  });
+  })
 
   const onNext = () => {
-    const totalPage = Math.ceil(totalTransactions / 10);
+    const totalPage = Math.ceil(totalTransactions / 10)
 
-    setCurrentPage(currentPage < totalPage ? currentPage + 1 : totalPage);
-  };
+    setCurrentPage(currentPage < totalPage ? currentPage + 1 : totalPage)
+  }
 
   const onPrev = () => {
-    setCurrentPage(currentPage > 1 ? currentPage - 1 : 1);
-  };
+    setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)
+  }
 
   return (
     <div className={styles.Transaction}>
-      <ContentLayout
-        title="All Transactions"
-        breadcrumbItems={breadcrumbs}
-        showBackButton
-      >
+      <ContentLayout title="All Transactions" breadcrumbItems={breadcrumbs} showBackButton>
         <div className={styles.wrapper}>
           <Dropdown
             apperance="outlined"
@@ -62,28 +50,19 @@ export const Transaction: React.FC = () => {
             items={TransactionSearchList.map((t) => t.value)}
             selected={transactionType.value}
             onSelect={(t) => {
-              setTransactionType(
-                TransactionSearchList.filter((i) => i.value === t)[0]
-              );
-              setCurrentPage(1);
+              setTransactionType(TransactionSearchList.filter((i) => i.value === t)[0])
+              setCurrentPage(1)
             }}
             buttonClassName={styles.button}
             onHoverOpen
           />
-          <PaginationPrevNext
-            onNext={onNext}
-            onPrev={onPrev}
-            page={currentPage}
-          />
+          <PaginationPrevNext onNext={onNext} onPrev={onPrev} page={currentPage} />
         </div>
         {loading ? (
           <div>Loading...</div>
         ) : transactions && transactions.length > 0 ? (
           <Fragment>
-            <TransactionTable
-              data={transactions}
-              txType={transactionType.key}
-            />
+            <TransactionTable data={transactions} txType={transactionType.key} />
             <div className={styles.paginationWrapper}>
               <Pagination
                 onPageChange={(p) => setCurrentPage(p)}
@@ -99,5 +78,5 @@ export const Transaction: React.FC = () => {
         )}
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

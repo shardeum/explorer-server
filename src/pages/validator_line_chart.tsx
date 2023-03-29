@@ -1,1 +1,1 @@
-export { ValidatorLineChart as default } from "../frontend/validator-line-chart";
+export { ValidatorLineChart as default } from '../frontend/validator-line-chart'

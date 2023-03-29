@@ -1,6 +1,6 @@
-@use "sass:map";
-@import "variables";
-@import "functions";
+@use 'sass:map';
+@import 'variables';
+@import 'functions';
 
 @mixin iconStyle($size: false, $color: false) {
   @if $size {
@@ -18,18 +18,14 @@
 }
 
 @mixin fontStyle($size, $weight: false, $line-height: false) {
-  $default-weight: map-get($font-sizes, $size, "defaultWeight");
+  $default-weight: map-get($font-sizes, $size, 'defaultWeight');
 
   font-weight: map-get($font-weights, if($weight, $weight, $default-weight));
-  font-size: map-get($font-sizes, $size, "desktop");
-  line-height: if(
-    $line-height == "fit",
-    1,
-    map-get($font-sizes, $size, "lineHeight")
-  );
+  font-size: map-get($font-sizes, $size, 'desktop');
+  line-height: if($line-height == 'fit', 1, map-get($font-sizes, $size, 'lineHeight'));
 
   @include mobile() {
-    font-size: map-get($font-sizes, $size, "mobile");
+    font-size: map-get($font-sizes, $size, 'mobile');
   }
 }
 
@@ -40,9 +36,9 @@
 }
 
 @mixin multilineEllipsis($size: body, $line-no: 2, $auto-height: true) {
-  $font-size-desktop: map-get($font-sizes, $size, "desktop");
-  $font-size-mobile: map-get($font-sizes, $size, "mobile");
-  $line-height: map-get($font-sizes, $size, "lineHeight");
+  $font-size-desktop: map-get($font-sizes, $size, 'desktop');
+  $font-size-mobile: map-get($font-sizes, $size, 'mobile');
+  $line-height: map-get($font-sizes, $size, 'lineHeight');
 
   $line-height-in-px: $line-height * $font-size-desktop;
   $height: $line-height-in-px * $line-no;
@@ -68,14 +64,14 @@
 }
 
 @mixin media($max-size: false, $min-size: false, $fields: ()) {
-  $size: if($max-size, $max-size, "default");
+  $size: if($max-size, $max-size, 'default');
   $values: ();
 
   @each $field in $fields {
     $values: append($values, layoutGrid($size, $field));
   }
 
-  @if $size == "default" and $min-size {
+  @if $size == 'default' and $min-size {
     @media (min-width: breakpoint($min-size)) {
       @content ($values...);
     }
@@ -129,29 +125,25 @@
 }
 
 @mixin desktopOnly($fields: ()) {
-  @include media($max-size: desktop, $min-size: laptop, $fields: $fields) using
-    ($values...) {
+  @include media($max-size: desktop, $min-size: laptop, $fields: $fields) using ($values...) {
     @content ($values...);
   }
 }
 
 @mixin laptopOnly($fields: ()) {
-  @include media($max-size: laptop, $min-size: tabletPro, $fields: $fields)
-    using ($values...) {
+  @include media($max-size: laptop, $min-size: tabletPro, $fields: $fields) using ($values...) {
     @content ($values...);
   }
 }
 
 @mixin tabletProOnly($fields: ()) {
-  @include media($max-size: tabletPro, $min-size: tablet, $fields: $fields)
-    using ($values...) {
+  @include media($max-size: tabletPro, $min-size: tablet, $fields: $fields) using ($values...) {
     @content ($values...);
   }
 }
 
 @mixin tabletOnly($fields: ()) {
-  @include media($max-size: tablet, $min-size: mobile, $fields: $fields) using
-    ($values...) {
+  @include media($max-size: tablet, $min-size: mobile, $fields: $fields) using ($values...) {
     @content ($values...);
   }
 }
@@ -160,7 +152,7 @@
   $empty-values: ();
 
   @each $field in $fields {
-    $empty-values: append($empty-values, "#{$field}");
+    $empty-values: append($empty-values, '#{$field}');
   }
 
   $start: (null);
@@ -181,17 +173,14 @@
 
     $is-changed: if($args or $values != nth($target-values, 1), true, false);
 
-    $previous-content-args: join(
-      (nth($previous-target-args, 1)),
-      nth($previous-target-values, 1)
-    );
+    $previous-content-args: join((nth($previous-target-args, 1)), nth($previous-target-values, 1));
     $content-args: join(
       join((nth($target-args, 1)), nth($target-values, 1)),
       if($include-previous, $previous-content-args, ())
     );
 
-    @if $size != "default" and $is-changed {
-      @if (nth($start, 1) == "default") {
+    @if $size != 'default' and $is-changed {
+      @if (nth($start, 1) == 'default') {
         @media (min-width: breakpoint($size)) {
           @content ($content-args...);
         }
@@ -207,17 +196,14 @@
       $previous-target-values: set-nth($previous-target-values, 1, $values);
     }
 
-    @if $size == "default" or $is-changed {
+    @if $size == 'default' or $is-changed {
       $start: set-nth($start, 1, $size);
       $target-values: set-nth($target-values, 1, $values);
       $target-args: set-nth($target-args, 1, $args);
     }
   }
 
-  $previous-content-args: join(
-    (nth($previous-target-args, 1)),
-    nth($previous-target-values, 1)
-  );
+  $previous-content-args: join((nth($previous-target-args, 1)), nth($previous-target-values, 1));
   $content-args: join(
     join((nth($target-args, 1)), nth($target-values, 1)),
     if($include-previous, $previous-content-args, ())
@@ -247,21 +233,9 @@
 }
 
 @mixin responsiveWidth($width-in-col-map) {
-  @include responsiveLayoutGrid($width-in-col-map, ("columns", "gutter"), true)
-    using
-    (
-      $width-in-col,
-      $columns,
-      $gutter,
-      $previous-width-in-col,
-      $previous-columns,
-      $previous-gutter
-    ) {
-    $col: if(
-      $width-in-col,
-      $width-in-col,
-      ceil($previous-width-in-col / $previous-columns * $columns)
-    );
+  @include responsiveLayoutGrid($width-in-col-map, ('columns', 'gutter'), true) using
+    ($width-in-col, $columns, $gutter, $previous-width-in-col, $previous-columns, $previous-gutter) {
+    $col: if($width-in-col, $width-in-col, ceil($previous-width-in-col / $previous-columns * $columns));
 
     @include columnWidth($col, $columns, $gutter) using ($n, $gutter, $fit) {
       @content ($n, $gutter, $fit);
@@ -269,11 +243,7 @@
   }
 }
 
-@mixin responsiveCardWidth(
-  $width-in-col-map,
-  $vertical-margin: false,
-  $direction: "right"
-) {
+@mixin responsiveCardWidth($width-in-col-map, $vertical-margin: false, $direction: 'right') {
   @include responsiveWidth($width-in-col-map) using ($n, $gutter, $fit) {
     $margin-top: if($vertical-margin, $vertical-margin, $gutter);
 

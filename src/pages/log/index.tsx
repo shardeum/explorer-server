@@ -1,1 +1,1 @@
-export { Log as default } from "../../frontend/log";
+export { Log as default } from '../../frontend/log'

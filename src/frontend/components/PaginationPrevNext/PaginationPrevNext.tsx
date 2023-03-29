@@ -1,23 +1,21 @@
-import { MouseEventHandler } from "react";
-import cx from "classnames";
+import { MouseEventHandler } from 'react'
+import cx from 'classnames'
 
-import { Button } from "../Button";
-import { Icon } from "../Icon";
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
-import styles from "./PaginationPrevNext.module.scss";
-import ReactTooltip from "react-tooltip";
+import styles from './PaginationPrevNext.module.scss'
+import ReactTooltip from 'react-tooltip'
 
 export interface PaginationPrevNextProps {
-  page: number | string;
-  onPrev: MouseEventHandler;
-  onNext: MouseEventHandler;
-  className?: string;
+  page: number | string
+  onPrev: MouseEventHandler
+  onNext: MouseEventHandler
+  className?: string
 }
 
-export const PaginationPrevNext: React.FC<PaginationPrevNextProps> = (
-  props
-) => {
-  const { page, onPrev, onNext, className } = props;
+export const PaginationPrevNext: React.FC<PaginationPrevNextProps> = (props) => {
+  const { page, onPrev, onNext, className } = props
 
   return (
     <div className={cx(styles.PaginationPrevNext, className)}>
@@ -26,7 +24,7 @@ export const PaginationPrevNext: React.FC<PaginationPrevNextProps> = (
         apperance="default"
         size="medium"
         className={cx(styles.button, styles.rightborder)}
-        data-tip={"Go To Prev"}
+        data-tip={'Go To Prev'}
         data-for="prev"
       >
         <Icon name="arrow_left" size="small" color="black" />
@@ -37,7 +35,7 @@ export const PaginationPrevNext: React.FC<PaginationPrevNextProps> = (
         apperance="default"
         size="medium"
         className={cx(styles.button, styles.leftborder)}
-        data-tip={"Go To Next"}
+        data-tip={'Go To Next'}
         data-for="nex"
       >
         <Icon name="arrow_right" size="small" color="black" />
@@ -45,5 +43,5 @@ export const PaginationPrevNext: React.FC<PaginationPrevNextProps> = (
       <ReactTooltip effect="solid" backgroundColor="#6610f2" id="prev" />
       <ReactTooltip effect="solid" backgroundColor="#6610f2" id="nex" />
     </div>
-  );
-};
+  )
+}

@@ -1,2 +1,2 @@
-export { Cycle } from "./Cycle";
-export { CycleDetail } from "./CycleDetail";
+export { Cycle } from './Cycle'
+export { CycleDetail } from './CycleDetail'

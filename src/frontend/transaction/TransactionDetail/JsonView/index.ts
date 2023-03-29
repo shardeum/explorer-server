@@ -1,1 +1,1 @@
-export { JsonView } from "./JsonView";
+export { JsonView } from './JsonView'

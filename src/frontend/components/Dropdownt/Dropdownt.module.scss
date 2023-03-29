@@ -1,4 +1,4 @@
-@import "../../../styles/index.scss";
+@import '../../../styles/index.scss';
 
 .Dropdownt {
   position: relative;
@@ -11,7 +11,7 @@
     align-items: flex-end;
 
     &:hover,
-    &[data-active="true"] {
+    &[data-active='true'] {
       color: color(primary);
     }
 
@@ -37,7 +37,7 @@
     transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
     z-index: 9999;
 
-    &[data-active="false"] {
+    &[data-active='false'] {
       opacity: 0;
       pointer-events: none;
     }

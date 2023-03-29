@@ -1,1 +1,1 @@
-export { Cycle as default } from "../../frontend/cycle";
+export { Cycle as default } from '../../frontend/cycle'

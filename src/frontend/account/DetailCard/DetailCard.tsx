@@ -1,21 +1,21 @@
-import React, { ReactNode } from "react";
-import cx from "classnames";
+import React, { ReactNode } from 'react'
+import cx from 'classnames'
 
-import styles from "./DetailCard.module.scss";
+import styles from './DetailCard.module.scss'
 
 interface Item {
-  key: string | number;
-  value: string | ReactNode;
+  key: string | number
+  value: string | ReactNode
 }
 
 interface DetailCardProps {
-  title: string;
-  titleRight?: ReactNode;
-  items: Item[];
+  title: string
+  titleRight?: ReactNode
+  items: Item[]
 }
 
 export const DetailCard: React.FC<DetailCardProps> = (props) => {
-  const { title, titleRight, items } = props;
+  const { title, titleRight, items } = props
 
   return (
     <div className={styles.DetailCard}>
@@ -33,5 +33,5 @@ export const DetailCard: React.FC<DetailCardProps> = (props) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}

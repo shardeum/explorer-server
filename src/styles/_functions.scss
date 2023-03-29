@@ -1,4 +1,4 @@
-@import "variables";
+@import 'variables';
 
 @function mapGet($map, $args...) {
   @if not map-has-key($map, $args...) {
@@ -17,9 +17,9 @@
 }
 
 @function color($name) {
-  $resolved-name: if($name == "primary", "primary", $name);
+  $resolved-name: if($name == 'primary', 'primary', $name);
 
-  @return _mapGet("Color", $colors, $resolved-name);
+  @return _mapGet('Color', $colors, $resolved-name);
 }
 
 @function spacing($size) {
@@ -40,7 +40,7 @@
       @error "Layout Grid " + $size + " does NOT have a field called " + $field;
     }
 
-    @if $field == "margin" or $field == "gutter" {
+    @if $field == 'margin' or $field == 'gutter' {
       @return spacing(map-get($layout-grids, $size, $field));
     }
 
@@ -51,13 +51,13 @@
 }
 
 @function breakpoint($layout-grid-size) {
-  @return layoutGrid($layout-grid-size, "maxWidth");
+  @return layoutGrid($layout-grid-size, 'maxWidth');
 }
 
 @function border($type) {
   @if map-has-key($borders, $type) {
-    $thickness: map-get($borders, $type, "thickness");
-    $color: map-get($borders, $type, "color");
+    $thickness: map-get($borders, $type, 'thickness');
+    $color: map-get($borders, $type, 'color');
 
     @return solid $thickness $color;
   }
@@ -66,13 +66,13 @@
 }
 
 @function borderRadius($size) {
-  @return _mapGet("Border radius", $border-radiuses, $size);
+  @return _mapGet('Border radius', $border-radiuses, $size);
 }
 
 @function overlay($type) {
-  @return _mapGet("Overlay", $overlays, $type);
+  @return _mapGet('Overlay', $overlays, $type);
 }
 
 @function shadow($type) {
-  @return _mapGet("Shadow", $shadows, $type);
+  @return _mapGet('Shadow', $shadows, $type);
 }

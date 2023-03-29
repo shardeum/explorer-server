@@ -1,22 +1,16 @@
-import React from "react";
-import { Transaction } from "../../../types";
+import React from 'react'
+import { Transaction } from '../../../types'
 
-import styles from "./JsonView.module.scss";
+import styles from './JsonView.module.scss'
 
 interface JsonViewProps {
-  transaction: Transaction;
+  transaction: Transaction
 }
 
 export const JsonView: React.FC<JsonViewProps> = ({ transaction }) => {
   return (
     <div className={styles.JsonView}>
-      <pre>
-        {JSON.stringify(
-          transaction?.wrappedEVMAccount?.readableReceipt,
-          null,
-          2
-        )}
-      </pre>
+      <pre>{JSON.stringify(transaction?.wrappedEVMAccount?.readableReceipt, null, 2)}</pre>
     </div>
-  );
-};
+  )
+}

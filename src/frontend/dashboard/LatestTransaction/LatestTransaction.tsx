@@ -1,19 +1,17 @@
-import moment from "moment";
-import { useRouter } from "next/router";
-import React from "react";
-import { AnchorLink, Button, Spacer } from "../../components";
-import { Transaction } from "../../types";
+import moment from 'moment'
+import { useRouter } from 'next/router'
+import React from 'react'
+import { AnchorLink, Button, Spacer } from '../../components'
+import { Transaction } from '../../types'
 
-import styles from "./LatestTransaction.module.scss";
+import styles from './LatestTransaction.module.scss'
 
 export interface LatestTransactionsProps {
-  transactions: Transaction[];
+  transactions: Transaction[]
 }
 
-export const LatestTransactions: React.FC<LatestTransactionsProps> = ({
-  transactions,
-}) => {
-  const router = useRouter();
+export const LatestTransactions: React.FC<LatestTransactionsProps> = ({ transactions }) => {
+  const router = useRouter()
 
   return (
     <div className={styles.LatestTransactions}>
@@ -64,11 +62,11 @@ export const LatestTransactions: React.FC<LatestTransactionsProps> = ({
         apperance="outlined"
         size="medium"
         onClick={() => {
-          router.push("/transaction");
+          router.push('/transaction')
         }}
       >
         View all transactions
       </Button>
     </div>
-  );
-};
+  )
+}

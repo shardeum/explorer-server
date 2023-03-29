@@ -1,4 +1,4 @@
-@import "../../../styles/index.scss";
+@import '../../../styles/index.scss';
 
 .ExpandableList {
   .button {
@@ -10,7 +10,7 @@
     cursor: pointer;
 
     &:hover,
-    &[data-active="true"] {
+    &[data-active='true'] {
       color: color(primary);
     }
   }

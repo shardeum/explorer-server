@@ -1,1 +1,1 @@
-export { BarChart } from "./BarChart";
+export { BarChart } from './BarChart'

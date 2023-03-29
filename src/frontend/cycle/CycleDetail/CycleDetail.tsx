@@ -1,39 +1,37 @@
-import React from "react";
-import { useRouter } from "next/router";
+import React from 'react'
+import { useRouter } from 'next/router'
 
-import { useCycleDetail } from "../../api";
+import { useCycleDetail } from '../../api'
 
-import { ContentLayout, PaginationPrevNext } from "../../components";
+import { ContentLayout, PaginationPrevNext } from '../../components'
 
-import styles from "./CycleDetail.module.scss";
-import { breadcrumbsList } from "../../types";
+import styles from './CycleDetail.module.scss'
+import { breadcrumbsList } from '../../types'
 
 export const CycleDetail: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const id = router?.query?.id ? router.query.id : ("0" as String);
+  const id = router?.query?.id ? router.query.id : ('0' as String)
 
-  const { data } = useCycleDetail(id);
+  const { data } = useCycleDetail(id)
 
-  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.cycle];
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.cycle]
 
   const onPrev = () => {
-    router.query.id = String(Number(id) - 1);
-    router.push(router);
-  };
+    router.query.id = String(Number(id) - 1)
+    router.push(router)
+  }
 
   const onNext = () => {
-    router.query.id = String(Number(id) + 1);
-    router.push(router);
-  };
+    router.query.id = String(Number(id) + 1)
+    router.push(router)
+  }
 
   return (
     <div className={styles.CycleDetail}>
       <ContentLayout
-        title={"Cycle"}
-        titleRight={
-          <PaginationPrevNext page={id} onPrev={onPrev} onNext={onNext} />
-        }
+        title={'Cycle'}
+        titleRight={<PaginationPrevNext page={id} onPrev={onPrev} onNext={onNext} />}
         breadcrumbItems={breadcrumbs}
         showBackButton
       >
@@ -46,9 +44,7 @@ export const CycleDetail: React.FC = () => {
 
             <div className={styles.item}>
               <div className={styles.title}>Network State Hash</div>
-              <div className={styles.value}>
-                {data?.cycleRecord?.networkStateHash || "-"}
-              </div>
+              <div className={styles.value}>{data?.cycleRecord?.networkStateHash || '-'}</div>
             </div>
 
             <div className={styles.item}>
@@ -63,9 +59,7 @@ export const CycleDetail: React.FC = () => {
 
             <div className={styles.item}>
               <div className={styles.title}>Cycle Start Time</div>
-              <div className={styles.value}>
-                {new Date(data?.cycleRecord?.start * 1000).toString()}
-              </div>
+              <div className={styles.value}>{new Date(data?.cycleRecord?.start * 1000).toString()}</div>
             </div>
 
             <div className={styles.item}>
@@ -90,52 +84,58 @@ export const CycleDetail: React.FC = () => {
 
             <div className={styles.item}>
               <div className={styles.title}>Removed Nodes</div>
-              <div className={styles.value}> { data?.cycleRecord?.removed?.length > 0  ?
-                data?.cycleRecord?.removed?.map((item) => {
-                  return <div>{item}</div>;
-                }):
-                '-'
-              }</div>
+              <div className={styles.value}>
+                {' '}
+                {data?.cycleRecord?.removed?.length > 0
+                  ? data?.cycleRecord?.removed?.map((item) => {
+                      return <div>{item}</div>
+                    })
+                  : '-'}
+              </div>
             </div>
 
             <div className={styles.item}>
               <div className={styles.title}>Lost Nodes</div>
-              <div className={styles.value}>{
-                data?.cycleRecord?.lost?.length > 0  ?
-                data?.cycleRecord?.lost?.map((item) => {
-                  return <div>{item}</div>;
-                }): '-'
-              }</div>
+              <div className={styles.value}>
+                {data?.cycleRecord?.lost?.length > 0
+                  ? data?.cycleRecord?.lost?.map((item) => {
+                      return <div>{item}</div>
+                    })
+                  : '-'}
+              </div>
             </div>
 
             <div className={styles.item}>
               <div className={styles.title}>Returned Nodes</div>
-              <div className={styles.value}>{
-                data?.cycleRecord?.refuted?.length > 0  ?
-                data?.cycleRecord?.refuted?.map((item) => {
-                  return <div>{item}</div>;
-                }) : '-'
-              }</div>
+              <div className={styles.value}>
+                {data?.cycleRecord?.refuted?.length > 0
+                  ? data?.cycleRecord?.refuted?.map((item) => {
+                      return <div>{item}</div>
+                    })
+                  : '-'}
+              </div>
             </div>
 
             <div className={styles.item}>
               <div className={styles.title}>Joined Nodes</div>
-              <div className={styles.value}>{
-                data?.cycleRecord?.joinedConsensors?.length > 0  ?
-                data?.cycleRecord?.joinedConsensors?.map((item) => {
-                  return <div>{item.id}</div>;
-                }) : '-'
-              }</div>
+              <div className={styles.value}>
+                {data?.cycleRecord?.joinedConsensors?.length > 0
+                  ? data?.cycleRecord?.joinedConsensors?.map((item) => {
+                      return <div>{item.id}</div>
+                    })
+                  : '-'}
+              </div>
             </div>
 
             <div className={styles.item}>
               <div className={styles.title}>Activated Nodes</div>
-              <div className={styles.value}>{
-                data?.cycleRecord?.actived?.length > 0  ?
-                data?.cycleRecord?.actived?.map((item) => {
-                  return <div>{item.id}</div>;
-                }) : '-'
-              }</div>
+              <div className={styles.value}>
+                {data?.cycleRecord?.actived?.length > 0
+                  ? data?.cycleRecord?.actived?.map((item) => {
+                      return <div>{item.id}</div>
+                    })
+                  : '-'}
+              </div>
             </div>
 
             {/* <div className={styles.item}>
@@ -146,24 +146,22 @@ export const CycleDetail: React.FC = () => {
             <div className={styles.item}>
               <div className={styles.title}>Refreshed Archivers</div>
               <div className={styles.value}>
-              {
-                data?.cycleRecord?.refreshedArchivers?.length > 0  ?
-                data?.cycleRecord?.refreshedArchivers?.map((item) => {
-                  return <div>{item.publicKey}</div>;
-                }) : '-'
-              }
+                {data?.cycleRecord?.refreshedArchivers?.length > 0
+                  ? data?.cycleRecord?.refreshedArchivers?.map((item) => {
+                      return <div>{item.publicKey}</div>
+                    })
+                  : '-'}
               </div>
             </div>
 
             <div className={styles.item}>
               <div className={styles.title}>Refreshed Concensors</div>
               <div className={styles.value}>
-              {
-                data?.cycleRecord?.refreshedConsensors?.length > 0  ?
-                data?.cycleRecord?.refreshedConsensors?.map((item) => {
-                  return <div>{item.id}</div>;
-                }) : '-'
-              }
+                {data?.cycleRecord?.refreshedConsensors?.length > 0
+                  ? data?.cycleRecord?.refreshedConsensors?.map((item) => {
+                      return <div>{item.id}</div>
+                    })
+                  : '-'}
               </div>
             </div>
 
@@ -177,5 +175,5 @@ export const CycleDetail: React.FC = () => {
         )}
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

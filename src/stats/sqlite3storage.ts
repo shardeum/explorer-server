@@ -1,4 +1,3 @@
-
 /***
 This is the copied code from 'storage/sqlite3storage.ts'
 Later, extract the commom functions into one place and refactor it to be able to use them in both places.

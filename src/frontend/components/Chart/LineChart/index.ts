@@ -1,2 +1,2 @@
-export { LineChart } from "./LineChart";
-export { LineStockChart } from "./LineStockChart";
+export { LineChart } from './LineChart'
+export { LineStockChart } from './LineStockChart'

@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react'
 
-import { ContentLayout, LineStockChart } from "../components";
+import { ContentLayout, LineStockChart } from '../components'
 
-import styles from "./ValidatorLineChart.module.scss";
-import { useStats } from "../api";
+import styles from './ValidatorLineChart.module.scss'
+import { useStats } from '../api'
 
 export const ValidatorLineChart: React.FC = () => {
-  const height = 600;
+  const height = 600
 
   const { validatorStats, transactionStats, loading } = useStats({
     validatorStatsCount: 10000000,
-  });
+  })
 
   return (
     <div className={styles.ValidatorLineChart}>
@@ -29,5 +29,5 @@ export const ValidatorLineChart: React.FC = () => {
         )}
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

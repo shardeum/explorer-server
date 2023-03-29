@@ -1,41 +1,41 @@
-import React from "react";
-import Highcharts from "highcharts";
-import HighchartsExporting from "highcharts/modules/exporting";
-import HighchartsReact from "highcharts-react-official";
-import { useRouter } from "next/router";
+import React from 'react'
+import Highcharts from 'highcharts'
+import HighchartsExporting from 'highcharts/modules/exporting'
+import HighchartsReact from 'highcharts-react-official'
+import { useRouter } from 'next/router'
 
-if (typeof Highcharts === "object") {
-  HighchartsExporting(Highcharts);
+if (typeof Highcharts === 'object') {
+  HighchartsExporting(Highcharts)
 }
 
 interface LineChartProps {
-  title: string;
-  centerTitle?: boolean;
-  subTitle?: string;
-  data: any;
-  height?: number;
-  name?: string;
+  title: string
+  centerTitle?: boolean
+  subTitle?: string
+  data: any
+  height?: number
+  name?: string
 }
 
 export const LineChart: React.FC<LineChartProps> = (props) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const { title, centerTitle, subTitle, data, height = 300, name } = props;
+  const { title, centerTitle, subTitle, data, height = 300, name } = props
 
   const option = {
     title: {
       text: title,
-      align: centerTitle ? "center" : "left",
+      align: centerTitle ? 'center' : 'left',
       style: {
-        fontSize: "12px",
-        fontWeight: "600",
-        color: "#495057",
+        fontSize: '12px',
+        fontWeight: '600',
+        color: '#495057',
       },
     },
     subtitle: {
       text: subTitle || undefined,
       style: {
-        fontSize: "12px",
+        fontSize: '12px',
       },
     },
     series: [
@@ -48,7 +48,7 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       enabled: false,
     },
     xAxis: {
-      type: "datetime",
+      type: 'datetime',
       gridLineWidth: 0,
       labels: {},
     },
@@ -63,55 +63,55 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     tooltip: {
       // @ts-ignore
       formatter:
-        name === "Validators"
+        name === 'Validators'
           ? function () {
               // @ts-ignore
-              const timestamp = this?.x;
+              const timestamp = this?.x
 
               // @ts-ignore
-              const data = this?.series?.options?.data;
+              const data = this?.series?.options?.data
 
               // @ts-ignore
-              const item = data?.filter((d) => d[0] === this?.x);
+              const item = data?.filter((d) => d[0] === this?.x)
               return `<span><b>${Highcharts.dateFormat(
-                "%A, %B %d, %Y",
+                '%A, %B %d, %Y',
                 //@ts-ignore
                 new Date(timestamp)
               )}</b></span><br /><br />
       <span>Active Validators: <b>${item[0][1]}</b></span><br />
-      <span>Cycle Number: <b>${item[0][2]}</b></span>`;
+      <span>Cycle Number: <b>${item[0][2]}</b></span>`
             }
           : function () {
               // @ts-ignore
-              const timestamp = this?.x;
+              const timestamp = this?.x
 
               // @ts-ignore
-              const data = this?.series?.options?.data;
+              const data = this?.series?.options?.data
 
               // @ts-ignore
-              const item = data?.filter((d) => d[0] === this?.x);
+              const item = data?.filter((d) => d[0] === this?.x)
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
-                  "%A, %B %d, %Y",
+                  '%A, %B %d, %Y',
                   //@ts-ignore
                   new Date(timestamp)
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />
         <span>Total Stake Txs: <b>${item[0][2]}</b></span><br />
         <span>Total Unstake Txs: <b>${item[0][3]}</b></span><br />
-        <span>Cycle Number: <b>${item[0][4]}</b></span>`;
+        <span>Cycle Number: <b>${item[0][4]}</b></span>`
             },
-      borderColor: "#e9ecef",
+      borderColor: '#e9ecef',
       borderRadius: 4,
     },
     chart: {
-      backgroundColor: "#ffffff",
-      borderColor: "#e9ecef",
+      backgroundColor: '#ffffff',
+      borderColor: '#e9ecef',
       borderWidth: 1,
       borderRadius: 8,
       spacingTop: 20,
       height: height,
-      zoomType: "x",
+      zoomType: 'x',
     },
     credits: {
       enabled: false,
@@ -121,38 +121,39 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       menuItemDefinitions: {
         viewFullscreen: {
           onclick: function () {
-            name === "Validators" ? router.push("/validator_line_chart") :
-            router.push("/transaction_line_chart")
+            name === 'Validators'
+              ? router.push('/validator_line_chart')
+              : router.push('/transaction_line_chart')
           },
-          text: "View Detail",
+          text: 'View Detail',
         },
       },
       buttons: {
         contextButton: {
-          menuItems: ["viewFullscreen"],
+          menuItems: ['viewFullscreen'],
         },
       },
     },
     navigation: {
       menuStyle: {
-        border: "1px solid #e9ecef",
-        background: "#ffffff",
-        padding: "5px 0",
+        border: '1px solid #e9ecef',
+        background: '#ffffff',
+        padding: '5px 0',
       },
       menuItemStyle: {
-        color: "#343a40",
+        color: '#343a40',
       },
     },
     rangeSelector: {
       inputStyle: {
-        color: "#039",
-        fontWeight: "bold",
-        backgroundColor: "white",
-        border: "none",
+        color: '#039',
+        fontWeight: 'bold',
+        backgroundColor: 'white',
+        border: 'none',
       },
       labelStyle: {
-        color: "silver",
-        fontWeight: "bold",
+        color: 'silver',
+        fontWeight: 'bold',
       },
       selected: 1,
     },
@@ -161,7 +162,7 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     //     color: "#555555",
     //   },
     // },
-  };
+  }
 
   return (
     <HighchartsReact
@@ -169,5 +170,5 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       options={option}
       // allowChartUpdate={true}
     />
-  );
-};
+  )
+}

@@ -1,37 +1,32 @@
-import React from "react";
-import Link from "next/link";
-import moment from "moment";
-import Web3Utils from "web3-utils";
+import React from 'react'
+import Link from 'next/link'
+import moment from 'moment'
+import Web3Utils from 'web3-utils'
 
-import { Chip, Icon } from "../../../components";
-import { Item } from "./Item";
+import { Chip, Icon } from '../../../components'
+import { Item } from './Item'
 
-import { Transaction, TransactionType } from "../../../types";
-import { showTxMethod } from "../../../utils/showMethod";
+import { Transaction, TransactionType } from '../../../types'
+import { showTxMethod } from '../../../utils/showMethod'
 
-import styles from "./Ovewview.module.scss";
+import styles from './Ovewview.module.scss'
 
-import {
-  calculateValue,
-  calculateFullValue,
-  calculateTokenValue,
-} from "../../../utils/calculateValue";
-import { toReadableDateFromMillis } from "../../../../utils/time";
+import { calculateValue, calculateFullValue, calculateTokenValue } from '../../../utils/calculateValue'
+import { toReadableDateFromMillis } from '../../../../utils/time'
 
 interface OvewviewProps {
-  transaction: Transaction;
+  transaction: Transaction
 }
 
 export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
   const renderErc20Tokens = () => {
-    const items = transaction?.tokenTxs;
+    const items = transaction?.tokenTxs
 
     // TODO: have to fix TransactionType enum
     if (
       items &&
       items.length > 0 &&
-      (items[0].tokenType === TransactionType.Internal ||
-        items[0].tokenType === TransactionType.ERC_20)
+      (items[0].tokenType === TransactionType.Internal || items[0].tokenType === TransactionType.ERC_20)
     ) {
       return (
         <div className={styles.item}>
@@ -42,28 +37,19 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div key={index} className={styles.row}>
                   <Icon name="right_arrow" color="black" size="small" />
                   <span>From</span>
-                  <Link
-                    href={`/account/${item.tokenFrom}`}
-                    className={styles.anchor}
-                  >
+                  <Link href={`/account/${item.tokenFrom}`} className={styles.anchor}>
                     {item.tokenFrom}
                   </Link>
                   <span>To</span>
-                  <Link
-                    href={`/account/${item.tokenTo}`}
-                    className={styles.anchor}
-                  >
+                  <Link href={`/account/${item.tokenTo}`} className={styles.anchor}>
                     {item.tokenTo}
                   </Link>
                   <span>For</span>
                   {/* TODO: calculate amount and token*/}
                   <div>{calculateTokenValue(item, item.tokenType)}&nbsp;</div>
-                  <Link
-                    href={`/account/${item.contractAddress}`}
-                    className={styles.anchor}
-                  >
+                  <Link href={`/account/${item.contractAddress}`} className={styles.anchor}>
                     {item.tokenType === TransactionType.Internal
-                      ? "SHM"
+                      ? 'SHM'
                       : item.contractInfo.name || item.contractAddress}
                   </Link>
                 </div>
@@ -71,19 +57,15 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             </div>
           </div>
         </div>
-      );
+      )
     }
-  };
+  }
 
   const renderErc721Tokens = () => {
-    const items = transaction?.tokenTxs;
+    const items = transaction?.tokenTxs
 
     // TODO: have to fix TransactionType enum
-    if (
-      items &&
-      items.length > 0 &&
-      items[0].tokenType === TransactionType.ERC_721
-    ) {
+    if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_721) {
       return (
         <div className={styles.item}>
           <div className={styles.title}>ERC-721 Tokens Transferred :</div>
@@ -97,19 +79,15 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             />
           </div>
         </div>
-      );
+      )
     }
-  };
+  }
 
   const renderErc1155Tokens = () => {
-    const items = transaction?.tokenTxs;
+    const items = transaction?.tokenTxs
 
     // TODO: have to fix TransactionType enum
-    if (
-      items &&
-      items.length > 0 &&
-      items[0].tokenType === TransactionType.ERC_1155
-    ) {
+    if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_1155) {
       return (
         <div className={styles.item}>
           <div className={styles.title}>ERC-1155 Tokens Transferred :</div>
@@ -125,9 +103,9 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             </div>
           </div>
         </div>
-      );
+      )
     }
-  };
+  }
 
   if (transaction) {
     if (transaction?.txStatus) {
@@ -251,7 +229,9 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   <div className={styles.item}>
                     <div className={styles.title}>Unstake Amount:</div>
                     <div className={styles.value}>
-                      {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.totalUnstakeAmount)}{' '}
+                      {calculateFullValue(
+                        transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.totalUnstakeAmount
+                      )}{' '}
                       SHM
                     </div>
                   </div>
@@ -283,8 +263,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
       )
     }
   } else {
-    return (
-      <div> No Data</div>
-    )
+    return <div> No Data</div>
   }
-};
+}

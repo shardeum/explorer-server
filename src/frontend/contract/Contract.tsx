@@ -1,19 +1,19 @@
-import moment from "moment";
-import React, { Fragment, useState } from "react";
+import moment from 'moment'
+import React, { Fragment, useState } from 'react'
 
-import { useContract } from "../api";
+import { useContract } from '../api'
 
-import { AnchorLink, ContentLayout, Dropdown, Pagination } from "../components";
-import { ContractTable } from "../components/Table";
-import { Table } from "../components/TableComp";
-import { breadcrumbsList, contractTypes } from "../types";
+import { AnchorLink, ContentLayout, Dropdown, Pagination } from '../components'
+import { ContractTable } from '../components/Table'
+import { Table } from '../components/TableComp'
+import { breadcrumbsList, contractTypes } from '../types'
 
-import styles from "./Contract.module.scss";
+import styles from './Contract.module.scss'
 
 const header = [
   {
-    key: "accountId",
-    value: "Contract Address",
+    key: 'accountId',
+    value: 'Contract Address',
     render: (val: unknown, item: any) => (
       <AnchorLink
         href={`/account/${item?.ethAddress}`}
@@ -25,30 +25,28 @@ const header = [
     ),
   },
   {
-    key: "timestamp",
-    value: "Last Used",
+    key: 'timestamp',
+    value: 'Last Used',
     render: (val: unknown) => moment(val as string).fromNow(),
   },
-];
+]
 
 export const Contract: React.FC = () => {
-  const [selected, setSelected] = useState(contractTypes[0]);
-  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState(contractTypes[0])
+  const [page, setPage] = useState(1)
 
   const { data, loading, total } = useContract({
     page,
     type: selected.key,
-  });
+  })
 
-  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.contract];
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.contract]
 
   return (
     <div className={styles.Contract}>
       <ContentLayout
         title="Contract Address"
-        titleRight={
-          <div className={styles.title}>Number of Contracts - {total}</div>
-        }
+        titleRight={<div className={styles.title}>Number of Contracts - {total}</div>}
         breadcrumbItems={breadcrumbs}
         showBackButton
       >
@@ -61,8 +59,8 @@ export const Contract: React.FC = () => {
               apperance="outlined"
               selected={selected.value}
               onSelect={(t) => {
-                setSelected(contractTypes.filter((i) => i.value === t)[0]);
-                setPage(1);
+                setSelected(contractTypes.filter((i) => i.value === t)[0])
+                setPage(1)
               }}
               className={styles.dropdown}
               buttonClassName={styles.button}
@@ -84,5 +82,5 @@ export const Contract: React.FC = () => {
         )}
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

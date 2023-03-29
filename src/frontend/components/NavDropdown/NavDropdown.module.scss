@@ -1,4 +1,4 @@
-@import "../../../styles/index.scss";
+@import '../../../styles/index.scss';
 
 .NavDropdown {
   .item {
@@ -14,7 +14,7 @@
     }
 
     .title {
-      &[data-active="true"] {
+      &[data-active='true'] {
         color: color(primary);
       }
     }

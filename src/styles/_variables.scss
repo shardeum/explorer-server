@@ -7,10 +7,10 @@ $colors: (
 
   info: #0784c3,
   info-tint: #0784c31a,
-  
+
   warning: #ffc107,
   warning-tint: #ffc1071a,
-  
+
   danger: #dc3545,
   danger-tint: #dc35451a,
 
@@ -113,7 +113,7 @@ $shadows: (
 
 $layout-grids: (
   default: (
-    maxWidth: "none",
+    maxWidth: 'none',
     columns: 12,
     gutter: 32,
     margin: 80,

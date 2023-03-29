@@ -351,8 +351,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
             tokenTx.tokenType === TransactionType.ERC_20
               ? ERC_20_BALANCE
               : tokenTx.tokenType === TransactionType.ERC_721
-                ? ERC_721_BALANCE
-                : ERC_1155_BALANCE
+              ? ERC_721_BALANCE
+              : ERC_1155_BALANCE
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
             let calculatedKey = Web3.utils

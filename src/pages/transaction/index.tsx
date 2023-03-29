@@ -1,1 +1,1 @@
-export { Transaction as default } from "../../frontend/transaction";
+export { Transaction as default } from '../../frontend/transaction'

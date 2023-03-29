@@ -1,1 +1,1 @@
-export { Contract } from "./Contract";
+export { Contract } from './Contract'

@@ -1,4 +1,4 @@
-@import "../../../styles/index.scss";
+@import '../../../styles/index.scss';
 
 .Tab {
   @extend %card;
@@ -24,7 +24,7 @@
         color: color(primary);
 
         &::after {
-          content: "";
+          content: '';
           position: absolute;
           bottom: 0;
           left: spacing(16);

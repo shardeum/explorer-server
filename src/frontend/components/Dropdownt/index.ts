@@ -1,1 +1,1 @@
-export { Dropdownt } from "./Dropdownt";
+export { Dropdownt } from './Dropdownt'

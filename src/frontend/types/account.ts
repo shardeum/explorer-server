@@ -1,34 +1,34 @@
-import { ContractType } from "./contract";
+import { ContractType } from './contract'
 
 export interface AccountQuery {
-  page?: number;
-  count?: number;
-  type?: number;
+  page?: number
+  count?: number
+  type?: number
 }
 
 export interface Account {
-  accountId: string;
-  accountType: number;
-  contractInfo: any;
-  contractType: any;
-  cycle: number;
-  ethAddress: string;
-  hash: string;
-  timestamp: number;
-  account: AccountDetail;
+  accountId: string
+  accountType: number
+  contractInfo: any
+  contractType: any
+  cycle: number
+  ethAddress: string
+  hash: string
+  timestamp: number
+  account: AccountDetail
 }
 
 export interface AccountDetail {
-  balance: string;
+  balance: string
   codeHash: {
-    data: number[];
-    type: string;
-  };
-  nonce: string;
+    data: number[]
+    type: string
+  }
+  nonce: string
   stateRoot: {
-    data: number[];
-    type: string;
-  };
+    data: number[]
+    type: string
+  }
 }
 
 // export const accountTypes = [
@@ -81,8 +81,8 @@ export enum AccountType {
 }
 
 export interface Token {
-  contractAddress: string;
-  contractInfo: any;
-  contractType: ContractType;
-  balance: string;
+  contractAddress: string
+  contractInfo: any
+  contractType: ContractType
+  balance: string
 }

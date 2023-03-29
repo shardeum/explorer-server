@@ -1,21 +1,21 @@
-import Link from "next/link";
-import React from "react";
+import Link from 'next/link'
+import React from 'react'
 
-import { Icon } from "../../components";
+import { Icon } from '../../components'
 
-import styles from "./CardDetail.module.scss";
+import styles from './CardDetail.module.scss'
 
 export interface CardDetailProps {
-  totalCycles: string | number;
-  totalNodes: string | number;
-  totalTransactions: string;
-  totalRewardTxs: string;
-  totalStakeTxs: string;
-  totalUnstakeTxs: string;
-  totalAccounts: string;
-  totalContracts: string;
-  totalStakedSHM: number;
-  totalSHM: number;
+  totalCycles: string | number
+  totalNodes: string | number
+  totalTransactions: string
+  totalRewardTxs: string
+  totalStakeTxs: string
+  totalUnstakeTxs: string
+  totalAccounts: string
+  totalContracts: string
+  totalStakedSHM: number
+  totalSHM: number
 }
 
 export const CardDetail: React.FC<CardDetailProps> = (data) => {
@@ -30,7 +30,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Cycles</p>
-            <p>{data?.totalCycles?.toLocaleString("en-US")}</p>
+            <p>{data?.totalCycles?.toLocaleString('en-US')}</p>
           </div>
         </div>
         <hr />
@@ -40,7 +40,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </div>
           <div>
             <p className={styles.title}>Active Validators</p>
-            <p>{data?.totalNodes?.toLocaleString("en-US")}</p>
+            <p>{data?.totalNodes?.toLocaleString('en-US')}</p>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Accounts</p>
-            <p>{data?.totalAccounts?.toLocaleString("en-US")}</p>
+            <p>{data?.totalAccounts?.toLocaleString('en-US')}</p>
           </div>
         </div>
         <hr />
@@ -65,7 +65,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Contracts</p>
-            <p>{data?.totalContracts?.toLocaleString("en-US")}</p>
+            <p>{data?.totalContracts?.toLocaleString('en-US')}</p>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Transactions</p>
-            <p>{data?.totalTransactions?.toLocaleString("en-US")}</p>
+            <p>{data?.totalTransactions?.toLocaleString('en-US')}</p>
           </div>
         </div>
         <hr />
@@ -90,7 +90,10 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Stake / Unstake Transactions</p>
-            <p>{data?.totalStakeTxs?.toLocaleString("en-US")} / {data?.totalUnstakeTxs?.toLocaleString("en-US")}</p>
+            <p>
+              {data?.totalStakeTxs?.toLocaleString('en-US')} /{' '}
+              {data?.totalUnstakeTxs?.toLocaleString('en-US')}
+            </p>
           </div>
         </div>
       </div>
@@ -103,7 +106,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total SHM</p>
-            <p>{data?.totalSHM?.toLocaleString("en-US")}</p>
+            <p>{data?.totalSHM?.toLocaleString('en-US')}</p>
           </div>
         </div>
         <hr />
@@ -115,10 +118,10 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Stake SHM</p>
-            <p>{data?.totalStakedSHM?.toLocaleString("en-US")}</p>
+            <p>{data?.totalStakedSHM?.toLocaleString('en-US')}</p>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

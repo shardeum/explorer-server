@@ -1,17 +1,17 @@
-import moment from "moment";
-import { useRouter } from "next/router";
-import React from "react";
-import { AnchorLink, Button } from "../../components";
-import { Cycle } from "../../types";
+import moment from 'moment'
+import { useRouter } from 'next/router'
+import React from 'react'
+import { AnchorLink, Button } from '../../components'
+import { Cycle } from '../../types'
 
-import styles from "./LatestCycle.module.scss";
+import styles from './LatestCycle.module.scss'
 
 export interface LatestCycleProps {
-  cycles: Cycle[];
+  cycles: Cycle[]
 }
 
 export const LatestCycle: React.FC<LatestCycleProps> = ({ cycles }) => {
-  const router = useRouter();
+  const router = useRouter()
   return (
     <div className={styles.LatestCycle}>
       <div className={styles.title}>Latest Cycles</div>
@@ -48,11 +48,11 @@ export const LatestCycle: React.FC<LatestCycleProps> = ({ cycles }) => {
         apperance="outlined"
         size="medium"
         onClick={() => {
-          router.push("/cycle");
+          router.push('/cycle')
         }}
       >
         View all cycles
       </Button>
     </div>
-  );
-};
+  )
+}

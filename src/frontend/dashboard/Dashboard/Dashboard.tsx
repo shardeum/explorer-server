@@ -1,25 +1,33 @@
-import React from "react";
-import moment from "moment";
+import React from 'react'
+import moment from 'moment'
 
-import { CardDetail } from "../CardDetail";
-import { SearchBox } from "../SearchBox";
-import { Spacer } from "../../components";
+import { CardDetail } from '../CardDetail'
+import { SearchBox } from '../SearchBox'
+import { Spacer } from '../../components'
 
-import { useCycle, useTransaction, useAccount, useStats } from "../../api";
-import styles from "./Dashboard.module.scss";
-import { ChartDetail } from "../ChartDetail";
-import { TransactionSearchType, AccountSearchType } from "../../types";
+import { useCycle, useTransaction, useAccount, useStats } from '../../api'
+import styles from './Dashboard.module.scss'
+import { ChartDetail } from '../ChartDetail'
+import { TransactionSearchType, AccountSearchType } from '../../types'
 
-import { LatestTransactions } from "../LatestTransaction";
-import { LatestCycle } from "../LatestCycle";
+import { LatestTransactions } from '../LatestTransaction'
+import { LatestCycle } from '../LatestCycle'
 
 export const Dashboard: React.FC = () => {
-  const { data: cycles, loading: cycleLoading } = useCycle({ count: 10 });
-  const { transactions, totalRewardTxs, totalStakeTxs, totalUnstakeTxs, totalTransactions, loading: transactionLoading } = useTransaction({
-    count: 10, txType: TransactionSearchType.StakeReceipt
-  });
+  const { data: cycles, loading: cycleLoading } = useCycle({ count: 10 })
+  const {
+    transactions,
+    totalRewardTxs,
+    totalStakeTxs,
+    totalUnstakeTxs,
+    totalTransactions,
+    loading: transactionLoading,
+  } = useTransaction({
+    count: 10,
+    txType: TransactionSearchType.StakeReceipt,
+  })
 
-  const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA });
+  const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA })
 
   const { validatorStats, transactionStats, totalSHM, totalStakedSHM } = useStats({
     validatorStatsCount: 1000,
@@ -29,18 +37,18 @@ export const Dashboard: React.FC = () => {
 
   const cyclesList = cycles.map((row) => {
     return {
-      key: row?.cycleRecord?.counter || "",
+      key: row?.cycleRecord?.counter || '',
       value: moment(row?.cycleRecord?.start * 1000).calendar(),
-      activeNodes: (row?.cycleRecord?.active) || 0
-    };
-  });
+      activeNodes: row?.cycleRecord?.active || 0,
+    }
+  })
 
   const transactionsList = transactions.map((row) => {
     return {
-      key: "Tx Hash",
+      key: 'Tx Hash',
       value: row?.txHash,
-    };
-  });
+    }
+  })
 
   return (
     <div className={styles.Dashboard}>
@@ -50,11 +58,22 @@ export const Dashboard: React.FC = () => {
       </session>
       <Spacer space="48" />
       <session>
-        <CardDetail totalCycles={cyclesList[0]?.key} totalNodes={cyclesList[0]?.activeNodes} totalAccounts={totalAccounts} totalContracts={totalContracts} totalTransactions={totalTransactions} totalRewardTxs={totalRewardTxs} totalStakeTxs={totalStakeTxs} totalUnstakeTxs={totalUnstakeTxs} totalSHM={totalSHM} totalStakedSHM={totalStakedSHM}  />
+        <CardDetail
+          totalCycles={cyclesList[0]?.key}
+          totalNodes={cyclesList[0]?.activeNodes}
+          totalAccounts={totalAccounts}
+          totalContracts={totalContracts}
+          totalTransactions={totalTransactions}
+          totalRewardTxs={totalRewardTxs}
+          totalStakeTxs={totalStakeTxs}
+          totalUnstakeTxs={totalUnstakeTxs}
+          totalSHM={totalSHM}
+          totalStakedSHM={totalStakedSHM}
+        />
       </session>
       <Spacer space="48" />
       <section>
-        <ChartDetail validatorStats={validatorStats} transactionStats={transactionStats}/>
+        <ChartDetail validatorStats={validatorStats} transactionStats={transactionStats} />
       </section>
       <Spacer space="48" />
       <session>
@@ -65,5 +84,5 @@ export const Dashboard: React.FC = () => {
       </session>
       <Spacer space="48" />
     </div>
-  );
-};
+  )
+}

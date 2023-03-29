@@ -1,16 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap");
-@import "variables";
-@import "mixins";
-@import "components";
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+@import 'variables';
+@import 'mixins';
+@import 'components';
 
 /***
     The new CSS reset - version 1.7.3 (last updated 7.8.2022)
     GitHub page: https://github.com/elad2412/the-new-css-reset
 ***/
 
-*:where(
-    :not(html,iframe, canvas, img, svg, video, audio, pre):not(svg *, symbol *)
-  ) {
+*:where(:not(html, iframe, canvas, img, svg, video, audio, pre):not(svg *, symbol *)) {
   all: unset;
   display: revert;
 }
@@ -76,7 +74,7 @@ meter {
 /* revert for bug in Chromium browsers
  - fix for the content editable attribute will work properly.
  - webkit-user-select: auto; added for Safari in case of using user-select:none on wrapper element*/
-:where([contenteditable]:not([contenteditable="false"])) {
+:where([contenteditable]:not([contenteditable='false'])) {
   -moz-user-modify: read-write;
   -webkit-user-modify: read-write;
   overflow-wrap: break-word;
@@ -87,14 +85,14 @@ meter {
 body {
   color: color(gray-900);
   background-color: color(gray-100);
-  font-family: "Sarabun", system-ui, -apple-system, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: 'Sarabun', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji';
   -webkit-font-smoothing: antialiased !important;
 
   @include fontStyle(medium, regular);
 }
 /* apply back the draggable feature - exist only in Chromium and Safari */
-:where([draggable="true"]) {
+:where([draggable='true']) {
   -webkit-user-drag: element;
 }
 

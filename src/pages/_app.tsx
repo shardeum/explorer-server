@@ -1,10 +1,10 @@
-import "../styles/globals.scss";
-import type { AppProps } from "next/app";
-import { SWRConfig } from "swr";
+import '../styles/globals.scss'
+import type { AppProps } from 'next/app'
+import { SWRConfig } from 'swr'
 
-import { fetcher } from "../frontend/api";
+import { fetcher } from '../frontend/api'
 
-import { Layout } from "../frontend/components";
+import { Layout } from '../frontend/components'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -17,5 +17,5 @@ export default function App({ Component, pageProps }: AppProps) {
         <Component {...pageProps} />
       </Layout>
     </SWRConfig>
-  );
+  )
 }

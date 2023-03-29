@@ -1,46 +1,49 @@
-import React from "react";
-import Highcharts from "highcharts/highstock";
-import HighchartsExporting from "highcharts/modules/exporting";
-import HighchartsReact from "highcharts-react-official";
+import React from 'react'
+import Highcharts from 'highcharts/highstock'
+import HighchartsExporting from 'highcharts/modules/exporting'
+import HighchartsReact from 'highcharts-react-official'
 
-if (typeof Highcharts === "object") {
-  HighchartsExporting(Highcharts);
+if (typeof Highcharts === 'object') {
+  HighchartsExporting(Highcharts)
 }
 
 interface LineStockChartProps {
-  title: string;
-  centerTitle?: boolean;
-  subTitle?: string;
-  data: any;
-  height?: number;
-  name?: string;
+  title: string
+  centerTitle?: boolean
+  subTitle?: string
+  data: any
+  height?: number
+  name?: string
 }
 
 export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
-  const { title, centerTitle, subTitle, data, height = 300, name } = props;
+  const { title, centerTitle, subTitle, data, height = 300, name } = props
 
   const option = {
     title: {
       text: title,
-      align: centerTitle ? "center" : "left",
+      align: centerTitle ? 'center' : 'left',
       style: {
-        fontSize: "18px",
-        fontWeight: "600",
-        color: "#495057",
+        fontSize: '18px',
+        fontWeight: '600',
+        color: '#495057',
       },
     },
     subtitle: {
       text: subTitle || undefined,
       style: {
-        fontSize: "12px",
+        fontSize: '12px',
       },
     },
     series: [
       {
         name: name,
-        keys: name === "Validators" ? ['x', 'y', 'cycleNumber'] : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
+        keys:
+          name === 'Validators'
+            ? ['x', 'y', 'cycleNumber']
+            : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
         data: data,
-        type: "line",
+        type: 'line',
         threshold: null,
         dataGrouping: {
           enabled: false,
@@ -51,7 +54,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
     //   enabled: false,
     // },
     xAxis: {
-      type: "datetime",
+      type: 'datetime',
       gridLineWidth: 0,
       labels: {},
       // maxZoom: 24 * 3600000 // fourteen days
@@ -65,9 +68,10 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       zoomEnabled: true,
     },
     tooltip: {
-      pointFormat: name === "Validators" ?
-      "<span>Validator: <b>{point.y}</b></span><br/><br /><span>Cycle Number <b>{point.cycleNumber}</b></span>" 
-      : `<span>Total Txs: <b>{point.y}</b></span><br />
+      pointFormat:
+        name === 'Validators'
+          ? '<span>Validator: <b>{point.y}</b></span><br/><br /><span>Cycle Number <b>{point.cycleNumber}</b></span>'
+          : `<span>Total Txs: <b>{point.y}</b></span><br />
         <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
         <span>Total UnstakeTxs: <b>{point.totalUnstakeTxs}</b></span><br />
         <span>Cycle Number: <b>{point.cycleNumber}</b></span><br />`,
@@ -113,29 +117,29 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       //   <span>Cycle Number: <b>${item[0][4]}</b></span>`;
       //       },
       split: true,
-      borderColor: "#e9ecef",
+      borderColor: '#e9ecef',
       borderRadius: 4,
     },
     chart: {
-      backgroundColor: "#ffffff",
-      borderColor: "#e9ecef",
+      backgroundColor: '#ffffff',
+      borderColor: '#e9ecef',
       borderWidth: 1,
       borderRadius: 8,
       spacingTop: 20,
       height: height,
-      zoomType: "x",
+      zoomType: 'x',
     },
     credits: {
       enabled: false,
     },
     navigation: {
       menuStyle: {
-        border: "1px solid #e9ecef",
-        background: "#ffffff",
-        padding: "5px 0",
+        border: '1px solid #e9ecef',
+        background: '#ffffff',
+        padding: '5px 0',
       },
       menuItemStyle: {
-        color: "#343a40",
+        color: '#343a40',
       },
     },
     // plotOptions: {
@@ -145,36 +149,36 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
     // },
     rangeSelector: {
       inputStyle: {
-        color: "#039",
-        fontWeight: "bold",
-        backgroundColor: "white",
-        border: "none",
+        color: '#039',
+        fontWeight: 'bold',
+        backgroundColor: 'white',
+        border: 'none',
       },
       labelStyle: {
-        color: "silver",
-        fontWeight: "bold",
+        color: 'silver',
+        fontWeight: 'bold',
       },
       selected: 5,
       buttons: [
         {
-          type: "hour",
+          type: 'hour',
           count: 1,
-          text: "1h",
+          text: '1h',
         },
         {
-          type: "day",
+          type: 'day',
           count: 1,
-          text: "1d",
+          text: '1d',
         },
         {
-          type: "day",
+          type: 'day',
           count: 5,
-          text: "5d",
+          text: '5d',
         },
         {
-          type: "month",
+          type: 'month',
           count: 1,
-          text: "1m",
+          text: '1m',
           // }, {
           //     type: 'month',
           //     count: 3,
@@ -192,12 +196,12 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
           //     text: 'YTD'
         },
         {
-          type: "all",
-          text: "All",
+          type: 'all',
+          text: 'All',
         },
       ],
     },
-  };
+  }
 
   return (
     <HighchartsReact
@@ -206,5 +210,5 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       allowChartUpdate={true}
       constructorType="stockChart"
     />
-  );
-};
+  )
+}

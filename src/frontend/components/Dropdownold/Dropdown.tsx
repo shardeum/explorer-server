@@ -1,21 +1,21 @@
-import { useState } from "react";
-import cx from "classnames";
-import { Button } from "../Button";
-import { Icon } from "../Icon";
-import { Menu } from "../Menu";
-import { MenuItem } from "../MenuItem";
-import styles from "./Dropdown.module.scss";
+import { useState } from 'react'
+import cx from 'classnames'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
+import { Menu } from '../Menu'
+import { MenuItem } from '../MenuItem'
+import styles from './Dropdown.module.scss'
 
 export interface DropdownProps {
-  items: string[];
-  onSelect?: (i: any) => void;
-  selected?: string;
-  disabled?: boolean;
-  apperance?: "primary" | "secondary" | "outlined" | "default";
-  size?: "large" | "medium" | "small";
-  className?: string;
-  buttonClassName?: string;
-  onHoverOpen?: boolean;
+  items: string[]
+  onSelect?: (i: any) => void
+  selected?: string
+  disabled?: boolean
+  apperance?: 'primary' | 'secondary' | 'outlined' | 'default'
+  size?: 'large' | 'medium' | 'small'
+  className?: string
+  buttonClassName?: string
+  onHoverOpen?: boolean
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -29,15 +29,15 @@ export const Dropdown: React.FC<DropdownProps> = ({
   buttonClassName,
   onHoverOpen = false,
 }) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const open = () => setIsFilterOpen(true);
-  const close = () => setIsFilterOpen(false);
+  const open = () => setIsFilterOpen(true)
+  const close = () => setIsFilterOpen(false)
 
   const onPress = (d: string) => {
-    onSelect?.(d);
-    close();
-  };
+    onSelect?.(d)
+    close()
+  }
 
   return (
     <div className={cx(styles.Dropdown, className)}>
@@ -51,7 +51,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
             className={buttonClassName}
             data-active={isFilterOpen}
             onMouseEnter={() => {
-              onHoverOpen && open();
+              onHoverOpen && open()
             }}
           >
             {selected || items[0]}
@@ -67,8 +67,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
         onClose={close}
         onOpen={open}
         onMouseDown={(e) => {
-          e.preventDefault();
-          open();
+          e.preventDefault()
+          open()
         }}
         top={8}
       >
@@ -77,13 +77,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
             label={item}
             key={`${item}-${index}`}
             onClick={(e) => {
-              e.stopPropagation();
-              onPress(item);
+              e.stopPropagation()
+              onPress(item)
             }}
             isActive={item === selected}
           />
         ))}
       </Menu>
     </div>
-  );
-};
+  )
+}

@@ -1,10 +1,10 @@
-import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import Link from 'next/link'
+import ReactTooltip from 'react-tooltip'
 
-import { Icon, iconTypes } from "../Icon";
-import { Spacer } from "../Spacer";
+import { Icon, iconTypes } from '../Icon'
+import { Spacer } from '../Spacer'
 
-import styles from "./Footer.module.scss";
+import styles from './Footer.module.scss'
 
 const company = [
   // { href: "http://shardeum.org", label: "About Shardeum" },
@@ -13,26 +13,25 @@ const company = [
   // { href: "", label: "Careers Join Us" },
   // { href: "", label: "Terms of Service" },
   // { href: "", label: "Bug Bounty" },
-];
+]
 
 const resources = [
-  { href: "https://shardeum.org", label: "About Shardeum" },
-  { href: "https://docs.shardeum.org", label: "Shardeum Docs" },
-  { href: "https://docs.shardeum.org/faucet/claim", label: "Testnet SHM Claim" },
+  { href: 'https://shardeum.org', label: 'About Shardeum' },
+  { href: 'https://docs.shardeum.org', label: 'Shardeum Docs' },
+  { href: 'https://docs.shardeum.org/faucet/claim', label: 'Testnet SHM Claim' },
   // { href: "", label: "Knowledge Base" },
   // { href: "", label: "Newsletter" },
   // { href: "", label: "Network Status" },
-];
-
+]
 
 const socials = [
-  { iconName: "discord", title: "Discord", href: "https://discord.gg/shardeum" },
-  { iconName: "twitter", title: "Twitter", href: "https://twitter.com/shardeum" },
+  { iconName: 'discord', title: 'Discord', href: 'https://discord.gg/shardeum' },
+  { iconName: 'twitter', title: 'Twitter', href: 'https://twitter.com/shardeum' },
   // { iconName: "facebook", title: "Facebook", href: "https://www.facebook.com" },
   // { iconName: "medium", title: "Medium", href: "https://www.medium.com" },
-  { iconName: "telegram", title: "Telegram", href: "https://telegram.me/shardeum" },
-  { iconName: "reddit", title: "Reddit", href: "https://www.reddit.com/r/shardeum/" },
-];
+  { iconName: 'telegram', title: 'Telegram', href: 'https://telegram.me/shardeum' },
+  { iconName: 'reddit', title: 'Reddit', href: 'https://www.reddit.com/r/shardeum/' },
+]
 
 export const Footer: React.FC = () => {
   return (
@@ -47,7 +46,8 @@ export const Footer: React.FC = () => {
           </div>
           <Spacer space="16" />
           <div className={styles.label}>
-            Shardeum is an EVM-based, linearly scalable smart contract platform that provides low gas fees forever while maintaining true decentralization and solid security through dynamic state sharding.
+            Shardeum is an EVM-based, linearly scalable smart contract platform that provides low gas fees
+            forever while maintaining true decentralization and solid security through dynamic state sharding.
           </div>
         </div>
         <div></div>
@@ -100,5 +100,5 @@ export const Footer: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

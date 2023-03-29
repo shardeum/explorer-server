@@ -1,4 +1,4 @@
-@import "../../../styles/index.scss";
+@import '../../../styles/index.scss';
 
 .Header {
   display: flex;
@@ -46,7 +46,7 @@
     padding: spacing(4) 0;
     box-shadow: none;
 
-    &[data-active="true"] {
+    &[data-active='true'] {
       color: color(info);
     }
   }

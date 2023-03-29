@@ -1,1 +1,1 @@
-export { Dashboard as default } from "../frontend/dashboard";
+export { Dashboard as default } from '../frontend/dashboard'

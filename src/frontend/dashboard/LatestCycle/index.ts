@@ -1,1 +1,1 @@
-export * from "./LatestCycle";
+export * from './LatestCycle'

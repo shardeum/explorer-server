@@ -1,29 +1,21 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
-import Web3Utils from "web3-utils";
+import React, { useState } from 'react'
+import { useRouter } from 'next/router'
+import Web3Utils from 'web3-utils'
 
-import {
-  AnchorLink,
-  Button,
-  ContentLayout,
-  CopyButton,
-  Spacer,
-  Tab,
-  Table,
-} from "../components";
-import { DetailCard } from "../account/DetailCard";
-import { TransactionTable } from "../transaction";
-import { breadcrumbsList, ContractType, TransactionSearchType } from "../types";
+import { AnchorLink, Button, ContentLayout, CopyButton, Spacer, Tab, Table } from '../components'
+import { DetailCard } from '../account/DetailCard'
+import { TransactionTable } from '../transaction'
+import { breadcrumbsList, ContractType, TransactionSearchType } from '../types'
 
-import { useTokenHook } from "./useTokenHook";
+import { useTokenHook } from './useTokenHook'
 
-import styles from "./Token.module.scss";
+import styles from './Token.module.scss'
 
 export const Token: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const id = router?.query?.id;
-  const address = router?.query?.a;
+  const id = router?.query?.id
+  const address = router?.query?.a
 
   const {
     account,
@@ -39,7 +31,7 @@ export const Token: React.FC = () => {
   } = useTokenHook({
     id: String(id),
     address: address?.toString(),
-  });
+  })
 
   const tokenType =
     account?.contractType === ContractType.ERC_20
@@ -48,40 +40,36 @@ export const Token: React.FC = () => {
       ? TransactionSearchType.ERC_721
       : account?.contractType === ContractType.ERC_1155
       ? TransactionSearchType.ERC_1155
-      : TransactionSearchType.All;
+      : TransactionSearchType.All
 
-  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account];
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
 
   const header = [
     {
-      key: "ethAddress",
-      value: "Address",
+      key: 'ethAddress',
+      value: 'Address',
       render: (val: unknown) => (
-        <AnchorLink
-          href={`/token/${id}/?a=${val}`}
-          label={val as unknown as string}
-          size="small"
-        />
+        <AnchorLink href={`/token/${id}/?a=${val}`} label={val as unknown as string} size="small" />
       ),
     },
     {
-      key: "tokenValue",
-      value: "Quantity",
+      key: 'tokenValue',
+      value: 'Quantity',
     },
-  ];
+  ]
 
   const tabs = [
     {
       key: TransactionSearchType.All,
-      value: "Transfer",
+      value: 'Transfer',
       content: <TransactionTable data={transactions} txType={tokenType} />,
     },
     {
-      key: "holder",
-      value: "Holder",
+      key: 'holder',
+      value: 'Holder',
       content: <Table columns={header} data={tokens} />,
     },
-  ];
+  ]
 
   return (
     <div className={styles.Token}>
@@ -123,27 +111,26 @@ export const Token: React.FC = () => {
               }
               items={[
                 {
-                  key: "Balance :",
-                  value: Web3Utils.fromWei(account?.account?.balance, "ether"),
+                  key: 'Balance :',
+                  value: Web3Utils.fromWei(account?.account?.balance, 'ether'),
                 },
-                { key: "Holders :", value: tokenHolders },
-                { key: "Transfers :", value: total },
+                { key: 'Holders :', value: tokenHolders },
+                { key: 'Transfers :', value: total },
               ]}
             />
-            {account?.contractType &&
-              account?.contractType !== ContractType.GENERIC && (
-                <DetailCard
-                  title="More Info"
-                  items={[
-                    { key: "Name", value: account?.contractInfo?.name },
-                    { key: "Symbol :", value: account?.contractInfo?.symbol },
-                    {
-                      key: "Total Supply :",
-                      value: account?.contractInfo?.totalSupply,
-                    },
-                  ]}
-                />
-              )}
+            {account?.contractType && account?.contractType !== ContractType.GENERIC && (
+              <DetailCard
+                title="More Info"
+                items={[
+                  { key: 'Name', value: account?.contractInfo?.name },
+                  { key: 'Symbol :', value: account?.contractInfo?.symbol },
+                  {
+                    key: 'Total Supply :',
+                    value: account?.contractInfo?.totalSupply,
+                  },
+                ]}
+              />
+            )}
           </div>
         )}
         <Spacer space="64" />
@@ -165,11 +152,7 @@ export const Token: React.FC = () => {
           <div className={styles.filter}>
             <div>
               <div className={styles.title}>FILTERED BY TOKEN HOLDER</div>
-              <AnchorLink
-                href={`/address/${filteredAddress}`}
-                label={filteredAddress}
-                size="small"
-              />
+              <AnchorLink href={`/address/${filteredAddress}`} label={filteredAddress} size="small" />
             </div>
             <div className={styles.divider} />
             <div>
@@ -182,5 +165,5 @@ export const Token: React.FC = () => {
         <Tab tabs={tabs} activeTab={activeTab} onClick={onTabChange} />
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

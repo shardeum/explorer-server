@@ -1,1 +1,1 @@
-export { Account as default } from "../../frontend/account";
+export { Account as default } from '../../frontend/account'

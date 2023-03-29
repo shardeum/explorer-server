@@ -1,1 +1,1 @@
-export { Contract as default } from "../../frontend/contract";
+export { Contract as default } from '../../frontend/contract'

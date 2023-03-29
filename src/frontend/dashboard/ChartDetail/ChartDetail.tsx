@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react'
 
-import { LineChart, BarChart } from "../../components";
+import { LineChart, BarChart } from '../../components'
 
-import { useCycleChart } from "../../api";
+import { useCycleChart } from '../../api'
 
-import styles from "./ChartDetail.module.scss";
+import styles from './ChartDetail.module.scss'
 
 const transactionData = [
   [1506988800000, 0.8509],
@@ -17,10 +17,10 @@ const transactionData = [
   [1507766400000, 0.8436],
   [1507852800000, 0.8468],
   [1508112000000, 0.8473],
-];
+]
 
 export interface ChartDetailProps {
-  validatorStats: [];
+  validatorStats: []
   transactionStats: []
 }
 
@@ -45,5 +45,5 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
         <BarChart title="CYCLES (This chart will be changed)" data={transactionData} />
       </div> */}
     </div>
-  );
-};
+  )
+}

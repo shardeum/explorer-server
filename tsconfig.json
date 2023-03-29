@@ -16,10 +16,6 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": [
-    "src/*"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src/*"],
+  "exclude": ["dist"]
 }

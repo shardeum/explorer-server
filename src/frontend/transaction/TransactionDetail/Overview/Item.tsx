@@ -1,24 +1,18 @@
-import React from "react";
+import React from 'react'
 
-import { Icon } from "../../../components";
+import { Icon } from '../../../components'
 
-import styles from "./Ovewview.module.scss";
-import Link from "next/link";
+import styles from './Ovewview.module.scss'
+import Link from 'next/link'
 
 interface ItemProps {
-  from?: string;
-  to?: string;
-  tokenId?: string;
-  token?: string;
-  type?: string;
+  from?: string
+  to?: string
+  tokenId?: string
+  token?: string
+  type?: string
 }
-export const Item: React.FC<ItemProps> = ({
-  from,
-  to,
-  tokenId,
-  token,
-  type,
-}) => {
+export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type }) => {
   return (
     <div className={styles.Overivew_Item}>
       <div className={styles.listItem}>
@@ -59,5 +53,5 @@ export const Item: React.FC<ItemProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

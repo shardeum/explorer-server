@@ -1,33 +1,24 @@
-import React from "react";
-import { useRouter } from "next/router";
+import React from 'react'
+import { useRouter } from 'next/router'
 
-import { Button, ContentLayout, Pagination } from "../components";
+import { Button, ContentLayout, Pagination } from '../components'
 
-import { breadcrumbsList, TransactionSearchType } from "../types";
+import { breadcrumbsList, TransactionSearchType } from '../types'
 
-import { useLogHook } from "./useLogHook";
+import { useLogHook } from './useLogHook'
 
-import styles from "./Log.module.scss";
-import { TransactionTable } from "../transaction";
+import styles from './Log.module.scss'
+import { TransactionTable } from '../transaction'
 
-const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.log];
+const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.log]
 
 export const Log: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const { address: addr, topic: tps } = router?.query;
+  const { address: addr, topic: tps } = router?.query
 
-  const {
-    address,
-    onAddressChange,
-    topic,
-    onTopicChange,
-    onSearch,
-    transactions,
-    total,
-    page,
-    setPage,
-  } = useLogHook(String(addr || ""), String(tps || ""));
+  const { address, onAddressChange, topic, onTopicChange, onSearch, transactions, total, page, setPage } =
+    useLogHook(String(addr || ''), String(tps || ''))
 
   return (
     <div className={styles.Log}>
@@ -51,17 +42,9 @@ export const Log: React.FC = () => {
             Search
           </Button>
         </div>
-        <TransactionTable
-          data={transactions}
-          txType={TransactionSearchType.All}
-        />
-        <Pagination
-          currentPage={page}
-          onPageChange={(p) => setPage(p)}
-          pageSize={10}
-          totalCount={total}
-        />
+        <TransactionTable data={transactions} txType={TransactionSearchType.All} />
+        <Pagination currentPage={page} onPageChange={(p) => setPage(p)} pageSize={10} totalCount={total} />
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

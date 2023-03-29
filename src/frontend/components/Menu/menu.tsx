@@ -155,54 +155,40 @@
 //   );
 // };
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import cx from "classnames";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import cx from 'classnames'
 
-import styles from "./Menu.module.scss";
+import styles from './Menu.module.scss'
 
 interface MenuProps {
-  onOpen?: () => void;
-  onClose?: () => void;
-  anchor: React.ReactNode;
-  isMenuOpen: boolean;
-  className?: string;
-  onMouseDown?: (e: any) => void;
-  children: React.ReactNode;
+  onOpen?: () => void
+  onClose?: () => void
+  anchor: React.ReactNode
+  isMenuOpen: boolean
+  className?: string
+  onMouseDown?: (e: any) => void
+  children: React.ReactNode
 }
 
 export const Menu: React.FC<MenuProps> = (props) => {
-  const {
-    onOpen,
-    onClose,
-    anchor,
-    isMenuOpen,
-    className,
-    onMouseDown,
-    children,
-  } = props;
+  const { onOpen, onClose, anchor, isMenuOpen, className, onMouseDown, children } = props
 
-  const menuRef = useRef(null);
+  const menuRef = useRef(null)
 
   const handleOutsideClick = useCallback((event: MouseEvent) => {
     // @ts-ignore
     if (menuRef.current && !menuRef.current?.contains(event.target)) {
-      onClose?.();
+      onClose?.()
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    document.addEventListener("click", handleOutsideClick, true);
+    document.addEventListener('click', handleOutsideClick, true)
 
     return () => {
-      document.removeEventListener("click", handleOutsideClick, true);
-    };
-  }, [handleOutsideClick]);
+      document.removeEventListener('click', handleOutsideClick, true)
+    }
+  }, [handleOutsideClick])
 
   return (
     <div>
@@ -223,5 +209,5 @@ export const Menu: React.FC<MenuProps> = (props) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

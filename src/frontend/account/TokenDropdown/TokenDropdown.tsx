@@ -1,26 +1,26 @@
-import { useCallback, useRef, useState } from "react";
-import styles from "./TokenDropdown.module.scss";
-import { Button, Icon, Menu, MenuItem, SortButton } from "../../components";
-import ReactTooltip from "react-tooltip";
-import { Token } from "../../types";
+import { useCallback, useRef, useState } from 'react'
+import styles from './TokenDropdown.module.scss'
+import { Button, Icon, Menu, MenuItem, SortButton } from '../../components'
+import ReactTooltip from 'react-tooltip'
+import { Token } from '../../types'
 
 interface TokenDropdownProps {
-  tokens: Token[];
+  tokens: Token[]
 }
 
 export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
-  const { tokens } = props;
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-  const [isSortUp, setIsSortUp] = useState<boolean>(true);
+  const { tokens } = props
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false)
+  const [isSortUp, setIsSortUp] = useState<boolean>(true)
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const open = useCallback(() => {
-    setIsFilterOpen(true);
-    inputRef?.current?.focus();
-  }, []);
+    setIsFilterOpen(true)
+    inputRef?.current?.focus()
+  }, [])
 
-  const close = useCallback(() => setIsFilterOpen(false), []);
+  const close = useCallback(() => setIsFilterOpen(false), [])
 
   return (
     <div className={styles.TokenDropdown}>
@@ -45,15 +45,11 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
         onClose={close}
         onOpen={open}
         onMouseDown={(e) => {
-          e.preventDefault();
-          open();
+          e.preventDefault()
+          open()
         }}
       >
-        <input
-          placeholder="Search for Token Name"
-          className={styles.search}
-          ref={inputRef}
-        />
+        <input placeholder="Search for Token Name" className={styles.search} ref={inputRef} />
         <div className={styles.item}>
           <div className={styles.label}>
             ERC-20 Tokens <span>(1)</span>
@@ -86,5 +82,5 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
       </Button>
       <ReactTooltip effect="solid" backgroundColor="#6610f2" id="tdd" />
     </div>
-  );
-};
+  )
+}

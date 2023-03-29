@@ -6,10 +6,10 @@ Shardeum explorer collects data from the the archiver server and indexes data an
 
 Sharduem explorer consists of four servers.
 
-- Collector               --> collector.ts
-- API and UI server       --> server.ts
-- RPC Data Collector      --> rpc_data_server.ts
-- Data Stats Aggregator   --> aggregator.ts
+- Collector --> collector.ts
+- API and UI server --> server.ts
+- RPC Data Collector --> rpc_data_server.ts
+- Data Stats Aggregator --> aggregator.ts
 
 Explorer server use Fastify.js and UI is developed using NextJS. For data storage, we are using `sqlite` for now.
 

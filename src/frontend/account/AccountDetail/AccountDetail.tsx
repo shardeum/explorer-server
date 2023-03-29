@@ -1,41 +1,29 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
-import Web3Utils from "web3-utils";
-import { utils } from "ethers";
-import moment from "moment";
-import {
-  Button,
-  ContentLayout,
-  CopyButton,
-  Spacer,
-  Pagination,
-  PaginationPrevNext,
-} from "../../components";
-import { Tab } from "../../components/Tab";
-import { DetailCard } from "../DetailCard";
-import { TokenDropdown } from "../TokenDropdown";
+import React, { useState } from 'react'
+import { useRouter } from 'next/router'
+import Web3Utils from 'web3-utils'
+import { utils } from 'ethers'
+import moment from 'moment'
+import { Button, ContentLayout, CopyButton, Spacer, Pagination, PaginationPrevNext } from '../../components'
+import { Tab } from '../../components/Tab'
+import { DetailCard } from '../DetailCard'
+import { TokenDropdown } from '../TokenDropdown'
 
-import { useAccountDetailHook } from "./useAccountDetailHook";
+import { useAccountDetailHook } from './useAccountDetailHook'
 
-import styles from "./AccountDetail.module.scss";
-import {
-  AccountType,
-  breadcrumbsList,
-  ContractType,
-  TransactionSearchType,
-} from "../../types";
-import { calculateValue } from "../../utils/calculateValue";
+import styles from './AccountDetail.module.scss'
+import { AccountType, breadcrumbsList, ContractType, TransactionSearchType } from '../../types'
+import { calculateValue } from '../../utils/calculateValue'
 
-import { TransactionTable } from "../../transaction";
+import { TransactionTable } from '../../transaction'
 
 export const AccountDetail: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const id = router?.query?.id;
-  const txType = router?.query?.txType as unknown as TransactionSearchType;
+  const id = router?.query?.id
+  const txType = router?.query?.txType as unknown as TransactionSearchType
 
-  const siblingCount = 3;
-  const pageSize = 10;
+  const siblingCount = 3
+  const pageSize = 10
 
   const {
     account,
@@ -50,18 +38,15 @@ export const AccountDetail: React.FC = () => {
   } = useAccountDetailHook({
     id: id as string,
     txType: txType,
-  });
+  })
 
   const tabs = [
     {
       key: TransactionSearchType.All,
-      value: "Transactions",
+      value: 'Transactions',
       content: (
         <>
-          <TransactionTable
-            data={transactions}
-            txType={TransactionSearchType.All}
-          />
+          <TransactionTable data={transactions} txType={TransactionSearchType.All} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}
@@ -76,13 +61,10 @@ export const AccountDetail: React.FC = () => {
     },
     {
       key: TransactionSearchType.Internal,
-      value: "Internal Txns",
+      value: 'Internal Txns',
       content: (
         <>
-          <TransactionTable
-            data={transactions}
-            txType={TransactionSearchType.Internal}
-          />
+          <TransactionTable data={transactions} txType={TransactionSearchType.Internal} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}
@@ -97,13 +79,10 @@ export const AccountDetail: React.FC = () => {
     },
     {
       key: TransactionSearchType.ERC_20,
-      value: "ERC-20 Token Txns",
+      value: 'ERC-20 Token Txns',
       content: (
         <>
-          <TransactionTable
-            data={transactions}
-            txType={TransactionSearchType.ERC_20}
-          />
+          <TransactionTable data={transactions} txType={TransactionSearchType.ERC_20} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}
@@ -118,13 +97,10 @@ export const AccountDetail: React.FC = () => {
     },
     {
       key: TransactionSearchType.ERC_721,
-      value: "ERC-721 Token Txns",
+      value: 'ERC-721 Token Txns',
       content: (
         <>
-          <TransactionTable
-            data={transactions}
-            txType={TransactionSearchType.ERC_721}
-          />
+          <TransactionTable data={transactions} txType={TransactionSearchType.ERC_721} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}
@@ -139,14 +115,10 @@ export const AccountDetail: React.FC = () => {
     },
     {
       key: TransactionSearchType.ERC_1155,
-      value: "ERC-1155 Token Txns",
+      value: 'ERC-1155 Token Txns',
       content: (
         <>
-          <TransactionTable
-            loading={false}
-            data={transactions}
-            txType={TransactionSearchType.ERC_1155}
-          />
+          <TransactionTable loading={false} data={transactions} txType={TransactionSearchType.ERC_1155} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}
@@ -159,19 +131,19 @@ export const AccountDetail: React.FC = () => {
         </>
       ),
     },
-  ];
+  ]
 
-  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account];
+  const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
 
-  const [activeTab, setActiveTab] = useState(tabs[0].key);
+  const [activeTab, setActiveTab] = useState(tabs[0].key)
 
   const onNext = () => {
-    setPage(page < totalPages ? page + 1 : totalPages);
-  };
+    setPage(page < totalPages ? page + 1 : totalPages)
+  }
 
   const onPrev = () => {
-    setPage(page > 1 ? page - 1 : 1);
-  };
+    setPage(page > 1 ? page - 1 : 1)
+  }
 
   return (
     <div className={styles.AccountDetail}>
@@ -216,19 +188,15 @@ export const AccountDetail: React.FC = () => {
                   }
                   items={[
                     {
-                      key: "Balance :",
-                      value:
-                        calculateValue(account?.account?.balance) +
-                        "   SHM",
+                      key: 'Balance :',
+                      value: calculateValue(account?.account?.balance) + '   SHM',
                     },
                     {
-                      key: "Nonce :",
-                      value: account?.account?.nonce && Web3Utils.hexToNumber(
-                        "0x" + account?.account?.nonce
-                      ),
+                      key: 'Nonce :',
+                      value: account?.account?.nonce && Web3Utils.hexToNumber('0x' + account?.account?.nonce),
                     },
                     {
-                      key: "Tokens :",
+                      key: 'Tokens :',
                       value: <TokenDropdown tokens={tokens} />,
                     },
                   ]}
@@ -238,22 +206,19 @@ export const AccountDetail: React.FC = () => {
                   title="Overview"
                   items={[
                     {
-                      key: "Node status",
-                      value: account?.account?.rewardStartTime > 0 && account?.account?.rewardEndTime === 0
-                        ? "Active"
-                        : "Inactive",
+                      key: 'Node status',
+                      value:
+                        account?.account?.rewardStartTime > 0 && account?.account?.rewardEndTime === 0
+                          ? 'Active'
+                          : 'Inactive',
                     },
                     {
-                      key: "Nominator",
-                      value:
-                        account?.account?.nominator &&
-                        account?.account?.nominator,
+                      key: 'Nominator',
+                      value: account?.account?.nominator && account?.account?.nominator,
                     },
                     {
-                      key: "StakeLock",
-                      value:
-                        account?.account?.stakeLock &&
-                        calculateValue(account?.account?.stakeLock),
+                      key: 'StakeLock',
+                      value: account?.account?.stakeLock && calculateValue(account?.account?.stakeLock),
                     },
                   ]}
                 />
@@ -262,10 +227,20 @@ export const AccountDetail: React.FC = () => {
                 <DetailCard
                   title="More Info"
                   items={[
-                    { key: "Reward Start Time", value: account?.account?.rewardStartTime && moment(account?.account?.rewardStartTime * 1000).calendar() },
-                    { key: "Reward End Time", value: account?.account?.rewardEndTime && moment(account?.account?.rewardEndTime * 1000).calendar() },
                     {
-                      key: "Reward",
+                      key: 'Reward Start Time',
+                      value:
+                        account?.account?.rewardStartTime &&
+                        moment(account?.account?.rewardStartTime * 1000).calendar(),
+                    },
+                    {
+                      key: 'Reward End Time',
+                      value:
+                        account?.account?.rewardEndTime &&
+                        moment(account?.account?.rewardEndTime * 1000).calendar(),
+                    },
+                    {
+                      key: 'Reward',
                       value: account?.account?.reward && calculateValue(account?.account?.reward),
                     },
                   ]}
@@ -276,14 +251,20 @@ export const AccountDetail: React.FC = () => {
                   <DetailCard
                     title="More Info"
                     items={[
-                      { key: "Name : ", value: account?.contractInfo?.name },
-                      { key: "Symbol :", value: account?.contractInfo?.symbol },
+                      { key: 'Name : ', value: account?.contractInfo?.name },
+                      { key: 'Symbol :', value: account?.contractInfo?.symbol },
                       {
-                        key: "Max Total Supply :",
-                        value: account?.contractInfo?.totalSupply ? utils.formatUnits(
-                          account?.contractInfo?.totalSupply,
-                          account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
-                        ).toString() : '',
+                        key: 'Max Total Supply :',
+                        value: account?.contractInfo?.totalSupply
+                          ? utils
+                              .formatUnits(
+                                account?.contractInfo?.totalSupply,
+                                account?.contractInfo?.decimals
+                                  ? parseInt(account?.contractInfo?.decimals)
+                                  : 18
+                              )
+                              .toString()
+                          : '',
                       },
                     ]}
                   />
@@ -296,16 +277,12 @@ export const AccountDetail: React.FC = () => {
                 tabs={tabs}
                 activeTab={activeTab}
                 onClick={(tab) => {
-                  setActiveTab(tab);
-                  setTransactionType(tab);
+                  setActiveTab(tab)
+                  setTransactionType(tab)
                 }}
               />
             ) : (
-              <TransactionTable
-                loading={false}
-                data={transactions}
-                txType={TransactionSearchType.All}
-              />
+              <TransactionTable loading={false} data={transactions} txType={TransactionSearchType.All} />
             )}
           </>
         ) : (
@@ -318,5 +295,5 @@ export const AccountDetail: React.FC = () => {
         )}
       </ContentLayout>
     </div>
-  );
-};
+  )
+}

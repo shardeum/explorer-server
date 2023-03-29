@@ -1,13 +1,13 @@
-import { Icon } from "../../components";
+import { Icon } from '../../components'
 
-import { useSearchHook } from "./useSearchHook";
+import { useSearchHook } from './useSearchHook'
 
-import styles from "./SearchBox.module.scss";
+import styles from './SearchBox.module.scss'
 
 interface SearchBoxProps {}
 
 export const SearchBox: React.FC<SearchBoxProps> = ({}) => {
-  const { search, setSearch, onSearch } = useSearchHook();
+  const { search, setSearch, onSearch } = useSearchHook()
 
   return (
     <div className={styles.SearchBox}>
@@ -19,8 +19,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({}) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key == "Enter") {
-              onSearch();
+            if (e.key == 'Enter') {
+              onSearch()
             }
           }}
         />
@@ -29,5 +29,5 @@ export const SearchBox: React.FC<SearchBoxProps> = ({}) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

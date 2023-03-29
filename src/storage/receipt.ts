@@ -214,10 +214,10 @@ export async function processReceiptData(receipts: any) {
             txReceipt.data.accountType === AccountType.Receipt
               ? TransactionType.Receipt
               : txReceipt.data.accountType === AccountType.NodeRewardReceipt
-                ? TransactionType.NodeRewardReceipt
-                : txReceipt.data.accountType === AccountType.StakeReceipt
-                  ? TransactionType.StakeReceipt
-                  : TransactionType.UnstakeReceipt,
+              ? TransactionType.NodeRewardReceipt
+              : txReceipt.data.accountType === AccountType.StakeReceipt
+              ? TransactionType.StakeReceipt
+              : TransactionType.UnstakeReceipt,
           txHash: txReceipt.data.ethAddress,
           txFrom: txReceipt.data.readableReceipt.from,
           txTo: txReceipt.data.readableReceipt.to

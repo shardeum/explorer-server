@@ -1,1 +1,1 @@
-export { Token as default } from "../../frontend/token";
+export { Token as default } from '../../frontend/token'

@@ -1,29 +1,29 @@
-import axios from "axios";
+import axios from 'axios'
 
-import { PATHS } from "./paths";
+import { PATHS } from './paths'
 
 const api = axios.create({
   baseURL: PATHS.BASE_URL,
   timeout: 5000,
-});
+})
 
 api.interceptors.request.use(
   (config) => {
-    return config;
+    return config
   },
   (error) => {
-    console.log(error);
+    console.log(error)
   }
-);
+)
 
 api.interceptors.response.use(
   (config) => {
-    return config;
+    return config
   },
   (error) => {
-    console.log(error);
-    return error;
+    console.log(error)
+    return error
   }
-);
+)
 
-export { api };
+export { api }

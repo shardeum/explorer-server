@@ -1,1 +1,1 @@
-export { ContentLayout } from "./ContentLayout";
+export { ContentLayout } from './ContentLayout'

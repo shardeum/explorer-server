@@ -1,1 +1,1 @@
-export { TransactionLineChart as default } from "../frontend/transaction-line-chart";
+export { TransactionLineChart as default } from '../frontend/transaction-line-chart'

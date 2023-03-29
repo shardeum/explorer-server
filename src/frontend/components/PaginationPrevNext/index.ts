@@ -1,1 +1,1 @@
-export { PaginationPrevNext } from "./PaginationPrevNext"
+export { PaginationPrevNext } from './PaginationPrevNext'

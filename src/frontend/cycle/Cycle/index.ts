@@ -1,1 +1,1 @@
-export { Cycle } from "./Cycle";
+export { Cycle } from './Cycle'

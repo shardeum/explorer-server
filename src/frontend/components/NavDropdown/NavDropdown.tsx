@@ -1,16 +1,16 @@
-import React, { useCallback, useState } from "react";
-import cx from "classnames";
+import React, { useCallback, useState } from 'react'
+import cx from 'classnames'
 
-import { Menu } from "../Menu";
-import { Icon } from "../Icon";
+import { Menu } from '../Menu'
+import { Icon } from '../Icon'
 
-import styles from "./NavDropdown.module.scss";
+import styles from './NavDropdown.module.scss'
 
 interface INavDropdown<T> {
-  items: T[];
-  label: string;
-  selected?: string;
-  onSelect?: (d: string) => void;
+  items: T[]
+  label: string
+  selected?: string
+  onSelect?: (d: string) => void
 }
 
 export function NavDropdown<T>({
@@ -19,15 +19,15 @@ export function NavDropdown<T>({
   selected,
   onSelect,
 }: React.PropsWithChildren<INavDropdown<T>>) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = () => setIsOpen(false);
+  const open = useCallback(() => setIsOpen(true), [])
+  const close = () => setIsOpen(false)
 
   const handleSelect = (d: string) => {
-    close();
-    onSelect?.(d);
-  };
+    close()
+    onSelect?.(d)
+  }
 
   return (
     <div className={styles.NavDropdown}>
@@ -49,8 +49,8 @@ export function NavDropdown<T>({
         onClose={close}
         onOpen={open}
         onMouseDown={(e) => {
-          e.preventDefault();
-          open();
+          e.preventDefault()
+          open()
         }}
         top={18}
         className={styles.menu}
@@ -66,5 +66,5 @@ export function NavDropdown<T>({
         ))}
       </Menu>
     </div>
-  );
+  )
 }

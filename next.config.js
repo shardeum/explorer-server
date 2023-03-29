@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path')
 
 /** @type {import('next').NextConfig} */
 
@@ -6,19 +6,19 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   sassOptions: {
-    includePaths: [path.join(__dirname, "styles")],
+    includePaths: [path.join(__dirname, 'styles')],
   },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"],
-    });
+      use: ['@svgr/webpack'],
+    })
 
-    return config;
+    return config
   },
   env: {
     BASE_URL: process.env.BASE_URL,
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

@@ -1,44 +1,44 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { useLayoutBreakpoint } from "../../utils/useLayoutBreakpoint";
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { useLayoutBreakpoint } from '../../utils/useLayoutBreakpoint'
 
-import { Icon, Menu, MenuItem, Button, TopBarDropdown } from "../index";
+import { Icon, Menu, MenuItem, Button, TopBarDropdown } from '../index'
 
-import styles from "./Header.module.scss";
+import styles from './Header.module.scss'
 
-interface HeaderProps { }
+interface HeaderProps {}
 
-export const Header: React.FC<HeaderProps> = ({ }) => {
-  const router = useRouter();
+export const Header: React.FC<HeaderProps> = ({}) => {
+  const router = useRouter()
 
-  const { isTablet, isMobile } = useLayoutBreakpoint();
+  const { isTablet, isMobile } = useLayoutBreakpoint()
 
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
 
-  const open = () => setIsMenuOpen(true);
-  const close = () => setIsMenuOpen(false);
+  const open = () => setIsMenuOpen(true)
+  const close = () => setIsMenuOpen(false)
 
   const navLinks = [
-    { key: "/", value: "Home" },
+    { key: '/', value: 'Home' },
     // {
     //   key: "/blockchain",
     //   value: "Blockchain",
     // },
     {
-      key: "https://explorer-liberty10.shardeum.org",
-      value: "Testnets",
+      key: 'https://explorer-liberty10.shardeum.org',
+      value: 'Testnets',
       render: () => {
         return (
           <TopBarDropdown
             label="Testnets"
             options={[
-              { key: 'https://explorer-liberty10.shardeum.org', value: "AlphaNet Liberty 1.6"},
-              { key: 'https://explorer-liberty20.shardeum.org', value: "AlphaNet Liberty 2.1"},
-              { key: 'https://explorer-sphinx.shardeum.org', value: "BetaNet Sphinx" },
+              { key: 'https://explorer-liberty10.shardeum.org', value: 'AlphaNet Liberty 1.6' },
+              { key: 'https://explorer-liberty20.shardeum.org', value: 'AlphaNet Liberty 2.1' },
+              { key: 'https://explorer-sphinx.shardeum.org', value: 'BetaNet Sphinx' },
             ]}
           />
-        );
+        )
       },
     },
     // {
@@ -50,19 +50,14 @@ export const Header: React.FC<HeaderProps> = ({ }) => {
     //   value: "More",
     // },
     // { key: "/singin", value: "Sign In" },
-  ];
+  ]
 
   const renderMenuButton = () => {
     if (isTablet || isMobile) {
       return (
         <Menu
           anchor={
-            <Button
-              onMouseEnter={open}
-              onClick={open}
-              apperance="outlined"
-              size="medium"
-            >
+            <Button onMouseEnter={open} onClick={open} apperance="outlined" size="medium">
               <Icon name="menu" size="medium" color="black" />
             </Button>
           }
@@ -81,16 +76,16 @@ export const Header: React.FC<HeaderProps> = ({ }) => {
               label={item.value}
               isActive={item.key === router.pathname}
               onClick={(e) => {
-                e.stopPropagation();
-                close();
+                e.stopPropagation()
+                close()
               }}
             />
           ))}
         </Menu>
-      );
+      )
     }
-    return;
-  };
+    return
+  }
 
   return (
     <header className={styles.Header}>
@@ -102,16 +97,12 @@ export const Header: React.FC<HeaderProps> = ({ }) => {
         <ul className={styles.list}>
           {navLinks.map((item) => (
             <li key={item.key} className={styles.list_item}>
-              {item?.render ? (
-                item?.render()
-              ) : (
-                <Link href={item.key}>{item.value}</Link>
-              )}
+              {item?.render ? item?.render() : <Link href={item.key}>{item.value}</Link>}
             </li>
           ))}
         </ul>
         {renderMenuButton()}
       </nav>
     </header>
-  );
-};
+  )
+}

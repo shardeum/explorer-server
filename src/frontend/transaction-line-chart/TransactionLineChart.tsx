@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react'
 
-import { ContentLayout, LineStockChart } from "../components";
+import { ContentLayout, LineStockChart } from '../components'
 
-import styles from "./TransactionLineChart.module.scss";
-import { useStats } from "../api";
+import styles from './TransactionLineChart.module.scss'
+import { useStats } from '../api'
 
 export const TransactionLineChart: React.FC = () => {
-  const height = 600;
+  const height = 600
 
   const { validatorStats, transactionStats, loading } = useStats({
     transactionStatsCount: 10000000,
-  });
+  })
   return (
     <div className={styles.TransactionLineChart}>
       <ContentLayout title="Transactions per Cycle Chart">
@@ -28,5 +28,5 @@ export const TransactionLineChart: React.FC = () => {
         )}
       </ContentLayout>
     </div>
-  );
-};
+  )
+}
