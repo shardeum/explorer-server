@@ -25,6 +25,13 @@ crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
 import { config as CONFIG, ARCHIVER_URL, RPC_DATA_SERVER_URL } from './config'
+import { count } from 'console'
+import {
+  coinStatsCacheRecord,
+  isCacheRecordValid,
+  transactionStatsCacheRecord,
+  validatorStatsCacheRecord,
+} from './cache_per_cycle'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -39,6 +46,7 @@ console.log('Port', CONFIG.port.server)
 interface RequestParams {
   counter: string
 }
+
 interface RequestQuery {
   page: string
   count: string
@@ -72,6 +80,12 @@ console.log(ARCHIVER_URL)
 let txHashQueryCache = new Map()
 const txHashQueryCacheSize = 1000
 
+async function getLatestCycleNumber(): Promise<number> {
+  let latestCycleRecords = await Cycle.queryLatestCycleRecords(1)
+  let latestCycleNumber = latestCycleRecords.length > 0 ? latestCycleRecords[0].counter : 0
+  return latestCycleNumber
+}
+
 // Setup Log Directory
 const start = async () => {
   await Storage.initializeDB()
@@ -81,11 +95,11 @@ const start = async () => {
     logger: false,
   })
 
-  await server.register(fastifyCors);
+  await server.register(fastifyCors)
   await server.register(fastifyRateLimit, {
     max: CONFIG.rateLimit,
-    timeWindow: "1 minute",
-  });
+    timeWindow: '1 minute',
+  })
   server
     .register(fastifyNextjs, {
       dev: process.env.NODE_ENV !== 'production',
@@ -94,10 +108,7 @@ const start = async () => {
     })
 
     .after(() => {
-      // console.log(server)
       server.next('/*')
-      // server.next("/counter");
-      // server.next("/hello");
     })
 
   server.get('/port', (req, reply) => {
@@ -456,7 +467,7 @@ const start = async () => {
           reply.send({ success: false, error: 'Invalid end cycle number' })
           return
         }
-      } else endCycle = await Cycle.queryCyleCount()
+      } else endCycle = await Cycle.queryCycleCount()
       console.log('endCycle', endCycle, 'startCycle', startCycle)
       totalTransactions = await Transaction.queryTransactionCountBetweenCycles(
         startCycle,
@@ -904,7 +915,7 @@ const start = async () => {
           reply.send({ success: false, error: 'Invalid end cycle number' })
           return
         }
-      } else endCycle = await Cycle.queryCyleCount()
+      } else endCycle = await Cycle.queryCycleCount()
       console.log('endCycle', endCycle, 'startCycle', startCycle)
       totalReceipts = await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle)
       const res: any = {
@@ -1121,7 +1132,17 @@ const start = async () => {
         return
       }
       if (count > 10000) count = 10000 // set to show max 10000 cycles
-      validatorStats = await ValidatorStats.queryLatestValidatorStats(count)
+
+      // Cache enabled only for query string => ?count=1000&responseType=array
+      if (query.responseType === 'array' && count === 1000) {
+        const latestCycleNumber = await getLatestCycleNumber()
+        if (isCacheRecordValid(latestCycleNumber, validatorStatsCacheRecord)) {
+          validatorStats = validatorStatsCacheRecord.data
+        } else {
+          validatorStats = await ValidatorStats.queryLatestValidatorStats(count)
+          validatorStatsCacheRecord.setData(latestCycleNumber, validatorStats)
+        }
+      }
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle)
       const endCycle = parseInt(query.endCycle)
@@ -1178,7 +1199,17 @@ const start = async () => {
         return
       }
       if (count > 10000) count = 10000 // set to show max 10000 cycles
-      transactionStats = await TransactionStats.queryLatestTransactionStats(count)
+
+      // Cache enabled only for query string => ?count=1000&responseType=array
+      if (query.responseType === 'array' && count === 1000) {
+        const latestCycleNumber = await getLatestCycleNumber()
+        if (isCacheRecordValid(latestCycleNumber, transactionStatsCacheRecord)) {
+          transactionStats = transactionStatsCacheRecord.data
+        } else {
+          transactionStats = await TransactionStats.queryLatestTransactionStats(count)
+          transactionStatsCacheRecord.setData(latestCycleNumber, transactionStats)
+        }
+      }
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle)
       const endCycle = parseInt(query.endCycle)
@@ -1224,15 +1255,24 @@ const start = async () => {
   })
 
   server.get('/api/stats/coin', async (_request, reply) => {
-    const coinStats = await CoinStats.queryAggregatedCoinStats()
+    let coinStats
+
+    const latestCycleNumber = await getLatestCycleNumber()
+    if (isCacheRecordValid(latestCycleNumber, coinStatsCacheRecord)) {
+      coinStats = coinStatsCacheRecord.data
+    } else {
+      coinStats = await CoinStats.queryAggregatedCoinStats()
+      coinStatsCacheRecord.setData(latestCycleNumber, coinStats)
+    }
+
     let res: any
     if (coinStats) {
       res = {
         success: true,
+        lastUpdatedCycle: coinStatsCacheRecord.lastUpdatedCycle,
         totalSupply: coinStats.totalSupplyChange + CONFIG.genesisSHMSupply,
         totalStaked: coinStats.totalStakeChange,
       }
-      // console.log('CoinStats response', coinStats)
     } else {
       res = {
         success: false,
@@ -1243,7 +1283,7 @@ const start = async () => {
   })
 
   server.get('/totalData', async (_request, reply) => {
-    const totalCycles = await Cycle.queryCyleCount()
+    const totalCycles = await Cycle.queryCycleCount()
     const totalAccounts = await Account.queryAccountCount(AccountSearchType.All)
     const totalTransactions = await Transaction.queryTransactionCount()
     const totalReceipts = await Receipt.queryReceiptCount()
@@ -1255,14 +1295,20 @@ const start = async () => {
     })
   })
 
-  server.listen(Number(CONFIG.port.server), '0.0.0.0', async (err) => {
-    if (err) {
-      server.log.error(err)
-      console.log(err)
-      throw err
+  server.listen(
+    {
+      port: Number(CONFIG.port.server),
+      host: '0.0.0.0',
+    },
+    async (err) => {
+      if (err) {
+        server.log.error(err)
+        console.log(err)
+        throw err
+      }
+      console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
     }
-    console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
-  })
+  )
 }
 
 start()

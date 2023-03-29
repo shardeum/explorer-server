@@ -172,7 +172,7 @@ export async function queryCycleByCounter(counter: number) {
 //   if (data.length > 0) return data[0];
 // };
 
-export async function queryCyleCount() {
+export async function queryCycleCount() {
   let cycles
   try {
     const sql = `SELECT COUNT(*) FROM cycles`

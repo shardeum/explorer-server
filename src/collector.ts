@@ -52,7 +52,7 @@ interface RequestQuery {
 
 export const checkAndSyncData = async () => {
   let lastStoredReceiptCount = await receipt.queryReceiptCount()
-  let lastStoredCycleCount = await cycle.queryCyleCount()
+  let lastStoredCycleCount = await cycle.queryCycleCount()
   let totalReceiptsToSync = 0
   let totalCyclesToSync = 0
   let response = await axios.get(`${ARCHIVER_URL}/totalData`)
