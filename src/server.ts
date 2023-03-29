@@ -19,6 +19,7 @@ import * as StatsStorage from './stats'
 import * as ValidatorStats from './stats/validatorStats'
 import * as TransactionStats from './stats/transactionStats'
 import * as CoinStats from './stats/coinStats'
+import fastifyRateLimit from '@fastify/rate-limit'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -80,14 +81,18 @@ const start = async () => {
     logger: false,
   })
 
-  server.register(fastifyCors)
-
+  await server.register(fastifyCors);
+  await server.register(fastifyRateLimit, {
+    max: CONFIG.rateLimit,
+    timeWindow: "1 minute",
+  });
   server
     .register(fastifyNextjs, {
       dev: process.env.NODE_ENV !== 'production',
       logLevel: 'debug',
       noServeAssets: false,
     })
+
     .after(() => {
       // console.log(server)
       server.next('/*')
