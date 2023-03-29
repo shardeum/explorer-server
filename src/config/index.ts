@@ -24,6 +24,7 @@ export const config = {
   verbose: false,
   experimentalSnapshot: true,
   genesisSHMSupply: 100000000,
+  rateLimit: 100,
 }
 
 export const ARCHIVER_URL = `http://${config.archiverInfo.ip}:${config.archiverInfo.port}`
