@@ -4,7 +4,7 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "explorer": "rm -fr dist tsconfig.json && cp tsconfig_example.json tsconfig.json && npm run compile && node --experimental-specifier-resolution=node dist/server.js",
+    "explorer": "npm run compile && node --experimental-specifier-resolution=node dist/server.js",
     "server": "node dist/server.js",
     "collector": "node dist/collector.js",
     "rpc_data_server": "node dist/rpc_data_server.js",
@@ -19,7 +19,7 @@
     "clean": "gts clean",
     "compile": "tsc -p .",
     "fix": "gts fix",
-    "prepare": "rm -fr dist tsconfig.json && cp tsconfig_example.json tsconfig.json && npm run compile",
+    "prepare": "npm run compile",
     "flush": "rm -fr db.sqlite3* statsDB.sqlite3"
   },
   "dependencies": {
