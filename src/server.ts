@@ -1236,16 +1236,15 @@ const start = async () => {
     }
     if (query.responseType && query.responseType === 'array') {
       let temp_array = []
-      if (temp_array.length > 0)
-        transactionStats.forEach((item) =>
-          temp_array.push([
-            item.timestamp * 1000,
-            item.totalTxs,
-            item.totalStakeTxs,
-            item.totalUnstakeTxs,
-            item.cycle,
-          ])
-        )
+      transactionStats.forEach((item) =>
+        temp_array.push([
+          item.timestamp * 1000,
+          item.totalTxs,
+          item.totalStakeTxs,
+          item.totalUnstakeTxs,
+          item.cycle,
+        ])
+      )
       transactionStats = temp_array
     }
     const res = {
