@@ -23,7 +23,7 @@ import {
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL } from './config'
+import { config as CONFIG, ARCHIVER_URL, config } from './config'
 import axios from 'axios'
 if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
@@ -61,13 +61,8 @@ export const checkAndSyncData = async () => {
     totalCyclesToSync = response.data.totalCycles
     console.log('totalReceiptsToSync', totalReceiptsToSync, 'totalCyclesToSync', totalCyclesToSync)
   }
-  if (totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
-    console.log(
-      'lastStoredReceiptCount',
-      lastStoredReceiptCount,
-      'lastStoredCycleCount',
-      lastStoredCycleCount
-    )
+  console.log('lastStoredReceiptCount', lastStoredReceiptCount, 'lastStoredCycleCount', lastStoredCycleCount)
+  if (CONFIG.dataPatch && totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
     // Make sure the data that are store are authentic by comparing 10 last receipts and 10 last cycles
     const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
     if (!receiptResult.success) {
@@ -86,14 +81,15 @@ export const checkAndSyncData = async () => {
     }
 
     lastStoredCycleCount = cycleResult.cycle
-  } else if (lastStoredReceiptCount > 0) {
+  }
+  if (CONFIG.dataPatch && lastStoredReceiptCount > 0) {
     if (lastStoredReceiptCount > totalReceiptsToSync) {
       throw Error(
         'The existing db has more data than the network data! Clear the DB and start the server again!'
       )
     }
   }
-  if (totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
+  if (CONFIG.dataPatch && totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
   if (!needSyncing && totalCyclesToSync > lastStoredCycleCount) toggleNeedSyncing()
 
   await downloadAndSyncGenesisAccounts() // To sync accounts data that are from genesis accounts/accounts data that the network start with

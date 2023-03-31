@@ -396,6 +396,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
   let startCycle = fromCycle
   let endReceipt = startReceipt + 1000
   let endCycle = startCycle + 1000
+  if (config.dataPatch) completeForReceipt = true
   while (!completeForReceipt || !completeForCycle) {
     if (endReceipt >= totalReceiptsToSync || endCycle >= totalCyclesToSync) {
       let res = await axios.get(`${ARCHIVER_URL}/totalData`)
@@ -408,6 +409,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
           completeForCycle = false
           totalCyclesToSync = res.data.totalCycles
         }
+        if (config.dataPatch) completeForReceipt = true
         console.log('totalReceiptsToSync', totalReceiptsToSync, 'totalCyclesToSync', totalCyclesToSync)
       }
     }
@@ -416,26 +418,26 @@ export const downloadAndInsertReceiptsAndCycles = async (
       const response = await axios.get(`${ARCHIVER_URL}/receipt?start=${startReceipt}&end=${endReceipt}`)
       if (response && response.data && response.data.receipts) {
         // collector = collector.concat(response.data.archivedCycles);
-        if (response.data.receipts.length < 1000) {
-          completeForReceipt = true
-          console.log('Download completed for receipts')
-        }
         console.log(`Downloaded receipts`, response.data.receipts.length)
         await Receipt.processReceiptData(response.data.receipts)
+        if (response.data.receipts.length < 1000) {
+          completeForReceipt = true
+          endReceipt += response.data.receipts.length
+          startReceipt = endReceipt
+          endReceipt += 1000
+          console.log('Download completed for receipts')
+        } else {
+          startReceipt = endReceipt
+          endReceipt += 1000
+        }
       } else {
         console.log('Receipt', 'Invalid download response')
       }
-      startReceipt = endReceipt
-      endReceipt += 1000
     }
     if (!completeForCycle) {
       console.log(`Downloading cycles from ${startCycle} to ${endCycle}`)
       const response = await axios.get(`${ARCHIVER_URL}/cycleinfo?start=${startCycle}&end=${endCycle}`)
       if (response && response.data && response.data.cycleInfo) {
-        if (response.data.cycleInfo.length < 1000) {
-          completeForCycle = true
-          console.log('Download completed for cycles')
-        }
         console.log(`Downloaded cycles`, response.data.cycleInfo.length)
         const cycles = response.data.cycleInfo
         let bucketSize = 1000
@@ -458,11 +460,19 @@ export const downloadAndInsertReceiptsAndCycles = async (
             combineCycles = []
           }
         }
+        if (response.data.cycleInfo.length < 1000) {
+          completeForCycle = true
+          endCycle += response.data.cycleInfo.length
+          startCycle = endCycle
+          endCycle += 1000
+          console.log('Download completed for cycles')
+        } else {
+          startCycle = endCycle
+          endCycle += 1000
+        }
       } else {
         console.log('Cycle', 'Invalid download response')
       }
-      startCycle = endCycle
-      endCycle += 1000
     }
   }
   console.log('Sync Cycle and Receipt data completed!')
