@@ -35,7 +35,7 @@ export async function queryLatestCoinStats(count?: number) {
 
 export async function queryAggregatedCoinStats() {
   try {
-    const sql = `SELECT sum(totalSupplyChange) as totalSupplyChange, sum(totalStakeChange) as totalStakeChange FROM coin_stats`
+    const sql = `SELECT IFNULL(sum(totalSupplyChange), 0) as totalSupplyChange, IFNULL(sum(totalStakeChange), 0) as totalStakeChange FROM coin_stats`
     const coinStats: any = await db.get(sql)
     if (config.verbose) console.log('aggregated coin stats', coinStats)
     return coinStats
