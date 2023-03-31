@@ -396,7 +396,9 @@ export const downloadAndInsertReceiptsAndCycles = async (
   let startCycle = fromCycle
   let endReceipt = startReceipt + 1000
   let endCycle = startCycle + 1000
-  if (config.dataPatch) completeForReceipt = true
+  let patchData = config.patchData
+  if (startReceipt === 0) patchData = true
+  if (!patchData) completeForReceipt = true
   while (!completeForReceipt || !completeForCycle) {
     if (endReceipt >= totalReceiptsToSync || endCycle >= totalCyclesToSync) {
       let res = await axios.get(`${ARCHIVER_URL}/totalData`)
@@ -409,7 +411,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
           completeForCycle = false
           totalCyclesToSync = res.data.totalCycles
         }
-        if (config.dataPatch) completeForReceipt = true
+        if (!patchData) completeForReceipt = true
         console.log('totalReceiptsToSync', totalReceiptsToSync, 'totalCyclesToSync', totalCyclesToSync)
       }
     }
@@ -644,5 +646,35 @@ export async function downloadReceiptsByCycle(data: any[] = []) {
         break
       }
     }
+  }
+}
+
+export const downloadReceiptsBetweenCycles = async (startCycle, totalCyclesToSync) => {
+  // totalCyclesToSync = response.data.cycleInfo[0].counter
+  let endCycle = startCycle + 100
+  for (; startCycle < totalCyclesToSync; ) {
+    if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
+    console.log(`Downloading receipts from cycle ${startCycle} to cycle ${endCycle}`)
+    let response = await axios.get(
+      `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=count`
+    )
+    if (response && response.data && response.data.receipts) {
+      console.log(`Download receipts Count`, response.data.receipts)
+      const receiptsCount = response.data.receipts
+      for (let i = 1; i <= Math.ceil(receiptsCount / 100); i++) {
+        response = await axios.get(
+          `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
+        )
+        if (response && response.data && response.data.receipts) {
+          console.log(`Downloaded receipts`, response.data.receipts.length)
+          const receipts = response.data.receipts
+          await Receipt.processReceiptData(receipts)
+        }
+      }
+    } else {
+      console.log('Receipt', 'Invalid download response')
+    }
+    startCycle = endCycle + 1
+    endCycle += 100
   }
 }

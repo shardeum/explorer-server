@@ -62,7 +62,8 @@ export const checkAndSyncData = async () => {
     console.log('totalReceiptsToSync', totalReceiptsToSync, 'totalCyclesToSync', totalCyclesToSync)
   }
   console.log('lastStoredReceiptCount', lastStoredReceiptCount, 'lastStoredCycleCount', lastStoredCycleCount)
-  if (CONFIG.dataPatch && totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
+  const patchData = CONFIG.patchData
+  if (patchData && totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
     // Make sure the data that are store are authentic by comparing 10 last receipts and 10 last cycles
     const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
     if (!receiptResult.success) {
@@ -82,14 +83,14 @@ export const checkAndSyncData = async () => {
 
     lastStoredCycleCount = cycleResult.cycle
   }
-  if (CONFIG.dataPatch && lastStoredReceiptCount > 0) {
+  if (patchData && lastStoredReceiptCount > 0) {
     if (lastStoredReceiptCount > totalReceiptsToSync) {
       throw Error(
         'The existing db has more data than the network data! Clear the DB and start the server again!'
       )
     }
   }
-  if (CONFIG.dataPatch && totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
+  if (patchData && totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
   if (!needSyncing && totalCyclesToSync > lastStoredCycleCount) toggleNeedSyncing()
 
   await downloadAndSyncGenesisAccounts() // To sync accounts data that are from genesis accounts/accounts data that the network start with
