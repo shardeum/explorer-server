@@ -1,4 +1,18 @@
-const BASE_URL = process.env.BASE_URL
+// const BASE_URL = process.env.BASE_URL
+
+// config variables
+import { config as CONFIG } from '../../config'
+if (process.env.PORT) {
+  CONFIG.port.server = process.env.PORT
+}
+
+console.log(process.argv)
+let port = process.argv[2]
+if (port) {
+  CONFIG.port.server = port
+}
+console.log('Port', CONFIG.port.server)
+const BASE_URL = `http://localhost:${CONFIG.port.server}`
 
 // const BASE_URL = "https://explorer-liberty20.shardeum.org";
 // const BASE_URL = "https://explorer-sphinx.shardeum.org";

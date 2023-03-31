@@ -20,7 +20,7 @@
     "compile": "tsc -p .",
     "fix": "gts fix",
     "prepare": "rm -fr dist tsconfig.json && cp tsconfig_example.json tsconfig.json && npm run compile",
-    "flush": "rm -fr db.sqlite3* statsDB.sqlite3"
+    "flush": "rm -fr db.sqlite3* statsDB.sqlite3*"
   },
   "dependencies": {
     "@ethereumjs/vm": "^6.2.0",
