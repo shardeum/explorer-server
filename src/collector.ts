@@ -63,8 +63,9 @@ export const checkAndSyncData = async () => {
   }
   console.log('lastStoredReceiptCount', lastStoredReceiptCount, 'lastStoredCycleCount', lastStoredCycleCount)
   const patchData = CONFIG.patchData
+  // Make sure the data that are store are authentic by comparing 10 last receipts and 10 last cycles
   if (patchData && totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
-    // Make sure the data that are store are authentic by comparing 10 last receipts and 10 last cycles
+    // TODO: update it of comparing receipts of last 10 cycles
     const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
     if (!receiptResult.success) {
       throw Error(

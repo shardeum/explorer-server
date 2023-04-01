@@ -44,31 +44,6 @@ const start = async () => {
     console.log('totalCyclesToSync', totalCyclesToSync)
   }
 
-  // Validate the data that are stored in the DB
-  // console.log('lastStoredReceiptCount', lastStoredReceiptCount, 'lastStoredCycleCount', lastStoredCycleCount)
-  // // Make sure the data that are store are authentic by comparing 10 last receipts and 10 last cycles
-  // if (totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
-  //   const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
-  //   if (!receiptResult.success) {
-  //     throw Error(
-  //       'The last saved 10 receipts data does not match with the archiver data! Clear the DB and start the server again!'
-  //     )
-  //   }
-  //   lastStoredReceiptCount = lastStoredReceiptCount - receiptResult.receiptsToMatchCount
-  // }
-  // if (totalCyclesToSync > lastStoredCycleCount && lastStoredCycleCount > 10) {
-  //   const cycleResult = await compareWithOldCyclesData(lastStoredCycleCount)
-  //   if (!cycleResult.success) {
-  //     throw Error(
-  //       'The last saved 10 cycles data does not match with the archiver data! Clear the DB and start the server again!'
-  //     )
-  //   }
-
-  //   lastStoredCycleCount = cycleResult.cycle
-  // }
-  // if (totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
-  // if (!needSyncing && totalCyclesToSync > lastStoredCycleCount) toggleNeedSyncing()
-
   await DataSync.downloadAndSyncGenesisAccounts() // To sync accounts data that are from genesis accounts/accounts data that the network start with
 
   console.log('startCycle', startCycle, 'totalCyclesToSync', totalCyclesToSync)
