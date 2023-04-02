@@ -41,6 +41,7 @@
     "compression": "^1.7.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.5",
+    "decimal.js": "^10.4.3",
     "dotenv": "^6.2.0",
     "ejs": "^3.1.5",
     "ethereumjs-util": "^7.1.5",
@@ -73,12 +74,13 @@
     "web3": "^1.8.1"
   },
   "devDependencies": {
-    "prettier": "^2.8.1",
     "@types/lodash": "^4.14.191",
     "@types/qs": "^6.9.7",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
     "eslint": "^8.31.0",
-    "eslint-config-prettier": "^8.6.0",
     "eslint-config-next": "13.0.5",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-no-unsanitized": "^4.0.2",
@@ -89,9 +91,8 @@
     "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-xss": "^0.1.12",
     "gts": "^3.1.1",
+    "prettier": "^2.8.1",
     "typescript": "^4.9.4",
-    "typescript-estree": "^18.1.0",
-    "@typescript-eslint/eslint-plugin": "^5.48.0",
-    "@typescript-eslint/parser": "^5.48.0"
+    "typescript-estree": "^18.1.0"
   }
 }

@@ -15,7 +15,8 @@ crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 // config variables
 import { TransactionSearchType, TransactionType } from './@type'
 import { config as CONFIG } from './config'
-import { BN } from 'bn.js'
+import BN from 'bn.js'
+import BigNumber from 'decimal.js'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -238,17 +239,21 @@ const recordCoinStats = async (latestCycle: number, lastStoredCycle: number) => 
             }
           }, new BN(0))
 
+          const weiBNToEth = (bn: BN): number => {
+            let stringVal = ''
+            if (bn.isNeg()) {
+              stringVal = `-${bn.neg().toString()}`
+            } else {
+              stringVal = bn.toString()
+            }
+            const result = new BigNumber(stringVal).div('1e18')
+            return result.toNumber()
+          }
+
           const coinStatsForCycle = {
             cycle: cycles[i].counter,
-            totalSupplyChange: nodeRewardAmount
-              .sub(nodePenaltyAmount)
-              .sub(gasBurnt)
-              .div(new BN(10).pow(new BN(18)))
-              .toNumber(),
-            totalStakeChange: stakeAmount
-              .sub(unStakeAmount)
-              .div(new BN(10).pow(new BN(18)))
-              .toNumber(),
+            totalSupplyChange: weiBNToEth(nodeRewardAmount.sub(nodePenaltyAmount).sub(gasBurnt)),
+            totalStakeChange: weiBNToEth(stakeAmount.sub(unStakeAmount)),
             timestamp: cycles[i].cycleRecord.start,
           }
           await CoinStats.insertCoinStats(coinStatsForCycle)
