@@ -19,6 +19,8 @@ import {
   toggleNeedSyncing,
   lastSyncedCycle,
   updateLastSyncedCycle,
+  compareReceiptsCountByCycles,
+  downloadReceiptsBetweenCycles,
 } from './class/DataSync'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -55,6 +57,7 @@ export const checkAndSyncData = async () => {
   let lastStoredCycleCount = await cycle.queryCycleCount()
   let totalReceiptsToSync = 0
   let totalCyclesToSync = 0
+  let lastStoredReceiptCycle = 0
   let response = await axios.get(`${ARCHIVER_URL}/totalData`)
   if (response.data && response.data.totalReceipts >= 0 && response.data.totalCycles >= 0) {
     totalReceiptsToSync = response.data.totalReceipts
@@ -65,14 +68,25 @@ export const checkAndSyncData = async () => {
   const patchData = CONFIG.patchData
   // Make sure the data that are store are authentic by comparing 10 last receipts and 10 last cycles
   if (patchData && totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
-    // TODO: update it of comparing receipts of last 10 cycles
+    // const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
+    // if (!receiptResult.success) {
+    //   throw Error(
+    //     'The last saved 10 receipts data does not match with the archiver data! Clear the DB and start the server again!'
+    //   )
+    // }
+    // lastStoredReceiptCount = lastStoredReceiptCount - receiptResult.receiptsToMatchCount
+
+    // Added new method of comparing receipts by cycle
+    let lastStoredReceiptInfo = await receipt.queryLatestReceipts(1)
+    if (lastStoredReceiptInfo && lastStoredReceiptInfo.length > 0)
+      lastStoredReceiptCycle = lastStoredReceiptInfo[0].cycle
     const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
     if (!receiptResult.success) {
       throw Error(
-        'The last saved 10 receipts data does not match with the archiver data! Clear the DB and start the server again!'
+        'The last saved receipts of last 10 cycles data do not match with the archiver data! Clear the DB and start the server again!'
       )
     }
-    lastStoredReceiptCount = lastStoredReceiptCount - receiptResult.receiptsToMatchCount
+    lastStoredReceiptCycle = receiptResult.matchedCycle
   }
   if (totalCyclesToSync > lastStoredCycleCount && lastStoredCycleCount > 10) {
     const cycleResult = await compareWithOldCyclesData(lastStoredCycleCount)
@@ -98,6 +112,11 @@ export const checkAndSyncData = async () => {
 
   if (needSyncing) {
     console.log(lastStoredReceiptCount, totalReceiptsToSync, lastStoredCycleCount, totalCyclesToSync)
+    // Sync receipts data first if there is old data
+    if (lastStoredReceiptCycle > 0 && totalCyclesToSync > lastStoredReceiptCycle) {
+      await downloadReceiptsBetweenCycles(lastStoredReceiptCycle, totalCyclesToSync)
+      lastStoredReceiptCount = await receipt.queryReceiptCount()
+    }
     await downloadAndInsertReceiptsAndCycles(
       totalReceiptsToSync,
       lastStoredReceiptCount,

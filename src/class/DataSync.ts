@@ -67,44 +67,78 @@ export const compareWithOldArchivedCyclesData = async (lastCycleCounter) => {
   return { success, cycle }
 }
 
-export const compareWithOldReceiptsData = async (lastReceiptCount) => {
-  let downloadedReceipts
+// export const compareWithOldReceiptsData = async (lastReceiptCount) => {
+//   let downloadedReceipts
+//   const response = await axios.get(
+//     `${ARCHIVER_URL}/receipt?start=${lastReceiptCount - 10}&end=${lastReceiptCount}`
+//   )
+//   if (response && response.data && response.data.receipts) {
+//     downloadedReceipts = response.data.receipts
+//   } else {
+//     throw Error(
+//       `Can't fetch data from receipt ${
+//         lastReceiptCount - 20
+//       } to receipt ${lastReceiptCount}  from archiver server`
+//     )
+//   }
+//   let oldReceipts = await Receipt.queryReceipts(lastReceiptCount - 10, lastReceiptCount)
+//   // downloadedReceipts.sort((a, b) =>
+//   //   a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
+//   // );
+//   // oldReceipts.sort((a, b) =>
+//   //   a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
+//   // );
+//   let success = false
+//   let receiptsToMatchCount = 10
+//   for (let i = 0; i < downloadedReceipts.length; i++) {
+//     let downloadedReceipt = downloadedReceipts[i]
+//     const oldReceipt = oldReceipts[i]
+//     if (oldReceipt.counter) delete oldReceipt.counter
+//     console.log(downloadedReceipt.receiptId, oldReceipt.receiptId)
+//     if (downloadedReceipt.receiptId !== oldReceipt.receiptId) {
+//       return {
+//         success,
+//         receiptsToMatchCount,
+//       }
+//     }
+//     success = true
+//     receiptsToMatchCount++
+//   }
+//   return { success, receiptsToMatchCount }
+// }
+
+export async function compareWithOldReceiptsData(lastStoredReceiptCycle: number = 0) {
+  let endCycle = lastStoredReceiptCycle
+  let startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
+  let downloadedReceiptCountByCycles: string | any[]
   const response = await axios.get(
-    `${ARCHIVER_URL}/receipt?start=${lastReceiptCount - 10}&end=${lastReceiptCount}`
+    `${ARCHIVER_URL}/receipt?start=${lastStoredReceiptCycle - 10}&end=${lastStoredReceiptCycle}`
   )
   if (response && response.data && response.data.receipts) {
-    downloadedReceipts = response.data.receipts
+    downloadedReceiptCountByCycles = response.data.receipts
   } else {
     throw Error(
-      `Can't fetch data from receipt ${
-        lastReceiptCount - 20
-      } to receipt ${lastReceiptCount}  from archiver server`
+      `Can't fetch receipts data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${ARCHIVER_URL}`
     )
   }
-  let oldReceipts = await Receipt.queryReceipts(lastReceiptCount - 10, lastReceiptCount)
-  // downloadedReceipts.sort((a, b) =>
-  //   a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
-  // );
-  // oldReceipts.sort((a, b) =>
-  //   a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
-  // );
+  let oldReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
   let success = false
-  let receiptsToMatchCount = 10
-  for (let i = 0; i < downloadedReceipts.length; i++) {
-    let downloadedReceipt = downloadedReceipts[i]
-    const oldReceipt = oldReceipts[i]
-    if (oldReceipt.counter) delete oldReceipt.counter
-    console.log(downloadedReceipt.receiptId, oldReceipt.receiptId)
-    if (downloadedReceipt.receiptId !== oldReceipt.receiptId) {
+  let matchedCycle = 0
+  for (let i = 0; i < downloadedReceiptCountByCycles.length; i++) {
+    const downloadedReceipt = downloadedReceiptCountByCycles[i]
+    const oldReceipt = oldReceiptCountByCycle[i]
+    console.log(downloadedReceipt, oldReceipt)
+    if (downloadedReceipt.cycle !== oldReceipt.cycle || downloadedReceipt.receipts !== oldReceipt.receipts) {
       return {
         success,
-        receiptsToMatchCount,
+        matchedCycle,
       }
     }
     success = true
-    receiptsToMatchCount++
+    matchedCycle = downloadedReceipt.cycle
   }
-  return { success, receiptsToMatchCount }
+  success = true
+  return { success, matchedCycle }
 }
 
 export const compareWithOldCyclesData = async (lastCycleCounter) => {
@@ -672,7 +706,8 @@ export const downloadReceiptsBetweenCycles = async (startCycle, totalCyclesToSyn
         }
       }
     } else {
-      console.log('Receipt', 'Invalid download response')
+      if (response && response.data && response.data.receipts !== 0)
+        console.log('Receipt', 'Invalid download response')
     }
     startCycle = endCycle + 1
     endCycle += 100
