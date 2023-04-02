@@ -1142,6 +1142,8 @@ const start = async () => {
           validatorStats = await ValidatorStats.queryLatestValidatorStats(count)
           validatorStatsCacheRecord.setData(latestCycleNumber, validatorStats)
         }
+      } else {
+        validatorStats = await ValidatorStats.queryLatestValidatorStats(count)
       }
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle)
@@ -1209,6 +1211,8 @@ const start = async () => {
           transactionStats = await TransactionStats.queryLatestTransactionStats(count)
           transactionStatsCacheRecord.setData(latestCycleNumber, transactionStats)
         }
+      } else {
+        transactionStats = await TransactionStats.queryLatestTransactionStats(count)
       }
     } else if (query.startCycle && query.endCycle) {
       const startCycle = parseInt(query.startCycle)
