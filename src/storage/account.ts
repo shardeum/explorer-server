@@ -18,8 +18,8 @@ export interface Account {
   account: WrappedEVMAccount
   hash: string
   accountType: AccountType.Account
-  contractType: ContractType
-  contractInfo: any
+  contractType?: ContractType
+  contractInfo?: any
 }
 
 export interface Token {
