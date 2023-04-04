@@ -14,13 +14,13 @@ export async function init() {
   console.log('Database initialized.')
 }
 
-export async function runCreate(createStatement) {
+export async function runCreate(createStatement: string) {
   await run(createStatement)
 }
 
-export async function run(sql, params = [] || {}) {
+export async function run(sql: string, params = [] || {}) {
   return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
+    db.run(sql, params, function (err: Error) {
       if (err) {
         console.log('Error running sql ' + sql)
         console.log(err)
@@ -32,9 +32,9 @@ export async function run(sql, params = [] || {}) {
   })
 }
 
-export async function get(sql, params = []) {
+export async function get(sql: string, params = []) {
   return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, result) => {
+    db.get(sql, params, (err: Error, result: unknown) => {
       if (err) {
         console.log('Error running sql: ' + sql)
         console.log(err)
@@ -46,9 +46,9 @@ export async function get(sql, params = []) {
   })
 }
 
-export async function all(sql, params = []) {
+export async function all(sql: string, params = []) {
   return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
+    db.all(sql, params, (err: Error, rows: unknown[]) => {
       if (err) {
         console.log('Error running sql: ' + sql)
         console.log(err)
@@ -60,7 +60,7 @@ export async function all(sql, params = []) {
   })
 }
 
-export function extractValues(object) {
+export function extractValues(object: Log | Transaction | TokenTx | Account | Token | Receipt | Cycle) {
   try {
     const inputs = []
     for (const column of Object.keys(object)) {
