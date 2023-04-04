@@ -88,7 +88,7 @@ export async function insertOrUpdateCycle(cycle: Cycle) {
   }
 }
 
-export async function queryLatestCycleRecords(count) {
+export async function queryLatestCycleRecords(count: number) {
   try {
     const sql = `SELECT * FROM cycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
     const cycleRecords: any = await db.all(sql)
@@ -148,19 +148,8 @@ export async function queryCycleByCounter(counter: number) {
   }
 }
 
-// export const queryCyclesByTimestamp = async (timestamp: number) => {
-//   //TODO need to limit 1
-//   const data = await Collection.find({
-//     filter: {'cycleRecord.start': {$lte: timestamp}},
-//     sort: {
-//       'cycleRecord.counter': -1,
-//     },
-//   });
-//   if (data.length > 0) return data[0];
-// };
-
-export async function queryCycleCount() {
-  let cycles
+export async function queryCycleCount(): Promise<number> {
+  let cycles: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM cycles`
     cycles = await db.get(sql, [])
