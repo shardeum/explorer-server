@@ -59,7 +59,7 @@ export async function bulkInsertReceipts(receipts: Receipt[]) {
   }
 }
 
-export async function processReceiptData(receipts: any) {
+export async function processReceiptData(receipts: any[]) {
   if (receipts && receipts.length <= 0) return
   if (!cleanReceiptsMapByCycle) {
     let currentTime = Date.now()
@@ -91,7 +91,7 @@ export async function processReceiptData(receipts: any) {
     for (let j = 0; j < accounts.length; j++) {
       const account = accounts[j]
       const accountType = account.data.accountType
-      let accObj
+      let accObj: Account.Account
       if (
         accountType === AccountType.Account ||
         accountType === AccountType.ContractStorage ||
@@ -268,7 +268,7 @@ export async function processReceiptData(receipts: any) {
           }
         }
         for (let i = 0; i < txs.length; i++) {
-          let accountExist
+          let accountExist: { contractInfo: object }
           if (txs[i].tokenType !== TransactionType.EVM_Internal)
             accountExist = await Account.queryAccountByAccountId(
               txs[i].contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
@@ -357,7 +357,7 @@ export async function queryReceiptByReceiptId(receiptId: string) {
   }
 }
 
-export async function queryLatestReceipts(count) {
+export async function queryLatestReceipts(count: number) {
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle DESC, timestamp DESC LIMIT ${count ? count : 100}`
     const receipts: any = await db.all(sql)
@@ -377,7 +377,7 @@ export async function queryLatestReceipts(count) {
 }
 
 export async function queryReceipts(skip = 0, limit = 10000) {
-  let receipts
+  let receipts: any[]
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql)
@@ -393,11 +393,12 @@ export async function queryReceipts(skip = 0, limit = 10000) {
     console.log(e)
   }
   if (config.verbose) console.log('Receipt receipts', receipts ? receipts.length : receipts, 'skip', skip)
+
   return receipts
 }
 
 export async function queryReceiptCount() {
-  let receipts
+  let receipts: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM receipts`
     receipts = await db.get(sql, [])
@@ -411,7 +412,7 @@ export async function queryReceiptCount() {
 }
 
 export async function queryReceiptCountByCycles(start: number, end: number) {
-  let receipts
+  let receipts: { cycle: number; 'COUNT(*)': number }[]
   try {
     const sql = `SELECT cycle, COUNT(*) FROM receipts GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
     receipts = await db.all(sql, [start, end])
@@ -428,8 +429,8 @@ export async function queryReceiptCountByCycles(start: number, end: number) {
   return receipts
 }
 
-export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start, end) {
-  let receipts
+export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: number, end: number) {
+  let receipts: any[]
   try {
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql, [start, end])
@@ -449,8 +450,8 @@ export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start, en
   return receipts
 }
 
-export async function queryReceiptCountBetweenCycles(start, end) {
-  let receipts
+export async function queryReceiptCountBetweenCycles(start: number, end: number) {
+  let receipts: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM receipts WHERE cycle BETWEEN ? and ?`
     receipts = await db.get(sql, [start, end])
