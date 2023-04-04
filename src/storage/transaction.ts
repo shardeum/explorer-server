@@ -254,7 +254,7 @@ export async function processTransactionData(transactions: any) {
   if (combineAccounts.length > 0) {
     let limit = bucketSize
     let j = limit
-    let accountsToSave
+    let accountsToSave: Account.Account[]
     for (let i = 0; i < combineAccounts.length; i = j) {
       accountsToSave = combineAccounts.slice(i, limit)
       await Account.bulkInsertAccounts(accountsToSave)
@@ -302,7 +302,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any) {
           acc?.data?.accountType === AccountType.UnstakeReceipt
         )
       })
-      let txReceipt
+      let txReceipt: { ethAddress: any }
       if (config.verbose) console.log('transactionData', txId, transactionData)
       if (transactionData.length > 0) {
         txReceipt = transactionData[0].data
@@ -472,7 +472,7 @@ export async function queryTransactionCount(
   txType?: TransactionSearchType,
   filterAddress?: string
 ) {
-  let transactions
+  let transactions: { 'COUNT(*)': number }
   try {
     if (address) {
       if (!txType ) { // (!txType || txType === TransactionSearchType.All)
@@ -597,7 +597,7 @@ export async function queryTransactions(
   txType?: TransactionSearchType,
   filterAddress?: string
 ) {
-  let transactions
+  let transactions: any[]
   try {
     if (address) {
       if (!txType || TransactionSearchType.All) {
@@ -754,7 +754,7 @@ export async function queryTransactionByHash(txHash: string, detail = false) {
         const sql = `SELECT * FROM tokenTxs WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
         const tokenTxs: any = await db.all(sql, [txHash])
         if (tokenTxs.length > 0) {
-          tokenTxs.forEach((tokenTx) => {
+          tokenTxs.forEach((tokenTx: { contractInfo: string }) => {
             if (tokenTx.contractInfo) tokenTx.contractInfo = JSON.parse(tokenTx.contractInfo)
           })
           transaction.tokenTxs = tokenTxs
@@ -768,8 +768,8 @@ export async function queryTransactionByHash(txHash: string, detail = false) {
   }
 }
 
-export async function queryTransactionsForCycle(cycleNumber): Promise<Transaction[]> {
-  let transactions
+export async function queryTransactionsForCycle(cycleNumber: number): Promise<Transaction[]> {
+  let transactions: any[]
   try {
     const sql = `SELECT * FROM transactions WHERE cycle=? ORDER BY timestamp ASC`
     transactions = await db.all(sql, [cycleNumber])
@@ -791,13 +791,13 @@ export async function queryTransactionsForCycle(cycleNumber): Promise<Transactio
 export async function queryTransactionsBetweenCycles(
   skip = 0,
   limit = 10,
-  start,
-  end,
+  start: number,
+  end: number,
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
 ) {
-  let transactions
+  let transactions: any[]
   try {
     if (address) {
       // const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -923,13 +923,13 @@ export async function queryTransactionsBetweenCycles(
 }
 
 export async function queryTransactionCountBetweenCycles(
-  start,
-  end,
+  start: number,
+  end: number,
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
 ) {
-  let transactions
+  let transactions: { 'COUNT(*)': number }
   try {
     if (address) {
       if (!txType) { // (!txType || txType === TransactionSearchType.All)
@@ -1052,7 +1052,7 @@ export async function queryTransactionCountByCycles(
   start: number,
   end: number,
   txType?: TransactionSearchType
-) {
+): Promise<{ cycle: number; transactions: number }[]> {
   let transactions
   try {
     if (
