@@ -16,7 +16,6 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "**/storage/*.ts",
     "collector.ts",
     "**/@type/index.ts"
   ],
