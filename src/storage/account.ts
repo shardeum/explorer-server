@@ -146,7 +146,7 @@ export async function insertOrUpdateAccount(archivedCycle: any) {
           acc?.data?.accountType === AccountType.NodeAccount2
         )
       })
-      let account
+      let account: Account
       if (accountData.length > 0) {
         if (config.verbose) console.log('accountData', txId, accountData)
       } else {
@@ -194,8 +194,8 @@ export async function insertOrUpdateAccount(archivedCycle: any) {
   }
 }
 
-export async function queryAccountCount(type = undefined) {
-  let Accounts
+export async function queryAccountCount(type = undefined): Promise<number> {
+  let Accounts: { 'COUNT(*)': number }
   try {
     if (type || type === AccountSearchType.All) {
       if (type === AccountSearchType.All) {
@@ -235,7 +235,7 @@ export async function queryAccountCount(type = undefined) {
 }
 
 export async function queryAccounts(skip = 0, limit = 10, type = undefined) {
-  let accounts
+  let accounts: any[]
   try {
     if (type || type === AccountSearchType.All) {
       if (type === AccountSearchType.All) {
@@ -305,7 +305,7 @@ export async function queryAccountByAddress(address: string, accountType = Accou
 }
 
 export async function queryAccountCountBetweenCycles(startCycleNumber: number, endCycleNumber: number) {
-  let accounts
+  let accounts: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM accounts WHERE cycle BETWEEN ? AND ?`
     accounts = await db.get(sql, [startCycleNumber, endCycleNumber])
@@ -326,7 +326,7 @@ export async function queryAccountsBetweenCycles(
   startCycleNumber: number,
   endCycleNumber: number
 ) {
-  let accounts
+  let accounts: unknown[]
   try {
     const sql = `SELECT * FROM accounts WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     accounts = await db.all(sql, [startCycleNumber, endCycleNumber])
@@ -376,7 +376,7 @@ export async function queryTokensByAddress(address: string, detail = false) {
 
 export async function queryTokenBalance(contractAddress: string, addressToSearch: string) {
   const sql = `SELECT * FROM tokens WHERE ethAddress=? AND contractAddress=?`
-  let token = (await db.get(sql, [addressToSearch, contractAddress])) as Token
+  let token: Token = await db.get(sql, [addressToSearch, contractAddress])
   if (config.verbose) console.log('Token balance', token)
   if (!token) return { success: false, error: 'tokenBalance is not found' }
   return {
@@ -386,7 +386,7 @@ export async function queryTokenBalance(contractAddress: string, addressToSearch
 }
 
 export async function queryTokenHolderCount(contractAddress: string) {
-  let tokens
+  let tokens: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM tokens WHERE contractAddress=?`
     tokens = await db.get(sql, [contractAddress])
@@ -400,7 +400,7 @@ export async function queryTokenHolderCount(contractAddress: string) {
 }
 
 export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: string) {
-  let tokens
+  let tokens: Token[]
   try {
     const sql = `SELECT * FROM tokens WHERE contractAddress=? ORDER BY tokenValue DESC LIMIT ${limit} OFFSET ${skip}`
     tokens = await db.all(sql, [contractAddress])
@@ -429,7 +429,7 @@ export async function processAccountData(accounts: any) {
       continue
     }
     const accountType = account.data.accountType
-    let accObj
+    let accObj: Account
     if (
       accountType === AccountType.Account ||
       accountType === AccountType.ContractStorage ||
