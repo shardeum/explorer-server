@@ -5,8 +5,9 @@ import { Log } from "./log"
 import { Receipt } from "./receipt"
 import { Transaction } from "./transaction"
 
-const sqlite3 = require('sqlite3').verbose()
-let db: any
+import sqlite3Lib from "sqlite3";
+const sqlite3 = sqlite3Lib.verbose()
+let db: sqlite3Lib.Database
 
 export async function init() {
   db = new sqlite3.Database('db.sqlite3')
