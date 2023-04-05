@@ -194,16 +194,16 @@ export async function insertOrUpdateAccount(archivedCycle: any): Promise<void> {
   }
 }
 
-export async function queryAccountCount(type = undefined): Promise<number> {
-  let Accounts: { 'COUNT(*)': number }
+export async function queryAccountCount(type = undefined) {
+  let accounts: { 'COUNT(*)': number }
   try {
     if (type || type === AccountSearchType.All) {
       if (type === AccountSearchType.All) {
         const sql = `SELECT COUNT(*) FROM accounts`
-        Accounts = await db.get(sql, [])
+        accounts = await db.get(sql, [])
       } else if (type === AccountSearchType.CA) {
         const sql = `SELECT COUNT(*) FROM accounts WHERE accountType=? AND contractType IS NOT NULL`
-        Accounts = await db.get(sql, [AccountType.Account])
+        accounts = await db.get(sql, [AccountType.Account])
       } else if (
         type === AccountSearchType.GENERIC ||
         type === AccountSearchType.ERC_20 ||
@@ -219,17 +219,17 @@ export async function queryAccountCount(type = undefined): Promise<number> {
             ? ContractType.ERC_721
             : ContractType.ERC_1155
         const sql = `SELECT COUNT(*) FROM accounts WHERE accountType=? AND contractType=?`
-        Accounts = await db.get(sql, [AccountType.Account, type])
+        accounts = await db.get(sql, [AccountType.Account, type])
       }
     } else {
       const sql = `SELECT COUNT(*) FROM accounts WHERE accountType=?`
-      Accounts = await db.get(sql, [AccountType.Account])
+      accounts = await db.get(sql, [AccountType.Account])
     }
   } catch (e) {
     console.log(e)
   }
-  if (config.verbose) console.log('Account count', Accounts)
-  return Accounts ? Accounts['COUNT(*)'] : 0
+  if (config.verbose) console.log('Account count', accounts)
+  return accounts ? accounts['COUNT(*)'] : 0
 }
 
 export async function queryAccounts(skip = 0, limit = 10, type = undefined): Promise<Account[]> {
