@@ -157,7 +157,6 @@ export async function queryCycleCount(): Promise<number> {
     console.log(e)
   }
   if (config.verbose) console.log('Cycle count', cycles)
-  if (cycles) cycles = cycles['COUNT(*)']
-  else cycles = 0
-  return cycles
+
+  return cycles ? cycles['COUNT(*)'] : 0
 }

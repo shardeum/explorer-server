@@ -229,9 +229,7 @@ export async function queryAccountCount(type = undefined): Promise<number> {
     console.log(e)
   }
   if (config.verbose) console.log('Account count', Accounts)
-  if (Accounts) Accounts = Accounts['COUNT(*)']
-  else Accounts = 0
-  return Accounts
+  return Accounts ? Accounts['COUNT(*)'] : 0
 }
 
 export async function queryAccounts(skip = 0, limit = 10, type = undefined) {
@@ -265,12 +263,10 @@ export async function queryAccounts(skip = 0, limit = 10, type = undefined) {
       const sql = `SELECT * FROM accounts WHERE accountType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
       accounts = await db.all(sql, [AccountType.Account])
     }
-    if (accounts.length > 0) {
-      accounts.forEach((account: any) => {
-        if (account.account) account.account = JSON.parse(account.account)
-        if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
-      })
-    }
+    accounts.forEach((account: any) => {
+      if (account.account) account.account = JSON.parse(account.account)
+      if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+    })
   } catch (e) {
     console.log(e)
   }
@@ -315,9 +311,7 @@ export async function queryAccountCountBetweenCycles(startCycleNumber: number, e
   if (config.verbose) {
     console.log('Account count between cycle', accounts)
   }
-  if (accounts) accounts = accounts['COUNT(*)']
-  else accounts = 0
-  return accounts
+  return accounts ? accounts['COUNT(*)'] : 0
 }
 
 export async function queryAccountsBetweenCycles(
@@ -330,12 +324,10 @@ export async function queryAccountsBetweenCycles(
   try {
     const sql = `SELECT * FROM accounts WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     accounts = await db.all(sql, [startCycleNumber, endCycleNumber])
-    if (accounts.length > 0) {
-      accounts.forEach((account: any) => {
-        if (account.account) account.account = JSON.parse(account.account)
-        if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
-      })
-    }
+    accounts.forEach((account: any) => {
+      if (account.account) account.account = JSON.parse(account.account)
+      if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+    })
   } catch (e) {
     console.log(e)
   }
@@ -394,9 +386,8 @@ export async function queryTokenHolderCount(contractAddress: string) {
     console.log(e)
   }
   if (config.verbose) console.log('Token holder count', tokens)
-  if (tokens) tokens = tokens['COUNT(*)']
-  else tokens = 0
-  return tokens
+
+  return tokens ? tokens['COUNT(*)'] : 0
 }
 
 export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: string) {

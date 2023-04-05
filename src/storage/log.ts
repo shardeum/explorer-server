@@ -108,10 +108,10 @@ export async function queryLogCount(
     console.log(e)
   }
   if (config.verbose) console.log('Log count', logs)
-  if (logs && type === 'txs') logs = logs['COUNT(DISTINCT(txHash))']
-  else if (logs) logs = logs['COUNT(txHash)']
-  else logs = 0
-  return logs
+
+  if (logs && type === 'txs') return logs['COUNT(DISTINCT(txHash))']
+  else if (logs) return logs['COUNT(txHash)']
+  else return 0
 }
 
 export async function queryLogs(
@@ -191,9 +191,8 @@ export async function queryLogCountBetweenCycles(startCycleNumber: number, endCy
   if (config.verbose) {
     console.log('Log count between cycle', logs)
   }
-  if (logs) logs = logs['COUNT(*)']
-  else logs = 0
-  return logs
+
+  return logs ? logs['COUNT(*)'] : 0
 }
 
 export async function queryLogsBetweenCycles(
@@ -217,5 +216,6 @@ export async function queryLogsBetweenCycles(
   if (config.verbose) {
     console.log('Log logs between cycles', logs ? logs.length : logs, 'skip', skip)
   }
+
   return logs
 }

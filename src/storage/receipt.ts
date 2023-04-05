@@ -361,14 +361,14 @@ export async function queryLatestReceipts(count: number) {
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle DESC, timestamp DESC LIMIT ${count ? count : 100}`
     const receipts: any = await db.all(sql)
-    if (receipts.length > 0) {
+
       receipts.forEach((receipt: any) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
         if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
       })
-    }
+
     if (config.verbose) console.log('Receipt latest', receipts)
     return receipts
   } catch (e) {
@@ -381,14 +381,13 @@ export async function queryReceipts(skip = 0, limit = 10000) {
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql)
-    if (receipts.length > 0) {
+
       receipts.forEach((receipt: any) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
         if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
       })
-    }
   } catch (e) {
     console.log(e)
   }
@@ -420,13 +419,13 @@ export async function queryReceiptCountByCycles(start: number, end: number) {
     console.log(e)
   }
   if (config.verbose) console.log('Receipt count by cycles', receipts)
-  if (receipts.length > 0) {
-    receipts.forEach((receipt) => {
-      receipt['receipts'] = receipt['COUNT(*)']
-      delete receipt['COUNT(*)']
-    })
+
+  return receipts.map((receipt) => {
+    return {
+      receipts: receipt['COUNT(*)'],
+      cycle: receipt.cycle
   }
-  return receipts
+  })
 }
 
 export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: number, end: number) {
@@ -434,14 +433,12 @@ export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: nu
   try {
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql, [start, end])
-    if (receipts.length > 0) {
       receipts.forEach((receipt: any) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
         if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
       })
-    }
   } catch (e) {
     console.log(e)
   }
@@ -459,9 +456,8 @@ export async function queryReceiptCountBetweenCycles(start: number, end: number)
     console.log(e)
   }
   if (config.verbose) console.log('Receipt receipts count between cycles', receipts)
-  if (receipts) receipts = receipts['COUNT(*)']
-  else receipts = 0
-  return receipts
+
+  return receipts ? receipts['COUNT(*)'] : 0
 }
 
 export function resetReceiptsMap() {

@@ -585,9 +585,8 @@ export async function queryTransactionCount(
     console.log(e)
   }
   if (config.verbose) console.log('transactions count', transactions)
-  if (transactions) transactions = transactions['COUNT(*)']
-  else transactions = 0
-  return transactions
+
+  return transactions ? transactions['COUNT(*)'] : 0
 }
 
 export async function queryTransactions(
@@ -704,18 +703,19 @@ export async function queryTransactions(
       const sql = `SELECT * FROM transactions ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
       transactions = await db.all(sql)
     }
-    if (transactions.length > 0) {
+
       transactions.forEach((transaction: any) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)
         if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
       })
-    }
+
     if (config.verbose) console.log('transactions', transactions)
   } catch (e) {
     console.log(e)
   }
+
   return transactions
 }
 
@@ -1042,10 +1042,10 @@ export async function queryTransactionCountBetweenCycles(
   } catch (e) {
     console.log(e)
   }
+
   if (config.verbose) console.log('transactions count between cycles', transactions)
-  if (transactions) transactions = transactions['COUNT(*)']
-  else transactions = 0
-  return transactions
+
+  return transactions ? transactions['COUNT(*)'] : 0
 }
 
 export async function queryTransactionCountByCycles(
@@ -1082,11 +1082,11 @@ export async function queryTransactionCountByCycles(
     console.log(e)
   }
   if (config.verbose) console.log('Transaction count by cycles', transactions)
-  if (transactions.length > 0) {
-    transactions.forEach((receipt) => {
-      receipt['transactions'] = receipt['COUNT(*)']
-      delete receipt['COUNT(*)']
+
+  return transactions.map((receipt) => {
+    return {
+      cycle: receipt.cycle,
+      transactions: receipt['COUNT(*)']
+    }
     })
   }
-  return transactions
-}
