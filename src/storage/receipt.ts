@@ -28,7 +28,7 @@ export let lastReceiptMapResetTimestamp = 0
 export let newestReceiptsMapIsReset = false
 export let cleanReceiptsMapByCycle = true
 
-export async function insertReceipt(receipt: Receipt) {
+export async function insertReceipt(receipt: Receipt): Promise<void> {
   try {
     const fields = Object.keys(receipt).join(', ')
     const placeholders = Object.keys(receipt).fill('?').join(', ')
@@ -42,7 +42,7 @@ export async function insertReceipt(receipt: Receipt) {
   }
 }
 
-export async function bulkInsertReceipts(receipts: Receipt[]) {
+export async function bulkInsertReceipts(receipts: Receipt[]): Promise<void> {
   try {
     const fields = Object.keys(receipts[0]).join(', ')
     const placeholders = Object.keys(receipts[0]).fill('?').join(', ')
@@ -59,7 +59,7 @@ export async function bulkInsertReceipts(receipts: Receipt[]) {
   }
 }
 
-export async function processReceiptData(receipts: any[]) {
+export async function processReceiptData(receipts: any[]): Promise<void> {
   if (receipts && receipts.length <= 0) return
   if (!cleanReceiptsMapByCycle) {
     let currentTime = Date.now()
@@ -339,7 +339,7 @@ export async function processReceiptData(receipts: any[]) {
   if (!cleanReceiptsMapByCycle) resetReceiptsMap()
 }
 
-export async function queryReceiptByReceiptId(receiptId: string) {
+export async function queryReceiptByReceiptId(receiptId: string): Promise<Receipt> {
   try {
     const sql = `SELECT * FROM receipts WHERE receiptId=?`
     let receipt: any = await db.get(sql, [receiptId])
@@ -351,13 +351,13 @@ export async function queryReceiptByReceiptId(receiptId: string) {
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
     }
     if (config.verbose) console.log('Receipt receiptId', receipt)
-    return receipt
+    return receipt as Receipt
   } catch (e) {
     console.log(e)
   }
 }
 
-export async function queryLatestReceipts(count: number) {
+export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle DESC, timestamp DESC LIMIT ${count ? count : 100}`
     const receipts: any = await db.all(sql)
@@ -376,7 +376,7 @@ export async function queryLatestReceipts(count: number) {
   }
 }
 
-export async function queryReceipts(skip = 0, limit = 10000) {
+export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]> {
   let receipts: any[]
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -396,7 +396,7 @@ export async function queryReceipts(skip = 0, limit = 10000) {
   return receipts
 }
 
-export async function queryReceiptCount() {
+export async function queryReceiptCount(): Promise<number> {
   let receipts: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM receipts`
@@ -405,12 +405,11 @@ export async function queryReceiptCount() {
     console.log(e)
   }
   if (config.verbose) console.log('Receipt count', receipts)
-  if (receipts) receipts = receipts['COUNT(*)']
-  else receipts = 0
-  return receipts
+
+  return receipts ? receipts['COUNT(*)'] : 0
 }
 
-export async function queryReceiptCountByCycles(start: number, end: number) {
+export async function queryReceiptCountByCycles(start: number, end: number): Promise<{ receipts: number, cycle: number }[]> {
   let receipts: { cycle: number; 'COUNT(*)': number }[]
   try {
     const sql = `SELECT cycle, COUNT(*) FROM receipts GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
@@ -428,7 +427,7 @@ export async function queryReceiptCountByCycles(start: number, end: number) {
   })
 }
 
-export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: number, end: number) {
+export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: number, end: number): Promise<Receipt[]> {
   let receipts: any[]
   try {
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -447,7 +446,7 @@ export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: nu
   return receipts
 }
 
-export async function queryReceiptCountBetweenCycles(start: number, end: number) {
+export async function queryReceiptCountBetweenCycles(start: number, end: number): Promise<number> {
   let receipts: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM receipts WHERE cycle BETWEEN ? and ?`
@@ -460,7 +459,7 @@ export async function queryReceiptCountBetweenCycles(start: number, end: number)
   return receipts ? receipts['COUNT(*)'] : 0
 }
 
-export function resetReceiptsMap() {
+export function resetReceiptsMap(): void {
   if (Date.now() - lastReceiptMapResetTimestamp >= 120000) {
     receiptsMap = new Map()
     lastReceiptMapResetTimestamp = Date.now()
@@ -469,7 +468,7 @@ export function resetReceiptsMap() {
   }
 }
 
-export function cleanReceiptsMap(endCycle: number) {
+export function cleanReceiptsMap(endCycle: number): void {
   for (let [key, value] of receiptsMap) {
     if (value <= endCycle) receiptsMap.delete(key)
   }

@@ -33,7 +33,7 @@ export async function run(sql: string, params = [] || {}) {
   })
 }
 
-export async function get<T>(sql: string, params = []) {
+export async function get<T>(sql: string, params = []): Promise<T> {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err: Error, result: T) => {
       if (err) {
@@ -47,7 +47,7 @@ export async function get<T>(sql: string, params = []) {
   })
 }
 
-export async function all<T>(sql: string, params = []) {
+export async function all<T>(sql: string, params = []): Promise<T[]> {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err: Error, rows: T[]) => {
       if (err) {
@@ -61,7 +61,7 @@ export async function all<T>(sql: string, params = []) {
   })
 }
 
-export function extractValues(object: Log | Transaction | TokenTx | Account | Token | Receipt | Cycle) {
+export function extractValues(object: Log | Transaction | TokenTx | Account | Token | Receipt | Cycle): string[] {
   try {
     const inputs = []
     for (const column of Object.keys(object)) {

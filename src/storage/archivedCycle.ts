@@ -80,7 +80,7 @@ export async function queryAllArchivedCycles(count?: number) {
   }
 }
 
-export async function queryAllArchivedCyclesBetween(start: number, end: number) {
+export async function queryAllArchivedCyclesBetween(start: number, end: number): Promise<ArchivedCycle[]> {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC LIMIT 100`
     const archivedCycles: any = await db.all(sql, [start, end])

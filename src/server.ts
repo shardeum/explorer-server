@@ -1025,7 +1025,7 @@ const start = async (): Promise<void> => {
         return
       }
       logs = await Log.queryLogs(0, count)
-      totalLogs = await Log.queryLogCount(query.type)
+      totalLogs = await Log.queryLogCount(0, 0, query.type)
     } else if (query.address || query.topic0 || query.startCycle || query.endCycle) {
       const address: string = query.address ? query.address.toLowerCase() : ''
 

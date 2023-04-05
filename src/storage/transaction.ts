@@ -36,7 +36,7 @@ export interface Transaction {
   originTxData: any
 }
 
-export async function insertTransaction(transaction: Transaction) {
+export async function insertTransaction(transaction: Transaction): Promise<void> {
   try {
     const fields = Object.keys(transaction).join(', ')
     const placeholders = Object.keys(transaction).fill('?').join(', ')
@@ -50,7 +50,7 @@ export async function insertTransaction(transaction: Transaction) {
   }
 }
 
-export async function bulkInsertTransactions(transactions: Transaction[]) {
+export async function bulkInsertTransactions(transactions: Transaction[]): Promise<void> {
   try {
     const fields = Object.keys(transactions[0]).join(', ')
     const placeholders = Object.keys(transactions[0]).fill('?').join(', ')
@@ -67,7 +67,7 @@ export async function bulkInsertTransactions(transactions: Transaction[]) {
   }
 }
 
-export async function updateTransaction(_txId: string, transaction: Transaction) {
+export async function updateTransaction(_txId: string, transaction: Transaction): Promise<void> {
   try {
     const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, accountId = $accountId, txHash = $txHash WHERE txId = $txId `
     await db.run(sql, {
@@ -86,7 +86,7 @@ export async function updateTransaction(_txId: string, transaction: Transaction)
   }
 }
 
-export async function insertTokenTransaction(tokenTx: TokenTx) {
+export async function insertTokenTransaction(tokenTx: TokenTx): Promise<void> {
   try {
     const fields = Object.keys(tokenTx).join(', ')
     const placeholders = Object.keys(tokenTx).fill('?').join(', ')
@@ -100,7 +100,7 @@ export async function insertTokenTransaction(tokenTx: TokenTx) {
   }
 }
 
-export async function bulkInsertTokenTransactions(tokenTxs: TokenTx[]) {
+export async function bulkInsertTokenTransactions(tokenTxs: TokenTx[]): Promise<void> {
   try {
     const fields = Object.keys(tokenTxs[0]).join(', ')
     const placeholders = Object.keys(tokenTxs[0]).fill('?').join(', ')
@@ -117,7 +117,7 @@ export async function bulkInsertTokenTransactions(tokenTxs: TokenTx[]) {
   }
 }
 
-export async function processTransactionData(transactions: any) {
+export async function processTransactionData(transactions: any): Promise<void> {
   console.log('transactions size', transactions.length)
   if (transactions && transactions.length <= 0) return
   let bucketSize = 1000
@@ -268,7 +268,7 @@ export async function processTransactionData(transactions: any) {
   if (combineTokens.length > 0) await Account.bulkInsertTokens(combineTokens)
 }
 
-export async function insertOrUpdateTransaction(archivedCycle: any) {
+export async function insertOrUpdateTransaction(archivedCycle: any): Promise<void> {
   const skipTxs: string[] = []
   if (!archivedCycle.receipt) {
     if (config.verbose) console.log('No Receipt')
@@ -442,7 +442,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any) {
   }
 }
 
-export const getWeb3 = function () {
+export const getWeb3 = function (): Promise<Web3> {
   if (config.rpcUrl) {
     return new Promise((resolve, reject) => {
       try {
@@ -471,7 +471,7 @@ export async function queryTransactionCount(
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
-) {
+): Promise<number> {
   let transactions: { 'COUNT(*)': number }
   try {
     if (address) {
@@ -595,7 +595,7 @@ export async function queryTransactions(
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
-) {
+): Promise<(Transaction | TokenTx)[]> {
   let transactions: any[]
   try {
     if (address) {
@@ -742,7 +742,7 @@ export async function queryTransactionByTxId(txId: string, detail = false) {
   }
 }
 
-export async function queryTransactionByHash(txHash: string, detail = false) {
+export async function queryTransactionByHash(txHash: string, detail = false): Promise<DbTransaction<object>> {
   try {
     const sql = `SELECT * FROM transactions WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
     const transaction: any = await db.get(sql, [txHash])
@@ -796,7 +796,7 @@ export async function queryTransactionsBetweenCycles(
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
-) {
+): Promise<(Transaction | TokenTx)[]> {
   let transactions: any[]
   try {
     if (address) {
@@ -928,7 +928,7 @@ export async function queryTransactionCountBetweenCycles(
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
-) {
+): Promise<number> {
   let transactions: { 'COUNT(*)': number }
   try {
     if (address) {
