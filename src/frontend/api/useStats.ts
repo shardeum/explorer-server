@@ -14,8 +14,8 @@ export const useStats = (query: any) => {
   let response
   let validatorStats: any[] = []
   let transactionStats: any[] = []
-  let totalSHM: number = 0
-  let totalStakedSHM: number = 0
+  let totalSHM = 0
+  let totalStakedSHM = 0
 
   if (validatorStatsCount) {
     response = useSWR(`${PATHS.STATS_VALIDATOR}?count=${validatorStatsCount}&responseType=array`, fetcher)
