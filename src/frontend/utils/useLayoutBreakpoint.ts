@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const DESKTOP_BREAKPOINT = 1440
 const LAPTOP_BREAKPOINT = 1280
 const TABLET_PRO_BREAKPOINT = 960
 const TABLET_BREAKPOINT = 820
