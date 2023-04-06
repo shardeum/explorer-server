@@ -1,7 +1,6 @@
-import { ChangeEvent, ChangeEventHandler, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../api'
-import { Account, AccountSearchType, Token, Transaction, TransactionSearchType } from '../types'
-import { Tokens } from '../types/transaction'
+import { Account, AccountSearchType, Transaction, TransactionSearchType } from '../types'
 
 interface detailProps {
   id: string

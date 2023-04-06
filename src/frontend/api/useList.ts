@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import debounce from 'lodash/debounce'
-import qs from 'qs'
 
 import { api } from './axios'
 

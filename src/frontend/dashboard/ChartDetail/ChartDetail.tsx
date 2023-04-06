@@ -1,8 +1,6 @@
 import React from 'react'
 
-import { LineChart, BarChart } from '../../components'
-
-import { useCycleChart } from '../../api'
+import { LineChart } from '../../components'
 
 import styles from './ChartDetail.module.scss'
 

@@ -1,6 +1,5 @@
 import useSWR from 'swr'
 import { CycleQuery, Cycle } from '../types'
-import { api } from './axios'
 
 import { fetcher } from './fetcher'
 

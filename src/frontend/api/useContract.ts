@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import { Account, ContractQuery, ContractType } from '../types'
+import { Account, ContractQuery } from '../types'
 
 import { fetcher } from './fetcher'
 

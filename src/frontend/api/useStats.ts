@@ -1,5 +1,4 @@
 import useSWR from 'swr'
-import { api } from './axios'
 
 import { fetcher } from './fetcher'
 

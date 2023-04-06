@@ -4,7 +4,6 @@ import React, { Fragment, useState } from 'react'
 import { useContract } from '../api'
 
 import { AnchorLink, ContentLayout, Dropdown, Pagination } from '../components'
-import { ContractTable } from '../components/Table'
 import { Table } from '../components/TableComp'
 import { breadcrumbsList, contractTypes } from '../types'
 

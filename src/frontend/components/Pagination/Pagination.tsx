@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import ReactTooltip from 'react-tooltip'
-import { Button, IconButton } from '../Button'
+import { Button } from '../Button'
 import { Icon } from '../Icon'
 
 import styles from './Pagination.module.scss'

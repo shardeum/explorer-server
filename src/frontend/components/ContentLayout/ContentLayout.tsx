@@ -4,11 +4,9 @@ import cx from 'classnames'
 
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { Spacer } from '../Spacer'
 
 import styles from './ContentLayout.module.scss'
 import { Breadcrumb } from '../Breadcrumb'
-import { breadcrumbsList } from '../../types'
 import ReactTooltip from 'react-tooltip'
 
 interface ContentLayoutProps {

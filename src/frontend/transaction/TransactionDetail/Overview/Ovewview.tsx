@@ -11,7 +11,7 @@ import { showTxMethod } from '../../../utils/showMethod'
 
 import styles from './Ovewview.module.scss'
 
-import { calculateValue, calculateFullValue, calculateTokenValue } from '../../../utils/calculateValue'
+import { calculateFullValue, calculateTokenValue } from '../../../utils/calculateValue'
 import { toReadableDateFromMillis } from '../../../../utils/time'
 
 interface OvewviewProps {

@@ -1,9 +1,6 @@
 import HighchartsReact from 'highcharts-react-official'
 import Highcharts from 'highcharts/highstock'
 
-import styles from './BarChart.module.scss'
-// headerFormat: `<span style="font-size:10px">{point.x::%A, %B %d, %Y}</span><br>`,
-
 interface BarChartProps {
   title: string
   data: any

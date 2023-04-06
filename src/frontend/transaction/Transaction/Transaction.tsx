@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 
 import { useTransaction } from '../../api'
 
-import { ContentLayout, Dropdown, Dropdownt, Pagination, PaginationPrevNext } from '../../components'
+import { ContentLayout, Dropdown, Pagination, PaginationPrevNext } from '../../components'
 import { TransactionTable } from '../TransactionTable'
 
 import { breadcrumbsList, TransactionSearchList } from '../../types'

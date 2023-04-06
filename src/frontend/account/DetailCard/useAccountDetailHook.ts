@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../../api'
-import { Account, AccountSearchType, Cycle, Transaction, TransactionSearchType } from '../../types'
+import { Account, AccountSearchType, Transaction, TransactionSearchType } from '../../types'
 
 interface detailProps {
   id: string

@@ -155,7 +155,7 @@
 //   );
 // };
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import cx from 'classnames'
 
 import styles from './Menu.module.scss'

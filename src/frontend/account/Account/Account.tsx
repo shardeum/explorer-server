@@ -5,7 +5,8 @@ import Web3Utils from 'web3-utils'
 import { useAccount } from '../../api'
 import { AnchorLink, ContentLayout, Pagination } from '../../components'
 import { Table } from '../../components/TableComp'
-import { breadcrumbsList } from '../../types'
+import { IColumnProps } from '../../components/TableComp/Table'
+import { Account as AccountT, breadcrumbsList } from '../../types'
 
 import styles from './Account.module.scss'
 

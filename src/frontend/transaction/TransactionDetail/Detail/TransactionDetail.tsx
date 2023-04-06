@@ -5,7 +5,6 @@ import { ContentLayout } from '../../../components'
 import { Tab } from '../../../components/Tab'
 import { breadcrumbsList } from '../../../types'
 import { JsonView } from '../JsonView'
-import { Logs } from '../Logs'
 import { Ovewview } from '../Overview'
 
 import styles from './TransactionDetail.module.scss'
