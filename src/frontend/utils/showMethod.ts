@@ -1,20 +1,20 @@
 import { Transaction, TokenTxs, TransactionType } from '../types'
 
 export const showTxMethod = (tx: Transaction | TokenTxs) => {
-  const data = tx?.wrappedEVMAccount?.readableReceipt.data
+  const data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt.data : null
 
-  const methodCode = data && data.length > 10 ? data.substr(0, 10) : null
+  const methodCode = data && data.length > 10 ? data.substring(0, 10) : null
 
-  return tx?.tokenEvent
+  return 'tokenEvent' in tx && tx?.tokenEvent
     ? tx.tokenEvent
-    : tx?.wrappedEVMAccount?.readableReceipt.from.length === 64
+    : 'wrappedEVMAccount' in tx && tx?.wrappedEVMAccount?.readableReceipt.from.length === 64
     ? 'Node Reward'
-    : tx?.transactionType && tx?.transactionType === TransactionType.StakeReceipt
+    : 'transactionType' in tx && tx?.transactionType && tx?.transactionType === TransactionType.StakeReceipt
     ? 'Stake'
-    : tx?.transactionType && tx?.transactionType === TransactionType.UnstakeReceipt
+    : 'transactionType' in tx && tx?.transactionType && tx?.transactionType === TransactionType.UnstakeReceipt
     ? 'Unstake'
-    : tx?.wrappedEVMAccount?.readableReceipt.to
-    ? ERC_TOKEN_METHOD_DIC[methodCode]
+    : 'wrappedEVMAccount' in tx && tx?.wrappedEVMAccount?.readableReceipt.to
+    ? methodCode !== null && ERC_TOKEN_METHOD_DIC[methodCode]
       ? ERC_TOKEN_METHOD_DIC[methodCode]
       : 'Transfer'
     : 'Contract'
