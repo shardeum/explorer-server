@@ -1,4 +1,4 @@
-import { MouseEventHandler } from 'react'
+import React, { MouseEventHandler } from 'react'
 import cx from 'classnames'
 
 import { Button } from '../Button'

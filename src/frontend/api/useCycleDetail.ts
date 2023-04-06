@@ -1,4 +1,4 @@
-import useSWR from 'swr'
+import useSWR, { SWRResponse } from 'swr'
 import { Cycle } from '../types'
 
 import { fetcher } from './fetcher'

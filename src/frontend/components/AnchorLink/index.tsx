@@ -1,3 +1,4 @@
+import React from 'react'
 import Link from 'next/link'
 import cx from 'classnames'
 import styles from './AnchorLink.module.scss'

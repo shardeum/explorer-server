@@ -1,4 +1,4 @@
-import { MouseEventHandler, ReactNode } from 'react'
+import React, { MouseEventHandler, ReactNode } from 'react'
 import cx from 'classnames'
 
 import styles from './Button.module.scss'

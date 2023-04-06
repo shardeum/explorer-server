@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import React, { Fragment } from 'react'
 import Link from 'next/link'
 import cx from 'classnames'
 
