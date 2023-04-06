@@ -17,8 +17,6 @@
   ],
   "ignorePatterns": [
     "**/storage/*.ts",
-    "**/frontend/**/*.ts",
-    "**/frontend/**/*.tsx",
     "**/class/**/*.ts",
     "server.ts",
     "rpc_data_server.ts",
