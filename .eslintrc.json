@@ -17,7 +17,6 @@
   ],
   "ignorePatterns": [
     "**/storage/*.ts",
-    "**/utils/*.ts",
     "**/frontend/**/*.ts",
     "**/frontend/**/*.tsx",
     "**/class/**/*.ts",
