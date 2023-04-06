@@ -5,3 +5,4 @@ declare namespace JSX {
 }
 
 declare module '*.scss'
+declare module '*.svg'
