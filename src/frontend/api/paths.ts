@@ -1,5 +1,3 @@
-// const BASE_URL = process.env.BASE_URL
-
 // config variables
 import { config as CONFIG } from '../../config'
 if (process.env.PORT) {

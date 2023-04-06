@@ -41,11 +41,6 @@ export const TopBarDropdown: React.FC<TopBarDropdownProps> = (props) => {
     else open()
   }, [isMenuOpen, close, open])
 
-  // const handleSelect = (item: Option): void => {
-  //   close()
-  //   onSelect?.(item)
-  // }
-
   const handleClick = useCallback(
     (e: MouseEvent) => {
       if (!menuRef.current?.contains(e?.target as Node)) {
@@ -76,16 +71,6 @@ export const TopBarDropdown: React.FC<TopBarDropdownProps> = (props) => {
       {isMenuOpen && (
         <div ref={menuRef} className={cx(styles.menu, menuClassName)}>
           {options?.map((item) => (
-            // <p
-            //   key={item.key}
-            //   onClick={() => handleSelect(item)}
-            //   className={cx(
-            //     styles.menuItem,
-            //     item.key === selected && styles.active
-            //   )}
-            // >
-            //   {item.value}
-            // </p>
             <a
               key={item.key}
               target="_blank"

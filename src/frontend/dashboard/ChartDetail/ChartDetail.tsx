@@ -26,9 +26,6 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
           name="Transactions"
         />
       </div>
-      {/* <div className={styles.item}>
-        <BarChart title="CYCLES (This chart will be changed)" data={transactionData} />
-      </div> */}
     </div>
   )
 }

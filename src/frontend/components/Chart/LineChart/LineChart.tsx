@@ -21,14 +21,6 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
   const router = useRouter()
 
   const { title, centerTitle, subTitle, data, height = 300, name } = props
-  // let activeAndSyncing
-
-  // if (data.length === 0) return <></>
-  // if (data) {
-  //   activeAndSyncing = data.map((d) => {
-  //     return [d[0], d[1] + d[2], d[2], d[3], d[4]]
-  //   })
-  // }
 
   const option = {
     title: {
@@ -51,11 +43,6 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
         name: name,
         data: data,
       },
-      // {
-      //   name: 'activeAndSyncing',
-      //   lineWidth: 0.5,
-      //   data: activeAndSyncing,
-      // },
     ],
     legend: {
       enabled: false,
@@ -74,14 +61,10 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
       zoomEnabled: true,
     },
     tooltip: {
-      // crosshairs: true,
-      // shared: true,
       formatter:
         name === 'Validators'
           ? function () {
               const timestamp = this?.x
-
-              // const data = this?.series?.options?.data
 
               const item = data?.findIndex((d: number[]) => d[0] === timestamp)
               /* eslint-disable security/detect-object-injection */
@@ -170,18 +153,7 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
       },
       selected: 1,
     },
-    // plotOptions: {
-    //   series: {
-    //     color: "#555555",
-    //   },
-    // },
   }
 
-  return (
-    <HighchartsReact
-      highcharts={Highcharts}
-      options={option}
-      // allowChartUpdate={true}
-    />
-  )
+  return <HighchartsReact highcharts={Highcharts} options={option} />
 }

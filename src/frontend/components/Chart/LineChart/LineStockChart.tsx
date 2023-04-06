@@ -184,11 +184,6 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
         color: '#343a40',
       },
     },
-    // plotOptions: {
-    //   series: {
-    //     color: "#555555",
-    //   },
-    // },
     rangeSelector: {
       inputStyle: {
         color: '#039',
