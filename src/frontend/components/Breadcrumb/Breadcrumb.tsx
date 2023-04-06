@@ -21,7 +21,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
 
   return (
     <ol className={styles.Breadcrumb}>
-      {items?.map((item, index) => {
+      {items?.map((item: item, index: number) => {
         return (
           <Fragment key={`${index}-${item.to}`}>
             <li className={cx(styles.item, router?.pathname === item.to && styles.active)}>

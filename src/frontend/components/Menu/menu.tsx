@@ -19,7 +19,7 @@ export const Menu: React.FC<MenuProps> = (props) => {
   const menuRef = useRef(null)
 
   const handleOutsideClick = useCallback((event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current?.contains(event.target)) {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
       onClose?.()
     }
   }, [])

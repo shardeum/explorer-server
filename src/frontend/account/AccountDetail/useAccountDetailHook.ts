@@ -70,12 +70,18 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
         ) {
           const { tokens } = await getToken()
           if (tokens.length > 0) {
-            tokens.forEach((item) => {
-              if (item.contractType === ContractType.ERC_20) {
-                const decimalsValue = item.contractInfo.decimals ? parseInt(item.contractInfo.decimals) : 18
-                item.balance = utils.formatUnits(item.balance, decimalsValue)
+            tokens.forEach(
+              (item: {
+                contractType: ContractType
+                contractInfo: { decimals: string }
+                balance: BigNumberish
+              }) => {
+                if (item.contractType === ContractType.ERC_20) {
+                  const decimalsValue = item.contractInfo.decimals ? parseInt(item.contractInfo.decimals) : 18
+                  item.balance = utils.formatUnits(item.balance, decimalsValue)
+                }
               }
-            })
+            )
           }
           setTokens(tokens)
         }

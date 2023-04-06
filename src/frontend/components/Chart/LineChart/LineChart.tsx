@@ -8,16 +8,16 @@ if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts)
 }
 
-interface LineChartProps {
+interface LineChartProps<D> {
   title: string
   centerTitle?: boolean
   subTitle?: string
-  data: any
+  data: D[]
   height?: number
   name?: string
 }
 
-export const LineChart: React.FC<LineChartProps> = (props) => {
+export const LineChart = <D,>(props: LineChartProps<D>)  => {
   const router = useRouter()
 
   const { title, centerTitle, subTitle, data, height = 300, name } = props
@@ -83,10 +83,10 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
 
               // const data = this?.series?.options?.data
 
-              const item = data?.findIndex((d) => d[0] === timestamp)
+              const item = data?.findIndex((d: D) => d[0] === timestamp)
               return `<span><b>${Highcharts.dateFormat(
                 '%A, %B %d, %Y',
-                new Date(timestamp)
+                new Date(timestamp).getTime()
               )}</b></span><br /><br />
       <span>Active Validators: <b>${data[item][1]}</b></span><br />
       <span>Activated Validators: <b>${data[item][2]}</b></span><br />
@@ -101,11 +101,11 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
 
               const data = this?.series?.options?.data
 
-              const item = data?.filter((d) => d[0] === this?.x)
+              const item = data?.filter((d: number[]) => d[0] === this?.x)
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
                   '%A, %B %d, %Y',
-                  new Date(timestamp)
+                  new Date(timestamp).getTime()
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />
         <span>Total Stake Txs: <b>${item[0][3]}</b></span><br />

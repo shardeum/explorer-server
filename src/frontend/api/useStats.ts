@@ -10,7 +10,7 @@ export const useStats = (query: any) => {
   // console.log(fetcher, `${PATHS.STATS_VALIDATOR}?count=${count}&responseType=array`);
   const loading = true
 
-  let response
+  let response: SWRResponse<any, any>
   let validatorStats: any[] = []
   let transactionStats: any[] = []
   let totalSHM = 0

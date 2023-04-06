@@ -44,7 +44,12 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
   const [header, setHeader] = useState([])
 
   useEffect(() => {
-    let tHeader
+    let tHeader: {
+      key: string
+      value: string
+      render?: (val: unknown, item?: unknown) => JSX.Element | string
+      maxChar?: number
+    }[]
 
     if (
       txType === TransactionSearchType.AllExceptInternalTx ||

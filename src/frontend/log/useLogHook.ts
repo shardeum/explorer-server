@@ -28,7 +28,10 @@ export const useLogHook = (addr?: string, tps?: string) => {
 
   const createURL = useCallback(
     (address: string, topic: string) => {
-      let topic0, topic1, topic2, topic3
+      let topic0: string | any[] | null = null
+      let topic1: string | any[] | null = null
+      let topic2: string | any[] | null = null
+      let topic3: string | any[] | null = null
 
       if (topic) {
         const topicItems = topic.split(',')
