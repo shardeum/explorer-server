@@ -61,13 +61,13 @@ export async function bulkInsertValidatorsStats(validators: ValidatorStats[]) {
   }
 }
 
-export async function queryLatestValidatorStats(count) {
+export async function queryLatestValidatorStats(count: number) {
   try {
     const sql = `SELECT * FROM validators ORDER BY cycle DESC LIMIT ${count ? count : 100}`
     const validatorsStats: any = await db.all(sql)
     if (config.verbose) console.log('validatorStats count', validatorsStats)
     if (validatorsStats.length > 0) {
-      validatorsStats.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+      validatorsStats.sort((a: { timestamp: number }, b: { timestamp: number }) => (a.timestamp > b.timestamp ? 1 : -1))
     }
     return validatorsStats
   } catch (e) {
@@ -78,10 +78,10 @@ export async function queryLatestValidatorStats(count) {
 export async function queryValidatorStatsBetween(startCycle: number, endCycle: number) {
   try {
     const sql = `SELECT * FROM validators WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC LIMIT 100`
-    const validatorsStats: any = await db.all(sql, [startCycle, endCycle])
+    const validatorsStats = await db.all(sql, [startCycle, endCycle])
     if (config.verbose) console.log('validator between', validatorsStats)
     if (validatorsStats.length > 0) {
-      validatorsStats.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+      validatorsStats.sort((a: { timestamp: number }, b: { timestamp: number }) => (a.timestamp > b.timestamp ? 1 : -1))
     }
     return validatorsStats
   } catch (e) {
