@@ -9,7 +9,7 @@ interface ButtonProps {
   onMouseEnter?: MouseEventHandler
   disabled?: boolean
   children: ReactNode
-  apperance?: 'primary' | 'outlined' | 'default'
+  apperance?: 'primary' | 'secondary' | 'outlined' | 'default'
   size?: 'large' | 'medium' | 'small'
   type?: 'button' | 'link'
 }
