@@ -68,7 +68,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
           (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
           (accounts && accounts.length > 0 && accounts[0].accountId)
         ) {
-          let { tokens } = await getToken()
+          const { tokens } = await getToken()
           if (tokens.length > 0) {
             tokens.forEach((item) => {
               if (item.contractType === ContractType.ERC_20) {

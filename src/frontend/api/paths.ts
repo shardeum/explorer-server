@@ -7,7 +7,7 @@ if (process.env.PORT) {
 }
 
 console.log(process.argv)
-let port = process.argv[2]
+const port = process.argv[2]
 if (port) {
   CONFIG.port.server = port
 }

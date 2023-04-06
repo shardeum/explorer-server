@@ -9,7 +9,7 @@ export const useStats = (query: any) => {
   const { validatorStatsCount, transactionStatsCount, fetchCoinStats } = query
 
   // console.log(fetcher, `${PATHS.STATS_VALIDATOR}?count=${count}&responseType=array`);
-  let loading = true
+  const loading = true
 
   let response
   let validatorStats: any[] = []
