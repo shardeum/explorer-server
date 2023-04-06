@@ -3,9 +3,8 @@ import React from 'react'
 import styles from './Receipt.module.scss'
 
 interface ReceiptProps {
-  receipt: any
+  receipt: unknown
 }
-
 
 export const Receipt: React.FC<ReceiptProps> = ({ receipt }) => {
   return (

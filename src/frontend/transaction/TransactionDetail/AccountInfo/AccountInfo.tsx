@@ -7,12 +7,36 @@ import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
 import styles from './AccountInfo.module.scss'
 
 interface AccountInfoProps {
-  receipt: any
+  receipt: {
+    accounts: {
+      accountId: string
+      data: {
+        accountType: AccountType
+        contractAddress: string
+        ethAddress: string
+        account: {
+          balance: string
+          nonce: string
+          key: string
+        }
+        key?: string
+        value: {
+          data: Buffer
+        }
+        codeHash: {
+          data: Buffer
+        }
+        codeByte: {
+          data: Buffer
+        }
+      }
+    }[]
+  }
 }
 
 export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
-  const acounts = receipt?.accounts
-  const accountsInfo = acounts?.map((account: any) => {
+  const accounts = receipt?.accounts
+  const accountsInfo = accounts?.map((account) => {
     if (account?.data?.accountType === AccountType.Account)
       return {
         accountId: account?.accountId,

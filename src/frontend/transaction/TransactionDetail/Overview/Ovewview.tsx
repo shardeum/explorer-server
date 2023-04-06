@@ -108,7 +108,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({transaction}) => {
   }
 
   if (transaction) {
-    if (transaction?.txStatus) {
+    if ('txStatus' in transaction && transaction.txStatus) {
       return (
         <div className={styles.Ovewview}>
           <div className={styles.item}>

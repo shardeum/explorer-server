@@ -131,8 +131,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Activated Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.activated?.length > 0
-                  ? data?.cycleRecord?.activated?.map((item: { id: string }, index: number) => {
-                      return <div key={index}>{item.id}</div>
+                  ? data?.cycleRecord?.activated?.map((item: { id: string }) => {
+                      return <div key={item.id}>{item.id}</div>
                     })
                   : '-'}
               </div>
@@ -155,8 +155,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Refreshed Concensors</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.refreshedConsensors?.length > 0
-                  ? data?.cycleRecord?.refreshedConsensors?.map((item: { id: string }, index: number) => {
-                      return <div key={index}>{item.id}</div>
+                  ? data?.cycleRecord?.refreshedConsensors?.map((item: { id: string }) => {
+                      return <div key={item.id}>{item.id}</div>
                     })
                   : '-'}
               </div>
