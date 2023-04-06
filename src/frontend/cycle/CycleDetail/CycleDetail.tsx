@@ -11,7 +11,7 @@ import { breadcrumbsList } from '../../types'
 export const CycleDetail: React.FC = () => {
   const router = useRouter()
 
-  const id = router?.query?.id ? router.query.id : ('0' as String)
+  const id = router?.query?.id ? router.query.id : ('0' as string)
 
   const { data } = useCycleDetail(id)
 
