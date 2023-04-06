@@ -53,7 +53,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Accounts</p>
-            <p>{data?.totalAccounts?.toLocaleString('en-US')}</p>
+            <p>{data?.totalAccounts?.toLocaleString()}</p>
           </div>
         </div>
         <hr />
@@ -65,7 +65,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Contracts</p>
-            <p>{data?.totalContracts?.toLocaleString('en-US')}</p>
+            <p>{data?.totalContracts?.toLocaleString()}</p>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           </Link>
           <div>
             <p className={styles.title}>Total Transactions</p>
-            <p>{data?.totalTransactions?.toLocaleString('en-US')}</p>
+            <p>{data?.totalTransactions?.toLocaleString()}</p>
           </div>
         </div>
         <hr />
@@ -91,8 +91,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
           <div>
             <p className={styles.title}>Total Stake / Unstake Transactions</p>
             <p>
-              {data?.totalStakeTxs?.toLocaleString('en-US')} /{' '}
-              {data?.totalUnstakeTxs?.toLocaleString('en-US')}
+              {data?.totalStakeTxs?.toLocaleString()} / {data?.totalUnstakeTxs?.toLocaleString()}
             </p>
           </div>
         </div>

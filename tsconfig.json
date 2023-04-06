@@ -9,8 +9,17 @@
     "noEmitOnError": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "noEmit": true,
+    "incremental": true,
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "jsx": "preserve"
   },
-  "include": ["src/*"],
-  "exclude": ["dist"]
+  "include": [
+    "src/*"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }

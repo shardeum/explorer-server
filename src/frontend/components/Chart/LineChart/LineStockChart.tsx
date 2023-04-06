@@ -87,7 +87,6 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       type: 'datetime',
       gridLineWidth: 0,
       labels: {},
-      // maxZoom: 24 * 3600000 // fourteen days
     },
     yAxis: {
       title: {
@@ -111,22 +110,15 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
       <span>Total UnstakeTxs: <b>{point.totalUnstakeTxs}</b></span><br />
       <span>Cycle Number: <b>{point.cycleNumber}</b></span><br />`,
-      // @ts-ignore
       formatter:
         name === 'Validators'
           ? function () {
-              // @ts-ignore
               const timestamp = this?.x
 
-              // @ts-ignore
-              // const data = this?.series?.options?.data
-
-              // @ts-ignore
               const item = data?.filter((d) => d[0] === this?.x)
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
                   '%A, %B %d, %Y',
-                  //@ts-ignore
                   new Date(timestamp)
                 )}</b></span><br /><br />
       <span>Active Validators: <b>${item[0][1]}</b></span><br />
@@ -138,18 +130,12 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       <span>Cycle Number: <b>${item[0][7]}</b></span>`
             }
           : function () {
-              // @ts-ignore
               const timestamp = this?.x
 
-              // @ts-ignore
-              // const data = this?.series?.options?.data
-
-              // @ts-ignore
               const item = data?.filter((d) => d[0] === this?.x)
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
                   '%A, %B %d, %Y',
-                  //@ts-ignore
                   new Date(timestamp)
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />

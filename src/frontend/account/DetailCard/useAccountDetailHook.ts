@@ -32,7 +32,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
   }, [id, page, tType])
 
   const getToken = useCallback(async () => {
-    const data = await api.get(`${PATHS.ACCOUNT}?address=${id}&type=tokens`)
+    await api.get(`${PATHS.ACCOUNT}?address=${id}&type=tokens`)
   }, [id])
 
   useEffect(() => {

@@ -9,7 +9,7 @@ interface BarChartProps {
 
 // TODO: have to refactor the code
 
-export const BarChart: React.FC<BarChartProps> = ({ title, data }) => {
+export const BarChart: React.FC<BarChartProps> = ({ title }) => {
   const option = {
     chart: {
       type: 'column',

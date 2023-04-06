@@ -1,16 +1,13 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { useLayoutBreakpoint } from '../../utils/useLayoutBreakpoint'
 
 import { Icon, Menu, MenuItem, Button, TopBarDropdown } from '../index'
 
 import styles from './Header.module.scss'
 
-interface HeaderProps {}
-
-export const Header: React.FC<HeaderProps> = ({}) => {
+export const Header: React.FC<{}> = () => {
   const router = useRouter()
 
   const { isTablet, isMobile } = useLayoutBreakpoint()
@@ -22,10 +19,6 @@ export const Header: React.FC<HeaderProps> = ({}) => {
 
   const navLinks = [
     { key: '/', value: 'Home' },
-    // {
-    //   key: "/blockchain",
-    //   value: "Blockchain",
-    // },
     {
       key: 'https://explorer-liberty10.shardeum.org',
       value: 'Testnets',
@@ -42,15 +35,6 @@ export const Header: React.FC<HeaderProps> = ({}) => {
         )
       },
     },
-    // {
-    //   key: "/",
-    //   value: "Resources",
-    // },
-    // {
-    //   key: "/more",
-    //   value: "More",
-    // },
-    // { key: "/singin", value: "Sign In" },
   ]
 
   const renderMenuButton = (): JSX.Element => {

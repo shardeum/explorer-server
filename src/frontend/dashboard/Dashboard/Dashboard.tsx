@@ -14,15 +14,8 @@ import { LatestTransactions } from '../LatestTransaction'
 import { LatestCycle } from '../LatestCycle'
 
 export const Dashboard: React.FC = () => {
-  const { data: cycles, loading: cycleLoading } = useCycle({ count: 10 })
-  const {
-    transactions,
-    totalRewardTxs,
-    totalStakeTxs,
-    totalUnstakeTxs,
-    totalTransactions,
-    loading: transactionLoading,
-  } = useTransaction({
+  const { data: cycles } = useCycle({ count: 10 })
+  const { transactions, totalRewardTxs, totalStakeTxs, totalUnstakeTxs, totalTransactions } = useTransaction({
     count: 10,
     txType: TransactionSearchType.StakeReceipt,
   })
@@ -40,13 +33,6 @@ export const Dashboard: React.FC = () => {
       key: row?.cycleRecord?.counter || '',
       value: moment(row?.cycleRecord?.start * 1000).calendar(),
       activeNodes: row?.cycleRecord?.active || 0,
-    }
-  })
-
-  const transactionsList = transactions.map((row) => {
-    return {
-      key: 'Tx Hash',
-      value: row?.txHash,
     }
   })
 

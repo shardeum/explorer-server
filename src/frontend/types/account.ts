@@ -31,22 +31,6 @@ export interface AccountDetail {
   }
 }
 
-// export const accountTypes = [
-//   { key: 0, value: "All" },
-//   { key: 1, value: "EOA" },
-//   { key: 2, value: "CA" },
-//   { key: 3, value: "GENERIC" },
-//   { key: 4, value: "ERC_20" },
-//   { key: 5, value: "ERC_721" },
-//   { key: 6, value: "ERC_1155" },
-//   { key: 7, value: "Receipt" },
-//   { key: 8, value: "NetworkAccount" },
-//   { key: 9, value: "NodeAccount" },
-//   { key: 10, value: "NodeRewardReceipt" },
-//   { key: 11, value: "ContractStorage" },
-//   { key: 12, value: "ContractCode" },
-// ];
-
 export enum AccountSearchType {
   All, // All Accounts Type
   EOA,

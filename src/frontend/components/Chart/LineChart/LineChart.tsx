@@ -76,21 +76,16 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     tooltip: {
       // crosshairs: true,
       // shared: true,
-      // @ts-ignore
       formatter:
         name === 'Validators'
           ? function () {
-              // @ts-ignore
               const timestamp = this?.x
 
-              // @ts-ignore
               // const data = this?.series?.options?.data
 
-              // @ts-ignore
               const item = data?.findIndex((d) => d[0] === timestamp)
               return `<span><b>${Highcharts.dateFormat(
                 '%A, %B %d, %Y',
-                //@ts-ignore
                 new Date(timestamp)
               )}</b></span><br /><br />
       <span>Active Validators: <b>${data[item][1]}</b></span><br />
@@ -102,18 +97,14 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       <span>Cycle Number: <b>${data[item][7]}</b></span>`
             }
           : function () {
-              // @ts-ignore
               const timestamp = this?.x
 
-              // @ts-ignore
               const data = this?.series?.options?.data
 
-              // @ts-ignore
               const item = data?.filter((d) => d[0] === this?.x)
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
                   '%A, %B %d, %Y',
-                  //@ts-ignore
                   new Date(timestamp)
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />
@@ -190,5 +181,4 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       options={option}
       // allowChartUpdate={true}
     />
-  )
-}
+  )}

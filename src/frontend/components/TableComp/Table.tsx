@@ -3,19 +3,19 @@ import styles from './Table.module.scss'
 import get from 'lodash/get'
 
 export interface ITableProps<T> {
-  columns: IColumnProps<T>[]
+  columns: IColumnProps[]
   data: T[]
 }
 
-export interface IColumnProps<T> {
+export interface IColumnProps {
   key: string
   value: any
   maxChar?: number
   render?: (value: unknown, item: any) => void
 }
 
-interface ITableBody<T> {
-  col: IColumnProps<T>
+interface ITableBody {
+  col: IColumnProps
   row: any
 }
 
@@ -48,7 +48,7 @@ export function TableHeaderItem({ value }: { value: string | any }): JSX.Element
   return <th>{typeof value === 'string' ? <span>{value}</span> : value}</th>
 }
 
-export function TableBodyItem<T>({ col, row }: ITableBody<T>): JSX.Element {
+export function TableBodyItem({ col, row }: ITableBody) {
   const value = get(row, col.key)
 
   return (

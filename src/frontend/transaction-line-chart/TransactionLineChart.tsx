@@ -8,7 +8,7 @@ import { useStats } from '../api'
 export const TransactionLineChart: React.FC = () => {
   const height = 600
 
-  const { validatorStats, transactionStats, loading } = useStats({
+  const { transactionStats, loading } = useStats({
     transactionStatsCount: 10000000,
   })
   return (

@@ -11,7 +11,7 @@ interface SortButtonProps {
   onSort?: MouseEventHandler
 }
 
-export const SortButton: React.FC<SortButtonProps> = ({ isUp, className, onSort }) => {
+export const SortButton: React.FC<SortButtonProps> = ({ isUp, onSort }) => {
   const [up, setUp] = useState<boolean>(isUp || false)
 
   const onClick = (e: any): void => {

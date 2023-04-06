@@ -138,11 +138,6 @@ export const CycleDetail: React.FC = () => {
               </div>
             </div>
 
-            {/* <div className={styles.item}>
-              <div className={styles.title}>Activated Public Keys</div>
-              <div className={styles.value}>-</div>
-            </div> */}
-
             <div className={styles.item}>
               <div className={styles.title}>Refreshed Archivers</div>
               <div className={styles.value}>
@@ -164,11 +159,6 @@ export const CycleDetail: React.FC = () => {
                   : '-'}
               </div>
             </div>
-
-            {/* <div className={styles.item}>
-              <div className={styles.title}>Partition Blocks</div>
-              <div className={styles.value}>-</div>
-            </div> */}
           </div>
         ) : (
           <div> No Data</div>

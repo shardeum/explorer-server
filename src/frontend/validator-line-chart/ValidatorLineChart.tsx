@@ -8,7 +8,7 @@ import { useStats } from '../api'
 export const ValidatorLineChart: React.FC = () => {
   const height = 600
 
-  const { validatorStats, transactionStats, loading } = useStats({
+  const { validatorStats, loading } = useStats({
     validatorStatsCount: 10000000,
   })
 

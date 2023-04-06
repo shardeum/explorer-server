@@ -29,7 +29,6 @@ export const AccountDetail: React.FC = () => {
     account,
     accountType,
     totalTransactions,
-    totalPages,
     page,
     tokens,
     transactions,
@@ -136,14 +135,6 @@ export const AccountDetail: React.FC = () => {
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
 
   const [activeTab, setActiveTab] = useState(tabs[0].key)
-
-  const onNext = (): void => {
-    setPage(page < totalPages ? page + 1 : totalPages)
-  }
-
-  const onPrev = (): void => {
-    setPage(page > 1 ? page - 1 : 1)
-  }
 
   return (
     <div className={styles.AccountDetail}>

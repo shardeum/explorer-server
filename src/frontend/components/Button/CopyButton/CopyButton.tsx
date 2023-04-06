@@ -11,7 +11,7 @@ interface CopyButtonProps {
   className?: string
 }
 
-export const CopyButton: React.FC<CopyButtonProps> = ({ title, text, className }) => {
+export const CopyButton: React.FC<CopyButtonProps> = ({ title, text }) => {
   const [isCopied, setIsCopied] = useState<boolean>(false)
 
   const onCopy = (): void => {

@@ -14,23 +14,6 @@ if (port) {
 console.log('Port', CONFIG.port.server)
 const BASE_URL = `http://localhost:${CONFIG.port.server}`
 
-// const BASE_URL = "https://explorer-liberty20.shardeum.org";
-// const BASE_URL = "https://explorer-sphinx.shardeum.org";
-
-// import { config as CONFIG } from "../../config";
-
-// let BASE_URL = `http://localhost:${CONFIG.port.server}`;
-
-// // console.log(process.argv);
-// let port = process.argv[2];
-// if (port) {
-//   CONFIG.port.server = port;
-//   BASE_URL = `http://localhost:${CONFIG.port.server}`;
-// }
-
-// const BASE_URL = `http://localhost:${process.argv[2]}`;
-// console.log("BASE_URL", BASE_URL);
-
 export const PATHS = {
   BASE_URL,
   TOTAL_DATA: BASE_URL + '/totalData',

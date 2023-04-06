@@ -13,7 +13,7 @@ interface IExpandableList {
   onSelect: (item: Option) => void
 }
 
-export const ExpandableList: React.FC<IExpandableList> = ({ label, options, onSelect }) => {
+export const ExpandableList: React.FC<IExpandableList> = ({ label, options }) => {
   const [isExpand, setIsExpand] = useState<boolean>(false)
 
   const open = useCallback(() => setIsExpand(true), [])
