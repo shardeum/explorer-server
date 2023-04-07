@@ -6,27 +6,38 @@ import { AnchorLink, Chip } from '../../components'
 import { calculateTokenValue, calculateValue } from '../../utils/calculateValue'
 import { showTxMethod } from '../../utils/showMethod'
 
-import { Transaction, TransactionSearchType, TransactionType } from '../../types'
+import { TokenTxs, Transaction, TransactionSearchType, TransactionType } from '../../types'
 import { Table } from '../../components/TableComp'
+import { IColumnProps } from '../../components/TableComp/Table'
 
 interface ITransactionTable {
-  data: Transaction[]
+  data: (Transaction | TokenTxs)[]
   loading?: boolean
   txType?: TransactionSearchType
 }
 
-const tempHeader = [
+const tempHeader: IColumnProps<string | TransactionType, Transaction | TokenTxs>[] = [
   {
     key: 'txHash',
     value: 'Txn Hash',
-    render: (val: unknown): JSX.Element => (
+    render: (val: string | TransactionType) => (
       <AnchorLink href={`/transaction/${val}`} label={val as string} size="small" ellipsis width={150} />
     ),
   },
   {
     key: 'method',
     value: 'Method',
-    render: (_: unknown, item: Transaction) => <Chip title={showTxMethod(item)} color={item?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'} size="medium" />,
+    render: (_: unknown, item: Transaction | TokenTxs) => (
+      <Chip
+        title={showTxMethod(item)}
+        color={
+          'wrappedEVMAccount' in item && item?.wrappedEVMAccount?.readableReceipt?.status === 1
+            ? 'success'
+            : 'error'
+        }
+        size="medium"
+      />
+    ),
   },
   {
     key: 'cycle',
@@ -35,22 +46,17 @@ const tempHeader = [
   {
     key: 'timestamp',
     value: 'Timestamp',
-    render: (val: unknown): JSX.Element => moment(val as string).fromNow(),
+    render: (val: string | TransactionType) => moment(val as string).fromNow(),
   },
 ]
 
 export const TransactionTable: React.FC<ITransactionTable> = (props) => {
   const { data, txType = 1 } = props
 
-  const [header, setHeader] = useState([])
+  const [header, setHeader] = useState<IColumnProps<string | TransactionType, Transaction | TokenTxs>[]>([])
 
   useEffect(() => {
-    let tHeader: {
-      key: string
-      value: string
-      render?: (val: unknown, item?: unknown) => JSX.Element | string
-      maxChar?: number
-    }[]
+    let tHeader: IColumnProps<string | TransactionType, Transaction | TokenTxs>[] = []
 
     if (
       txType === TransactionSearchType.AllExceptInternalTx ||
@@ -62,14 +68,14 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'wrappedEVMAccount.readableReceipt.from',
           value: 'From',
-          render: (val: unknown) => (
+          render: (val: string | TransactionType) => (
             <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
           ),
         },
         {
           key: 'wrappedEVMAccount.readableReceipt.to',
           value: 'To',
-          render: (val: unknown) =>
+          render: (val: string | TransactionType) =>
             val ? (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
             ) : (
@@ -79,12 +85,12 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'wrappedEVMAccount.readableReceipt.value',
           value: 'Value',
-          render: (val: unknown) => calculateValue(val),
+          render: (val: string | TransactionType) => calculateValue(val as string),
         },
         {
           key: 'wrappedEVMAccount.amountSpent',
           value: 'Txn Fee',
-          render: (val: unknown) => calculateValue(val),
+          render: (val: string | TransactionType) => calculateValue(val as string),
         },
       ]
     }
@@ -94,14 +100,14 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenFrom',
           value: 'From',
-          render: (val: unknown) => (
+          render: (val: string | TransactionType) => (
             <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
           ),
         },
         {
           key: 'tokenTo',
           value: 'To',
-          render: (val: unknown) =>
+          render: (val: string | TransactionType) =>
             val ? (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
             ) : (
@@ -111,7 +117,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenType',
           value: 'Value',
-          render: (val: unknown, item: any) => calculateTokenValue(item, val as TransactionType),
+          render: (val: string | TransactionType, item?: Transaction | TokenTxs) =>
+            calculateTokenValue(item as TokenTxs, val as TransactionType),
         },
         {
           key: 'transactionFee',
@@ -142,17 +149,19 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenType',
           value: 'Value',
-          render: (val: unknown, item: any) => calculateTokenValue(item, val as TransactionType),
+          render: (val: string | TransactionType, item?: Transaction | TokenTxs) =>
+            calculateTokenValue(item as TokenTxs, val as TransactionType),
         },
         {
           key: 'token',
           value: 'Token',
-          render: (_: unknown, item: any) => item?.contractInfo?.name || item?.contractAddress || '',
+          render: (_: string | TransactionType, item?: Transaction | TokenTxs) =>
+            (item as TokenTxs)?.contractInfo?.name || (item as TokenTxs)?.contractAddress || '',
         },
         {
           key: 'transactionFee',
           value: 'Txn Fee',
-          render: (val: unknown) => calculateValue(val),
+          render: (val: string | TransactionType) => calculateValue(val as string),
         },
       ]
     }
@@ -180,17 +189,19 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           key: 'tokenType',
           value: 'Token ID',
           maxChar: 30,
-          render: (val: unknown, item: any) => calculateTokenValue(item, val as TransactionType),
+          render: (val: TransactionType | string, item: Transaction | TokenTxs) =>
+            calculateTokenValue(item as TokenTxs, val as TransactionType, true),
         },
         {
           key: 'token',
           value: 'Token',
-          render: (_: unknown, item: any) => item?.contractInfo?.name || item?.contractAddress || '',
+          render: (_: TransactionType | string, item: Transaction | TokenTxs) =>
+            (item as TokenTxs)?.contractInfo?.name || (item as TokenTxs)?.contractAddress || '',
         },
         {
           key: 'transactionFee',
           value: 'Txn Fee',
-          render: (val: unknown) => calculateValue(val),
+          render: (val: TransactionType | string) => calculateValue(val as string),
         },
       ]
     }
@@ -217,19 +228,27 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenType',
           value: 'Token ID',
-          render: (val: unknown, item: any) => calculateTokenValue(item, val as TransactionType, true),
+          render: (val: string | TransactionType, item: Transaction | TokenTxs) =>
+            calculateTokenValue(item as TokenTxs, val as TransactionType, true),
         },
         {
           key: 'tokenType',
           value: 'Value',
-          render: (val: unknown, item: any) => calculateTokenValue(item, val as TransactionType),
+          render: (val: string | TransactionType, item: Transaction | TokenTxs) =>
+            calculateTokenValue(item as TokenTxs, val as TransactionType),
         },
         {
           key: 'contractAddress',
           value: 'Token',
+<<<<<<< HEAD
           render: (val: unknown, item: any): JSX.Element => {
             return item?.contractInfo?.name ? (
               item?.contractInfo?.name
+=======
+          render: (val: string | TransactionType, item: Transaction | TokenTxs) => {
+            return (item as TokenTxs)?.contractInfo?.name ? (
+              (item as TokenTxs)?.contractInfo?.name
+>>>>>>> d28e410 (TransactionTable: Use types other than `any` or `unknown`)
             ) : (
               <AnchorLink href={`/token/${val}`} label={val as string} size="small" ellipsis width={150} />
             )
@@ -238,16 +257,15 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'transactionFee',
           value: 'Txn Fee',
-          render: (val: unknown) => calculateValue(val),
+          render: (val: string | TransactionType) => calculateValue(val as string),
         },
       ]
     }
 
-    // @ts-ignore
     setHeader([...tempHeader, ...tHeader])
   }, [txType])
 
   if (!header) return null
 
-  return <Table data={data} columns={header} />
+  return <Table data={data} columns={header as IColumnProps<unknown, unknown>[]} />
 }
