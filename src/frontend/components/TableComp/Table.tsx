@@ -7,11 +7,11 @@ export interface ITableProps<T> {
   data: T[]
 }
 
-export interface IColumnProps {
+export interface IColumnProps<V = unknown, I = unknown> {
   key: string
   value: any
   maxChar?: number
-  render?: (value: unknown, item: any) => void
+  render?: (value: V, item: I) => void
 }
 
 interface ITableBody {

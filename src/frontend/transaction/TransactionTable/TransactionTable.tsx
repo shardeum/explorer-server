@@ -6,11 +6,11 @@ import { AnchorLink, Chip } from '../../components'
 import { calculateTokenValue, calculateValue } from '../../utils/calculateValue'
 import { showTxMethod } from '../../utils/showMethod'
 
-import { TransactionSearchType, TransactionType } from '../../types'
+import { Transaction, TransactionSearchType, TransactionType } from '../../types'
 import { Table } from '../../components/TableComp'
 
 interface ITransactionTable {
-  data: any[]
+  data: Transaction[]
   loading?: boolean
   txType?: TransactionSearchType
 }
@@ -26,7 +26,7 @@ const tempHeader = [
   {
     key: 'method',
     value: 'Method',
-    render: (_: unknown, item: any): JSX.Element => <Chip title={showTxMethod(item)} color={item?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'} size="medium" />,
+    render: (_: unknown, item: Transaction) => <Chip title={showTxMethod(item)} color={item?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'} size="medium" />,
   },
   {
     key: 'cycle',
