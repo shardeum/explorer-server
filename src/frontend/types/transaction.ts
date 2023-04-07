@@ -116,3 +116,16 @@ export enum TransactionType {
   ERC_1155,
   InternalTxReceipt,
 }
+
+export interface TransactionStatus {
+  txHash: string
+  accepted: boolean
+  injected: boolean
+  reason: string
+}
+
+export interface StakeInfo {
+  totalUnstakeAmount: number
+  reward: number
+  stakeAmount: number
+}
