@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../api'
 import { Account, AccountSearchType, Transaction, TransactionSearchType } from '../types'
-import { Tokens } from '../types/transaction'
+import { Token } from '../types/account'
 
 interface detailProps {
   id: string
@@ -11,7 +11,7 @@ interface detailProps {
 export const useTokenHook = ({ id, address }: detailProps) => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [tokens, setTokens] = useState<Tokens[]>([])
+  const [tokens, setTokens] = useState<Token[]>([])
   const [tokenHolders, setTokenHolders] = useState<number>(0)
   const [total, setTotal] = useState<number>()
   const [page, setPage] = useState<number>(1)
@@ -83,7 +83,7 @@ export const useTokenHook = ({ id, address }: detailProps) => {
       ) {
         const { tokenHolders, tokens } = await getToken()
         setTokenHolders(tokenHolders)
-        setTokens(tokens as Tokens[])
+        setTokens(tokens)
       }
     }
 

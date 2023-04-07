@@ -23,7 +23,7 @@ export interface ReadableReceipt {
   data: string
   from: string
   gasUsed: string
-  logs: string
+  logs: string[]
   nonce: string
   status: number
   to: string
