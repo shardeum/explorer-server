@@ -29,6 +29,11 @@ export interface AccountDetail {
     data: number[]
     type: string
   }
+  rewardStartTime: number
+  rewardEndTime: number
+  nominator: string
+  stakeLock: number
+  reward: number
 }
 
 export enum AccountSearchType {

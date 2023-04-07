@@ -30,6 +30,7 @@ export interface ReadableReceipt {
   transactionHash: string
   transactionIndex: string
   value: string
+  stakeInfo: StakeInfo
 }
 
 export interface WrappedEVMAccount {
@@ -62,6 +63,8 @@ export interface Transaction {
   txTo: string
   nominee?: string
   originTxData: any
+  tokenTxs: TokenTxs[]
+  txStatus: TransactionStatus
 }
 
 export interface TransactionQuery {

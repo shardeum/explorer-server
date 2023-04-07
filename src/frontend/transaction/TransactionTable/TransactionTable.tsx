@@ -11,6 +11,7 @@ import { Table } from '../../components/TableComp'
 
 interface ITransactionTable {
   data: any[]
+  loading?: boolean
   txType?: TransactionSearchType
 }
 

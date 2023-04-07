@@ -11,6 +11,11 @@ interface MenuProps {
   className?: string
   onMouseDown?: (e: any) => void
   children: React.ReactNode
+
+  verticalPosition?: string
+  horizontalPosition?: string
+  top?: number
+  left?: number
 }
 
 export const Menu: React.FC<MenuProps> = (props) => {
