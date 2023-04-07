@@ -142,8 +142,8 @@ export const CycleDetail: React.FC = () => {
             <div className={styles.item}>
               <div className={styles.title}>Activated Nodes</div>
               <div className={styles.value}>
-                {data?.cycleRecord?.actived?.length > 0
-                  ? data?.cycleRecord?.actived?.map((item: { id: string }) => {
+                {data?.cycleRecord?.activated?.length > 0
+                  ? data?.cycleRecord?.activated?.map((item: { id: string }) => {
                       return <div>{item.id}</div>
                     })
                   : '-'}

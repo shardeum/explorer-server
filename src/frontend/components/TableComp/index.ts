@@ -1,1 +1,1 @@
-export { Table, TableHeadingItem } from './Table'
+export { Table, TableHeaderItem } from './Table'
