@@ -28,9 +28,9 @@ const start = async () => {
   await Storage.initializeDB()
 
   await StatsStorage.initializeStatsDB()
-  let lastCheckedCycleForValidators = 0
-  let lastCheckedCycleForTxs = 0
-  let lastCheckedCycleForCoinStats = 0
+  let lastCheckedCycleForValidators = -1
+  let lastCheckedCycleForTxs = -1
+  let lastCheckedCycleForCoinStats = -1
   let waitCycleForStats = 5 // Calculate transactions count per Cycle after 5 cycles
 
   let lastStoredValidators = await ValidatorStats.queryLatestValidatorStats(1)
