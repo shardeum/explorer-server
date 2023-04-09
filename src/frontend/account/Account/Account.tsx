@@ -13,11 +13,11 @@ import styles from './Account.module.scss'
 const siblingCount = 3
 const limit = 10
 
-const tableColumns = [
+const tableColumns: IColumnProps<unknown, AccountT>[] = [
   {
     key: 'accountId',
     value: 'Account Address',
-    render: (val: unknown, item: any) => (
+    render: (val: unknown, item: AccountT) => (
       <AnchorLink
         href={`/account/${item?.ethAddress}`}
         label={val as string}
@@ -30,7 +30,7 @@ const tableColumns = [
   {
     key: 'account.balance',
     value: 'Balance',
-    render: (_: any, item: any) => (
+    render: (_: unknown, item: AccountT) => (
       <>{`${Number(Web3Utils.fromWei(item?.account?.balance, 'ether')).toFixed()} SHM`}</>
     ),
   },
@@ -42,7 +42,7 @@ const tableColumns = [
   {
     key: 'contractInfo',
     value: 'Account Type',
-    render: (val: any) => (val ? 'Contract Account' : 'User Account'),
+    render: (val: unknown) => (val ? 'Contract Account' : 'User Account'),
   },
 ]
 
@@ -60,7 +60,7 @@ export const Account: React.FC = () => {
           <div>Loading...</div>
         ) : accounts && accounts.length > 0 ? (
           <Fragment>
-            <Table columns={tableColumns} data={accounts} />
+            <Table columns={tableColumns as IColumnProps<unknown, unknown>[]} data={accounts} />
             <div className={styles.paginationWrapper}>
               <Pagination
                 onPageChange={(p) => setPage(p)}
