@@ -307,7 +307,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
           if (config.verbose) console.log(Web3.utils.fromWei(log.data, 'ether'))
           if (tx.txTo !== log.address)
             tokenTx = {
-              tokenType: TransactionType.Internal,
+              tokenType: TransactionType.EVM_Internal,
               tokenFrom: `0x${log.topics[1].substring(26)}`.toLowerCase(),
               tokenTo: log.address,
               tokenValue: log.data,
@@ -318,7 +318,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
           if (config.verbose) console.log(Web3.utils.fromWei(log.data, 'ether'))
           if (tx.txTo !== log.address)
             tokenTx = {
-              tokenType: TransactionType.Internal,
+              tokenType: TransactionType.EVM_Internal,
               tokenFrom: log.address,
               tokenTo: `0x${log.topics[1].substring(26)}`.toLowerCase(),
               tokenValue: log.data,
@@ -343,7 +343,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
         if (
           tokenTx.tokenEvent !== 'Approval' &&
           tokenTx.tokenEvent !== 'Approval For All' &&
-          (tokenTx.tokenType === TransactionType.Internal ||
+          (tokenTx.tokenType === TransactionType.EVM_Internal ||
             tokenTx.tokenType === TransactionType.ERC_20 ||
             tokenTx.tokenType === TransactionType.ERC_721)
         ) {
@@ -481,7 +481,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
       if (result && result['0'] && result['1'] && result['0'].length === result['1'].length) {
         for (let i = 0; i < result['0'].length; i++) {
           const tokenTx = {
-            tokenType: TransactionType.Internal,
+            tokenType: TransactionType.EVM_Internal,
             tokenFrom: tx.txTo,
             tokenTo: result['0'][i].toLowerCase(),
             tokenValue: result['1'][i],

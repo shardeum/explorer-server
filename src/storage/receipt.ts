@@ -275,7 +275,7 @@ export async function processReceiptData(receipts: any) {
         }
         for (let i = 0; i < txs.length; i++) {
           let accountExist
-          if (txs[i].tokenType !== TransactionType.Internal)
+          if (txs[i].tokenType !== TransactionType.EVM_Internal)
             accountExist = await Account.queryAccountByAccountId(
               txs[i].contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
             )

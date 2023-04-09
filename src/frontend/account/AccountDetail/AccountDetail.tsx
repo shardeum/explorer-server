@@ -60,11 +60,11 @@ export const AccountDetail: React.FC = () => {
       ),
     },
     {
-      key: TransactionSearchType.Internal,
+      key: TransactionSearchType.EVM_Internal,
       value: 'Internal Txns',
       content: (
         <>
-          <TransactionTable data={transactions} txType={TransactionSearchType.Internal} />
+          <TransactionTable data={transactions} txType={TransactionSearchType.EVM_Internal} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}

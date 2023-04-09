@@ -20,7 +20,7 @@ export const calculateFullValue = (value: any) => {
 
 export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, tokenId = false) => {
   try {
-    if (txType === TransactionType.ERC_20 || txType === TransactionType.Internal) {
+    if (txType === TransactionType.ERC_20 || txType === TransactionType.EVM_Internal) {
       const decimalsValue = tokenTx.contractInfo.decimals ? parseInt(tokenTx.contractInfo.decimals) : 18
 
       return tokenTx.tokenValue === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

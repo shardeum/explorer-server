@@ -83,7 +83,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
       ]
     }
 
-    if (txType === TransactionSearchType.Internal) {
+    if (txType === TransactionSearchType.EVM_Internal) {
       tHeader = [
         {
           key: 'tokenFrom',

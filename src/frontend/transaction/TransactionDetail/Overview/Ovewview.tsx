@@ -26,7 +26,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     if (
       items &&
       items.length > 0 &&
-      (items[0].tokenType === TransactionType.Internal || items[0].tokenType === TransactionType.ERC_20)
+      (items[0].tokenType === TransactionType.EVM_Internal || items[0].tokenType === TransactionType.ERC_20)
     ) {
       return (
         <div className={styles.item}>
@@ -48,7 +48,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   {/* TODO: calculate amount and token*/}
                   <div>{calculateTokenValue(item, item.tokenType)}&nbsp;</div>
                   <Link href={`/account/${item.contractAddress}`} className={styles.anchor}>
-                    {item.tokenType === TransactionType.Internal
+                    {item.tokenType === TransactionType.EVM_Internal
                       ? 'SHM'
                       : item.contractInfo.name || item.contractAddress}
                   </Link>
