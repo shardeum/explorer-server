@@ -75,6 +75,7 @@ export interface IconProps {
 }
 
 export const Icon: React.FC<IconProps> = ({ name, className, color = 'white', size = 'small', ...props }) => {
+  // eslint-disable-next-line security/detect-object-injection
   const IconComponent = iconTypes[name]
 
   const style = cx(styles.Icon, `${styles[color as string]}`, `${styles[size as string]}`, className)
