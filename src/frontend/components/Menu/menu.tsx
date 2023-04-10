@@ -23,11 +23,14 @@ export const Menu: React.FC<MenuProps> = (props) => {
 
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const handleOutsideClick = useCallback((event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      onClose?.()
-    }
-  }, [onClose])
+  const handleOutsideClick = useCallback(
+    (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose?.()
+      }
+    },
+    [onClose]
+  )
 
   useEffect(() => {
     document.addEventListener('click', handleOutsideClick, true)

@@ -25,19 +25,11 @@ export const AccountDetail: React.FC = () => {
   const siblingCount = 3
   const pageSize = 10
 
-  const {
-    account,
-    accountType,
-    totalTransactions,
-    page,
-    tokens,
-    transactions,
-    setTransactionType,
-    setPage,
-  } = useAccountDetailHook({
-    id: id as string,
-    txType: txType,
-  })
+  const { account, accountType, totalTransactions, page, tokens, transactions, setTransactionType, setPage } =
+    useAccountDetailHook({
+      id: id as string,
+      txType: txType,
+    })
 
   const tabs = [
     {
