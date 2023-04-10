@@ -63,27 +63,31 @@ export const Dropdownt: React.FC<DropdowntProps> = (props) => {
 
   return (
     <div className={cx(styles.Dropdownt, className)}>
-      <button data-active={isMenuOpen} className={cx(styles.button, buttonClassName)} onClick={toggle}>
-        {label || selected || options?.[0].value}
-        {isMenuOpen ? (
-          <Icon name="arrow_up" color="black" className={styles.icon} />
-        ) : (
-          <Icon name="arrow_down" color="black" className={styles.icon} />
+      <>
+        <button data-active={isMenuOpen} className={cx(styles.button, buttonClassName)} onClick={toggle}>
+          <>
+            {label || selected || options?.[0].value}
+            {isMenuOpen ? (
+              <Icon name="arrow_up" color="black" className={styles.icon} />
+            ) : (
+              <Icon name="arrow_down" color="black" className={styles.icon} />
+            )}
+          </>
+        </button>
+        {isMenuOpen && (
+          <div ref={menuRef} className={cx(styles.menu, menuClassName)}>
+            {options?.map((item) => (
+              <p
+                key={item.key}
+                onClick={() => handleSelect(item)}
+                className={cx(styles.menuItem, item.key === selected && styles.active)}
+              >
+                {item.value}
+              </p>
+            ))}
+          </div>
         )}
-      </button>
-      {isMenuOpen && (
-        <div ref={menuRef} className={cx(styles.menu, menuClassName)}>
-          {options?.map((item) => (
-            <p
-              key={item.key}
-              onClick={() => handleSelect(item)}
-              className={cx(styles.menuItem, item.key === selected && styles.active)}
-            >
-              {item.value}
-            </p>
-          ))}
-        </div>
-      )}
+      </>
     </div>
   )
 }

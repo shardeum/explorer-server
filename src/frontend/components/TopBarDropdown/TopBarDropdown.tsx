@@ -64,12 +64,14 @@ export const TopBarDropdown: React.FC<TopBarDropdownProps> = (props) => {
   return (
     <div className={cx(styles.TopBarDropdown, className)}>
       <button data-active={isMenuOpen} className={cx(styles.button, buttonClassName)} onClick={toggle}>
-        {label || selected || options?.[0].value}
-        {isMenuOpen ? (
-          <Icon name="arrow_up" color="black" className={styles.icon} />
-        ) : (
-          <Icon name="arrow_down" color="black" className={styles.icon} />
-        )}
+        <>
+          {label || selected || options?.[0].value}
+          {isMenuOpen ? (
+            <Icon name="arrow_up" color="black" className={styles.icon} />
+          ) : (
+            <Icon name="arrow_down" color="black" className={styles.icon} />
+          )}
+        </>
       </button>
       {isMenuOpen && (
         <div ref={menuRef} className={cx(styles.menu, menuClassName)}>

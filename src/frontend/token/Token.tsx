@@ -87,50 +87,52 @@ export const Token: React.FC = () => {
       >
         {account && (
           <div className={styles.row}>
-            <DetailCard
-              title="Contract Info"
-              titleRight={
-                account?.contractType === ContractType.GENERIC && (
-                  <div className={styles.buttonWrapper}>
-                    <Button
-                      apperance="outlined"
-                      className={styles.btn}
-                      onClick={() => router.push(`/token/${id}?a=${id}`)}
-                    >
-                      Token Tracker
-                    </Button>
-                    <Button
-                      apperance="outlined"
-                      className={styles.btn}
-                      onClick={() => router.push(`/log?address=${id}`)}
-                    >
-                      Filter By Logs
-                    </Button>
-                  </div>
-                )
-              }
-              items={[
-                {
-                  key: 'Balance :',
-                  value: Web3Utils.fromWei(account?.account?.balance, 'ether'),
-                },
-                { key: 'Holders :', value: tokenHolders },
-                { key: 'Transfers :', value: total },
-              ]}
-            />
-            {account?.contractType && account?.contractType !== ContractType.GENERIC && (
+            <>
               <DetailCard
-                title="More Info"
+                title="Contract Info"
+                titleRight={
+                  account?.contractType === ContractType.GENERIC && (
+                    <div className={styles.buttonWrapper}>
+                      <Button
+                        apperance="outlined"
+                        className={styles.btn}
+                        onClick={() => router.push(`/token/${id}?a=${id}`)}
+                      >
+                        Token Tracker
+                      </Button>
+                      <Button
+                        apperance="outlined"
+                        className={styles.btn}
+                        onClick={() => router.push(`/log?address=${id}`)}
+                      >
+                        Filter By Logs
+                      </Button>
+                    </div>
+                  )
+                }
                 items={[
-                  { key: 'Name', value: account?.contractInfo?.name },
-                  { key: 'Symbol :', value: account?.contractInfo?.symbol },
                   {
-                    key: 'Total Supply :',
-                    value: account?.contractInfo?.totalSupply,
+                    key: 'Balance :',
+                    value: Web3Utils.fromWei(account?.account?.balance, 'ether'),
                   },
+                  { key: 'Holders :', value: tokenHolders },
+                  { key: 'Transfers :', value: total },
                 ]}
               />
-            )}
+              {account?.contractType && (account?.contractType as ContractType) !== ContractType.GENERIC && (
+                <DetailCard
+                  title="More Info"
+                  items={[
+                    { key: 'Name', value: account?.contractInfo?.name },
+                    { key: 'Symbol :', value: account?.contractInfo?.symbol },
+                    {
+                      key: 'Total Supply :',
+                      value: account?.contractInfo?.totalSupply,
+                    },
+                  ]}
+                />
+              )}
+            </>
           </div>
         )}
         <Spacer space="64" />

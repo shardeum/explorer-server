@@ -153,114 +153,110 @@ export const AccountDetail: React.FC = () => {
         {account ? (
           <>
             <div className={styles.row}>
-              {accountType === AccountType.Account && account ? (
-                <DetailCard
-                  title="Overview"
-                  titleRight={
-                    account?.contractType &&
-                    account?.contractType !== ContractType.GENERIC && (
-                      <div className={styles.buttonWrapper}>
-                        <Button
-                          apperance="outlined"
-                          className={styles.btn}
-                          onClick={() => router.push(`/token/${id}`)}
-                        >
-                          Token Tracker
-                        </Button>
-                        {/* <Button
-                          apperance="outlined"
-                          className={styles.btn}
-                          onClick={() => router.push(`/log?address=${id}`)}
-                        >
-                          Filter By Logs
-                        </Button> */}
-                      </div>
-                    )
-                  }
-                  items={[
-                    {
-                      key: 'Balance :',
-                      value: calculateValue(account?.account?.balance) + '   SHM',
-                    },
-                    {
-                      key: 'Nonce :',
-                      value: account?.account?.nonce && Web3Utils.hexToNumber('0x' + account?.account?.nonce),
-                    },
-                    {
-                      key: 'Tokens :',
-                      value: <TokenDropdown tokens={tokens} />,
-                    },
-                  ]}
-                />
-              ) : (
-                <DetailCard
-                  title="Overview"
-                  items={[
-                    {
-                      key: 'Node status',
-                      value:
-                        account?.account?.rewardStartTime > 0 && account?.account?.rewardEndTime === 0
-                          ? 'Active'
-                          : 'Inactive',
-                    },
-                    {
-                      key: 'Nominator',
-                      value: account?.account?.nominator && account?.account?.nominator,
-                    },
-                    {
-                      key: 'StakeLock',
-                      value: account?.account?.stakeLock && calculateValue(account?.account?.stakeLock),
-                    },
-                  ]}
-                />
-              )}
-              {accountType !== AccountType.Account ? (
-                <DetailCard
-                  title="More Info"
-                  items={[
-                    {
-                      key: 'Reward Start Time',
-                      value:
-                        account?.account?.rewardStartTime &&
-                        moment(account?.account?.rewardStartTime * 1000).calendar(),
-                    },
-                    {
-                      key: 'Reward End Time',
-                      value:
-                        account?.account?.rewardEndTime &&
-                        moment(account?.account?.rewardEndTime * 1000).calendar(),
-                    },
-                    {
-                      key: 'Reward',
-                      value: account?.account?.reward && calculateValue(account?.account?.reward),
-                    },
-                  ]}
-                />
-              ) : (
-                account?.contractType &&
-                account?.contractType !== ContractType.GENERIC && (
+              <>
+                {accountType === AccountType.Account && account ? (
                   <DetailCard
-                    title="More Info"
+                    title="Overview"
+                    titleRight={
+                      account?.contractType &&
+                      (account?.contractType as ContractType) !== ContractType.GENERIC ? (
+                        <div className={styles.buttonWrapper}>
+                          <Button
+                            apperance="outlined"
+                            className={styles.btn}
+                            onClick={() => router.push(`/token/${id}`)}
+                          >
+                            Token Tracker
+                          </Button>
+                        </div>
+                      ) : null
+                    }
                     items={[
-                      { key: 'Name : ', value: account?.contractInfo?.name },
-                      { key: 'Symbol :', value: account?.contractInfo?.symbol },
                       {
-                        key: 'Max Total Supply :',
-                        value: account?.contractInfo?.totalSupply
-                          ? utils
-                              .formatUnits(
-                                account?.contractInfo?.totalSupply,
-                                account?.contractInfo?.decimals
-                                  ? parseInt(account?.contractInfo?.decimals)
-                                  : 18
-                              )
-                              .toString()
-                          : '',
+                        key: 'Balance :',
+                        value: calculateValue(account?.account?.balance) + '   SHM',
+                      },
+                      {
+                        key: 'Nonce :',
+                        value:
+                          account?.account?.nonce && Web3Utils.hexToNumber('0x' + account?.account?.nonce),
+                      },
+                      {
+                        key: 'Tokens :',
+                        value: <TokenDropdown tokens={tokens} />,
                       },
                     ]}
                   />
-                )
-              )}
+                ) : (
+                  <DetailCard
+                    title="Overview"
+                    items={[
+                      {
+                        key: 'Node status',
+                        value:
+                          account?.account?.rewardStartTime > 0 && account?.account?.rewardEndTime === 0
+                            ? 'Active'
+                            : 'Inactive',
+                      },
+                      {
+                        key: 'Nominator',
+                        value: account?.account?.nominator && account?.account?.nominator,
+                      },
+                      {
+                        key: 'StakeLock',
+                        value: account?.account?.stakeLock && calculateValue(account?.account?.stakeLock),
+                      },
+                    ]}
+                  />
+                )}
+                {accountType !== AccountType.Account ? (
+                  <DetailCard
+                    title="More Info"
+                    items={[
+                      {
+                        key: 'Reward Start Time',
+                        value:
+                          account?.account?.rewardStartTime &&
+                          moment(account?.account?.rewardStartTime * 1000).calendar(),
+                      },
+                      {
+                        key: 'Reward End Time',
+                        value:
+                          account?.account?.rewardEndTime &&
+                          moment(account?.account?.rewardEndTime * 1000).calendar(),
+                      },
+                      {
+                        key: 'Reward',
+                        value: account?.account?.reward && calculateValue(account?.account?.reward),
+                      },
+                    ]}
+                  />
+                ) : (
+                  account?.contractType &&
+                  (account?.contractType as ContractType) !== ContractType.GENERIC && (
+                    <DetailCard
+                      title="More Info"
+                      items={[
+                        { key: 'Name : ', value: account?.contractInfo?.name },
+                        { key: 'Symbol :', value: account?.contractInfo?.symbol },
+                        {
+                          key: 'Max Total Supply :',
+                          value: account?.contractInfo?.totalSupply
+                            ? utils
+                                .formatUnits(
+                                  account?.contractInfo?.totalSupply,
+                                  account?.contractInfo?.decimals
+                                    ? parseInt(account?.contractInfo?.decimals)
+                                    : 18
+                                )
+                                .toString()
+                            : '',
+                        },
+                      ]}
+                    />
+                  )
+                )}
+              </>
             </div>
             <Spacer space="64" />
             {accountType === AccountType.Account ? (
