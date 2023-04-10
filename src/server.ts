@@ -31,7 +31,7 @@ import {
   isCacheRecordValid,
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
-} from './cache_per_cycle'
+} from './class/cache_per_cycle'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }

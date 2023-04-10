@@ -18,7 +18,7 @@
   },
   "include": [
     "src/*"
-  ],
+, "src/class/cache_per_cycle.ts"  ],
   "exclude": [
     "dist"
   ]
