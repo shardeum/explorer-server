@@ -56,7 +56,7 @@ export async function bulkInsertCycles(cycles: Cycle[]) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted Cycles', cycles.length)
+    console.log('Successfully bulk inserted Cycles', cycles.length)
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert Cycles', cycles.length)
@@ -118,7 +118,7 @@ export async function queryLatestCycleRecords(count) {
 
 export async function queryCycleRecordsBetween(start: number, end: number) {
   try {
-    const sql = `SELECT * FROM cycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC LIMIT 100`
+    const sql = `SELECT * FROM cycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC`
     const cycleRecords: any = await db.all(sql, [start, end])
     if (cycleRecords.length > 0) {
       cycleRecords.map((cycleRecord: any) => {

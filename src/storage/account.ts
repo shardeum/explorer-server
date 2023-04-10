@@ -93,7 +93,7 @@ export async function bulkInsertAccounts(accounts: Account[]) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted Accounts', accounts.length)
+    console.log('Successfully bulk inserted Accounts', accounts.length)
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert Accounts', accounts.length)

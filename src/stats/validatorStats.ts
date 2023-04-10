@@ -39,7 +39,8 @@ export async function bulkInsertValidatorsStats(validators: ValidatorStats[]) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted ValidatorStats', validators.length)
+    const addedCycles = validators.map((v) => v.cycle)
+    console.log('Successfully bulk inserted ValidatorStats', validators.length, 'for cycles', addedCycles)
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert ValidatorStats', validators.length)

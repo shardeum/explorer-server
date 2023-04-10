@@ -58,7 +58,7 @@ export async function bulkInsertReceipts(receipts: Receipt[]) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted receipts', receipts.length)
+    console.log('Successfully bulk inserted receipts', receipts.length)
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert receipts', receipts.length)

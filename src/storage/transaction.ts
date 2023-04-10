@@ -79,7 +79,7 @@ export async function bulkInsertTransactions(transactions: Transaction[]) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted transactions', transactions.length)
+    console.log('Successfully bulk inserted transactions', transactions.length)
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert transactions', transactions.length)

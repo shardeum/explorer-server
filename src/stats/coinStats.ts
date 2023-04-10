@@ -1,6 +1,6 @@
 import { config } from '../config/index'
 import * as db from './sqlite3storage'
-import { extractValues } from './sqlite3storage'
+import { extractValues, extractValuesFromArray } from './sqlite3storage'
 
 export interface CoinStats {
   cycle: number
@@ -19,6 +19,24 @@ export async function insertCoinStats(coinStats: CoinStats) {
     console.log('Successfully inserted coinStats', coinStats.cycle)
   } catch (e) {
     console.log('Unable to insert coinStats or it is already stored in to database', coinStats.cycle, e)
+  }
+}
+
+export async function bulkInsertCoinsStats(coinStats: CoinStats[]) {
+  try {
+    const fields = Object.keys(coinStats[0]).join(', ')
+    const placeholders = Object.keys(coinStats[0]).fill('?').join(', ')
+    const values = extractValuesFromArray(coinStats)
+    let sql = 'INSERT OR REPLACE INTO coin_stats (' + fields + ') VALUES (' + placeholders + ')'
+    for (let i = 1; i < coinStats.length; i++) {
+      sql = sql + ', (' + placeholders + ')'
+    }
+    await db.run(sql, values)
+    const addedCycles = coinStats.map((v) => v.cycle)
+    console.log('Successfully inserted CoinStats', coinStats.length, 'for cycles', addedCycles)
+  } catch (e) {
+    console.log(e)
+    console.log('Unable to bulk insert CoinStats', coinStats.length)
   }
 }
 

@@ -44,7 +44,13 @@ export async function bulkInsertTransactionsStats(transactionsStats: Transaction
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted TransactionsStats', transactionsStats.length)
+    const addedCycles = transactionsStats.map((v) => v.cycle)
+    console.log(
+      'Successfully bulk inserted TransactionsStats',
+      transactionsStats.length,
+      'for cycles',
+      addedCycles
+    )
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert TransactionsStats', transactionsStats.length)

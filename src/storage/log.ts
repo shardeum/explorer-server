@@ -45,7 +45,7 @@ export async function bulkInsertLogs(logs: Log[]) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully inserted Logs', logs.length)
+    console.log('Successfully bulk inserted Logs', logs.length)
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert Logs', logs.length)
