@@ -204,3 +204,9 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
     endCycle = endCycle + bucketSize
   }
 }
+
+export const patchStatsBetweenCycles = async (startCycle: number, endCycle: number) => {
+  await recordOldValidatorsStats(endCycle, startCycle - 1)
+  await recordTransactionsStats(endCycle, startCycle - 1)
+  await recordCoinStats(endCycle, startCycle - 1)
+}

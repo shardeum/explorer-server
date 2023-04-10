@@ -1,20 +1,12 @@
 require('dotenv').config()
 
-import { Collector } from './class/Collector'
-import * as ioclient from 'socket.io-client'
 import * as crypto from '@shardus/crypto-utils'
 import * as Storage from './storage'
-import * as archivedCycle from './storage/archivedCycle'
-import * as Cycle from './storage/cycle'
 import * as Receipt from './storage/receipt'
-import * as Transaction from './storage/transaction'
-import * as Account from './storage/account'
 import * as DataSync from './class/DataSync'
-import { AccountSearchType, AccountType, TransactionSearchType } from './@type'
 import * as StatsStorage from './stats'
-import * as ValidatorStats from './stats/validatorStats'
-import * as TransactionStats from './stats/transactionStats'
-import * as CoinStats from './stats/coinStats'
+import * as StatsFunctions from './class/StatsFunctions'
+
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
@@ -48,6 +40,11 @@ const start = async () => {
 
   console.log('startCycle', startCycle, 'totalCyclesToSync', totalCyclesToSync)
   await DataSync.downloadReceiptsBetweenCycles(startCycle, totalCyclesToSync)
+  console.log('Receipts Patched!')
+
+  await StatsFunctions.patchStatsBetweenCycles(startCycle, totalCyclesToSync)
+  console.log('Stats Patched!')
+
   console.log('Patching done! from cycle', startCycle, 'to cycle', totalCyclesToSync)
 }
 
