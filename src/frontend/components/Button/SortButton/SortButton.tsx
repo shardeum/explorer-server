@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useState } from 'react'
+import React, { MouseEvent, MouseEventHandler, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 import { Icon } from '../../Icon'
@@ -14,7 +14,7 @@ interface SortButtonProps {
 export const SortButton: React.FC<SortButtonProps> = ({ isUp, onSort }) => {
   const [up, setUp] = useState<boolean>(isUp || false)
 
-  const onClick = (e: any): void => {
+  const onClick = (e: MouseEvent<Element>) => {
     setUp(!up)
     onSort?.(e)
   }

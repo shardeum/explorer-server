@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { MouseEvent } from 'react'
 import { useCallback, useRef, useState } from 'react'
 import styles from './TokenDropdown.module.scss'
 import { Button, Icon, Menu, MenuItem, SortButton } from '../../components'
@@ -45,7 +45,7 @@ export const TokenDropdown: React.FC<TokenDropdownProps> = (props) => {
         isMenuOpen={isFilterOpen}
         onClose={close}
         onOpen={open}
-        onMouseDown={(e) => {
+        onMouseDown={(e: MouseEvent) => {
           e.preventDefault()
           open()
         }}

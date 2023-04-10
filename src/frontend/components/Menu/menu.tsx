@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { MouseEventHandler, useCallback, useEffect, useRef } from 'react'
 import cx from 'classnames'
 
 import styles from './Menu.module.scss'
@@ -9,7 +9,7 @@ interface MenuProps {
   anchor: React.ReactNode
   isMenuOpen: boolean
   className?: string
-  onMouseDown?: (e: any) => void
+  onMouseDown?: MouseEventHandler
   children: React.ReactNode
 
   verticalPosition?: string
