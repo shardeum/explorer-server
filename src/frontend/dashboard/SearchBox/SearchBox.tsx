@@ -6,7 +6,7 @@ import { useSearchHook } from './useSearchHook'
 
 import styles from './SearchBox.module.scss'
 
-export const SearchBox: React.FC<{}> = () => {
+export const SearchBox: React.FC<Record<string, never>> = () => {
   const { search, setSearch, onSearch } = useSearchHook()
 
   return (

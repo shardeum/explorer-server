@@ -264,8 +264,8 @@ export const AccountDetail: React.FC = () => {
                 tabs={tabs}
                 activeTab={activeTab}
                 onClick={(tab) => {
-                  setActiveTab(tab)
-                  setTransactionType(tab)
+                  setActiveTab(tab as TransactionSearchType)
+                  setTransactionType(tab as TransactionSearchType)
                 }}
               />
             ) : (

@@ -1,4 +1,5 @@
 import { ContractType } from './contract'
+import { ContractInfo } from './transaction'
 
 export interface AccountQuery {
   page?: number
@@ -32,8 +33,8 @@ export interface AccountDetail {
   rewardStartTime: number
   rewardEndTime: number
   nominator: string
-  stakeLock: number
-  reward: number
+  stakeLock: string
+  reward: string
 }
 
 export enum AccountSearchType {

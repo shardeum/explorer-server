@@ -39,7 +39,7 @@ export const TransactionDetail: React.FC = () => {
   return (
     <div className={styles.TransactionDetail}>
       <ContentLayout title="Transaction Details" showBackButton breadcrumbItems={breadcrumbs}>
-        <Tab tabs={tabs} activeTab={activeTab} onClick={(tab) => setActiveTab(tab)} />
+        <Tab tabs={tabs} activeTab={activeTab} onClick={(tab) => setActiveTab(tab as string)} />
       </ContentLayout>
     </div>
   )

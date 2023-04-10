@@ -87,21 +87,9 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.value}>
                 {' '}
                 {data?.cycleRecord?.removed?.length > 0
-                  ? data?.cycleRecord?.removed?.map(
-                      (
-                        item:
-                          | string
-                          | number
-                          | boolean
-                          | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>>
-                          | React.ReactFragment
-                          | React.ReactPortal
-                          | null
-                          | undefined
-                      ) => {
-                        return <div>{item}</div>
-                      }
-                    )
+                  ? data?.cycleRecord?.removed?.map((item: string) => {
+                      return <div>{item}</div>
+                    })
                   : '-'}
               </div>
             </div>

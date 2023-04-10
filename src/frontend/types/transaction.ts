@@ -23,7 +23,7 @@ export interface ReadableReceipt {
   data: string
   from: string
   gasUsed: string
-  logs: string[]
+  logs: Log[]
   nonce: string
   status: number
   to: string
@@ -128,9 +128,9 @@ export interface TransactionStatus {
 }
 
 export interface StakeInfo {
-  totalUnstakeAmount: number
-  reward: number
-  stakeAmount: number
+  totalUnstakeAmount: string
+  reward: string
+  stakeAmount: string
 }
 
 export interface ContractInfo {

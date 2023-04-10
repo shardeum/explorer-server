@@ -21,6 +21,9 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   apperance = 'default',
   size = 'medium',
+
+  // type is, in fact, used in `props` below
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'button',
   ...props
 }) => {

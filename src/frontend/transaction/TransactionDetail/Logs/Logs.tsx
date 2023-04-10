@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import { Button, Dropdown } from '../../../components'
 import { Transaction } from '../../../types'
+import { Log } from '../../../types/transaction'
 
 import styles from './Logs.module.scss'
 

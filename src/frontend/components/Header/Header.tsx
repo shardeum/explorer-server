@@ -7,7 +7,7 @@ import { Icon, Menu, MenuItem, Button, TopBarDropdown } from '../index'
 
 import styles from './Header.module.scss'
 
-export const Header: React.FC<{}> = () => {
+export const Header: React.FC<Record<string, never>> = () => {
   const router = useRouter()
 
   const { isTablet, isMobile } = useLayoutBreakpoint()

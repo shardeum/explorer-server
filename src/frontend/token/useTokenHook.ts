@@ -17,7 +17,7 @@ export const useTokenHook = ({ id, address }: detailProps) => {
   const [page, setPage] = useState<number>(1)
   const [transactionType, setTransactionType] = useState<number | string>(TransactionSearchType.TokenTransfer)
   const [filteredAddress, setFilteredAddress] = useState<string>('')
-  const [activeTab, setActiveTab] = useState(0)
+  const [activeTab, setActiveTab] = useState<string | number>(0)
   const [tokenBalance, setTokenBalance] = useState<string>('')
 
   const accountType = id && id.length === 64 ? AccountSearchType.NodeAccount : AccountSearchType.All // TODO: I think it has to be EOA
