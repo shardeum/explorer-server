@@ -43,7 +43,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
     return {
       tokens: data?.data?.tokens,
     }
-  }, [accountType, id])
+  }, [id])
 
   useEffect(() => {
     setTransactions([])
@@ -89,7 +89,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
     }
 
     fetchData()
-  }, [id, getAddress, getTransaction])
+  }, [accountType, getToken, totalPages, id, getAddress, getTransaction])
 
   return {
     account,

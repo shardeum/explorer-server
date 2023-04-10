@@ -88,7 +88,7 @@ export const useTokenHook = ({ id, address }: detailProps) => {
     }
 
     fetchData()
-  }, [getAddress, getTransaction])
+  }, [getAddress, getTransaction, getToken])
 
   useEffect(() => {
     if (address) {

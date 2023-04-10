@@ -16,7 +16,7 @@ export const useLogHook = (addr?: string, tps?: string) => {
     if (addr || tps) {
       getTransaction(addr || '', tps || '')
     }
-  }, [addr, tps])
+  }, [addr, tps, getTransaction])
 
   const onAddressChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value)
@@ -83,7 +83,7 @@ export const useLogHook = (addr?: string, tps?: string) => {
 
   const onSearch = useCallback(async () => {
     getTransaction(address, topic)
-  }, [address, topic])
+  }, [address, topic, getTransaction])
 
   return {
     address,
