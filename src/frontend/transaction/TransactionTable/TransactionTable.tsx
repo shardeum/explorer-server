@@ -16,7 +16,7 @@ interface ITransactionTable {
   txType?: TransactionSearchType
 }
 
-const tempHeader: IColumnProps<string | TransactionType, Transaction | TokenTxs>[] = [
+const tempHeader: IColumnProps<Transaction | TokenTxs>[] = [
   {
     key: 'txHash',
     value: 'Txn Hash',
@@ -53,10 +53,10 @@ const tempHeader: IColumnProps<string | TransactionType, Transaction | TokenTxs>
 export const TransactionTable: React.FC<ITransactionTable> = (props) => {
   const { data, txType = 1 } = props
 
-  const [header, setHeader] = useState<IColumnProps<string | TransactionType, Transaction | TokenTxs>[]>([])
+  const [header, setHeader] = useState<IColumnProps<Transaction | TokenTxs>[]>([])
 
   useEffect(() => {
-    let tHeader: IColumnProps<string | TransactionType, Transaction | TokenTxs>[] = []
+    let tHeader: IColumnProps<Transaction | TokenTxs>[] = []
 
     if (
       txType === TransactionSearchType.AllExceptInternalTx ||
@@ -267,5 +267,5 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
 
   if (!header) return null
 
-  return <Table data={data} columns={header as IColumnProps<unknown, unknown>[]} />
+  return <Table data={data} columns={header} />
 }

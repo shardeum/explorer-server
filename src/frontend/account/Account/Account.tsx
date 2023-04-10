@@ -13,7 +13,7 @@ import styles from './Account.module.scss'
 const siblingCount = 3
 const limit = 10
 
-const tableColumns: IColumnProps<unknown, AccountT>[] = [
+const tableColumns: IColumnProps<AccountT>[] = [
   {
     key: 'accountId',
     value: 'Account Address',
@@ -60,7 +60,7 @@ export const Account: React.FC = () => {
           <div>Loading...</div>
         ) : accounts && accounts.length > 0 ? (
           <Fragment>
-            <Table columns={tableColumns as IColumnProps<unknown, unknown>[]} data={accounts} />
+            <Table columns={tableColumns as IColumnProps<AccountT>[]} data={accounts} />
             <div className={styles.paginationWrapper}>
               <Pagination
                 onPageChange={(p) => setPage(p)}

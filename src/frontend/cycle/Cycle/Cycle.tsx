@@ -2,7 +2,7 @@ import moment from 'moment'
 import React, { Fragment } from 'react'
 import { AnchorLink, ContentLayout, Pagination } from '../../components'
 import { Table } from '../../components/TableComp'
-import { breadcrumbsList } from '../../types'
+import { breadcrumbsList, Cycle as CycleT } from '../../types'
 
 import styles from './Cycle.module.scss'
 import { useCycleHook } from './useCycleHook'
@@ -11,7 +11,7 @@ const header = [
   {
     key: 'cycleRecord.counter',
     value: 'Count',
-    render: (val: unknown, item: any) => (
+    render: (val: unknown, item: CycleT) => (
       <AnchorLink href={`/cycle/${item?.counter}`} label={val as unknown as string} size="small" />
     ),
   },

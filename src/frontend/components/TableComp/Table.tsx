@@ -1,25 +1,29 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import styles from './Table.module.scss'
 import get from 'lodash/get'
 
 export interface ITableProps<T> {
-  columns: IColumnProps[]
+  columns: IColumnProps<T>[]
   data: T[]
 }
 
-export interface IColumnProps<V = unknown, I = unknown> {
+export interface IColumnProps<T> {
   key: string
-  value: any
+  value: string | ReactNode
   maxChar?: number
-  render?: (value: V, item: I) => void
+  render?: (value: T[keyof T], item: T) => JSX.Element | string
 }
 
-interface ITableBody {
-  col: IColumnProps
-  row: any
+interface ITableBody<T> {
+  col: IColumnProps<T>
+  row: T
 }
 
+<<<<<<< HEAD
 export function Table<T>({ columns, data }: ITableProps<T>): JSX.Element {
+=======
+export function Table<T = unknown>({ columns, data }: ITableProps<T>) {
+>>>>>>> b48979f (frontend: Add generics to `Table`)
   return (
     <div className={styles.Table}>
       <table>
@@ -33,8 +37,8 @@ export function Table<T>({ columns, data }: ITableProps<T>): JSX.Element {
         <tbody>
           {data.map((row, index) => (
             <tr key={index}>
-              {columns.map((col) => (
-                <TableBodyItem col={col} row={row} key={col.key} />
+              {columns.map((col: IColumnProps<T>) => (
+                <TableBodyItem<T> col={col} row={row} key={col.key} />
               ))}
             </tr>
           ))}
@@ -44,11 +48,12 @@ export function Table<T>({ columns, data }: ITableProps<T>): JSX.Element {
   )
 }
 
-export function TableHeaderItem({ value }: { value: string | any }): JSX.Element {
+
+export function TableHeaderItem({ value }: { value: string | ReactNode }) {
   return <th>{typeof value === 'string' ? <span>{value}</span> : value}</th>
 }
 
-export function TableBodyItem({ col, row }: ITableBody) {
+export function TableBodyItem<T>({ col, row }: ITableBody<T>) {
   const value = get(row, col.key)
 
   return (

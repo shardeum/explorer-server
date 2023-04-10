@@ -5,15 +5,16 @@ import { useContract } from '../api'
 
 import { AnchorLink, ContentLayout, Dropdown, Pagination } from '../components'
 import { Table } from '../components/TableComp'
-import { breadcrumbsList, contractTypes } from '../types'
+import { IColumnProps } from '../components/TableComp/Table'
+import { Account, breadcrumbsList, contractTypes } from '../types'
 
 import styles from './Contract.module.scss'
 
-const header = [
+const header: IColumnProps<Account>[] = [
   {
     key: 'accountId',
     value: 'Contract Address',
-    render: (val: unknown, item: any) => (
+    render: (val: Account[keyof Account], item: Account) => (
       <AnchorLink
         href={`/account/${item?.ethAddress}`}
         label={val as string}
@@ -26,7 +27,7 @@ const header = [
   {
     key: 'timestamp',
     value: 'Last Used',
-    render: (val: unknown) => moment(val as string).fromNow(),
+    render: (val: Account[keyof Account]) => moment(val as string).fromNow(),
   },
 ]
 
