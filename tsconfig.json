@@ -9,17 +9,8 @@
     "noEmitOnError": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "noImplicitReturns": false,
-    "noEmit": true,
-    "incremental": true,
-    "moduleResolution": "node",
-    "isolatedModules": true,
-    "jsx": "preserve"
+    "noImplicitReturns": false
   },
-  "include": [
-    "src/*"
-, "src/class/cache_per_cycle.ts"  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src/*"],
+  "exclude": ["dist"]
 }

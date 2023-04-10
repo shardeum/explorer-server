@@ -201,7 +201,21 @@ export async function processReceiptData(receipts: any) {
         txReceipt = account
     }
     if (txReceipt) {
-      if (txReceipt.data.accountType !== AccountType.InternalTxReceipt) {
+      // if (txReceipt.data.accountType !== AccountType.InternalTxReceipt) {
+      const transactionType: TransactionType =
+        txReceipt.data.accountType === AccountType.Receipt
+          ? TransactionType.Receipt
+          : txReceipt.data.accountType === AccountType.NodeRewardReceipt
+          ? TransactionType.NodeRewardReceipt
+          : txReceipt.data.accountType === AccountType.StakeReceipt
+          ? TransactionType.StakeReceipt
+          : txReceipt.data.accountType === AccountType.UnstakeReceipt
+          ? TransactionType.UnstakeReceipt
+          : txReceipt.data.accountType === AccountType.InternalTxReceipt
+          ? TransactionType.InternalTxReceipt
+          : (-1 as TransactionType)
+
+      if (transactionType === (-1 as TransactionType)) {
         const txObj = {
           txId: tx.txId,
           result,
@@ -210,14 +224,7 @@ export async function processReceiptData(receipts: any) {
           timestamp: tx.timestamp,
           wrappedEVMAccount: txReceipt.data,
           accountId: txReceipt.accountId,
-          transactionType:
-            txReceipt.data.accountType === AccountType.Receipt
-              ? TransactionType.Receipt
-              : txReceipt.data.accountType === AccountType.NodeRewardReceipt
-              ? TransactionType.NodeRewardReceipt
-              : txReceipt.data.accountType === AccountType.StakeReceipt
-              ? TransactionType.StakeReceipt
-              : TransactionType.UnstakeReceipt,
+          transactionType,
           txHash: txReceipt.data.ethAddress,
           txFrom: txReceipt.data.readableReceipt.from,
           txTo: txReceipt.data.readableReceipt.to

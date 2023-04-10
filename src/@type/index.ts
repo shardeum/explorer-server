@@ -19,7 +19,7 @@ export enum AccountType {
 }
 
 export enum TransactionType {
-  Receipt,
+  Receipt, // EVM Receipt
   NodeRewardReceipt,
   StakeReceipt,
   UnstakeReceipt,
@@ -27,6 +27,7 @@ export enum TransactionType {
   ERC_20,
   ERC_721,
   ERC_1155,
+  InternalTxReceipt,
 }
 
 export interface BaseAccount {
@@ -192,7 +193,7 @@ export enum AccountSearchType {
   ERC_20,
   ERC_721,
   ERC_1155,
-  Receipt,
+  Receipt, // EVM Receipt
   StakeReceipt,
   UnstakeReceipt,
   NetworkAccount,
@@ -201,11 +202,12 @@ export enum AccountSearchType {
   NodeAccount2,
   ContractStorage,
   ContractCode,
+  InternalTxReceipt,
 }
 
 export enum TransactionSearchType {
-  All, // Receipt + NodeRewardReceipt
-  Receipt,
+  All, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt + InternalTxReceipt
+  Receipt, // EVM Receipt
   NodeRewardReceipt,
   StakeReceipt,
   UnstakeReceipt,
@@ -214,4 +216,6 @@ export enum TransactionSearchType {
   ERC_721,
   ERC_1155,
   TokenTransfer, // token txs of a contract
+  InternalTxReceipt,
+  AllExceptInternalTx, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt
 }
