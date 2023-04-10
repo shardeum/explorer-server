@@ -9,23 +9,6 @@ export const useLogHook = (addr?: string, tps?: string) => {
   const [transactions, setTransaction] = useState<Transaction[]>([])
   const [total, setTotal] = useState<number>(0)
 
-  useEffect(() => {
-    if (addr) setAddress(addr)
-    if (tps) setTopic(tps)
-
-    if (addr || tps) {
-      getTransaction(addr || '', tps || '')
-    }
-  }, [addr, tps, getTransaction])
-
-  const onAddressChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setAddress(e.target.value)
-  }, [])
-
-  const onTopicChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setTopic(e.target.value)
-  }, [])
-
   const createURL = useCallback(
     (address: string, topic: string) => {
       let topic0: string | null = null
@@ -80,6 +63,23 @@ export const useLogHook = (addr?: string, tps?: string) => {
     },
     [createURL]
   )
+
+  useEffect(() => {
+    if (addr) setAddress(addr)
+    if (tps) setTopic(tps)
+
+    if (addr || tps) {
+      getTransaction(addr || '', tps || '')
+    }
+  }, [addr, tps, getTransaction])
+
+  const onAddressChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setAddress(e.target.value)
+  }, [])
+
+  const onTopicChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setTopic(e.target.value)
+  }, [])
 
   const onSearch = useCallback(async () => {
     getTransaction(address, topic)
