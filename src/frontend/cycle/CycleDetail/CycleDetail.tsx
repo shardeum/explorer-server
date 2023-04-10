@@ -87,8 +87,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.value}>
                 {' '}
                 {data?.cycleRecord?.removed?.length > 0
-                  ? data?.cycleRecord?.removed?.map((item: string) => {
-                      return <div>{item}</div>
+                  ? data?.cycleRecord?.removed?.map((item: string, index: number) => {
+                      return <div key={index}>{item}</div>
                     })
                   : '-'}
               </div>
@@ -98,8 +98,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Lost Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.lost?.length > 0
-                  ? data?.cycleRecord?.lost?.map((item: string) => {
-                      return <div>{item}</div>
+                  ? data?.cycleRecord?.lost?.map((item: string, index: number) => {
+                      return <div key={index}>{item}</div>
                     })
                   : '-'}
               </div>
@@ -109,8 +109,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Returned Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.refuted?.length > 0
-                  ? data?.cycleRecord?.refuted?.map((item: string) => {
-                      return <div>{item}</div>
+                  ? data?.cycleRecord?.refuted?.map((item: string, index: number) => {
+                      return <div key={index}>{item}</div>
                     })
                   : '-'}
               </div>
@@ -120,8 +120,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Joined Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.joinedConsensors?.length > 0
-                  ? data?.cycleRecord?.joinedConsensors?.map((item: { id: string }) => {
-                      return <div>{item.id}</div>
+                  ? data?.cycleRecord?.joinedConsensors?.map((item: { id: string }, index: number) => {
+                      return <div key={index}>{item.id}</div>
                     })
                   : '-'}
               </div>
@@ -131,8 +131,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Activated Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.activated?.length > 0
-                  ? data?.cycleRecord?.activated?.map((item: { id: string }) => {
-                      return <div>{item.id}</div>
+                  ? data?.cycleRecord?.activated?.map((item: { id: string }, index: number) => {
+                      return <div key={index}>{item.id}</div>
                     })
                   : '-'}
               </div>
@@ -142,9 +142,11 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Refreshed Archivers</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.refreshedArchivers?.length > 0
-                  ? data?.cycleRecord?.refreshedArchivers?.map((item: { publicKey: string }) => {
-                      return <div>{item.publicKey}</div>
-                    })
+                  ? data?.cycleRecord?.refreshedArchivers?.map(
+                      (item: { publicKey: string }, index: number) => {
+                        return <div key={index}>{item.publicKey}</div>
+                      }
+                    )
                   : '-'}
               </div>
             </div>
@@ -153,8 +155,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Refreshed Concensors</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.refreshedConsensors?.length > 0
-                  ? data?.cycleRecord?.refreshedConsensors?.map((item: { id: string }) => {
-                      return <div>{item.id}</div>
+                  ? data?.cycleRecord?.refreshedConsensors?.map((item: { id: string }, index: number) => {
+                      return <div key={index}>{item.id}</div>
                     })
                   : '-'}
               </div>
