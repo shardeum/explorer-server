@@ -8,16 +8,16 @@ if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts)
 }
 
-interface LineChartProps<D> {
+interface LineChartProps {
   title: string
   centerTitle?: boolean
   subTitle?: string
-  data: D[]
+  data: number[][]
   height?: number
   name?: string
 }
 
-export const LineChart = <D,>(props: LineChartProps<D>)  => {
+export const LineChart: React.FC<LineChartProps> = (props: LineChartProps)  => {
   const router = useRouter()
 
   const { title, centerTitle, subTitle, data, height = 300, name } = props
@@ -83,7 +83,7 @@ export const LineChart = <D,>(props: LineChartProps<D>)  => {
 
               // const data = this?.series?.options?.data
 
-              const item = data?.findIndex((d: D) => d[0] === timestamp)
+              const item = data?.findIndex((d: number[]) => d[0] === timestamp)
               return `<span><b>${Highcharts.dateFormat(
                 '%A, %B %d, %Y',
                 new Date(timestamp).getTime()

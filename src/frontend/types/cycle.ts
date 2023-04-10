@@ -9,34 +9,34 @@ export interface Cycle {
 }
 
 export interface CycleRecord {
-  activated: any
-  activatedPublicKeys: any
+  activated: { id: string }[]
+  activatedPublicKeys: unknown
   active: number
-  apoptosized: any
+  apoptosized: unknown
   counter: number
   desired: number
   duration: number
   expired: number
-  joined: any
-  joinedArchivers: any
-  joinedConsensors: any
-  leavingArchivers: any
-  lost: any
-  lostSyncing: any
+  joined: unknown
+  joinedArchivers: unknown
+  joinedConsensors: { id: string }[]
+  leavingArchivers: unknown
+  lost: string[]
+  lostSyncing: unknown
   marker: string
   maxSyncTime: number
   networkConfigHash: string
-  networkDataHash: any
+  networkDataHash: unknown
   networkId: string
-  networkReceiptHash: any
+  networkReceiptHash: unknown
   networkStateHash: string
-  networkSummaryHash: any
+  networkSummaryHash: unknown
   previous: string
-  refreshedArchivers: any
-  refreshedConsensors: any
-  refuted: any
-  removed: any
-  returned: any
+  refreshedArchivers: { publicKey: string }[]
+  refreshedConsensors: { id: string }[]
+  refuted: string[]
+  removed: string[]
+  returned: unknown
   safetyMode: boolean
   safetyNum: number
   start: number

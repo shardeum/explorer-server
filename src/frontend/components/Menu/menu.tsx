@@ -21,7 +21,7 @@ interface MenuProps {
 export const Menu: React.FC<MenuProps> = (props) => {
   const { onOpen, onClose, anchor, isMenuOpen, className, onMouseDown, children } = props
 
-  const menuRef = useRef<any | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const handleOutsideClick = useCallback((event: MouseEvent) => {
     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {

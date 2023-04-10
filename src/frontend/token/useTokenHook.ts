@@ -26,7 +26,7 @@ export const useTokenHook = ({ id, address }: detailProps) => {
     setFilteredAddress(e.target.value)
   }, [])
 
-  const onTabChange = useCallback((tab: any) => {
+  const onTabChange = useCallback((tab: string | number) => {
     setActiveTab(tab)
   }, [])
 

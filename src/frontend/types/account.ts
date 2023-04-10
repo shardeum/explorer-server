@@ -9,8 +9,8 @@ export interface AccountQuery {
 export interface Account {
   accountId: string
   accountType: number
-  contractInfo: any
-  contractType: any
+  contractInfo: ContractInfo
+  contractType: ContractType
   cycle: number
   ethAddress: string
   hash: string
@@ -71,7 +71,7 @@ export enum AccountType {
 
 export interface Token {
   contractAddress: string
-  contractInfo: any
+  contractInfo: ContractInfo
   contractType: ContractType
   balance: string
 }

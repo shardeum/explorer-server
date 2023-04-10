@@ -1,11 +1,11 @@
 export interface TokenTxs {
   contractAddress: string
-  contractInfo: any
+  contractInfo: ContractInfo
   cycle: number
   timestamp: number
   tokenEvent: string
   tokenFrom: string
-  tokenOperator: any
+  tokenOperator: unknown
   tokenTo: string
   tokenType: number
   tokenValue: string
@@ -62,7 +62,7 @@ export interface Transaction {
   txFrom: string
   txTo: string
   nominee?: string
-  originTxData: any
+  originTxData: unknown
   tokenTxs: TokenTxs[]
   txStatus: TransactionStatus
 }
@@ -131,4 +131,18 @@ export interface StakeInfo {
   totalUnstakeAmount: number
   reward: number
   stakeAmount: number
+}
+
+export interface ContractInfo {
+  totalSupply: number
+  decimals: string
+  name: string
+  symbol: string
+}
+
+export interface Log {
+  logIndex: number
+  address: number
+  topics: string[]
+  data: string
 }

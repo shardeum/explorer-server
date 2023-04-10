@@ -5,13 +5,13 @@ import styles from './Tab.module.scss'
 
 interface TabProps {
   tabs: Tab[]
-  activeTab?: any
-  onClick: (key: any) => void
+  activeTab?: unknown
+  onClick: (key: string | number) => void
   className?: string
 }
 
 interface Tab {
-  key: any
+  key: string | number
   value: string
   content: ReactNode
 }

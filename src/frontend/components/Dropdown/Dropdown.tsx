@@ -8,7 +8,7 @@ import styles from './Dropdown.module.scss'
 
 export interface DropdownProps {
   items: string[]
-  onSelect?: (i: any) => void
+  onSelect?: (i: unknown) => void
   selected?: string
   disabled?: boolean
   apperance?: 'primary' | 'outlined' | 'default'

@@ -110,7 +110,7 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Lost Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.lost?.length > 0
-                  ? data?.cycleRecord?.lost?.map((item: any) => {
+                  ? data?.cycleRecord?.lost?.map((item: string) => {
                       return <div>{item}</div>
                     })
                   : '-'}
@@ -121,7 +121,7 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Returned Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.refuted?.length > 0
-                  ? data?.cycleRecord?.refuted?.map((item: any) => {
+                  ? data?.cycleRecord?.refuted?.map((item: string) => {
                       return <div>{item}</div>
                     })
                   : '-'}

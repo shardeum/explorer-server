@@ -15,7 +15,7 @@ export const Logs: React.FC<LogsProps> = ({ transaction }) => {
     <div className={styles.Logs}>
       {transaction &&
         transaction?.wrappedEVMAccount?.readableReceipt?.logs &&
-        transaction?.wrappedEVMAccount?.readableReceipt?.logs.map((log: any) => (
+        transaction?.wrappedEVMAccount?.readableReceipt?.logs.map((log: Log) => (
           <div className={styles.logItem}>
             <Button apperance="outlined" className={styles.count}>
               {log.logIndex}
@@ -31,7 +31,7 @@ export const Logs: React.FC<LogsProps> = ({ transaction }) => {
                 <div className={styles.title}>Topic</div>
                 <div>
                   {log.topics &&
-                    log.topics.map((topic: any, index: any) => (
+                    log.topics.map((topic: string, index: number) => (
                       <div className={styles.row}>
                         <Button apperance="outlined" className={styles.btn}>
                           {index}

@@ -2,14 +2,14 @@ import React from 'react'
 import HighchartsReact from 'highcharts-react-official'
 import Highcharts from 'highcharts/highstock'
 
-interface BarChartProps {
+interface BarChartProps<D> {
   title: string
-  data: any
+  data: D[]
 }
 
 // TODO: have to refactor the code
 
-export const BarChart: React.FC<BarChartProps> = ({ title }) => {
+export const BarChart = <D,>({ title }: BarChartProps<D>) => {
   const option = {
     chart: {
       type: 'column',
@@ -55,6 +55,8 @@ export const BarChart: React.FC<BarChartProps> = ({ title }) => {
     credits: {
       enabled: false,
     },
+
+    // TODO: this is placeholder code.
     series: [
       {
         name: 'Year 1800',

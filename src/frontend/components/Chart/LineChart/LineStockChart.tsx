@@ -11,17 +11,31 @@ interface LineStockChartProps {
   title: string
   centerTitle?: boolean
   subTitle?: string
-  data: any
+  data: number[][]
   height?: number
   name?: string
 }
 
+interface SeriesData {
+  name: string
+  keys: string[]
+  data: number[][]
+  type?: string
+  threshold?: unknown
+  dataGrouping?: {
+    enabled: boolean
+  }
+  color?: string
+  visible?: boolean
+}
+
+
 export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
   const { title, centerTitle, subTitle, data, height = 300, name } = props
 
-  let activeAndSyncing = []
+  let activeAndSyncing: number[][] = []
 
-  let seriesData: any = []
+  const seriesData: SeriesData[] = []
 
   if (data.length === 0) return <></>
   if (data) {
@@ -119,7 +133,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
                   '%A, %B %d, %Y',
-                  new Date(timestamp)
+                  new Date(timestamp).getTime()
                 )}</b></span><br /><br />
       <span>Active Validators: <b>${item[0][1]}</b></span><br />
       <span>Activated Validators: <b>${item[0][2]}</b></span><br />
@@ -136,7 +150,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
               if (item)
                 return `<span><b>${Highcharts.dateFormat(
                   '%A, %B %d, %Y',
-                  new Date(timestamp)
+                  new Date(timestamp).getTime()
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />
         <span>Total Stake Txs: <b>${item[0][3]}</b></span><br />

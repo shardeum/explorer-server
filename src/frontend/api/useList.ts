@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce'
 import { api } from './axios'
 
 interface Response {
-  lists: any[]
+  lists: unknown[]
   count: number
 }
 

@@ -8,7 +8,7 @@ import { Icon } from '../Icon'
 
 type Option = {
   key: string | number
-  value: any
+  value: string
 }
 
 interface DropdowntProps {

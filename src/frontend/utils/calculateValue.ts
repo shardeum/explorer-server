@@ -1,8 +1,9 @@
 import Web3Utils from 'web3-utils'
 import { utils } from 'ethers'
 import { TokenTxs, TransactionType } from '../types'
+import BN from 'bn.js'
 
-export const calculateValue = (value: any) => {
+export const calculateValue = (value: string | BN) => {
   try {
     return round(Web3Utils.fromWei(value, 'ether'))
   } catch (e) {
@@ -10,7 +11,7 @@ export const calculateValue = (value: any) => {
   }
 }
 
-export const calculateFullValue = (value: any) => {
+export const calculateFullValue = (value: string | BN) => {
   try {
     return Web3Utils.fromWei(value, 'ether')
   } catch (e) {
@@ -59,13 +60,16 @@ export const shortTokenValue = (str: string): string => {
   else return str.slice(0, 10) + '...'
 }
 
-const countDecimals = (value: any) => {
+const countDecimals = (value: string | BN) => {
+  if (value instanceof BN) {
+    value = value.toString()
+  }
   const splitValue = value.split('.')
   if (splitValue.length > 1) return splitValue[1].length
   return 0
 }
 
-export const round = (value: any) => {
+export const round = (value: string) => {
   const decimals = countDecimals(value)
   if (decimals === 0) {
     return value

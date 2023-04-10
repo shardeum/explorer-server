@@ -4,7 +4,7 @@ import styles from './ExpandableList.module.scss'
 
 type Option = {
   key: string | number
-  value: any
+  value: string
 }
 
 interface IExpandableList {
