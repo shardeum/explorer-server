@@ -16,7 +16,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
   const [tokens, setTokens] = useState<Token[]>([])
   const [page, setPage] = useState<number>(1)
   const [transactionType, setTransactionType] = useState<TransactionSearchType>(
-    txType || TransactionSearchType.All
+    txType || TransactionSearchType.AllExceptInternalTx
   )
 
   const accountType = id && id.length === 64 ? AccountType.NodeAccount2 : AccountType.Account // TODO: I think it has to be EOA

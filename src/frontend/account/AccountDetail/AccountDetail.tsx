@@ -42,11 +42,11 @@ export const AccountDetail: React.FC = () => {
 
   const tabs = [
     {
-      key: TransactionSearchType.All,
+      key: TransactionSearchType.AllExceptInternalTx,
       value: 'Transactions',
       content: (
         <>
-          <TransactionTable data={transactions} txType={TransactionSearchType.All} />
+          <TransactionTable data={transactions} txType={TransactionSearchType.AllExceptInternalTx} />
           <div className={styles.paginationWrapper}>
             <Pagination
               onPageChange={(p) => setPage(p)}
@@ -282,7 +282,7 @@ export const AccountDetail: React.FC = () => {
                 }}
               />
             ) : (
-              <TransactionTable loading={false} data={transactions} txType={TransactionSearchType.All} />
+              <TransactionTable data={transactions} txType={TransactionSearchType.AllExceptInternalTx} />
             )}
           </>
         ) : (

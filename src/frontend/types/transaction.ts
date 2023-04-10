@@ -71,7 +71,7 @@ export interface TransactionQuery {
 }
 
 export enum TransactionSearchType {
-  All, // Receipt + NodeRewardReceipt
+  All, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt + InternalTxReceipt
   Receipt,
   NodeRewardReceipt,
   StakeReceipt,
@@ -81,13 +81,15 @@ export enum TransactionSearchType {
   ERC_721,
   ERC_1155,
   TokenTransfer, // token txs of a contract
+  InternalTxReceipt,
+  AllExceptInternalTx, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt (exclude InternalTxReceipt)
 }
 
 export const TransactionSearchList: {
   key: TransactionSearchType
   value: string
 }[] = [
-  { key: TransactionSearchType.All, value: 'All Transactions' },
+  { key: TransactionSearchType.AllExceptInternalTx, value: 'All Transactions' },
   // {
   //   key: TransactionSearchType.NodeRewardReceipt,
   //   value: "Node Reward Transactions",
@@ -112,4 +114,5 @@ export enum TransactionType {
   ERC_20,
   ERC_721,
   ERC_1155,
+  InternalTxReceipt,
 }

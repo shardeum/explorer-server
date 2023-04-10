@@ -42,7 +42,7 @@ export const Log: React.FC = () => {
             Search
           </Button>
         </div>
-        <TransactionTable data={transactions} txType={TransactionSearchType.All} />
+        <TransactionTable data={transactions} txType={TransactionSearchType.AllExceptInternalTx} />
         <Pagination currentPage={page} onPageChange={(p) => setPage(p)} pageSize={10} totalCount={total} />
       </ContentLayout>
     </div>

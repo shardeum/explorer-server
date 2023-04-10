@@ -196,7 +196,8 @@ export async function processReceiptData(receipts: any) {
         accountType === AccountType.Receipt ||
         accountType === AccountType.NodeRewardReceipt ||
         accountType === AccountType.StakeReceipt ||
-        accountType === AccountType.UnstakeReceipt
+        accountType === AccountType.UnstakeReceipt ||
+        accountType === AccountType.InternalTxReceipt
       )
         txReceipt = account
     }
@@ -215,7 +216,7 @@ export async function processReceiptData(receipts: any) {
           ? TransactionType.InternalTxReceipt
           : (-1 as TransactionType)
 
-      if (transactionType === (-1 as TransactionType)) {
+      if (transactionType !== (-1 as TransactionType)) {
         const txObj = {
           txId: tx.txId,
           result,

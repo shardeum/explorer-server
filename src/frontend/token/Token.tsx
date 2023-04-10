@@ -40,7 +40,7 @@ export const Token: React.FC = () => {
       ? TransactionSearchType.ERC_721
       : account?.contractType === ContractType.ERC_1155
       ? TransactionSearchType.ERC_1155
-      : TransactionSearchType.All
+      : TransactionSearchType.AllExceptInternalTx
 
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
 
@@ -60,7 +60,7 @@ export const Token: React.FC = () => {
 
   const tabs = [
     {
-      key: TransactionSearchType.All,
+      key: TransactionSearchType.AllExceptInternalTx,
       value: 'Transfer',
       content: <TransactionTable data={transactions} txType={tokenType} />,
     },

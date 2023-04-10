@@ -47,7 +47,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
     let tHeader
 
     if (
-      txType === TransactionSearchType.All ||
+      txType === TransactionSearchType.AllExceptInternalTx ||
       txType === TransactionSearchType.NodeRewardReceipt ||
       txType === TransactionSearchType.StakeReceipt ||
       txType === TransactionSearchType.UnstakeReceipt

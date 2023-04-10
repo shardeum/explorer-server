@@ -504,7 +504,8 @@ export async function queryTransactionCount(
         transactions = await db.get(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
         txType = TransactionType.InternalTxReceipt
-        const sql = `SELECT COUNT(*) FROM transactions WHERE txFrom=? OR txTo=? OR nominee=? AND transactionType!=?`
+        console.log('txType', txType)
+        const sql = `SELECT COUNT(*) FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=?`
         transactions = await db.get(sql, [address, address, address, txType])
       } else if (
         txType === TransactionSearchType.Receipt ||
