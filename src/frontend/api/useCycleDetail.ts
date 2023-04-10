@@ -1,4 +1,4 @@
-import useSWR, { SWRResponse } from 'swr'
+import useSWR from 'swr'
 import { Cycle } from '../types'
 
 import { fetcher } from './fetcher'
@@ -11,14 +11,15 @@ export const useCycleDetail = (id: string) => {
   if (!regex.test(id)) {
     cycleNumber = id
   }
-  let response: SWRResponse<any, any>
+
+  const queryPath = cycleNumber ? `${PATHS.CYCLE}/${id}` : `${PATHS.CYCLE}?marker=${id}`
+  const response = useSWR(queryPath, fetcher)
+
   let cycle: Cycle
   if (cycleNumber) {
-    response = useSWR(`${PATHS.CYCLE}/${id}`, fetcher)
-    cycle = response?.data?.cycle as Cycle
+    cycle = response?.data?.cycle
   } else {
-    response = useSWR(`${PATHS.CYCLE}?marker=${id}`, fetcher)
-    cycle = response?.data?.cycles[0] as Cycle
+    cycle = response?.data?.cycles?.[0]
   }
 
   return {
