@@ -15,7 +15,7 @@ const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.log]
 export const Log: React.FC = () => {
   const router = useRouter()
 
-  const { address: addr, topic: tps } = router?.query
+  const { address: addr, topic: tps } = router.query
 
   const { address, onAddressChange, topic, onTopicChange, onSearch, transactions, total, page, setPage } =
     useLogHook(String(addr || ''), String(tps || ''))
