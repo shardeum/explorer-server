@@ -663,7 +663,10 @@ const start = async () => {
       res.totalTransactions = totalTransactions
     }
     if (query.count) {
-      totalTransactions = await Transaction.queryTransactionCount()
+      totalTransactions = await Transaction.queryTransactionCount(
+        null,
+        TransactionSearchType.AllExceptInternalTx
+      )
       if (query.txType) {
         if (
           txType === TransactionSearchType.StakeReceipt ||
