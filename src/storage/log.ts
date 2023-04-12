@@ -23,7 +23,7 @@ export async function insertLog(log: Log) {
     const fields = Object.keys(log).join(', ')
     const placeholders = Object.keys(log).fill('?').join(', ')
     const values = extractValues(log)
-    let sql = 'INSERT OR REPLACE INTO logs (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO logs (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Log', log.txHash, log.contractAddress)
   } catch (e) {

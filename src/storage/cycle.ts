@@ -21,7 +21,7 @@ export async function insertCycle(cycle: Cycle) {
     const fields = Object.keys(cycle).join(', ')
     const placeholders = Object.keys(cycle).fill('?').join(', ')
     const values = extractValues(cycle)
-    let sql = 'INSERT OR REPLACE INTO cycles (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO cycles (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     if (config.verbose)
       console.log('Successfully inserted Cycle', cycle.cycleRecord.counter, cycle.cycleMarker)

@@ -24,7 +24,7 @@ export async function insertArchivedCycle(archivedCycle: any) {
     const fields = Object.keys(archivedCycle).join(', ')
     const placeholders = Object.keys(archivedCycle).fill('?').join(', ')
     const values = extractValues(archivedCycle)
-    let sql = 'INSERT OR REPLACE INTO archivedCycles (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO archivedCycles (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     console.log(
       'Successfully inserted archivedCycle',

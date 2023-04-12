@@ -41,7 +41,7 @@ export async function insertTransaction(transaction: Transaction): Promise<void>
     const fields = Object.keys(transaction).join(', ')
     const placeholders = Object.keys(transaction).fill('?').join(', ')
     const values = extractValues(transaction)
-    let sql = 'INSERT OR REPLACE INTO transactions (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO transactions (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Transaction', transaction.txId, transaction.txHash)
   } catch (e) {
@@ -91,7 +91,7 @@ export async function insertTokenTransaction(tokenTx: TokenTx): Promise<void> {
     const fields = Object.keys(tokenTx).join(', ')
     const placeholders = Object.keys(tokenTx).fill('?').join(', ')
     const values = extractValues(tokenTx)
-    let sql = 'INSERT OR REPLACE INTO tokenTxs (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO tokenTxs (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Token Transaction', tokenTx.txHash)
   } catch (e) {
@@ -120,9 +120,9 @@ export async function bulkInsertTokenTransactions(tokenTxs: TokenTx[]): Promise<
 export async function processTransactionData(transactions: any): Promise<void> {
   console.log('transactions size', transactions.length)
   if (transactions && transactions.length <= 0) return
-  let bucketSize = 1000
-  let combineAccounts = []
-  let existingAccounts = [] // To save perf on querying from the db again and again, save the existing account that is queried once in memory
+  const bucketSize = 1000
+  const combineAccounts = []
+  const existingAccounts = [] // To save perf on querying from the db again and again, save the existing account that is queried once in memory
   let combineTransactions = []
   let combineTokenTransactions = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2 = [] // For TransactionType (ERC1155)
@@ -170,7 +170,7 @@ export async function processTransactionData(transactions: any): Promise<void> {
           (a) => a.accountId === accs[i].slice(2).toLowerCase() + '0'.repeat(24)
         )
         if (index > -1) {
-          let accountExist = combineAccounts[index]
+          const accountExist = combineAccounts[index]
           accountExist.timestamp = txObj.timestamp
           combineAccounts.splice(index, 1)
           combineAccounts.push(accountExist)

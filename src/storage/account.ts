@@ -43,7 +43,7 @@ export async function insertAccount(account: Account): Promise<void> {
     const fields = Object.keys(account).join(', ')
     const placeholders = Object.keys(account).fill('?').join(', ')
     const values = extractValues(account)
-    let sql = 'INSERT OR REPLACE INTO accounts (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO accounts (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Account', account.ethAddress || account.accountId)
   } catch (e) {
@@ -91,7 +91,7 @@ export async function insertToken(token: Token): Promise<void> {
     const fields = Object.keys(token).join(', ')
     const placeholders = Object.keys(token).fill('?').join(', ')
     const values = extractValues(token)
-    let sql = 'INSERT OR REPLACE INTO tokens (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO tokens (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Token', token.ethAddress)
   } catch (e) {
@@ -277,7 +277,7 @@ export async function queryAccounts(skip = 0, limit = 10, type = undefined): Pro
 export async function queryAccountByAccountId(accountId: string): Promise<Account | null> {
   try {
     const sql = `SELECT * FROM accounts WHERE accountId=?`
-    let account: any = await db.get(sql, [accountId])
+    const account: any = await db.get(sql, [accountId])
     if (account) account.account = JSON.parse(account.account)
     if (account && account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
     if (config.verbose) console.log('Account accountId', account)
@@ -344,7 +344,7 @@ export async function queryTokensByAddress(address: string, detail = false): Pro
     const sql = `SELECT * FROM tokens WHERE ethAddress=?`
     let tokens = (await db.all(sql, [address])) as Token[]
     if (detail) {
-      let filterTokens = []
+      const filterTokens = []
       for (let i = 0; i < tokens.length; i++) {
         const { contractAddress, tokenValue } = tokens[i]
         const accountExist = await queryAccountByAccountId(
@@ -374,7 +374,7 @@ export async function queryTokenBalance(
   addressToSearch: string
 ): Promise<{ success: boolean; error?: string; balance?: string }> {
   const sql = `SELECT * FROM tokens WHERE ethAddress=? AND contractAddress=?`
-  let token: Token = await db.get(sql, [addressToSearch, contractAddress])
+  const token: Token = await db.get(sql, [addressToSearch, contractAddress])
   if (config.verbose) console.log('Token balance', token)
   if (!token) return { success: false, error: 'tokenBalance is not found' }
   return {
@@ -411,14 +411,14 @@ export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: s
 export async function processAccountData(accounts: any): Promise<Account[] | null> {
   console.log('accounts size', accounts.length)
   if (accounts && accounts.length <= 0) return
-  let bucketSize = 1000
+  const bucketSize = 1000
   let combineAccounts1 = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
   let combineAccounts2 = [] // For AccountType (NetworkAccount, NodeAccount)
 
-  let transactions = []
+  const transactions = []
 
   for (let j = 0; j < accounts.length; j++) {
-    let account = accounts[j]
+    const account = accounts[j]
     try {
       if (typeof account.data === 'string') account.data = JSON.parse(account.data)
     } catch (e) {
