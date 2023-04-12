@@ -3,7 +3,7 @@ import { extractValues } from './sqlite3storage'
 import { config } from '../config/index'
 import { StateManager, P2P } from '@shardus/types'
 
-export let Collection: any
+export let Collection: unknown
 
 export interface ArchivedCycle {
   counter: number
@@ -14,11 +14,20 @@ export interface ArchivedCycle {
   summary: StateManager.StateMetaDataTypes.Summary
 }
 
+interface DbArchivedCycle {
+  counter: number
+  cycleRecord: string
+  cycleMarker: string
+  data: string
+  receipt: string
+  summary: string
+}
+
 export function isArchivedCycle(obj: ArchivedCycle): obj is ArchivedCycle {
   return (obj as ArchivedCycle).cycleRecord !== undefined && (obj as ArchivedCycle).cycleMarker !== undefined
 }
 
-export async function insertArchivedCycle(archivedCycle: any) {
+export async function insertArchivedCycle(archivedCycle: ArchivedCycle) {
   try {
     archivedCycle.counter = archivedCycle.cycleRecord.counter
     const fields = Object.keys(archivedCycle).join(', ')
@@ -40,7 +49,7 @@ export async function insertArchivedCycle(archivedCycle: any) {
   }
 }
 
-export async function updateArchivedCycle(marker: string, archivedCycle: any) {
+export async function updateArchivedCycle(marker: string, archivedCycle: ArchivedCycle) {
   try {
     const sql = `UPDATE archivedCycles SET cycleRecord = $cycleRecord, data = $data, receipt = $receipt, summary = $summary WHERE cycleMarker = $cycleMarker `
     await db.run(sql, {
@@ -64,9 +73,9 @@ export async function updateArchivedCycle(marker: string, archivedCycle: any) {
 export async function queryAllArchivedCycles(count?: number) {
   try {
     const sql = `SELECT * FROM archivedCycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
-    const archivedCycles: any = await db.all(sql)
+    const archivedCycles: DbArchivedCycle[] = await db.all(sql)
     if (archivedCycles.length > 0) {
-      archivedCycles.forEach((archiveCycle: any) => {
+      archivedCycles.forEach((archiveCycle: DbArchivedCycle) => {
         if (archiveCycle.cycleRecord) archiveCycle.cycleRecord = JSON.parse(archiveCycle.cycleRecord)
         if (archiveCycle.data) archiveCycle.data = JSON.parse(archiveCycle.data)
         if (archiveCycle.receipt) archiveCycle.receipt = JSON.parse(archiveCycle.receipt)
@@ -83,9 +92,9 @@ export async function queryAllArchivedCycles(count?: number) {
 export async function queryAllArchivedCyclesBetween(start: number, end: number): Promise<ArchivedCycle[]> {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC LIMIT 100`
-    const archivedCycles: any = await db.all(sql, [start, end])
+    const archivedCycles: DbArchivedCycle[] = await db.all(sql, [start, end])
     if (archivedCycles.length > 0) {
-      archivedCycles.forEach((archiveCycle: any) => {
+      archivedCycles.forEach((archiveCycle: DbArchivedCycle) => {
         if (archiveCycle.cycleRecord) archiveCycle.cycleRecord = JSON.parse(archiveCycle.cycleRecord)
         if (archiveCycle.data) archiveCycle.data = JSON.parse(archiveCycle.data)
         if (archiveCycle.receipt) archiveCycle.receipt = JSON.parse(archiveCycle.receipt)
@@ -102,7 +111,7 @@ export async function queryAllArchivedCyclesBetween(start: number, end: number):
 export async function queryArchivedCycleByMarker(marker: string) {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE cycleMarker=? LIMIT 1`
-    const archivedCycles: any = await db.get(sql, [marker])
+    const archivedCycles: DbArchivedCycle = await db.get(sql, [marker])
     if (archivedCycles) {
       if (archivedCycles.cycleRecord) archivedCycles.cycleRecord = JSON.parse(archivedCycles.cycleRecord)
       if (archivedCycles.data) archivedCycles.data = JSON.parse(archivedCycles.data)
@@ -119,7 +128,7 @@ export async function queryArchivedCycleByMarker(marker: string) {
 export async function queryArchivedCycleByCounter(counter: number) {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE counter=? LIMIT 1`
-    const archivedCycles: any = await db.get(sql, [counter])
+    const archivedCycles: DbArchivedCycle = await db.get(sql, [counter])
     if (archivedCycles) {
       if (archivedCycles.cycleRecord) archivedCycles.cycleRecord = JSON.parse(archivedCycles.cycleRecord)
       if (archivedCycles.data) archivedCycles.data = JSON.parse(archivedCycles.data)

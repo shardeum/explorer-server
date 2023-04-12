@@ -1,7 +1,7 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { AccountType, TransactionType } from '../@type'
+import { AccountType, TransactionType, WrappedAccount } from '../@type'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
@@ -9,11 +9,11 @@ import { bufferToHex } from 'ethereumjs-util'
 
 export interface Receipt {
   receiptId: string
-  tx: any
+  tx: unknown
   cycle: number
   timestamp: number
-  result: any
-  accounts: any[]
+  result: unknown
+  accounts: unknown[]
   sign: {
     owner: string
     sig: string
@@ -59,7 +59,15 @@ export async function bulkInsertReceipts(receipts: Receipt[]): Promise<void> {
   }
 }
 
-export async function processReceiptData(receipts: any[]): Promise<void> {
+export async function processReceiptData(
+  receipts: {
+    accounts: WrappedAccount[]
+    cycle: number
+    result: unknown
+    tx: Transaction.Transaction
+    receipt: WrappedAccount
+  }[]
+): Promise<void> {
   if (receipts && receipts.length <= 0) return
   if (!cleanReceiptsMapByCycle) {
     const currentTime = Date.now()
@@ -70,7 +78,7 @@ export async function processReceiptData(receipts: any[]): Promise<void> {
     }
   }
   const bucketSize = 1000
-  let combineReceipts = []
+  let combineReceipts: Receipt[] = []
   let combineAccounts1 = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
   let combineAccounts2 = [] // For AccountType (NetworkAccount, NodeAccount)
   let combineTransactions = []
@@ -83,7 +91,7 @@ export async function processReceiptData(receipts: any[]): Promise<void> {
       continue
     }
 
-    let txReceipt = receipt
+    let txReceipt: WrappedAccount = receipt
     combineReceipts.push(receipts[i])
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
@@ -135,7 +143,7 @@ export async function processReceiptData(receipts: any[]): Promise<void> {
             combineAccounts1.push(accObj)
           }
         } else {
-          const accountExist: any = await Account.queryAccountByAccountId(accObj.accountId)
+          const accountExist: Account.Account = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
             combineAccounts1.push(accObj)
@@ -170,7 +178,7 @@ export async function processReceiptData(receipts: any[]): Promise<void> {
             combineAccounts2.push(accObj)
           }
         } else {
-          const accountExist: any = await Account.queryAccountByAccountId(accObj.accountId)
+          const accountExist: Account.Account = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
             combineAccounts2.push(accObj)
@@ -342,7 +350,7 @@ export async function processReceiptData(receipts: any[]): Promise<void> {
 export async function queryReceiptByReceiptId(receiptId: string): Promise<Receipt> {
   try {
     const sql = `SELECT * FROM receipts WHERE receiptId=?`
-    const receipt: any = await db.get(sql, [receiptId])
+    const receipt: DbReceipt = await db.get(sql, [receiptId])
     if (receipt) {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
@@ -360,9 +368,9 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
 export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle DESC, timestamp DESC LIMIT ${count ? count : 100}`
-    const receipts: any = await db.all(sql)
+    const receipts: DbReceipt[] = await db.all(sql)
 
-      receipts.forEach((receipt: any) => {
+    receipts.forEach((receipt: DbReceipt) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
@@ -377,12 +385,12 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
 }
 
 export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]> {
-  let receipts: any[]
+  let receipts: DbReceipt[]
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql)
 
-      receipts.forEach((receipt: any) => {
+    receipts.forEach((receipt: DbReceipt) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
@@ -427,12 +435,17 @@ export async function queryReceiptCountByCycles(start: number, end: number): Pro
   })
 }
 
-export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start: number, end: number): Promise<Receipt[]> {
-  let receipts: any[]
+export async function queryReceiptsBetweenCycles(
+  skip = 0,
+  limit = 10,
+  start: number,
+  end: number
+): Promise<Receipt[]> {
+  let receipts: DbReceipt[]
   try {
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql, [start, end])
-      receipts.forEach((receipt: any) => {
+    receipts.forEach((receipt: DbReceipt) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)

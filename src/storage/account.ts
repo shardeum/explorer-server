@@ -1,14 +1,10 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import {
-  AccountType,
-  AccountSearchType,
-  WrappedEVMAccount,
-  TransactionType,
-} from '../@type'
+import { AccountType, AccountSearchType, WrappedEVMAccount, TransactionType } from '../@type'
 import { bufferToHex } from 'ethereumjs-util'
 import { getContractInfo } from '../class/TxDecoder'
+import { ArchivedCycle } from './archivedCycle'
 
 export interface Account {
   accountId: string
@@ -17,9 +13,14 @@ export interface Account {
   ethAddress: string
   account: WrappedEVMAccount
   hash: string
-  accountType: AccountType.Account
+  accountType: AccountType
   contractType?: ContractType
-  contractInfo?: any
+  contractInfo?: unknown
+}
+
+type DbAccount = Account & {
+  account: string
+  contractInfo: string
 }
 
 export interface Token {
@@ -117,7 +118,7 @@ export async function bulkInsertTokens(tokens: Token[]): Promise<void> {
   }
 }
 
-export async function insertOrUpdateAccount(archivedCycle: any): Promise<void> {
+export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promise<void> {
   const skipTxs: string[] = []
   if (!archivedCycle.receipt) {
     if (config.verbose) console.log('No Receipt')
@@ -138,14 +139,16 @@ export async function insertOrUpdateAccount(archivedCycle: any): Promise<void> {
         )
         continue
       }
-      const accountData = archivedCycle.receipt.partitionTxs[partition][txId].filter((acc: any) => {
+      const accountData = archivedCycle.receipt.partitionTxs[partition][txId].filter(
+        (acc?: { data?: { accountType: AccountType } }) => {
         return (
           acc?.data?.accountType === AccountType.Account ||
           acc?.data?.accountType === AccountType.NetworkAccount ||
           acc?.data?.accountType === AccountType.NodeAccount ||
           acc?.data?.accountType === AccountType.NodeAccount2
         )
-      })
+        }
+      )
       let account: Account
       if (accountData.length > 0) {
         if (config.verbose) console.log('accountData', txId, accountData)
@@ -155,7 +158,7 @@ export async function insertOrUpdateAccount(archivedCycle: any): Promise<void> {
 
       for (let i = 0; i < accountData.length; i++) {
         account = accountData[i].data
-        let accObj: any
+        let accObj: Account
         if (account.accountType === AccountType.Account) {
           accObj = {
             accountId: accountData[i].accountId,
@@ -171,12 +174,12 @@ export async function insertOrUpdateAccount(archivedCycle: any): Promise<void> {
             accountId: accountData[i].accountId,
             cycle: archivedCycle.cycleRecord.counter,
             timestamp: account.timestamp,
-            account: account,
+            account: account as unknown as WrappedEVMAccount,
             hash: account.hash,
             accountType: account.accountType,
           }
         }
-        const accountExist: any = await queryAccountByAddress(accObj.accountId)
+        const accountExist: Account = await queryAccountByAddress(accObj.accountId)
         if (config.verbose) console.log('accountExist', accountExist)
         if (!accountExist) {
           await insertAccount(accObj)
@@ -233,7 +236,7 @@ export async function queryAccountCount(type = undefined) {
 }
 
 export async function queryAccounts(skip = 0, limit = 10, type = undefined): Promise<Account[]> {
-  let accounts: any[]
+  let accounts: DbAccount[]
   try {
     if (type || type === AccountSearchType.All) {
       if (type === AccountSearchType.All) {
@@ -277,7 +280,7 @@ export async function queryAccounts(skip = 0, limit = 10, type = undefined): Pro
 export async function queryAccountByAccountId(accountId: string): Promise<Account | null> {
   try {
     const sql = `SELECT * FROM accounts WHERE accountId=?`
-    const account: any = await db.get(sql, [accountId])
+    const account: DbAccount = await db.get(sql, [accountId])
     if (account) account.account = JSON.parse(account.account)
     if (account && account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
     if (config.verbose) console.log('Account accountId', account)
@@ -291,7 +294,7 @@ export async function queryAccountByAccountId(accountId: string): Promise<Accoun
 export async function queryAccountByAddress(address: string, accountType = AccountType.Account): Promise<Account | null> {
   try {
     const sql = `SELECT * FROM accounts WHERE accountType=? AND ethAddress=? ORDER BY accountType ASC LIMIT 1`
-    const account: any = await db.get(sql, [accountType, address])
+    const account: DbAccount = await db.get(sql, [accountType, address])
     if (account) account.account = JSON.parse(account.account)
     if (account && account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
     if (config.verbose) console.log('Account Address', account)
@@ -302,7 +305,10 @@ export async function queryAccountByAddress(address: string, accountType = Accou
   return null
 }
 
-export async function queryAccountCountBetweenCycles(startCycleNumber: number, endCycleNumber: number): Promise<number> {
+export async function queryAccountCountBetweenCycles(
+  startCycleNumber: number,
+  endCycleNumber: number
+): Promise<number> {
   let accounts: { 'COUNT(*)': number }
   try {
     const sql = `SELECT COUNT(*) FROM accounts WHERE cycle BETWEEN ? AND ?`
@@ -321,14 +327,14 @@ export async function queryAccountsBetweenCycles(
   limit = 10000,
   startCycleNumber: number,
   endCycleNumber: number
-) {
-  let accounts: unknown[]
+): Promise<Account[]> {
+  let accounts: DbAccount[]
   try {
     const sql = `SELECT * FROM accounts WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     accounts = await db.all(sql, [startCycleNumber, endCycleNumber])
-    accounts.forEach((account: any) => {
-      if (account.account) account.account = JSON.parse(account.account)
-      if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+    accounts.forEach((account: DbAccount) => {
+      if (account.account) (account as Account).account = JSON.parse(account.account) as WrappedEVMAccount
+      if (account.contractInfo) (account as Account).contractInfo = JSON.parse(account.contractInfo)
     })
   } catch (e) {
     console.log(e)
@@ -408,7 +414,19 @@ export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: s
   return tokens
 }
 
-export async function processAccountData(accounts: any): Promise<Account[] | null> {
+type RawAccount = {
+  accountId: string
+  cycleNumber: number
+  data: {
+    accountType: AccountType
+    ethAddress: string
+    account: WrappedEVMAccount
+  }
+  timestamp: number
+  hash: string
+}
+
+export async function processAccountData(accounts: RawAccount[]): Promise<Account[] | null> {
   console.log('accounts size', accounts.length)
   if (accounts && accounts.length <= 0) return
   const bucketSize = 1000
@@ -437,7 +455,10 @@ export async function processAccountData(accounts: any): Promise<Account[] | nul
         cycle: account.cycleNumber,
         timestamp: account.timestamp,
         ethAddress: account.data.ethAddress.toLowerCase(),
-        account: accountType === AccountType.Account ? account.data.account : account.data,
+        account:
+          accountType === AccountType.Account
+            ? account.data.account
+            : (account.data as unknown as WrappedEVMAccount),
         hash: account.hash,
         accountType: account.data.accountType,
       }
@@ -460,7 +481,7 @@ export async function processAccountData(accounts: any): Promise<Account[] | nul
         cycle: account.cycleNumber,
         timestamp: account.timestamp,
         ethAddress: account.accountId, // Adding accountId as ethAddess for these account types for now; since we need ethAddress for mysql index
-        account: account.data,
+        account: account.data as unknown as WrappedEVMAccount,
         hash: account.hash,
         accountType: account.data.accountType,
       }

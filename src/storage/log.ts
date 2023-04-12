@@ -9,7 +9,7 @@ export interface Log {
   txHash: string
   blockNumber: string
   contractAddress: number
-  log: any
+  log: unknown
   topic0: string
   topic1?: string
   topic2?: string
@@ -54,19 +54,19 @@ export async function bulkInsertLogs(logs: Log[]) {
 }
 
 export async function queryLogCount(
-  startCycle = undefined,
-  endCycle = undefined,
+  startCycle = 0,
+  endCycle = 0,
   type = undefined,
-  contractAddress = undefined,
-  topic0 = undefined,
-  topic1 = undefined,
-  topic2 = undefined,
-  topic3 = undefined
+  contractAddress?: string,
+  topic0?: string,
+  topic1?: string,
+  topic2?: string,
+  topic3?: string
 ) {
   let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number }
   try {
     let sql = 'SELECT COUNT(txHash) FROM logs '
-    let inputs = []
+    let inputs: (string | number)[] = []
     if (type === 'txs') sql = 'SELECT COUNT(DISTINCT(txHash)) FROM logs '
     if (contractAddress && topic0 && topic1 && topic2 && topic3) {
       sql += `WHERE contractAddress=? AND topic0=? AND topic1=? AND topic2=? AND topic3=?`
@@ -117,19 +117,19 @@ export async function queryLogCount(
 export async function queryLogs(
   skip = 0,
   limit = 10,
-  startCycle = undefined,
-  endCycle = undefined,
+  startCycle = 0,
+  endCycle = 0,
   type = undefined,
-  contractAddress = undefined,
-  topic0 = undefined,
-  topic1 = undefined,
-  topic2 = undefined,
-  topic3 = undefined
+  contractAddress?: string,
+  topic0?: string,
+  topic1?: string,
+  topic2?: string,
+  topic3?: string
 ) {
   let logs: Log[]
   try {
     let sql = 'SELECT * FROM logs '
-    let inputs = []
+    let inputs: (string | number)[] = []
     let sqlQueryExtension = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     if (type === 'txs') {
       sqlQueryExtension = ` GROUP BY txHash` + sqlQueryExtension

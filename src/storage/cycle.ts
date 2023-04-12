@@ -4,12 +4,18 @@ import { config } from '../config/index'
 import { P2P, StateManager } from '@shardus/types'
 import { checkIfAnyReceiptsMissing } from '../class/DataSync'
 
-export let Collection: any
+export let Collection: unknown
 
 export interface Cycle {
   counter: number
   cycleRecord: P2P.CycleCreatorTypes.CycleRecord
   cycleMarker: StateManager.StateMetaDataTypes.CycleMarker
+}
+
+export interface DbCycle {
+  counter: number
+  cycleRecord: string
+  cycleMarker: string
 }
 
 export function isCycle(obj: Cycle): obj is Cycle {
@@ -91,9 +97,9 @@ export async function insertOrUpdateCycle(cycle: Cycle) {
 export async function queryLatestCycleRecords(count: number) {
   try {
     const sql = `SELECT * FROM cycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
-    const cycleRecords: any = await db.all(sql)
+    const cycleRecords: DbCycle[] = await db.all(sql)
     if (cycleRecords.length > 0) {
-      cycleRecords.forEach((cycleRecord: any) => {
+      cycleRecords.forEach((cycleRecord: DbCycle) => {
         if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
       })
     }
@@ -107,9 +113,9 @@ export async function queryLatestCycleRecords(count: number) {
 export async function queryCycleRecordsBetween(start: number, end: number): Promise<Cycle[]> {
   try {
     const sql = `SELECT * FROM cycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC`
-    const cycles: any = await db.all(sql, [start, end])
+    const cycles: DbCycle[] = await db.all(sql, [start, end])
     if (cycles.length > 0) {
-      cycles.forEach((cycleRecord: any) => {
+      cycles.forEach((cycleRecord: DbCycle) => {
         if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
       })
     }
@@ -123,7 +129,7 @@ export async function queryCycleRecordsBetween(start: number, end: number): Prom
 export async function queryCycleByMarker(marker: string) {
   try {
     const sql = `SELECT * FROM cycles WHERE cycleMarker=? LIMIT 1`
-    const cycleRecord: any = await db.get(sql, [marker])
+    const cycleRecord: DbCycle = await db.get(sql, [marker])
     if (cycleRecord) {
       if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
     }
@@ -137,7 +143,7 @@ export async function queryCycleByMarker(marker: string) {
 export async function queryCycleByCounter(counter: number) {
   try {
     const sql = `SELECT * FROM cycles WHERE counter=? LIMIT 1`
-    const cycleRecord: any = await db.get(sql, [counter])
+    const cycleRecord: DbCycle = await db.get(sql, [counter])
     if (cycleRecord) {
       if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
     }
