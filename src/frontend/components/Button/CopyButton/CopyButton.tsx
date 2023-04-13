@@ -14,7 +14,7 @@ interface CopyButtonProps {
 export const CopyButton: React.FC<CopyButtonProps> = ({ title, text, className }) => {
   const [isCopied, setIsCopied] = useState<boolean>(false)
 
-  const onCopy = () => {
+  const onCopy = (): void => {
     setIsCopied(true)
 
     setTimeout(() => {

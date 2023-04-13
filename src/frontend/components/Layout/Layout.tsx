@@ -14,7 +14,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [showUpButton, setShowUpButton] = useState<boolean>(false)
 
   useEffect(() => {
-    const handleScrollButtonVisibility = () => {
+    const handleScrollButtonVisibility = (): void => {
       setShowUpButton(window.pageYOffset > 300 ? true : false)
     }
     window.addEventListener('scroll', handleScrollButtonVisibility)
@@ -24,7 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }, [])
 
-  const scrollToTop = () => {
+  const scrollToTop = (): void => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',

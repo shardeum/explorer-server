@@ -19,7 +19,7 @@ interface OvewviewProps {
 }
 
 export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
-  const renderErc20Tokens = () => {
+  const renderErc20Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
     // TODO: have to fix TransactionType enum
@@ -61,7 +61,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     }
   }
 
-  const renderErc721Tokens = () => {
+  const renderErc721Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
     // TODO: have to fix TransactionType enum
@@ -83,7 +83,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     }
   }
 
-  const renderErc1155Tokens = () => {
+  const renderErc1155Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
     // TODO: have to fix TransactionType enum

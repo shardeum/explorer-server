@@ -18,14 +18,14 @@ const tempHeader = [
   {
     key: 'txHash',
     value: 'Txn Hash',
-    render: (val: unknown) => (
+    render: (val: unknown): JSX.Element => (
       <AnchorLink href={`/transaction/${val}`} label={val as string} size="small" ellipsis width={150} />
     ),
   },
   {
     key: 'method',
     value: 'Method',
-    render: (_: unknown, item: any) => <Chip title={showTxMethod(item)} color={item?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'} size="medium" />,
+    render: (_: unknown, item: any): JSX.Element => <Chip title={showTxMethod(item)} color={item?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'} size="medium" />,
   },
   {
     key: 'cycle',
@@ -34,7 +34,7 @@ const tempHeader = [
   {
     key: 'timestamp',
     value: 'Timestamp',
-    render: (val: unknown) => moment(val as string).fromNow(),
+    render: (val: unknown): JSX.Element => moment(val as string).fromNow(),
   },
 ]
 
@@ -221,7 +221,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'contractAddress',
           value: 'Token',
-          render: (val: unknown, item: any) => {
+          render: (val: unknown, item: any): JSX.Element => {
             return item?.contractInfo?.name ? (
               item?.contractInfo?.name
             ) : (

@@ -30,13 +30,13 @@ export const Transaction: React.FC = () => {
     txType: transactionType.key,
   })
 
-  const onNext = () => {
+  const onNext = (): void => {
     const totalPage = Math.ceil(totalTransactions / 10)
 
     setCurrentPage(currentPage < totalPage ? currentPage + 1 : totalPage)
   }
 
-  const onPrev = () => {
+  const onPrev = (): void => {
     setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)
   }
 

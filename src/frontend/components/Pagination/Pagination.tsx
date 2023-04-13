@@ -29,15 +29,15 @@ export const Pagination: React.FC<PaginationProps> = (props) => {
     return null
   }
 
-  const onNext = () => {
+  const onNext = (): void => {
     onPageChange(currentPage + 1)
   }
 
-  const onPrevious = () => {
+  const onPrevious = (): void => {
     onPageChange(currentPage - 1)
   }
 
-  const onChnagePage = (page: number | string) => {
+  const onChnagePage = (page: number | string): void => {
     if (typeof page === 'string') onPageChange(parseInt(page, 2))
     else onPageChange(page)
   }

@@ -30,7 +30,7 @@ export const ContentLayout: React.FC<ContentLayoutProps> = ({
 }) => {
   const router = useRouter()
 
-  const goBack = () => router.back()
+  const goBack = (): void => router.back()
 
   return (
     <div className={cx(styles.ContentLayout, className)}>

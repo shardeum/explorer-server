@@ -137,11 +137,11 @@ export const AccountDetail: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState(tabs[0].key)
 
-  const onNext = () => {
+  const onNext = (): void => {
     setPage(page < totalPages ? page + 1 : totalPages)
   }
 
-  const onPrev = () => {
+  const onPrev = (): void => {
     setPage(page > 1 ? page - 1 : 1)
   }
 

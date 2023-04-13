@@ -16,8 +16,8 @@ export const Header: React.FC<HeaderProps> = ({}) => {
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
 
-  const open = () => setIsMenuOpen(true)
-  const close = () => setIsMenuOpen(false)
+  const open = (): void => setIsMenuOpen(true)
+  const close = (): void => setIsMenuOpen(false)
 
   const navLinks = [
     { key: '/', value: 'Home' },
@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({}) => {
     // { key: "/singin", value: "Sign In" },
   ]
 
-  const renderMenuButton = () => {
+  const renderMenuButton = (): JSX.Element => {
     if (isTablet || isMobile) {
       return (
         <Menu

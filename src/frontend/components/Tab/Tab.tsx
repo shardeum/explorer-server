@@ -19,7 +19,7 @@ interface Tab {
 export const Tab: React.FC<TabProps> = (props) => {
   const { tabs, activeTab, onClick, className } = props
 
-  const renderHeaders = () => {
+  const renderHeaders = (): JSX.Element => {
     return tabs.map((tab, index) => (
       <button
         key={index}
@@ -31,7 +31,7 @@ export const Tab: React.FC<TabProps> = (props) => {
     ))
   }
 
-  const renderContent = () => {
+  const renderContent = (): JSX.Element => {
     return tabs.map((tab) => (tab.key === activeTab ? <div key={tab.key}>{tab.content}</div> : ''))
   }
 

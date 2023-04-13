@@ -41,7 +41,7 @@ export const TopBarDropdown: React.FC<TopBarDropdownProps> = (props) => {
     else open()
   }, [isMenuOpen, close, open])
 
-  const handleSelect = (item: Option) => {
+  const handleSelect = (item: Option): void => {
     close()
     onSelect?.(item)
   }

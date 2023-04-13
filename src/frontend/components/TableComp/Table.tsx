@@ -18,7 +18,7 @@ interface ITableBody<T> {
   row: any
 }
 
-export function Table<T>({ columns, data }: ITableProps<T>) {
+export function Table<T>({ columns, data }: ITableProps<T>): JSX.Element {
   return (
     <div className={styles.Table}>
       <table>
@@ -43,11 +43,11 @@ export function Table<T>({ columns, data }: ITableProps<T>) {
   )
 }
 
-export function TableHeaderItem({ value }: { value: string | any }) {
+export function TableHeaderItem({ value }: { value: string | any }): JSX.Element {
   return <th>{typeof value === 'string' ? <span>{value}</span> : value}</th>
 }
 
-export function TableBodyItem<T>({ col, row }: ITableBody<T>) {
+export function TableBodyItem<T>({ col, row }: ITableBody<T>): JSX.Element {
   const value = get(row, col.key)
 
   return (

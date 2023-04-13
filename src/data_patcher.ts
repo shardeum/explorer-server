@@ -22,7 +22,7 @@ if (cycleNumberToSyncFrom) {
 console.log('Start Cycle', startCycle)
 
 // Setup Log Directory
-const start = async () => {
+const start = async (): Promise<void> => {
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
 

@@ -31,10 +31,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const open = () => setIsFilterOpen(true)
-  const close = () => setIsFilterOpen(false)
+  const open = (): void => setIsFilterOpen(true)
+  const close = (): void => setIsFilterOpen(false)
 
-  const onPress = (d: string) => {
+  const onPress = (d: string): void => {
     onSelect?.(d)
     close()
   }

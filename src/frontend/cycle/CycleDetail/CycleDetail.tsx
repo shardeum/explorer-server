@@ -17,12 +17,12 @@ export const CycleDetail: React.FC = () => {
 
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.cycle]
 
-  const onPrev = () => {
+  const onPrev = (): void => {
     router.query.id = String(Number(id) - 1)
     router.push(router)
   }
 
-  const onNext = () => {
+  const onNext = (): void => {
     router.query.id = String(Number(id) + 1)
     router.push(router)
   }

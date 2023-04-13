@@ -3,7 +3,7 @@ import Script from 'next/script'
 import { config } from './../config/index'
 
 export default class MyDocument extends Document {
-  render() {
+  render(): JSX.Element {
     return (
       <Html>
         <Head>

@@ -6,7 +6,7 @@ import { fetcher } from '../frontend/api'
 
 import { Layout } from '../frontend/components'
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <SWRConfig
       value={{

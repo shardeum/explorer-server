@@ -18,13 +18,13 @@ export function NavDropdown<T>({
   label,
   selected,
   onSelect,
-}: React.PropsWithChildren<INavDropdown<T>>) {
+}: React.PropsWithChildren<INavDropdown<T>>): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
 
   const open = useCallback(() => setIsOpen(true), [])
-  const close = () => setIsOpen(false)
+  const close = (): void => setIsOpen(false)
 
-  const handleSelect = (d: string) => {
+  const handleSelect = (d: string): void => {
     close()
     onSelect?.(d)
   }

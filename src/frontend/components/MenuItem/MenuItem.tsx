@@ -23,7 +23,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   onClick,
   className,
 }) => {
-  const content = () => {
+  const content = (): JSX.Element => {
     if (type === 'checkbox') {
       return (
         <>
