@@ -6,11 +6,13 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 export interface ValidatorStats {
   cycle: number
   active: number
+  syncing: number
+  joined: number
   timestamp: number
 }
 
 export function isValidatorStats(obj: ValidatorStats): obj is ValidatorStats {
-  return obj.cycle && obj.active && obj.timestamp ? true : false
+  return obj.cycle && obj.active && obj.timestamp && obj.syncing && obj.joined? true : false
 }
 
 export async function insertValidatorStats(validator: ValidatorStats) {

@@ -99,6 +99,7 @@ const start = async () => {
   await server.register(fastifyRateLimit, {
     max: CONFIG.rateLimit,
     timeWindow: '1 minute',
+    allowList: ['127.0.0.1', 'localhost'],
   })
   server
     .register(fastifyNextjs, {
@@ -1180,7 +1181,9 @@ const start = async () => {
     }
     if (query.responseType && query.responseType === 'array') {
       let temp_array = []
-      validatorStats.forEach((item) => temp_array.push([item.timestamp * 1000, item.active, item.cycle]))
+      validatorStats.forEach((item) =>
+        temp_array.push([item.timestamp * 1000, item.active, item.syncing, item.joined, item.cycle])
+      )
       validatorStats = temp_array
     }
     const res = {
