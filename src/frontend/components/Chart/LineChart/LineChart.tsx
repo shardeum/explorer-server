@@ -21,6 +21,14 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
   const router = useRouter()
 
   const { title, centerTitle, subTitle, data, height = 300, name } = props
+  // let activeAndSyncing
+
+  // if (data.length === 0) return <></>
+  // if (data) {
+  //   activeAndSyncing = data.map((d) => {
+  //     return [d[0], d[1] + d[2], d[2], d[3], d[4]]
+  //   })
+  // }
 
   const option = {
     title: {
@@ -43,6 +51,11 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
         name: name,
         data: data,
       },
+      // {
+      //   name: 'activeAndSyncing',
+      //   lineWidth: 0.5,
+      //   data: activeAndSyncing,
+      // },
     ],
     legend: {
       enabled: false,
@@ -61,6 +74,8 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
       zoomEnabled: true,
     },
     tooltip: {
+      // crosshairs: true,
+      // shared: true,
       // @ts-ignore
       formatter:
         name === 'Validators'
@@ -69,17 +84,19 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
               const timestamp = this?.x
 
               // @ts-ignore
-              const data = this?.series?.options?.data
+              // const data = this?.series?.options?.data
 
               // @ts-ignore
-              const item = data?.filter((d) => d[0] === this?.x)
+              const item = data?.findIndex((d) => d[0] === timestamp)
               return `<span><b>${Highcharts.dateFormat(
                 '%A, %B %d, %Y',
                 //@ts-ignore
                 new Date(timestamp)
               )}</b></span><br /><br />
-      <span>Active Validators: <b>${item[0][1]}</b></span><br />
-      <span>Cycle Number: <b>${item[0][2]}</b></span>`
+      <span>Active Validators: <b>${data[item][1]}</b></span><br />
+      <span>Syncing Validators: <b>${data[item][2]}</b></span><br />
+      <span>Joined Validators: <b>${data[item][3]}</b></span><br />
+      <span>Cycle Number: <b>${data[item][4]}</b></span>`
             }
           : function () {
               // @ts-ignore

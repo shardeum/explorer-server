@@ -19,6 +19,45 @@ interface LineStockChartProps {
 export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
   const { title, centerTitle, subTitle, data, height = 300, name } = props
 
+  let activeAndSyncing = []
+
+  let seriesData: any = []
+
+  if (data.length === 0) return <></>
+  if (data) {
+    if (name === 'Validators') {
+      activeAndSyncing = data.map((d) => {
+        return [d[0], d[1] + d[2], d[2], d[3], d[4]]
+      })
+      seriesData.push({
+        name: 'Active & Syncing Validators',
+        keys:
+          name === 'Validators'
+            ? ['x', 'y', 'syncing', 'joined', 'cycleNumber']
+            : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
+        data: activeAndSyncing,
+        // type: 'line',
+        threshold: null,
+        dataGrouping: {
+          enabled: false,
+        },
+      })
+    }
+    seriesData.push({
+      name: name === 'Validators' ? 'Active Validators' : 'Total Txs',
+      keys:
+        name === 'Validators'
+          ? ['x', 'y', 'syncing', 'joined', 'cycleNumber']
+          : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
+      data: data,
+      // type: 'line',
+      threshold: null,
+      dataGrouping: {
+        enabled: false,
+      },
+    })
+  }
+
   const option = {
     title: {
       text: title,
@@ -35,24 +74,13 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
         fontSize: '12px',
       },
     },
-    series: [
-      {
-        name: name,
-        keys:
-          name === 'Validators'
-            ? ['x', 'y', 'cycleNumber']
-            : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
-        data: data,
-        type: 'line',
-        threshold: null,
-        dataGrouping: {
-          enabled: false,
-        },
-      },
-    ],
-    // legend: {
-    //   enabled: false,
-    // },
+    series: seriesData,
+    legend: {
+      enabled: true,
+      layout: 'horizontal',
+      align: 'center',
+      verticalAlign: 'bottom',
+    },
     xAxis: {
       type: 'datetime',
       gridLineWidth: 0,
@@ -70,52 +98,57 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
     tooltip: {
       pointFormat:
         name === 'Validators'
-          ? '<span>Validator: <b>{point.y}</b></span><br/><br /><span>Cycle Number <b>{point.cycleNumber}</b></span>'
+          ? `<span>Active Validators: <b>{point.y}</b></span><br/>
+          <span>Syncing Validators: <b>{point.syncing}</b></span><br/>
+          <span>Joined Validators: <b>{point.joined}</b></span><br/>
+          <span>Cycle Number <b>{point.cycleNumber}</b></span>`
           : `<span>Total Txs: <b>{point.y}</b></span><br />
-        <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
-        <span>Total UnstakeTxs: <b>{point.totalUnstakeTxs}</b></span><br />
-        <span>Cycle Number: <b>{point.cycleNumber}</b></span><br />`,
+      <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
+      <span>Total UnstakeTxs: <b>{point.totalUnstakeTxs}</b></span><br />
+      <span>Cycle Number: <b>{point.cycleNumber}</b></span><br />`,
       // @ts-ignore
-      // formatter:
-      //   name === "Validators"
-      //     ? function () {
-      //         // @ts-ignore
-      //         const timestamp = this?.x;
+      formatter:
+        name === 'Validators'
+          ? function () {
+              // @ts-ignore
+              const timestamp = this?.x
 
-      //         // @ts-ignore
-      //         const data = this?.series?.options?.data;
+              // @ts-ignore
+              // const data = this?.series?.options?.data
 
-      //         // @ts-ignore
-      //         const item = data?.filter((d) => d[0] === this?.x);
-      //         if (item)
-      //           return `<span><b>${Highcharts.dateFormat(
-      //             "%A, %B %d, %Y",
-      //             //@ts-ignore
-      //             new Date(timestamp)
-      //           )}</b></span><br /><br />
-      // <span>Active Validators: <b>${item[0][1]}</b></span><br />
-      // <span>Cycle Number: <b>${item[0][2]}</b></span>`;
-      //       }
-      //     : function () {
-      //         // @ts-ignore
-      //         const timestamp = this?.x;
+              // @ts-ignore
+              const item = data?.filter((d) => d[0] === this?.x)
+              if (item)
+                return `<span><b>${Highcharts.dateFormat(
+                  '%A, %B %d, %Y',
+                  //@ts-ignore
+                  new Date(timestamp)
+                )}</b></span><br /><br />
+      <span>Active Validators: <b>${item[0][1]}</b></span><br />
+      <span>Syncing Validators: <b>${item[0][2]}</b></span><br/>
+      <span>Joined Validators: <b>${item[0][3]}</b></span><br/>
+      <span>Cycle Number: <b>${item[0][4]}</b></span>`
+            }
+          : function () {
+              // @ts-ignore
+              const timestamp = this?.x
 
-      //         // @ts-ignore
-      //         const data = this?.series?.options?.data;
+              // @ts-ignore
+              const data = this?.series?.options?.data
 
-      //         // @ts-ignore
-      //         const item = data?.filter((d) => d[0] === this?.x);
-      //         if (item)
-      //           return `<span><b>${Highcharts.dateFormat(
-      //             "%A, %B %d, %Y",
-      //             //@ts-ignore
-      //             new Date(timestamp)
-      //           )}</b></span><br /><br />
-      //   <span>Total Txs: <b>${item[0][1]}</b></span><br />
-      //   <span>Total Stake Txs: <b>${item[0][2]}</b></span><br />
-      //   <span>Total Unstake Txs: <b>${item[0][3]}</b></span><br />
-      //   <span>Cycle Number: <b>${item[0][4]}</b></span>`;
-      //       },
+              // @ts-ignore
+              const item = data?.filter((d) => d[0] === this?.x)
+              if (item)
+                return `<span><b>${Highcharts.dateFormat(
+                  '%A, %B %d, %Y',
+                  //@ts-ignore
+                  new Date(timestamp)
+                )}</b></span><br /><br />
+        <span>Total Txs: <b>${item[0][1]}</b></span><br />
+        <span>Total Stake Txs: <b>${item[0][2]}</b></span><br />
+        <span>Total Unstake Txs: <b>${item[0][3]}</b></span><br />
+        <span>Cycle Number: <b>${item[0][4]}</b></span>`
+            },
       split: true,
       borderColor: '#e9ecef',
       borderRadius: 4,
@@ -128,6 +161,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       spacingTop: 20,
       height: height,
       zoomType: 'x',
+      type: 'spline',
     },
     credits: {
       enabled: false,
