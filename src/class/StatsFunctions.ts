@@ -11,8 +11,11 @@ export const insertValidatorStats = async (cycleRecord) => {
   const validatorsInfo: ValidatorStats.ValidatorStats = {
     cycle: cycleRecord.counter,
     active: cycleRecord.active,
+    activated: cycleRecord.activated.length,
     syncing: cycleRecord.syncing,
     joined: cycleRecord.joinedConsensors.length,
+    removed: cycleRecord.removed.length,
+    apoped: cycleRecord.apoptosized.length,
     timestamp: cycleRecord.start,
   }
   await ValidatorStats.insertValidatorStats(validatorsInfo)
@@ -31,8 +34,11 @@ export const recordOldValidatorsStats = async (latestCycle: number, lastStoredCy
         combineValidatorsStats.push({
           cycle: cycles[j].counter,
           active: cycles[j].cycleRecord.active,
+          activated: cycles[j].cycleRecord.activated.length,
           syncing: cycles[j].cycleRecord.syncing,
           joined: cycles[j].cycleRecord.joinedConsensors.length,
+          removed: cycles[j].cycleRecord.removed.length,
+          apoped: cycles[j].cycleRecord.apoptosized.length,
           timestamp: cycles[j].cycleRecord.start,
         })
       }

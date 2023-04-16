@@ -3,7 +3,7 @@ import * as db from './sqlite3storage'
 export const initializeStatsDB = async () => {
   await db.init()
   await db.runCreate(
-    'CREATE TABLE if not exists `validators` (`cycle` NUMBER NOT NULL UNIQUE PRIMARY KEY, `active` NUMBER NOT NULL, `syncing` NUMBER NOT NULL, `joined` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL)'
+    'CREATE TABLE if not exists `validators` (`cycle` NUMBER NOT NULL UNIQUE PRIMARY KEY, `active` NUMBER NOT NULL, `activated` NUMBER NOT NULL, `syncing` NUMBER NOT NULL, `joined` NUMBER NOT NULL, `removed` NUMBER NOT NULL, `apoped` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL)'
   )
   // await db.runCreate('Drop INDEX if exists `validators_idx`');
   await db.runCreate('CREATE INDEX if not exists `validators_idx` ON `validators` (`timestamp` DESC)')

@@ -25,29 +25,11 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
 
   if (data.length === 0) return <></>
   if (data) {
-    if (name === 'Validators') {
-      activeAndSyncing = data.map((d) => {
-        return [d[0], d[1] + d[2], d[2], d[3], d[4]]
-      })
-      seriesData.push({
-        name: 'Active & Syncing Validators',
-        keys:
-          name === 'Validators'
-            ? ['x', 'y', 'syncing', 'joined', 'cycleNumber']
-            : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
-        data: activeAndSyncing,
-        // type: 'line',
-        threshold: null,
-        dataGrouping: {
-          enabled: false,
-        },
-      })
-    }
     seriesData.push({
       name: name === 'Validators' ? 'Active Validators' : 'Total Txs',
       keys:
         name === 'Validators'
-          ? ['x', 'y', 'syncing', 'joined', 'cycleNumber']
+          ? ['x', 'y', 'activated', 'syncing', 'joined', 'removed', 'apoped', 'cycleNumber']
           : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
       data: data,
       // type: 'line',
@@ -56,6 +38,26 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
         enabled: false,
       },
     })
+    if (name === 'Validators') {
+      activeAndSyncing = data.map((d) => {
+        return [d[0], d[1] + d[3], d[2], d[3], d[4], d[5], d[6], d[7]]
+      })
+      seriesData.push({
+        name: 'Active & Syncing Validators',
+        keys:
+          name === 'Validators'
+            ? ['x', 'y', 'activated', 'syncing', 'joined', 'removed', 'apoped', 'cycleNumber']
+            : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
+        data: activeAndSyncing,
+        // type: 'line',
+        threshold: null,
+        dataGrouping: {
+          enabled: false,
+        },
+        color: 'teal',
+        visible: false,
+      })
+    }
   }
 
   const option = {
@@ -99,8 +101,11 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       pointFormat:
         name === 'Validators'
           ? `<span>Active Validators: <b>{point.y}</b></span><br/>
+          <span>Activated Validators: <b>{point.activated}</b></span><br/>
           <span>Syncing Validators: <b>{point.syncing}</b></span><br/>
           <span>Joined Validators: <b>{point.joined}</b></span><br/>
+          <span>Removed Validators: <b>{point.removed}</b></span><br/>
+          <span>Apoptosized Validators: <b>{point.apoped}</b></span><br/>
           <span>Cycle Number <b>{point.cycleNumber}</b></span>`
           : `<span>Total Txs: <b>{point.y}</b></span><br />
       <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
@@ -125,16 +130,19 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
                   new Date(timestamp)
                 )}</b></span><br /><br />
       <span>Active Validators: <b>${item[0][1]}</b></span><br />
-      <span>Syncing Validators: <b>${item[0][2]}</b></span><br/>
-      <span>Joined Validators: <b>${item[0][3]}</b></span><br/>
-      <span>Cycle Number: <b>${item[0][4]}</b></span>`
+      <span>Activated Validators: <b>${item[0][2]}</b></span><br />
+      <span>Syncing Validators: <b>${item[0][3]}</b></span><br/>
+      <span>Joined Validators: <b>${item[0][4]}</b></span><br/>
+      <span>Removed Validators: <b>${item[0][5]}</b></span><br/>
+      <span>Apoptosized Validators: <b>${item[0][6]}</b></span><br/>
+      <span>Cycle Number: <b>${item[0][7]}</b></span>`
             }
           : function () {
               // @ts-ignore
               const timestamp = this?.x
 
               // @ts-ignore
-              const data = this?.series?.options?.data
+              // const data = this?.series?.options?.data
 
               // @ts-ignore
               const item = data?.filter((d) => d[0] === this?.x)

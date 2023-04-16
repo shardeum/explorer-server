@@ -1182,7 +1182,16 @@ const start = async () => {
     if (query.responseType && query.responseType === 'array') {
       let temp_array = []
       validatorStats.forEach((item) =>
-        temp_array.push([item.timestamp * 1000, item.active, item.syncing, item.joined, item.cycle])
+        temp_array.push([
+          item.timestamp * 1000,
+          item.active,
+          item.activated,
+          item.syncing,
+          item.joined,
+          item.removed,
+          item.apoped,
+          item.cycle,
+        ])
       )
       validatorStats = temp_array
     }
