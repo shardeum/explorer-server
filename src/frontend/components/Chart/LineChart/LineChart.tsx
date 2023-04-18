@@ -94,9 +94,12 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
                 new Date(timestamp)
               )}</b></span><br /><br />
       <span>Active Validators: <b>${data[item][1]}</b></span><br />
-      <span>Syncing Validators: <b>${data[item][2]}</b></span><br />
-      <span>Joined Validators: <b>${data[item][3]}</b></span><br />
-      <span>Cycle Number: <b>${data[item][4]}</b></span>`
+      <span>Activated Validators: <b>${data[item][2]}</b></span><br />
+      <span>Syncing Validators: <b>${data[item][3]}</b></span><br />
+      <span>Joined Validators: <b>${data[item][4]}</b></span><br />
+      <span>Removed Validators: <b>${data[item][5]}</b></span><br />
+      <span>Apoptosized Validators: <b>${data[item][6]}</b></span><br />
+      <span>Cycle Number: <b>${data[item][7]}</b></span>`
             }
           : function () {
               // @ts-ignore
