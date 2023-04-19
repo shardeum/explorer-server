@@ -76,6 +76,7 @@
     "web3": "^1.8.1"
   },
   "devDependencies": {
+    "@types/dotenv": "^8.2.0",
     "@types/lodash": "^4.14.191",
     "@types/node-cron": "^3.0.7",
     "@types/qs": "^6.9.7",
