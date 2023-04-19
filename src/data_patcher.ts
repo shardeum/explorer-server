@@ -15,7 +15,7 @@ import axios from 'axios'
 
 let startCycle = 0
 console.log(process.argv)
-let cycleNumberToSyncFrom = process.argv[2]
+const cycleNumberToSyncFrom = process.argv[2]
 if (cycleNumberToSyncFrom) {
   startCycle = parseInt(cycleNumberToSyncFrom)
 }
@@ -27,7 +27,7 @@ const start = async () => {
   await StatsStorage.initializeStatsDB()
 
   let totalCyclesToSync = 0
-  let response = await axios.get(`${ARCHIVER_URL}/totalData`)
+  const response = await axios.get(`${ARCHIVER_URL}/totalData`)
   if (response.data && response.data.totalReceipts >= 0 && response.data.totalCycles >= 0) {
     totalCyclesToSync = response.data.totalCycles
     console.log('totalCyclesToSync', totalCyclesToSync)
