@@ -32,7 +32,7 @@ export async function insertValidatorStats(validator: ValidatorStats) {
     const fields = Object.keys(validator).join(', ')
     const placeholders = Object.keys(validator).fill('?').join(', ')
     const values = extractValues(validator)
-    let sql = 'INSERT OR REPLACE INTO validators (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO validators (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     // if (config.verbose)
     console.log('Successfully inserted ValidatorStats', validator.cycle)
