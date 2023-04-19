@@ -61,7 +61,7 @@ export async function bulkInsertTransactionsStats(transactionsStats: Transaction
 export async function queryLatestTransactionStats(count) {
   try {
     const sql = `SELECT * FROM transactions ORDER BY cycle DESC LIMIT ${count ? count : 100}`
-    const transactionsStats: any = await db.all(sql)
+    const transactionsStats: TransactionStats[] = await db.all(sql)
     if (config.verbose) console.log('transactionStats count', transactionsStats)
     if (transactionsStats.length > 0) {
       transactionsStats.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
@@ -75,7 +75,7 @@ export async function queryLatestTransactionStats(count) {
 export async function queryTransactionStatsBetween(startCycle: number, endCycle: number) {
   try {
     const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC LIMIT 100`
-    const transactionsStats: any = await db.all(sql, [startCycle, endCycle])
+    const transactionsStats: TransactionStats[] = await db.all(sql, [startCycle, endCycle])
     if (config.verbose) console.log('transactionStats between', transactionsStats)
     if (transactionsStats.length > 0) {
       transactionsStats.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
