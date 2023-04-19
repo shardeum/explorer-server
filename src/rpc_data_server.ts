@@ -44,7 +44,7 @@ const start = async () => {
   })
 
   server.get('/api/tx/:hash', async (_request, reply) => {
-    const err = utils.validateTypes(_request.params, { hash: 's' })
+    const err = utils.validateTypes(_request.params as object, { hash: 's' })
     if (err) {
       reply.send({ success: false, error: err })
       return
