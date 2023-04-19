@@ -75,7 +75,7 @@ export function extractValues(object: CoinStats | ValidatorStats | TransactionSt
   }
 }
 
-export function extractValuesFromArray(arr: any): any {
+export function extractValuesFromArray(arr: object[]): string[] {
   try {
     const inputs = []
     for (const object of arr) {
