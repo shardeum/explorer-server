@@ -21,7 +21,7 @@ export async function insertTransactionStats(transactionStats: TransactionStats)
     const fields = Object.keys(transactionStats).join(', ')
     const placeholders = Object.keys(transactionStats).fill('?').join(', ')
     const values = extractValues(transactionStats)
-    let sql = 'INSERT OR REPLACE INTO transactions (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO transactions (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     // if (config.verbose)
     console.log('Successfully inserted TransactionStats', transactionStats.cycle)
