@@ -43,7 +43,7 @@ export async function bulkInsertCoinsStats(coinStats: CoinStats[]) {
 export async function queryLatestCoinStats(count?: number) {
   try {
     const sql = `SELECT * FROM coin_stats ORDER BY cycle DESC LIMIT ${count ? count : 100}`
-    const coinStats: any = await db.all(sql)
+    const coinStats: CoinStats[] = await db.all(sql)
     if (config.verbose) console.log('coinStats count', coinStats)
     return coinStats
   } catch (e) {
@@ -54,7 +54,10 @@ export async function queryLatestCoinStats(count?: number) {
 export async function queryAggregatedCoinStats() {
   try {
     const sql = `SELECT IFNULL(sum(totalSupplyChange), 0) as totalSupplyChange, IFNULL(sum(totalStakeChange), 0) as totalStakeChange FROM coin_stats`
-    const coinStats: any = await db.get(sql)
+    const coinStats: {
+      totalSupplyChange: number
+      totalStakeChange: number
+    } = await db.get(sql)
     if (config.verbose) console.log('aggregated coin stats', coinStats)
     return coinStats
   } catch (e) {
