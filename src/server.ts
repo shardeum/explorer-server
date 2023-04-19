@@ -117,7 +117,7 @@ const start = async () => {
   })
 
   server.get('/api/cycleinfo', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       to: 's?',
       from: 's?',
@@ -170,7 +170,7 @@ const start = async () => {
   })
 
   server.get('/api/account', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       page: 's?',
       address: 's?',
@@ -305,7 +305,7 @@ const start = async () => {
   })
 
   server.get('/api/address', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       address: 's?',
       accountType: 's?',
     })
@@ -352,7 +352,7 @@ const start = async () => {
   })
 
   server.get('/api/token', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       page: 's?',
       address: 's?',
       contractAddress: 's?',
@@ -416,7 +416,7 @@ const start = async () => {
   })
 
   server.get('/api/transaction', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       page: 's?',
       txHash: 's?',
@@ -686,7 +686,7 @@ const start = async () => {
 
   // Seems we can remove this endpoint now.
   server.get('/api/tx', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       txHash: 's?',
       type: 's?',
     })
@@ -775,7 +775,7 @@ const start = async () => {
   })
 
   server.get('/api/cycleinfo/:counter', async (_request, reply) => {
-    const err = utils.validateTypes(_request.params, { counter: 's' })
+    const err = utils.validateTypes(_request.params as object, { counter: 's' })
     if (err) {
       reply.send({ success: false, error: err })
       return
@@ -796,7 +796,7 @@ const start = async () => {
   })
 
   server.get('/api/archive/:counter', async (_request, reply) => {
-    const err = utils.validateTypes(_request.params, { counter: 's' })
+    const err = utils.validateTypes(_request.params as object, { counter: 's' })
     if (err) {
       reply.send({ success: false, error: err })
       return
@@ -817,7 +817,7 @@ const start = async () => {
   })
 
   server.get('/api/archive', async (_request, reply) => {
-    let err = utils.validateTypes(_request.query, {
+    let err = utils.validateTypes(_request.query as object, {
       start: 's?',
       end: 's?',
       count: 's?',
@@ -874,7 +874,7 @@ const start = async () => {
   })
 
   server.get('/api/receipt', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       page: 's?',
       txId: 's?',
@@ -990,7 +990,7 @@ const start = async () => {
   })
 
   server.get('/api/log', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       page: 's?',
       address: 's?',
@@ -1115,7 +1115,7 @@ const start = async () => {
   })
 
   server.get('/api/stats/validator', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       startCycle: 's?',
       endCycle: 's?',
@@ -1195,7 +1195,7 @@ const start = async () => {
   })
 
   server.get('/api/stats/transaction', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query, {
+    const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       startCycle: 's?',
       endCycle: 's?',
