@@ -34,9 +34,10 @@ export function validateTypes(inp: object, def: object) {
     a: 'array',
     o: 'object',
   }
-  const fields = Object.keys(def)
-  for (const name of fields) {
-    const types = def[name]
+
+  // the keys and values of `def` are only ever hardcoded in this codebase.
+  /* eslint-disable security/detect-object-injection */
+  for (const [name, types] of Object.entries(def)) {
     const opt = types.substr(-1, 1) === '?' ? 1 : 0
     if (inp[name] === undefined && !opt) return name + ' is required'
     if (inp[name] !== undefined) {
