@@ -14,11 +14,11 @@ Example of def:
 Returns a string with the first error encountered or and empty string ''.
 Errors are: "[name] is required" or "[name] must be, [type]"
 */
-export function validateTypes(inp: any, def: any) {
+export function validateTypes(inp: object, def: object) {
   if (inp === undefined) return 'input is undefined'
   if (inp === null) return 'input is null'
   if (typeof inp !== 'object') return 'input must be object, not ' + typeof inp
-  const map: any = {
+  const map = {
     string: 's',
     number: 'n',
     boolean: 'b',
@@ -26,7 +26,7 @@ export function validateTypes(inp: any, def: any) {
     array: 'a',
     object: 'o',
   }
-  const imap: any = {
+  const imap = {
     s: 'string',
     n: 'number',
     b: 'boolean',
