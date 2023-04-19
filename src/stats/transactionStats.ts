@@ -58,7 +58,7 @@ export async function bulkInsertTransactionsStats(transactionsStats: Transaction
   }
 }
 
-export async function queryLatestTransactionStats(count) {
+export async function queryLatestTransactionStats(count: number) {
   try {
     const sql = `SELECT * FROM transactions ORDER BY cycle DESC LIMIT ${count ? count : 100}`
     const transactionsStats: TransactionStats[] = await db.all(sql)
