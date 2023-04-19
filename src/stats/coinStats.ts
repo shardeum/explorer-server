@@ -14,7 +14,7 @@ export async function insertCoinStats(coinStats: CoinStats) {
     const fields = Object.keys(coinStats).join(', ')
     const placeholders = Object.keys(coinStats).fill('?').join(', ')
     const values = extractValues(coinStats)
-    let sql = 'INSERT OR REPLACE INTO coin_stats (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = 'INSERT OR REPLACE INTO coin_stats (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
     console.log('Successfully inserted coinStats', coinStats.cycle)
   } catch (e) {
