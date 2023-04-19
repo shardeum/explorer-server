@@ -3,7 +3,6 @@ dotenv.config()
 
 import * as crypto from '@shardus/crypto-utils'
 import * as Storage from './storage'
-import * as Receipt from './storage/receipt'
 import * as DataSync from './class/DataSync'
 import * as StatsStorage from './stats'
 import * as StatsFunctions from './class/StatsFunctions'
@@ -11,7 +10,7 @@ import * as StatsFunctions from './class/StatsFunctions'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL } from './config'
+import { ARCHIVER_URL } from './config'
 import axios from 'axios'
 
 let startCycle = 0
@@ -26,9 +25,6 @@ console.log('Start Cycle', startCycle)
 const start = async () => {
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
-
-  let lastStoredReceiptCount = await Receipt.queryReceiptCount()
-  let lastStoredCycleCount = startCycle
 
   let totalCyclesToSync = 0
   let response = await axios.get(`${ARCHIVER_URL}/totalData`)
