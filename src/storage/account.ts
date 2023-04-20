@@ -70,7 +70,7 @@ export async function bulkInsertAccounts(accounts: Account[]): Promise<void> {
   }
 }
 
-export async function updateAccount(_accountId: string, account: Account): Promise<void> {
+export async function updateAccount(_accountId: string, account: Partial<Account>): Promise<void> {
   try {
     const sql = `UPDATE accounts SET cycle = $cycle, timestamp = $timestamp, account = $account, hash = $hash WHERE accountId = $accountId `
     await db.run(sql, {
@@ -158,7 +158,7 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
 
       for (let i = 0; i < accountData.length; i++) {
         account = accountData[i].data
-        let accObj: Account
+        let accObj: Partial<Account>
         if (account.accountType === AccountType.Account) {
           accObj = {
             accountId: accountData[i].accountId,
@@ -197,8 +197,8 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
   }
 }
 
-export async function queryAccountCount(type = undefined) {
-  let accounts: { 'COUNT(*)': number }
+export async function queryAccountCount(type?: ContractType | AccountSearchType): Promise<number> {
+  let accounts: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (type || type === AccountSearchType.All) {
       if (type === AccountSearchType.All) {
@@ -235,8 +235,8 @@ export async function queryAccountCount(type = undefined) {
   return accounts ? accounts['COUNT(*)'] : 0
 }
 
-export async function queryAccounts(skip = 0, limit = 10, type = undefined): Promise<Account[]> {
-  let accounts: DbAccount[]
+export async function queryAccounts(skip = 0, limit = 10, type?: AccountSearchType | ContractType): Promise<Account[]> {
+  let accounts: DbAccount[] = []
   try {
     if (type || type === AccountSearchType.All) {
       if (type === AccountSearchType.All) {
@@ -309,7 +309,7 @@ export async function queryAccountCountBetweenCycles(
   startCycleNumber: number,
   endCycleNumber: number
 ): Promise<number> {
-  let accounts: { 'COUNT(*)': number }
+  let accounts: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM accounts WHERE cycle BETWEEN ? AND ?`
     accounts = await db.get(sql, [startCycleNumber, endCycleNumber])
@@ -319,7 +319,7 @@ export async function queryAccountCountBetweenCycles(
   if (config.verbose) {
     console.log('Account count between cycle', accounts)
   }
-  return accounts ? accounts['COUNT(*)'] : 0
+  return accounts['COUNT(*)']
 }
 
 export async function queryAccountsBetweenCycles(
@@ -390,7 +390,7 @@ export async function queryTokenBalance(
 }
 
 export async function queryTokenHolderCount(contractAddress: string): Promise<number> {
-  let tokens: { 'COUNT(*)': number }
+  let tokens: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM tokens WHERE contractAddress=?`
     tokens = await db.get(sql, [contractAddress])
@@ -403,7 +403,7 @@ export async function queryTokenHolderCount(contractAddress: string): Promise<nu
 }
 
 export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: string): Promise<Token[]> {
-  let tokens: Token[]
+  let tokens: Token[] = []
   try {
     const sql = `SELECT * FROM tokens WHERE contractAddress=? ORDER BY tokenValue DESC LIMIT ${limit} OFFSET ${skip}`
     tokens = await db.all(sql, [contractAddress])
@@ -430,10 +430,10 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
   console.log('accounts size', accounts.length)
   if (accounts && accounts.length <= 0) return
   const bucketSize = 1000
-  let combineAccounts1 = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
-  let combineAccounts2 = [] // For AccountType (NetworkAccount, NodeAccount)
+  let combineAccounts1: Account[] = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
+  let combineAccounts2: Account[] = [] // For AccountType (NetworkAccount, NodeAccount)
 
-  const transactions = []
+  const transactions: Account[] = []
 
   for (let j = 0; j < accounts.length; j++) {
     const account = accounts[j]
