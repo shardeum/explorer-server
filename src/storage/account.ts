@@ -128,17 +128,19 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
     if (config.verbose) console.log('No partitionMaps')
     return
   }
-  for (const partition in archivedCycle.receipt.partitionMaps) {
-    const receiptsInPartition = archivedCycle.receipt.partitionMaps[partition]
+  for (const [partition, receiptsInPartition] of Object.entries(archivedCycle.receipt.partitionMaps)) {
     for (const txId in receiptsInPartition) {
       if (skipTxs.includes(txId)) continue
+      // eslint-disable-next-line security/detect-object-injection
       if (!archivedCycle.receipt.partitionTxs[partition][txId]) {
         console.log(
           `txId ${txId} is not found in partitionTxs`,
+          // eslint-disable-next-line security/detect-object-injection
           archivedCycle.receipt.partitionMaps[partition][txId]
         )
         continue
       }
+      // eslint-disable-next-line security/detect-object-injection
       const accountData = archivedCycle.receipt.partitionTxs[partition][txId].filter(
         (acc?: { data?: { accountType: AccountType } }) => {
         return (
@@ -156,12 +158,12 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
         continue // skip other types of tx for now // will open it back after changes are made in client to display it
       }
 
-      for (let i = 0; i < accountData.length; i++) {
-        account = accountData[i].data
+      for (const accountDatum of accountData) {
+        account = accountDatum.data
         let accObj: Partial<Account>
         if (account.accountType === AccountType.Account) {
           accObj = {
-            accountId: accountData[i].accountId,
+            accountId: accountDatum.accountId,
             cycle: archivedCycle.cycleRecord.counter,
             timestamp: account.timestamp,
             ethAddress: account.ethAddress,
@@ -171,7 +173,7 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
           }
         } else {
           accObj = {
-            accountId: accountData[i].accountId,
+            accountId: accountDatum.accountId,
             cycle: archivedCycle.cycleRecord.counter,
             timestamp: account.timestamp,
             account: account as unknown as WrappedEVMAccount,
@@ -235,7 +237,11 @@ export async function queryAccountCount(type?: ContractType | AccountSearchType)
   return accounts ? accounts['COUNT(*)'] : 0
 }
 
-export async function queryAccounts(skip = 0, limit = 10, type?: AccountSearchType | ContractType): Promise<Account[]> {
+export async function queryAccounts(
+  skip = 0,
+  limit = 10,
+  type?: AccountSearchType | ContractType
+): Promise<Account[]> {
   let accounts: DbAccount[] = []
   try {
     if (type || type === AccountSearchType.All) {
@@ -351,8 +357,7 @@ export async function queryTokensByAddress(address: string, detail = false): Pro
     let tokens = (await db.all(sql, [address])) as Token[]
     if (detail) {
       const filterTokens = []
-      for (let i = 0; i < tokens.length; i++) {
-        const { contractAddress, tokenValue } = tokens[i]
+      for (const { contractAddress, tokenValue } of tokens) {
         const accountExist = await queryAccountByAccountId(
           contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
         )
@@ -435,8 +440,7 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
 
   const transactions: Account[] = []
 
-  for (let j = 0; j < accounts.length; j++) {
-    const account = accounts[j]
+  for (const account of accounts) {
     try {
       if (typeof account.data === 'string') account.data = JSON.parse(account.data)
     } catch (e) {

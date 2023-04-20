@@ -127,8 +127,7 @@ export async function processTransactionData(transactions: any): Promise<void> {
   let combineTokenTransactions = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2 = [] // For TransactionType (ERC1155)
   let combineTokens = [] // For Tokens owned by an address
-  for (let j = 0; j < transactions.length; j++) {
-    const transaction = transactions[j]
+  for (const transaction of transactions) {
     const accountType = transaction.data && transaction.data.accountType
     if (
       accountType === AccountType.Receipt ||
@@ -164,18 +163,19 @@ export async function processTransactionData(transactions: any): Promise<void> {
       } as Transaction
 
       const { txs, accs, tokens } = await decodeTx(txObj)
-      for (let i = 0; i < accs.length; i++) {
-        if (accs[i] === ZERO_ETH_ADDRESS) continue
+      for (const acc of accs) {
+        if (acc === ZERO_ETH_ADDRESS) continue
         const index = combineAccounts.findIndex(
-          (a) => a.accountId === accs[i].slice(2).toLowerCase() + '0'.repeat(24)
+          (a) => a.accountId === acc.slice(2).toLowerCase() + '0'.repeat(24)
         )
         if (index > -1) {
+          // eslint-disable-next-line security/detect-object-injection
           const accountExist = combineAccounts[index]
           accountExist.timestamp = txObj.timestamp
           combineAccounts.splice(index, 1)
           combineAccounts.push(accountExist)
         } else {
-          const addressToCreate = accs[i]
+          const addressToCreate = acc
           // To save performance on querying from the db again and again, save it in memory
           if (existingAccounts.includes(addressToCreate)) {
             continue
@@ -205,9 +205,9 @@ export async function processTransactionData(transactions: any): Promise<void> {
           }
         }
       }
-      for (let i = 0; i < txs.length; i++) {
+      for (const tx of txs) {
         const accountExist = await Account.queryAccountByAccountId(
-          txs[i].contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
+          tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
         )
         let contractInfo = {}
         if (accountExist && accountExist.contractInfo) {
@@ -222,9 +222,9 @@ export async function processTransactionData(transactions: any): Promise<void> {
             timestamp: txObj.timestamp,
             transactionFee: txObj.wrappedEVMAccount.readableReceipt.gasUsed ?? '0', // Maybe provide with actual token transfer cost
             contractInfo,
-            ...txs[i],
+            ...tx,
           }
-          if (txs[i].tokenType === TransactionType.ERC_1155) {
+          if (tx.tokenType === TransactionType.ERC_1155) {
             combineTokenTransactions2.push(obj)
           } else {
             combineTokenTransactions.push(obj)
@@ -278,23 +278,21 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
     if (config.verbose) console.log('No partitionMaps')
     return
   }
-  for (const partition in archivedCycle.receipt.partitionMaps) {
-    const receiptsInPartition = archivedCycle.receipt.partitionMaps[partition]
-
+  for (const [partition, receiptsInPartition] of Object.entries(archivedCycle.receipt.partitionMaps)) {
     for (const txId in receiptsInPartition) {
       if (skipTxs.includes(txId)) continue
-      if (!archivedCycle.receipt.partitionTxs[partition][txId]) {
-        console.log(
-          `txId ${txId} is not found in partitionTxs`,
-          archivedCycle.receipt.partitionMaps[partition][txId]
-        )
+
+      // eslint-disable-next-line security/detect-object-injection
+      const partitionTx = archivedCycle?.receipt?.partitionTxs?.[partition][txId]
+      if (!partitionTx) {
+        console.log(`txId ${txId} is not found in partitionTxs`, partitionTx)
         continue
       }
       // console.log('accountList', archivedCycle.receipt.partitionTxs[partition][txId])
       let transactionExist: any = await queryTransactionByTxId(txId)
       if (config.verbose) console.log('transactionExist', transactionExist)
       if (transactionExist) continue
-      let transactionData = archivedCycle.receipt.partitionTxs[partition][txId].filter((acc: any) => {
+      let transactionData = partitionTx.filter((acc: Transaction<object, { accountType: AccountType }>) => {
         return (
           acc?.data?.accountType === AccountType.Receipt ||
           acc?.data?.accountType === AccountType.NodeRewardReceipt ||
@@ -313,6 +311,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
       }
       const transactionInfo: any = {
         txId,
+        // eslint-disable-next-line security/detect-object-injection
         result: receiptsInPartition[txId],
         cycle: archivedCycle.cycleRecord.counter,
         partition: Number(partition),
@@ -351,6 +350,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
         }
         // transactionInfo.wrappedEVMAccount.contractInfo = contractInfo
         // Contract Account
+        // eslint-disable-next-line security/detect-object-injection
         transactionData = archivedCycle.receipt.partitionTxs[partition][txId].filter((acc: any) => {
           return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
         })
@@ -385,8 +385,10 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
         if (config.verbose) console.log('ERC 20 Token', transactionInfo.wrappedEVMAccount.readableReceipt)
         const methodCode = data.substr(0, 10)
         if (config.verbose) console.log(methodCode)
+        // eslint-disable-next-line security/detect-object-injection
         if (ERC20_METHOD_DIC[methodCode] === 'transfer' || ERC20_METHOD_DIC[methodCode] === 'transferFrom') {
           const tokenTx = {} as TokenTx
+          // eslint-disable-next-line security/detect-object-injection
           if (ERC20_METHOD_DIC[methodCode] === 'transfer') {
             // Token transfer transaction
             tokenTx.tokenFrom = from

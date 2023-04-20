@@ -85,19 +85,18 @@ export async function processReceiptData(
   let combineTokenTransactions = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2 = [] // For TransactionType (ERC1155)
   let combineTokens = [] // For Tokens owned by an address
-  for (let i = 0; i < receipts.length; i++) {
-    const { accounts, cycle, result, tx, receipt } = receipts[i]
+  for (const receiptObj of receipts) {
+    const { accounts, cycle, result, tx, receipt } = receiptObj
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
       continue
     }
 
     let txReceipt: WrappedAccount = receipt
-    combineReceipts.push(receipts[i])
+    combineReceipts.push(receiptObj)
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
     const storageKeyValueMap = {}
-    for (let j = 0; j < accounts.length; j++) {
-      const account = accounts[j]
+    for (const account of accounts) {
       const accountType = account.data.accountType
       let accObj: Account.Account
       if (
@@ -137,6 +136,8 @@ export async function processReceiptData(
           return a.accountId === accObj.accountId
         })
         if (index > -1) {
+          // index comes from an index found in the array
+          // eslint-disable-next-line security/detect-object-injection
           const accountExist = combineAccounts1[index]
           if (accountExist.cycle < accObj.cycle && accountExist.timestamp < accObj.timestamp) {
             combineAccounts1.splice(index, 1)
@@ -172,6 +173,8 @@ export async function processReceiptData(
         }
         const index = combineAccounts2.findIndex((a) => a.accountId === accObj.accountId)
         if (index > -1) {
+          // index comes from an index found in the array
+          // eslint-disable-next-line security/detect-object-injection
           const accountExist = combineAccounts2[index]
           if (accountExist.cycle <= accObj.cycle && accountExist.timestamp < accObj.timestamp) {
             combineAccounts2.splice(index, 1)
@@ -248,10 +251,10 @@ export async function processReceiptData(
           }
         }
         const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap)
-        for (let i = 0; i < accs.length; i++) {
-          if (accs[i] === ZERO_ETH_ADDRESS) continue
-          if (!combineAccounts1.some((a) => a.ethAddress === accs[i])) {
-            const addressToCreate = accs[i]
+        for (const acc of accs) {
+          if (acc === ZERO_ETH_ADDRESS) return
+          if (!combineAccounts1.some((a) => a.ethAddress === acc)) {
+            const addressToCreate = acc
             const accountExist = await Account.queryAccountByAccountId(
               addressToCreate.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
             )
@@ -275,11 +278,11 @@ export async function processReceiptData(
             }
           }
         }
-        for (let i = 0; i < txs.length; i++) {
-          let accountExist: { contractInfo: object }
-          if (txs[i].tokenType !== TransactionType.EVM_Internal)
+        for (const tx of txs) {
+          let accountExist: Account.Account
+          if (tx.tokenType !== TransactionType.EVM_Internal)
             accountExist = await Account.queryAccountByAccountId(
-              txs[i].contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
+              tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
             )
           let contractInfo = {}
           if (accountExist && accountExist.contractInfo) {
@@ -293,9 +296,9 @@ export async function processReceiptData(
               timestamp: txObj.timestamp,
               transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
               contractInfo,
-              ...txs[i],
+              ...tx,
             }
-            if (tx[i].tokenType === TransactionType.ERC_1155) {
+            if (tx.tokenType === TransactionType.ERC_1155) {
               combineTokenTransactions2.push(obj)
           } else {
               combineTokenTransactions.push(obj)
