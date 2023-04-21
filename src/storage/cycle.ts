@@ -104,9 +104,8 @@ export async function queryLatestCycleRecords(count) {
     const sql = `SELECT * FROM cycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
     const cycleRecords: any = await db.all(sql)
     if (cycleRecords.length > 0) {
-      cycleRecords.map((cycleRecord: any) => {
+      cycleRecords.forEach((cycleRecord: any) => {
         if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
-        return cycleRecord
       })
     }
     if (config.verbose) console.log('cycle count', cycleRecords)
@@ -121,9 +120,8 @@ export async function queryCycleRecordsBetween(start: number, end: number) {
     const sql = `SELECT * FROM cycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC`
     const cycleRecords: any = await db.all(sql, [start, end])
     if (cycleRecords.length > 0) {
-      cycleRecords.map((cycleRecord: any) => {
+      cycleRecords.forEach((cycleRecord: any) => {
         if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
-        return cycleRecord
       })
     }
     if (config.verbose) console.log('cycle between', cycleRecords)
