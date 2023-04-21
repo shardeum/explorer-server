@@ -727,12 +727,11 @@ export async function queryTransactions(
       transactions = await db.all(sql)
     }
     if (transactions.length > 0) {
-      transactions.map((transaction: any) => {
+      transactions.forEach((transaction: any) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)
         if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
-        return transaction
       })
     }
     if (config.verbose) console.log('transactions', transactions)
@@ -797,12 +796,11 @@ export async function queryTransactionsForCycle(cycleNumber): Promise<Transactio
     const sql = `SELECT * FROM transactions WHERE cycle=? ORDER BY timestamp ASC`
     transactions = await db.all(sql, [cycleNumber])
     if (transactions.length > 0) {
-      transactions.map((transaction: any) => {
+      transactions.forEach((transaction: any) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)
         if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
-        return transaction
       })
     }
     if (config.verbose) console.log('transactions for cycle', cycleNumber, transactions)
@@ -931,12 +929,11 @@ export async function queryTransactionsBetweenCycles(
       transactions = await db.all(sql, [start, end])
     }
     if (transactions.length > 0) {
-      transactions.map((transaction: any) => {
+      transactions.forEach((transaction: any) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)
         if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
-        return transaction
       })
     }
   } catch (e) {
