@@ -300,10 +300,9 @@ export async function queryAccounts(skip = 0, limit = 10, type = undefined) {
     console.log(e)
   }
   if (accounts.length > 0) {
-    accounts.map((account: any) => {
+    accounts.forEach((account: any) => {
       if (account.account) account.account = JSON.parse(account.account)
       if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
-      return account
     })
   }
   if (config.verbose) console.log('Accounts accounts', accounts)
@@ -363,10 +362,9 @@ export async function queryAccountsBetweenCycles(
     const sql = `SELECT * FROM accounts WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     accounts = await db.all(sql, [startCycleNumber, endCycleNumber])
     if (accounts.length > 0) {
-      accounts.map((account: any) => {
+      accounts.forEach((account: any) => {
         if (account.account) account.account = JSON.parse(account.account)
         if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
-        return account
       })
     }
   } catch (e) {
