@@ -88,12 +88,11 @@ export async function queryAllArchivedCycles(count?: number) {
     const sql = `SELECT * FROM archivedCycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
     const archivedCycles: any = await db.all(sql)
     if (archivedCycles.length > 0) {
-      archivedCycles.map((archiveCycle: any) => {
+      archivedCycles.forEach((archiveCycle: any) => {
         if (archiveCycle.cycleRecord) archiveCycle.cycleRecord = JSON.parse(archiveCycle.cycleRecord)
         if (archiveCycle.data) archiveCycle.data = JSON.parse(archiveCycle.data)
         if (archiveCycle.receipt) archiveCycle.receipt = JSON.parse(archiveCycle.receipt)
         if (archiveCycle.summary) archiveCycle.summary = JSON.parse(archiveCycle.summary)
-        return archiveCycle
       })
     }
     if (config.verbose) console.log('ArchivedCycle lastest', archivedCycles)
@@ -108,12 +107,11 @@ export async function queryAllArchivedCyclesBetween(start: number, end: number) 
     const sql = `SELECT * FROM archivedCycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC LIMIT 100`
     const archivedCycles: any = await db.all(sql, [start, end])
     if (archivedCycles.length > 0) {
-      archivedCycles.map((archiveCycle: any) => {
+      archivedCycles.forEach((archiveCycle: any) => {
         if (archiveCycle.cycleRecord) archiveCycle.cycleRecord = JSON.parse(archiveCycle.cycleRecord)
         if (archiveCycle.data) archiveCycle.data = JSON.parse(archiveCycle.data)
         if (archiveCycle.receipt) archiveCycle.receipt = JSON.parse(archiveCycle.receipt)
         if (archiveCycle.summary) archiveCycle.summary = JSON.parse(archiveCycle.summary)
-        return archiveCycle
       })
     }
     if (config.verbose) console.log('ArchivedCycle cycle between', archivedCycles)
