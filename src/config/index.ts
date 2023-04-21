@@ -26,6 +26,7 @@ export const config = {
   genesisSHMSupply: 100000000,
   rateLimit: 100,
   patchData: false,
+  GTM_Id: '',
 }
 
 export const ARCHIVER_URL = `http://${config.archiverInfo.ip}:${config.archiverInfo.port}`
