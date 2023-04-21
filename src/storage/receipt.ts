@@ -380,12 +380,11 @@ export async function queryLatestReceipts(count) {
     const sql = `SELECT * FROM receipts ORDER BY cycle DESC, timestamp DESC LIMIT ${count ? count : 100}`
     const receipts: any = await db.all(sql)
     if (receipts.length > 0) {
-      receipts.map((receipt: any) => {
+      receipts.forEach((receipt: any) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
         if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
-        return receipt
       })
     }
     if (config.verbose) console.log('Receipt latest', receipts)
@@ -401,12 +400,11 @@ export async function queryReceipts(skip = 0, limit = 10000) {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql)
     if (receipts.length > 0) {
-      receipts.map((receipt: any) => {
+      receipts.forEach((receipt: any) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
         if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
-        return receipt
       })
     }
   } catch (e) {
@@ -454,12 +452,11 @@ export async function queryReceiptsBetweenCycles(skip = 0, limit = 10, start, en
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql, [start, end])
     if (receipts.length > 0) {
-      receipts.map((receipt: any) => {
+      receipts.forEach((receipt: any) => {
         if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
         if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
         if (receipt.result) receipt.result = JSON.parse(receipt.result)
         if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
-        return receipt
       })
     }
   } catch (e) {
