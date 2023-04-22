@@ -25,7 +25,7 @@ const tempHeader = [
   {
     key: 'method',
     value: 'Method',
-    render: (_: unknown, item: any) => <Chip title={showTxMethod(item)} color="success" size="medium" />,
+    render: (_: unknown, item: any) => <Chip title={showTxMethod(item)} color={item?.wrappedEVMAccount?.readableReceipt?.status === 1 ? 'success' : 'error'} size="medium" />,
   },
   {
     key: 'cycle',
