@@ -120,7 +120,7 @@ export async function queryCycleRecordsBetween(start: number, end: number): Prom
       })
     }
     if (config.verbose) console.log('cycle between', cycles)
-    return cycles
+    return cycles as unknown as Cycle[]
   } catch (e) {
     console.log(e)
   }
