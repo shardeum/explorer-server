@@ -496,7 +496,7 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
       accountType === AccountType.StakeReceipt ||
       accountType === AccountType.UnstakeReceipt
     ) {
-      transactions.push(account)
+      transactions.push(account as unknown as Account)
     }
     if (combineAccounts1.length >= bucketSize) {
       await bulkInsertAccounts(combineAccounts1)
