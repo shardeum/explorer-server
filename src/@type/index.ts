@@ -125,7 +125,7 @@ export interface ERC20ContractDetail {
   txHash: string
 }
 
-export interface TokenTx {
+export interface TokenTx<C = string> {
   txId: string
   txHash: string
   cycle: number
@@ -138,7 +138,7 @@ export interface TokenTx {
   tokenEvent: string
   tokenOperator?: string
   contractAddress: string
-  contractInfo: string
+  contractInfo: C
   transactionFee: string
 }
 
