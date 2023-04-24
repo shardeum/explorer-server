@@ -88,6 +88,7 @@ export interface WrappedDataReceipt {
   contractInfo: ERC20ContractDetail
   tokenTx: TokenTx
   balance: string // For debug tx
+  nonce: string
 }
 
 export interface ReadableReceipt {
