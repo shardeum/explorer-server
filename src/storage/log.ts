@@ -63,7 +63,7 @@ export async function queryLogCount(
   topic2?: string,
   topic3?: string
 ) {
-  let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number }
+  let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = { 'COUNT(txHash)': 0 }
   try {
     let sql = 'SELECT COUNT(txHash) FROM logs '
     let inputs: (string | number)[] = []
@@ -126,7 +126,7 @@ export async function queryLogs(
   topic2?: string,
   topic3?: string
 ) {
-  let logs: Log[]
+  let logs: Log[] = []
   try {
     let sql = 'SELECT * FROM logs '
     let inputs: (string | number)[] = []
@@ -181,7 +181,7 @@ export async function queryLogs(
 }
 
 export async function queryLogCountBetweenCycles(startCycleNumber: number, endCycleNumber: number) {
-  let logs: { 'COUNT(*)': number }
+  let logs: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM logs WHERE cycle BETWEEN ? AND ?`
     logs = await db.get(sql, [startCycleNumber, endCycleNumber])
@@ -201,7 +201,7 @@ export async function queryLogsBetweenCycles(
   startCycleNumber: number,
   endCycleNumber: number
 ) {
-  let logs: Log[]
+  let logs: Log[] = []
   try {
     const sql = `SELECT * FROM logs WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     logs = await db.all(sql, [startCycleNumber, endCycleNumber])

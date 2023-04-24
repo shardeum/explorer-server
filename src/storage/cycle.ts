@@ -155,7 +155,7 @@ export async function queryCycleByCounter(counter: number) {
 }
 
 export async function queryCycleCount(): Promise<number> {
-  let cycles: { 'COUNT(*)': number }
+  let cycles: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM cycles`
     cycles = await db.get(sql, [])

@@ -334,7 +334,7 @@ export async function queryAccountsBetweenCycles(
   startCycleNumber: number,
   endCycleNumber: number
 ): Promise<Account[]> {
-  let accounts: DbAccount[]
+  let accounts: DbAccount[] = []
   try {
     const sql = `SELECT * FROM accounts WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     accounts = await db.all(sql, [startCycleNumber, endCycleNumber])

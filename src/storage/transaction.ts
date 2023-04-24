@@ -416,6 +416,8 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
                 account: {
                   nonce: '0',
                   balance: '0',
+                  ethAddress: undefined,
+                  accountType: undefined,
                 },
                 accountType: AccountType.Account,
                 hash: 'Ox',
@@ -474,7 +476,7 @@ export async function queryTransactionCount(
   txType?: TransactionSearchType,
   filterAddress?: string
 ): Promise<number> {
-  let transactions: { 'COUNT(*)': number }
+  let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (address) {
       if (!txType ) { // (!txType || txType === TransactionSearchType.All)
@@ -596,9 +598,9 @@ export async function queryTransactions(
   limit = 10,
   address?: string,
   txType?: TransactionSearchType,
-  filterAddress?: string
-): Promise<(Transaction | TokenTx)[]> {
-  let transactions: any[]
+  filterAddress?: string,
+): Promise<(DbTransaction<object> | DbTokenTx)[]> {
+  let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {
       if (!txType || TransactionSearchType.All) {
@@ -771,7 +773,7 @@ export async function queryTransactionByHash(txHash: string, detail = false): Pr
 }
 
 export async function queryTransactionsForCycle(cycleNumber: number): Promise<Transaction[]> {
-  let transactions: any[]
+  let transactions: DbTransaction[] = []
   try {
     const sql = `SELECT * FROM transactions WHERE cycle=? ORDER BY timestamp ASC`
     transactions = await db.all(sql, [cycleNumber])
@@ -797,9 +799,9 @@ export async function queryTransactionsBetweenCycles(
   end: number,
   address?: string,
   txType?: TransactionSearchType,
-  filterAddress?: string
-): Promise<(Transaction | TokenTx)[]> {
-  let transactions: any[]
+  filterAddress?: string,
+): Promise<(DbTransaction<object> | DbTokenTx)[]> {
+  let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {
       // const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -931,7 +933,7 @@ export async function queryTransactionCountBetweenCycles(
   txType?: TransactionSearchType,
   filterAddress?: string
 ): Promise<number> {
-  let transactions: { 'COUNT(*)': number }
+  let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (address) {
       if (!txType) { // (!txType || txType === TransactionSearchType.All)
@@ -1055,7 +1057,7 @@ export async function queryTransactionCountByCycles(
   end: number,
   txType?: TransactionSearchType
 ): Promise<{ cycle: number; transactions: number }[]> {
-  let transactions
+  let transactions: { cycle: number; 'COUNT(*)': number }[] = []
   try {
     if (
       txType === TransactionSearchType.Receipt ||
