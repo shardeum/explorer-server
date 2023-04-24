@@ -101,7 +101,7 @@ export interface ReadableReceipt {
   cumulativeGasUsed: string
   gasUsed: string
   logs: any[]
-  contractAddress: string | null
+  contractAddress: string
   from: string
   to: string
   value: string
