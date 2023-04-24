@@ -38,7 +38,7 @@ export async function insertArchivedCycle(archivedCycle: ArchivedCycle) {
     console.log(
       'Successfully inserted archivedCycle',
       archivedCycle.cycleRecord.counter,
-      archivedCycle.cycleRecord.marker
+      (archivedCycle.cycleRecord as unknown as { marker: unknown }).marker // temporary until CycleRecord gets its marker field
     )
   } catch (e) {
     console.log(e)
@@ -102,7 +102,7 @@ export async function queryAllArchivedCyclesBetween(start: number, end: number):
       })
     }
     if (config.verbose) console.log('ArchivedCycle cycle between', archivedCycles)
-    return archivedCycles
+    return archivedCycles as unknown as ArchivedCycle[]
   } catch (e) {
     console.log(e)
   }
@@ -119,7 +119,7 @@ export async function queryArchivedCycleByMarker(marker: string) {
       if (archivedCycles.summary) archivedCycles.summary = JSON.parse(archivedCycles.summary)
     }
     if (config.verbose) console.log('ArchivedCycle marker', archivedCycles)
-    return archivedCycles
+    return archivedCycles as unknown as ArchivedCycle
   } catch (e) {
     console.log(e)
   }
@@ -136,7 +136,7 @@ export async function queryArchivedCycleByCounter(counter: number) {
       if (archivedCycles.summary) archivedCycles.summary = JSON.parse(archivedCycles.summary)
     }
     if (config.verbose) console.log('ArchivedCycle counter', archivedCycles)
-    return archivedCycles
+    return archivedCycles as unknown as ArchivedCycle
   } catch (e) {
     console.log(e)
   }
