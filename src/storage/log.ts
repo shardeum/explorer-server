@@ -16,6 +16,10 @@ export interface Log<L = object> {
   topic3?: string
 }
 
+type DbLog = Log & {
+  log: string
+}
+
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
 export async function insertLog(log: Log) {
@@ -126,7 +130,7 @@ export async function queryLogs(
   topic2?: string,
   topic3?: string
 ) {
-  let logs: Log[] = []
+  let logs: DbLog[] = []
   try {
     let sql = 'SELECT * FROM logs '
     let inputs: (string | number)[] = []
@@ -169,8 +173,8 @@ export async function queryLogs(
     }
     logs = await db.all(sql + sqlQueryExtension, inputs)
     if (logs.length > 0) {
-    logs.forEach((log: Log) => {
-        if (log.log) log.log = JSON.parse(log.log)
+    logs.forEach((log: DbLog) => {
+      if (log.log) (log as Log).log = JSON.parse(log.log)
       })
     }
   } catch (e) {
@@ -201,13 +205,13 @@ export async function queryLogsBetweenCycles(
   startCycleNumber: number,
   endCycleNumber: number
 ) {
-  let logs: Log[] = []
+  let logs: DbLog[] = []
   try {
     const sql = `SELECT * FROM logs WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     logs = await db.all(sql, [startCycleNumber, endCycleNumber])
     if (logs.length > 0) {
-      logs.forEach((log: Log) => {
-        if (log.log) log.log = JSON.parse(log.log)
+      logs.forEach((log: DbLog) => {
+        if (log.log) (log as Log).log = JSON.parse(log.log)
       })
     }
   } catch (e) {
