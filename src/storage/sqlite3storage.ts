@@ -1,11 +1,4 @@
-import { TokenTx } from "../@type"
-import { Account, Token } from "./account"
-import { Cycle } from "./cycle"
-import { Log } from "./log"
-import { Receipt } from "./receipt"
-import { Transaction } from "./transaction"
-
-import sqlite3Lib from "sqlite3";
+import sqlite3Lib from 'sqlite3'
 const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 
@@ -19,7 +12,7 @@ export async function runCreate(createStatement: string) {
   await run(createStatement)
 }
 
-export async function run(sql: string, params = [] || {}) {
+export async function run(sql: string, params: object = {}) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err: Error) {
       if (err) {
@@ -33,7 +26,7 @@ export async function run(sql: string, params = [] || {}) {
   })
 }
 
-export async function get<T>(sql: string, params = []): Promise<T> {
+export async function get<T>(sql: string, params: object = {}): Promise<T> {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err: Error, result: T) => {
       if (err) {
@@ -47,7 +40,7 @@ export async function get<T>(sql: string, params = []): Promise<T> {
   })
 }
 
-export async function all<T>(sql: string, params = []): Promise<T[]> {
+export async function all<T>(sql: string, params: object = {}): Promise<T[]> {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err: Error, rows: T[]) => {
       if (err) {
@@ -61,7 +54,7 @@ export async function all<T>(sql: string, params = []): Promise<T[]> {
   })
 }
 
-export function extractValues(object: Log | Transaction | TokenTx | Account | Token | Receipt | Cycle): string[] {
+export function extractValues(object: object): string[] {
   try {
     const inputs = []
     for (let value of Object.values(object)) {
@@ -74,7 +67,7 @@ export function extractValues(object: Log | Transaction | TokenTx | Account | To
   }
 }
 
-export function extractValuesFromArray(arr: any): any {
+export function extractValuesFromArray(arr: object[]): string[] {
   try {
     const inputs = []
     for (const object of arr) {
