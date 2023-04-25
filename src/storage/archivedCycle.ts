@@ -6,21 +6,21 @@ import { StateManager, P2P } from '@shardus/types'
 export let Collection: unknown
 
 export interface ArchivedCycle {
-  counter?: number
+  counter: number
   cycleRecord: P2P.CycleCreatorTypes.CycleRecord
   cycleMarker: StateManager.StateMetaDataTypes.CycleMarker
-  data: StateManager.StateMetaDataTypes.StateData
-  receipt: StateManager.StateMetaDataTypes.Receipt
-  summary: StateManager.StateMetaDataTypes.Summary
+  data?: StateManager.StateMetaDataTypes.StateData
+  receipt?: StateManager.StateMetaDataTypes.Receipt
+  summary?: StateManager.StateMetaDataTypes.Summary
 }
 
 interface DbArchivedCycle {
   counter: number
   cycleRecord: string
   cycleMarker: string
-  data: string
-  receipt: string
-  summary: string
+  data?: string
+  receipt?: string
+  summary?: string
 }
 
 export function isArchivedCycle(obj: ArchivedCycle): obj is ArchivedCycle {

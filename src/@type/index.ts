@@ -126,20 +126,21 @@ export interface ERC20ContractDetail {
 }
 
 export interface TokenTx<C = string> {
-  txId: string
-  txHash: string
   cycle: number
-  partition: number
   timestamp: number
-  tokenType: TransactionType
+  contractAddress: string
+  contractInfo?: C
   tokenFrom: string
   tokenTo: string
   tokenValue: string
+  tokenType: TransactionType
   tokenEvent: string
   tokenOperator?: string
-  contractAddress: string
-  contractInfo: C
   transactionFee: string
+
+  // references another tx
+  txId?: string
+  txHash: string
 }
 
 export enum InternalTXType {

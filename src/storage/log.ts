@@ -3,13 +3,13 @@ import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 
-export interface Log {
+export interface Log<L = object> {
   cycle: number
   timestamp: number
   txHash: string
   blockNumber: string
-  contractAddress: number
-  log: unknown
+  contractAddress: string
+  log: L
   topic0: string
   topic1?: string
   topic2?: string

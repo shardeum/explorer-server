@@ -7,15 +7,15 @@ import { checkIfAnyReceiptsMissing } from '../class/DataSync'
 export let Collection: unknown
 
 export interface Cycle {
+  cycleMarker: StateManager.StateMetaDataTypes.CycleMarker
   counter: number
   cycleRecord: P2P.CycleCreatorTypes.CycleRecord
-  cycleMarker: StateManager.StateMetaDataTypes.CycleMarker
 }
 
 export interface DbCycle {
+  cycleMarker: string
   counter: number
   cycleRecord: string
-  cycleMarker: string
 }
 
 export function isCycle(obj: Cycle): obj is Cycle {

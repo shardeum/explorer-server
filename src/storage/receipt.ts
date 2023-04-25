@@ -9,11 +9,11 @@ import { bufferToHex } from 'ethereumjs-util'
 
 export interface Receipt {
   receiptId: string
-  tx: unknown
+  tx: Transaction.Transaction
   cycle: number
   timestamp: number
-  result: unknown
-  accounts: unknown[]
+  result: object
+  accounts: Account.Account[]
   sign: {
     owner: string
     sig: string

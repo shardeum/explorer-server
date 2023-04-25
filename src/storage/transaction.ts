@@ -20,12 +20,12 @@ export const ERC20_METHOD_DIC = {
 
 export let Collection: any
 
-export interface Transaction {
+export interface Transaction<O extends object = object, D extends object = object> {
   txId: string
-  result: any
+  result: object
   cycle: number
-  partition: number
   timestamp: number
+  partition?: number
   wrappedEVMAccount: WrappedEVMAccount
   accountId: string
   transactionType: TransactionType
@@ -33,7 +33,7 @@ export interface Transaction {
   txFrom: string
   txTo: string
   nominee?: string
-  originTxData: any
+  originTxData: O
 }
 
 export async function insertTransaction(transaction: Transaction): Promise<void> {
