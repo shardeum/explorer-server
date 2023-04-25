@@ -418,6 +418,7 @@ export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: s
   return tokens
 }
 
+/** An account object from an HTTP API call */
 type RawAccount = {
   accountId: string
   cycleNumber: number
@@ -426,7 +427,7 @@ type RawAccount = {
     ethAddress: string
     account: WrappedEVMAccount
   }
-  timestamp: number
+  timestamp: bigint
   hash: string
 }
 
