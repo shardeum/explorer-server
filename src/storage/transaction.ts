@@ -84,7 +84,7 @@ export async function bulkInsertTransactions(transactions: Transaction[]): Promi
   }
 }
 
-export async function updateTransaction(_txId: string, transaction: Transaction): Promise<void> {
+export async function updateTransaction(_txId: string, transaction: Partial<Transaction>): Promise<void> {
   try {
     const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, accountId = $accountId, txHash = $txHash WHERE txId = $txId `
     await db.run(sql, {
