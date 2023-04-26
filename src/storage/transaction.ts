@@ -161,7 +161,7 @@ export async function processTransactionData(transactions: Transaction<object, {
       const txObj = {
         txId: transaction.data.txId,
         result: ['passed'], // temp placeholder
-        cycle: transaction.cycleNumber,
+        cycle: transaction.cycle,
         // partition: Number(partition), // We don't know the partition now
         timestamp: transaction.timestamp,
         wrappedEVMAccount: transaction.data,
