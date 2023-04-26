@@ -346,7 +346,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
 
       // Contract creation
       if (!to) {
-        if (config.verbose) console.log('Token', transactionInfo.wrappedEVMAccount.readableReceipt)
+        if (config.verbose) console.log('Token', transactionInfo.wrappedEVMAccount?.readableReceipt)
         // var provider = 'http://localhost:8080';
         // var web3Provider = new Web3.providers.HttpProvider(provider);
         // var web3Provider = new Web3(web3Provider);
@@ -373,7 +373,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         // transactionInfo.wrappedEVMAccount.contractInfo = contractInfo
         // Contract Account
         // eslint-disable-next-line security/detect-object-injection
-        transactionData = archivedCycle.receipt.partitionTxs[partition][txId].filter(
+        transactionData = archivedCycle?.receipt?.partitionTxs?.[partition][txId].filter(
           (acc: Transaction<object, {accountType: AccountType, ethAddress: string}>) => {
           return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
         })
