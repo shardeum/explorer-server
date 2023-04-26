@@ -99,7 +99,7 @@ export async function processReceiptData(
     }
 
     let txReceipt: WrappedAccount = receipt
-    combineReceipts.push(receiptObj)
+    combineReceipts.push(receiptObj as unknown as Receipt)
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
     const storageKeyValueMap = {}
