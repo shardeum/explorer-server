@@ -238,13 +238,13 @@ export async function processTransactionData(transactions: Transaction<object, {
         // wrapped data must be a receipt here. this type guard ensures that
         if ('readableReceipt' in txObj.wrappedEVMAccount) {
           const obj = {
+            ...tx,
             txId: txObj.txId,
             txHash: txObj.txHash,
             cycle: txObj.cycle,
             timestamp: txObj.timestamp,
             transactionFee: txObj.wrappedEVMAccount.readableReceipt.gasUsed ?? '0', // Maybe provide with actual token transfer cost
             contractInfo,
-            ...tx,
           }
           if (tx.tokenType === TransactionType.ERC_1155) {
             combineTokenTransactions2.push(obj)
