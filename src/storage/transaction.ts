@@ -36,6 +36,21 @@ export interface Transaction<O extends object = object, D extends object = objec
   txTo: string
   nominee?: string
   originTxData: O
+
+  // not in the database schema
+  data?: D
+  tokenTxs?: TokenTx[]
+  contractInfo?: object
+}
+
+type DbTransaction<D extends object = object> = Transaction<D> & {
+  wrappedEVMAccount: string
+  contractInfo: string
+  result: string
+}
+
+type DbTokenTx = TokenTx & {
+  contractInfo: string
 }
 
 export async function insertTransaction(transaction: Transaction): Promise<void> {
