@@ -56,7 +56,7 @@ export async function all<T>(sql: string, params: object = {}): Promise<T[]> {
 
 export function extractValues(object: object): string[] {
   try {
-    const inputs = []
+    const inputs: string[] = []
     for (let value of Object.values(object)) {
       if (typeof value === 'object') value = JSON.stringify(value)
       inputs.push(value)
@@ -69,7 +69,7 @@ export function extractValues(object: object): string[] {
 
 export function extractValuesFromArray(arr: object[]): string[] {
   try {
-    const inputs = []
+    const inputs: string[] = []
     for (const object of arr) {
       for (const value of Object.values(object)) {
         if (typeof value === 'object') {

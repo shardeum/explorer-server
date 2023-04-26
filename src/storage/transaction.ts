@@ -7,18 +7,20 @@ import {
   TransactionType,
   TransactionSearchType,
   WrappedEVMAccount,
+  ReadableReceipt,
 } from '../@type'
 import ERC20ABI from 'human-standard-token-abi'
 import Web3 from 'web3'
 import * as Account from './account'
 import { decodeTx, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
+import { ArchivedCycle } from './archivedCycle'
 
 export const ERC20_METHOD_DIC = {
   '0xa9059cbb': 'transfer',
   '0xa978501e': 'transferFrom',
 }
 
-export let Collection: any
+export let Collection: unknown
 
 export interface Transaction<O extends object = object, D extends object = object> {
   txId: string
@@ -117,16 +119,21 @@ export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx<C>[]): Pr
   }
 }
 
-export async function processTransactionData(transactions: any): Promise<void> {
+export async function processTransactionData(transactions: Transaction<object, {
+  accountType: AccountType
+  txId: string
+  ethAddress: string
+  readableReceipt: ReadableReceipt
+}>[]): Promise<void> {
   console.log('transactions size', transactions.length)
   if (transactions && transactions.length <= 0) return
   const bucketSize = 1000
-  const combineAccounts = []
-  const existingAccounts = [] // To save perf on querying from the db again and again, save the existing account that is queried once in memory
-  let combineTransactions = []
-  let combineTokenTransactions = [] // For TransactionType (Internal ,ERC20, ERC721)
-  let combineTokenTransactions2 = [] // For TransactionType (ERC1155)
-  let combineTokens = [] // For Tokens owned by an address
+  const combineAccounts: Account.Account[] = []
+  const existingAccounts: string[] = [] // To save perf on querying from the db again and again, save the existing account that is queried once in memory
+  let combineTransactions: Transaction[] = []
+  let combineTokenTransactions: TokenTx<Record<string, never>>[] = [] // For TransactionType (Internal ,ERC20, ERC721)
+  let combineTokenTransactions2: TokenTx<Record<string, never>>[] = [] // For TransactionType (ERC1155)
+  let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   for (const transaction of transactions) {
     const accountType = transaction.data && transaction.data.accountType
     if (
@@ -268,7 +275,7 @@ export async function processTransactionData(transactions: any): Promise<void> {
   if (combineTokens.length > 0) await Account.bulkInsertTokens(combineTokens)
 }
 
-export async function insertOrUpdateTransaction(archivedCycle: any): Promise<void> {
+export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): Promise<void> {
   const skipTxs: string[] = []
   if (!archivedCycle.receipt) {
     if (config.verbose) console.log('No Receipt')
@@ -289,7 +296,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
         continue
       }
       // console.log('accountList', archivedCycle.receipt.partitionTxs[partition][txId])
-      let transactionExist: any = await queryTransactionByTxId(txId)
+      let transactionExist: Transaction = await queryTransactionByTxId(txId)
       if (config.verbose) console.log('transactionExist', transactionExist)
       if (transactionExist) continue
       let transactionData = partitionTx.filter((acc: Transaction<object, { accountType: AccountType }>) => {
@@ -300,7 +307,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
           acc?.data?.accountType === AccountType.UnstakeReceipt
         )
       })
-      let txReceipt: { ethAddress: any }
+      let txReceipt: { ethAddress: string }
       if (config.verbose) console.log('transactionData', txId, transactionData)
       if (transactionData.length > 0) {
         txReceipt = transactionData[0].data
@@ -309,7 +316,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
         // Other types of tx like init_network, node_reward
         continue // skip other types of tx for now // will open it back after changes are made in client to display it
       }
-      const transactionInfo: any = {
+      const transactionInfo: Partial<Transaction> = {
         txId,
         // eslint-disable-next-line security/detect-object-injection
         result: receiptsInPartition[txId],
@@ -330,7 +337,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
         // var web3Provider = new Web3(web3Provider);
         let contractInfo = {}
         try {
-          const web3: any = await getWeb3()
+          const web3 = await getWeb3()
           const Token = new web3.eth.Contract(ERC20ABI, contractAddress)
           if (config.verbose) console.log('Token', await Token.methods.name().call())
           const name = await Token.methods.name().call()
@@ -351,16 +358,17 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
         // transactionInfo.wrappedEVMAccount.contractInfo = contractInfo
         // Contract Account
         // eslint-disable-next-line security/detect-object-injection
-        transactionData = archivedCycle.receipt.partitionTxs[partition][txId].filter((acc: any) => {
+        transactionData = archivedCycle.receipt.partitionTxs[partition][txId].filter(
+          (acc: Transaction<object, {accountType: AccountType, ethAddress: string}>) => {
           return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
         })
         if (transactionData.length > 0) {
           if (config.verbose) console.log('contract transactionData', txId, transactionData)
           const accountId = transactionData[0].accountId
-          const accountExist: any = await Account.queryAccountByAddress(accountId)
+          const accountExist: Account.Account = await Account.queryAccountByAddress(accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           const account = transactionData[0].data
-          const accObj: any = {
+          const accObj: Account.Account = {
             accountId: accountId,
             cycle: archivedCycle.cycleRecord.counter,
             timestamp: account.timestamp,
@@ -408,7 +416,7 @@ export async function insertOrUpdateTransaction(archivedCycle: any): Promise<voi
             if (!accountExist) {
               // Account is not created in the EVM yet
               // Make a sample account with that address to show the account info in the explorer
-              const accObj: any = {
+              const accObj: Partial<Account.Account> = {
                 accountId: tokenTx.tokenTo.slice(2).toLowerCase() + '0'.repeat(24),
                 cycle: archivedCycle.cycleRecord.counter,
                 timestamp: transactionInfo.timestamp,
@@ -600,7 +608,7 @@ export async function queryTransactions(
   txType?: TransactionSearchType,
   filterAddress?: string,
 ): Promise<(DbTransaction<object> | DbTokenTx)[]> {
-  let transactions: (DbTransaction | DbTokenTx)[] = []
+  let transactions: (DbTransaction | DbTokenTx)[]
   try {
     if (address) {
       if (!txType || TransactionSearchType.All) {
@@ -708,7 +716,7 @@ export async function queryTransactions(
       transactions = await db.all(sql)
     }
 
-      transactions.forEach((transaction: any) => {
+    transactions.forEach((transaction: DbTokenTx | DbTransaction) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)
@@ -726,7 +734,7 @@ export async function queryTransactions(
 export async function queryTransactionByTxId(txId: string, detail = false) {
   try {
     const sql = `SELECT * FROM transactions WHERE txId=?`
-    const transaction: any = await db.get(sql, [txId])
+    const transaction: DbTransaction = await db.get(sql, [txId])
     if (transaction) {
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
@@ -734,7 +742,7 @@ export async function queryTransactionByTxId(txId: string, detail = false) {
     }
     if (detail) {
       const sql = `SELECT * FROM tokenTxs WHERE txId=?`
-      const tokenTx: any = await db.all(sql, [txId])
+      const tokenTxs: DbTokenTx[] = await db.all(sql, [txId])
       if (tokenTx.length > 0) {
         transaction.tokenTx = tokenTx
       }
@@ -749,14 +757,14 @@ export async function queryTransactionByTxId(txId: string, detail = false) {
 export async function queryTransactionByHash(txHash: string, detail = false): Promise<DbTransaction<object>> {
   try {
     const sql = `SELECT * FROM transactions WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
-    const transaction: any = await db.get(sql, [txHash])
+    const transaction: DbTransaction = await db.get(sql, [txHash])
     if (transaction) {
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
       if (transaction.result) transaction.result = JSON.parse(transaction.result)
       if (detail) {
         const sql = `SELECT * FROM tokenTxs WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
-        const tokenTxs: any = await db.all(sql, [txHash])
+        const tokenTxs: DbTokenTx[] = await db.all(sql, [txHash])
         if (tokenTxs.length > 0) {
           tokenTxs.forEach((tokenTx: { contractInfo: string }) => {
             if (tokenTx.contractInfo) tokenTx.contractInfo = JSON.parse(tokenTx.contractInfo)
@@ -778,7 +786,7 @@ export async function queryTransactionsForCycle(cycleNumber: number): Promise<Tr
     const sql = `SELECT * FROM transactions WHERE cycle=? ORDER BY timestamp ASC`
     transactions = await db.all(sql, [cycleNumber])
     if (transactions.length > 0) {
-      transactions.forEach((transaction: any) => {
+      transactions.forEach((transaction: DbTransaction) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)
@@ -801,7 +809,7 @@ export async function queryTransactionsBetweenCycles(
   txType?: TransactionSearchType,
   filterAddress?: string,
 ): Promise<(DbTransaction<object> | DbTokenTx)[]> {
-  let transactions: (DbTransaction | DbTokenTx)[] = []
+  let transactions: (DbTransaction | DbTokenTx)[]
   try {
     if (address) {
       // const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -911,7 +919,7 @@ export async function queryTransactionsBetweenCycles(
       transactions = await db.all(sql, [start, end])
     }
     if (transactions.length > 0) {
-      transactions.forEach((transaction: any) => {
+      transactions.forEach((transaction) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.result) transaction.result = JSON.parse(transaction.result)

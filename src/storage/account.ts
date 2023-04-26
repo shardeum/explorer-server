@@ -181,7 +181,7 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
             accountType: account.accountType,
           }
         }
-        const accountExist: Account = await queryAccountByAddress(accObj.accountId)
+        const accountExist = await queryAccountByAddress(accObj.accountId)
         if (config.verbose) console.log('accountExist', accountExist)
         if (!accountExist) {
           await insertAccount(accObj)

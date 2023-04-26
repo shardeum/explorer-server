@@ -1,7 +1,7 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { AccountType, TransactionType, WrappedAccount } from '../@type'
+import { AccountType, TokenTx, TransactionType, WrappedAccount } from '../@type'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
@@ -86,11 +86,11 @@ export async function processReceiptData(
   }
   const bucketSize = 1000
   let combineReceipts: Receipt[] = []
-  let combineAccounts1 = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
-  let combineAccounts2 = [] // For AccountType (NetworkAccount, NodeAccount)
-  let combineTransactions = []
-  let combineTokenTransactions = [] // For TransactionType (Internal ,ERC20, ERC721)
-  let combineTokenTransactions2 = [] // For TransactionType (ERC1155)
+  let combineAccounts1: Account.Account[] = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
+  let combineAccounts2: Account.Account[] = [] // For AccountType (NetworkAccount, NodeAccount)
+  let combineTransactions: Transaction.Transaction[] = []
+  let combineTokenTransactions: TokenTx<object>[] = [] // For TransactionType (Internal ,ERC20, ERC721)
+  let combineTokenTransactions2: TokenTx<object>[] = [] // For TransactionType (ERC1155)
   let combineTokens = [] // For Tokens owned by an address
   for (const receiptObj of receipts) {
     const { accounts, cycle, result, tx, receipt } = receiptObj
@@ -151,7 +151,7 @@ export async function processReceiptData(
             combineAccounts1.push(accObj)
           }
         } else {
-          const accountExist: Account.Account = await Account.queryAccountByAccountId(accObj.accountId)
+          const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
             combineAccounts1.push(accObj)
@@ -188,7 +188,7 @@ export async function processReceiptData(
             combineAccounts2.push(accObj)
           }
         } else {
-          const accountExist: Account.Account = await Account.queryAccountByAccountId(accObj.accountId)
+          const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
             combineAccounts2.push(accObj)
@@ -286,7 +286,7 @@ export async function processReceiptData(
           }
         }
         for (const tx of txs) {
-          let accountExist: Account.Account
+          let accountExist: Account.Account | null = null
           if (tx.tokenType !== TransactionType.EVM_Internal)
             accountExist = await Account.queryAccountByAccountId(
               tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
