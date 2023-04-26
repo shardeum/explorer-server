@@ -217,7 +217,7 @@ export async function processTransactionData(transactions: Transaction<object, {
               account: {
                 nonce: '0',
                 balance: '0',
-              },
+              } as WrappedEVMAccount,
               hash: 'Ox',
               accountType: AccountType.Account,
             }
@@ -732,10 +732,12 @@ export async function queryTransactions(
     }
 
     transactions.forEach((transaction: DbTokenTx | DbTransaction) => {
-        if (transaction.wrappedEVMAccount)
-          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if (transaction.result) transaction.result = JSON.parse(transaction.result)
-        if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
+      if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
+        (transaction as Transaction).wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+      if ('result' in transaction && transaction.result)
+        (transaction as Transaction).result = JSON.parse(transaction.result)
+      if ('contractInfo' in transaction && transaction.contractInfo)
+        (transaction as TokenTx).contractInfo = JSON.parse(transaction.contractInfo)
       })
 
     if (config.verbose) console.log('transactions', transactions)
@@ -746,20 +748,20 @@ export async function queryTransactions(
   return transactions
 }
 
-export async function queryTransactionByTxId(txId: string, detail = false) {
+export async function queryTransactionByTxId(txId: string, detail = false): Promise<Transaction> {
   try {
     const sql = `SELECT * FROM transactions WHERE txId=?`
     const transaction: DbTransaction = await db.get(sql, [txId])
     if (transaction) {
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-      if (transaction.result) transaction.result = JSON.parse(transaction.result)
+      if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
     }
     if (detail) {
       const sql = `SELECT * FROM tokenTxs WHERE txId=?`
       const tokenTxs: DbTokenTx[] = await db.all(sql, [txId])
-      if (tokenTx.length > 0) {
-        transaction.tokenTx = tokenTx
+      if (tokenTxs.length > 0) {
+        (transaction as Transaction).tokenTxs = tokenTxs
       }
     }
     if (config.verbose) console.log('transaction txId', transaction)
@@ -776,7 +778,7 @@ export async function queryTransactionByHash(txHash: string, detail = false): Pr
     if (transaction) {
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-      if (transaction.result) transaction.result = JSON.parse(transaction.result)
+      if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
       if (detail) {
         const sql = `SELECT * FROM tokenTxs WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
         const tokenTxs: DbTokenTx[] = await db.all(sql, [txHash])
@@ -804,8 +806,10 @@ export async function queryTransactionsForCycle(cycleNumber: number): Promise<Tr
       transactions.forEach((transaction: DbTransaction) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if (transaction.result) transaction.result = JSON.parse(transaction.result)
-        if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
+        if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
+        if (transaction.contractInfo)
+          (transaction as Transaction).contractInfo = JSON.parse(transaction.contractInfo)
+        return transaction as Transaction
       })
     }
     if (config.verbose) console.log('transactions for cycle', cycleNumber, transactions)
@@ -935,10 +939,12 @@ export async function queryTransactionsBetweenCycles(
     }
     if (transactions.length > 0) {
       transactions.forEach((transaction) => {
-        if (transaction.wrappedEVMAccount)
+        if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if (transaction.result) transaction.result = JSON.parse(transaction.result)
-        if (transaction.contractInfo) transaction.contractInfo = JSON.parse(transaction.contractInfo)
+        if ('result' in transaction && transaction.result)
+          (transaction as Transaction).result = JSON.parse(transaction.result)
+        if ('contractInfo' in transaction && transaction.contractInfo)
+          transaction.contractInfo = JSON.parse(transaction.contractInfo)
       })
     }
   } catch (e) {
