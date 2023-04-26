@@ -5,7 +5,7 @@ import Web3 from 'web3'
 const EXPLORE_URL = 'http://localhost:6001'
 const STAKE_TX_TYPE = 3
 
-const getStakeTx = async () => {
+const getStakeTx = async (): Promise<void> => {
     let url = `${EXPLORE_URL}/api/transaction?txType=${STAKE_TX_TYPE}`
 
     let stakingTxs: any = []
