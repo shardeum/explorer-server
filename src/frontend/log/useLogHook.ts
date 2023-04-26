@@ -70,6 +70,9 @@ export const useLogHook = (addr?: string, tps?: string) => {
       if (transactions && transactions.length > 0) {
         setTransaction(transactions)
         setTotal(data?.data?.totalTransactions)
+      } else {
+        setTransaction([])
+        setTotal(0)
       }
     },
     [createURL]
