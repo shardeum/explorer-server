@@ -5,7 +5,7 @@ import Web3 from 'web3'
 const EXPLORE_URL = 'http://localhost:6001'
 const UNSTAKE_TX_TYPE = 4
 
-const getTotalRewardByAddress = async () => {
+const getTotalRewardByAddress = async (): Promise<void> => {
     let url = `${EXPLORE_URL}/api/transaction?txType=${UNSTAKE_TX_TYPE}`
 
     let operatorAccountMap = {}
