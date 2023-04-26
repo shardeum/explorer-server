@@ -238,7 +238,7 @@ export async function processReceiptData(
           txTo: txReceipt.data.readableReceipt.to
             ? txReceipt.data.readableReceipt.to
             : txReceipt.data.readableReceipt.contractAddress,
-          originTxData: tx.originalTxData || {},
+          originTxData: tx.originTxData || {},
         } as Transaction.Transaction
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
