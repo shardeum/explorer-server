@@ -6,7 +6,7 @@ const EXPLORE_URL = 'http://localhost:6001'
 const STAKE_TX_TYPE = 3
 const NODE_ACCOUNT_TYPE = 9
 
-async function sleep(time: number) {
+async function sleep(time: number): Promise<void> {
     return new Promise((resolve: any) => {
         setTimeout(() => {
             resolve(true)
@@ -14,7 +14,7 @@ async function sleep(time: number) {
     })
 }
 
-const getNodeAccountByAddress = async () => {
+const getNodeAccountByAddress = async (): Promise<void> => {
     let url = `${EXPLORE_URL}/api/transaction?txType=${STAKE_TX_TYPE}`
 
     let operatorAddresses: any = {}
