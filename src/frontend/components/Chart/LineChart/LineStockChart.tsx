@@ -207,21 +207,6 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
           type: 'month',
           count: 1,
           text: '1m',
-          // }, {
-          //     type: 'month',
-          //     count: 3,
-          //     text: '3m'
-          // }, {
-          //     type: 'month',
-          //     count: 6,
-          //     text: '6m'
-          // }, {
-          //     type: 'year',
-          //     count: 1,
-          //     text: '1y'
-          // }, {
-          //     type: 'ytd',
-          //     text: 'YTD'
         },
         {
           type: 'all',
