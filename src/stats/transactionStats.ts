@@ -6,6 +6,7 @@ import { config } from '../config/index'
 export interface TransactionStats {
   cycle: number
   totalTxs: number
+  totalInternalTxs: number
   totalStakeTxs: number
   totalUnstakeTxs: number
   timestamp: number

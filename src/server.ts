@@ -455,12 +455,7 @@ const start = async () => {
         return
       }
       // Temp change to show the last <count> transactions excluding internal txs
-      transactions = await Transaction.queryTransactions(
-        0,
-        count,
-        null,
-        TransactionSearchType.AllExceptInternalTx
-      )
+      transactions = await Transaction.queryTransactions(0, count, null, TransactionSearchType.All)
     } else if (query.startCycle) {
       const startCycle: number = parseInt(query.startCycle)
       if (startCycle < 0 || Number.isNaN(startCycle)) {
@@ -664,10 +659,7 @@ const start = async () => {
       res.totalTransactions = totalTransactions
     }
     if (query.count) {
-      totalTransactions = await Transaction.queryTransactionCount(
-        null,
-        TransactionSearchType.AllExceptInternalTx
-      )
+      totalTransactions = await Transaction.queryTransactionCount(null, TransactionSearchType.All)
       if (query.txType) {
         if (
           txType === TransactionSearchType.StakeReceipt ||
@@ -1265,6 +1257,7 @@ const start = async () => {
         temp_array.push([
           item.timestamp * 1000,
           item.totalTxs,
+          item.totalInternalTxs,
           item.totalStakeTxs,
           item.totalUnstakeTxs,
           item.cycle,

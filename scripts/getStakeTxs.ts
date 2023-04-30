@@ -24,7 +24,7 @@ const getStakeTx = async () => {
                         operatorAddress: tx.wrappedEVMAccount.txFrom,
                         nodeAddress: tx.wrappedEVMAccount.readableReceipt.stakeInfo.nominee,
                         stakeAmount: Web3.utils.fromWei(
-                            tx.wrappedEVMAccount.readableReceipt.stakeInfo.stakeAmount,
+                            tx.wrappedEVMAccount.readableReceipt.stakeInfo.stake,
                             'ether'
                         ),
                         timestamp: tx.timestamp,

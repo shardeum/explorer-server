@@ -212,7 +212,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   <div className={styles.title}>Stake Amount:</div>
                   <div className={styles.value}>
                     {calculateFullValue(
-                      transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stakeAmount
+                      transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake
                     )}{' '}
                     SHM
                   </div>

@@ -72,13 +72,20 @@ export const recordTransactionsStats = async (latestCycle: number, lastStoredCyc
         endCycle,
         TransactionSearchType.UnstakeReceipt
       )
+      const internalTransactions = await Transaction.queryTransactionCountByCycles(
+        startCycle,
+        endCycle,
+        TransactionSearchType.InternalTxReceipt
+      )
       for (let j = 0; j < cycles.length; j++) {
         const txsCycle = transactions.filter((a) => a.cycle === cycles[j].counter)
+        const internalTxsCycle = internalTransactions.filter((a) => a.cycle === cycles[j].counter)
         const stakeTxsCycle = stakeTransactions.filter((a) => a.cycle === cycles[j].counter)
         const unstakeTxsCycle = unstakeTransactions.filter((a) => a.cycle === cycles[j].counter)
         combineTransactionStats.push({
           cycle: cycles[j].counter,
           totalTxs: txsCycle.length > 0 ? txsCycle[0].transactions : 0,
+          totalInternalTxs: internalTxsCycle.length > 0 ? internalTxsCycle[0].transactions : 0,
           totalStakeTxs: stakeTxsCycle.length > 0 ? stakeTxsCycle[0].transactions : 0,
           totalUnstakeTxs: unstakeTxsCycle.length > 0 ? unstakeTxsCycle[0].transactions : 0,
           timestamp: cycles[j].cycleRecord.start,

@@ -8,7 +8,7 @@ export const initializeStatsDB = async () => {
   // await db.runCreate('Drop INDEX if exists `validators_idx`');
   await db.runCreate('CREATE INDEX if not exists `validators_idx` ON `validators` (`timestamp` DESC)')
   await db.runCreate(
-    'CREATE TABLE if not exists `transactions` (`cycle` NUMBER NOT NULL UNIQUE PRIMARY KEY, `totalTxs` NUMBER NOT NULL, `totalStakeTxs` NUMBER NOT NULL, `totalUnstakeTxs` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL)'
+    'CREATE TABLE if not exists `transactions` (`cycle` NUMBER NOT NULL UNIQUE PRIMARY KEY, `totalTxs` NUMBER NOT NULL, `totalInternalTxs` NUMBER NOT NULL, `totalStakeTxs` NUMBER NOT NULL, `totalUnstakeTxs` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL)'
   )
   // await db.runCreate('Drop INDEX if exists `transactions_idx`');
   await db.runCreate('CREATE INDEX if not exists `transactions_idx` ON `transactions` (`timestamp` DESC)')
