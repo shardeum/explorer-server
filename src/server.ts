@@ -455,7 +455,7 @@ const start = async () => {
         return
       }
       // Temp change to show the last <count> transactions excluding internal txs
-      transactions = await Transaction.queryTransactions(0, count, null, TransactionSearchType.All)
+      transactions = await Transaction.queryTransactions(0, count, null, TransactionSearchType.AllExceptInternalTx)
     } else if (query.startCycle) {
       const startCycle: number = parseInt(query.startCycle)
       if (startCycle < 0 || Number.isNaN(startCycle)) {
