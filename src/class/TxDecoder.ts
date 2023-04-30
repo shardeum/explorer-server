@@ -140,11 +140,10 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
     for (let i = 0; i < logs.length; i++) {
       let log = logs[i]
       const logToSave = {
-        // fromblock:
-        // toblock:
         cycle: tx.cycle,
         timestamp: tx.timestamp,
         txHash: tx.txHash,
+        blockNumber: log.blockNumber, // TODO: Currently, blockNumber is saved as hexString. Look into which way (as number or as hexString) would be better for faster lookup. Add index to blockNumber when initializing the database.
         contractAddress: log.address,
         log: log,
       } as Log.Log

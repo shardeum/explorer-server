@@ -7,6 +7,7 @@ export interface Log {
   cycle: number
   timestamp: number
   txHash: string
+  blockNumber: string
   contractAddress: number
   log: any
   topic0: string
