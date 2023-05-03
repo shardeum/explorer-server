@@ -64,7 +64,7 @@ export async function bulkInsertValidatorsStats(validators: ValidatorStats[]) {
 export async function queryLatestValidatorStats(count: number) {
   try {
     const sql = `SELECT * FROM validators ORDER BY cycle DESC LIMIT ${count ? count : 100}`
-    const validatorsStats: unknown[] = await db.all(sql)
+    const validatorsStats: ValidatorStats[] = await db.all(sql)
     if (config.verbose) console.log('validatorStats count', validatorsStats)
     if (validatorsStats.length > 0) {
       validatorsStats.sort((a: { timestamp: number }, b: { timestamp: number }) => (a.timestamp > b.timestamp ? 1 : -1))
