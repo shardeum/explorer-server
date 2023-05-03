@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
+import { isTransactionHash, isNodeAccount } from '../../utils/getSearchRoute'
 
 export const useSearchHook = () => {
   const router = useRouter()
 
   const [search, setSearch] = useState<string>('')
 
-  const onSearch = useCallback(() => {
+  const onSearch = useCallback(async () => {
     const searchText = search.trim().toLowerCase()
 
     const regex = /[a-z]/i
@@ -20,9 +21,11 @@ export const useSearchHook = () => {
       router.push(`/transaction/${searchText}`)
     }
     if (searchText.length === 64) {
-      console.log('64')
-      router.push(`/transaction/${searchText}`)
+      if (await isTransactionHash(searchText)) router.push(`/transaction/0x${searchText}`)
+      else if (await isNodeAccount(searchText)) router.push(`/account/${searchText}`)
+      else router.push(`/cycle/${searchText}`)
     }
+    // Regex to check if the search text is a cycle number
     if (!regex.test(searchText)) {
       router.push(`/cycle/${searchText}`)
       console.log('regex')

@@ -134,7 +134,8 @@ export const AccountDetail: React.FC = () => {
         title={
           <div className={styles.header}>
             <div className={styles.title}>
-              Address - <span>&nbsp;&nbsp;{id}&nbsp;&nbsp;</span>
+              {accountType === AccountType.NodeAccount2 ? 'Node ID -' : 'Address -'}
+              <span>&nbsp;&nbsp;{id}&nbsp;&nbsp;</span>
             </div>
             <CopyButton text={id as string} title="Copy address to clipboard" />
           </div>
