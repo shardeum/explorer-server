@@ -1,5 +1,6 @@
 // require("dotenv").config();
 
+import { LOG_SUBSCRIPTIONS } from './subscription/'
 import * as Storage from './storage'
 import * as ArchivedCycle from './storage/archivedCycle'
 import * as Transaction from './storage/transaction'
@@ -7,7 +8,8 @@ import * as Account from './storage/account'
 import * as Cycle from './storage/cycle'
 import * as Receipt from './storage/receipt'
 import * as Log from './storage/log'
-import * as Fastify from 'fastify'
+import Fastify, { FastifyRequest } from 'fastify'
+import * as vanillaCrypto from 'crypto'
 import * as crypto from '@shardus/crypto-utils'
 import * as utils from './utils'
 import fastifyCors from '@fastify/cors'
@@ -38,6 +40,7 @@ import {
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
+import { SocketStream } from '@fastify/websocket'
 import {
   AccountResponse,
   AddressResponse,
@@ -109,13 +112,12 @@ const start = async (): Promise<void> => {
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
 
-  const server: Fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = Fastify.fastify({
+  const server = Fastify({
     logger: false,
   })
 
-  await server.register(fastifyCors, {
-    origin: true
-  })
+  await server.register(require('@fastify/websocket'), {clientTracking: true});
+  await server.register(fastifyCors)
   await server.register(fastifyRateLimit, {
     max: CONFIG.rateLimit,
     timeWindow: '1 minute',
@@ -142,6 +144,76 @@ const start = async (): Promise<void> => {
   server.get('/port', (req, reply) => {
     reply.send({ port: CONFIG.port.server })
   })
+
+  server.get('/subscription_list', (req,reply)=>{
+    reply.send([...LOG_SUBSCRIPTIONS.entries()]);
+  })
+  server.post('/evm_log_subscribe',(req,reply) => {
+    try{
+      const payload = req.body as any
+      let { subscription_id, address, topics } = payload
+
+      if( !subscription_id || 
+          !address ||
+          !Array.isArray(topics)
+        ){
+        throw new Error("Parameters are invalid");
+      }
+      
+
+      if(typeof address === "string") {
+        address = [address]
+      }
+
+      for(const el of address){
+
+        if(LOG_SUBSCRIPTIONS.has(el)){
+          const subbed_entries_to_this_address = LOG_SUBSCRIPTIONS.get(el)
+          subbed_entries_to_this_address.push(payload);
+          LOG_SUBSCRIPTIONS.set(el, subbed_entries_to_this_address);
+          reply.send({success: true});
+          return
+        }
+          LOG_SUBSCRIPTIONS.set(el,[{subscription_id, address, topics}])
+          reply.send({success: true});
+          return
+      }
+      
+
+    }catch(e:any){
+      reply.send({success: false, error: e.message});
+    }
+  })
+
+  // server.get('/evm_log_subscription', { websocket: true }, 
+  //            (connection:SocketStream, req:FastifyRequest) => {
+  //  
+  //    let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
+  //    socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
+  //    clients.list.set(socket_id, connection);
+  //
+  //   connection.socket.on('message', message => {
+  //     try{
+  //       const {address, subscription_id, topics} = JSON.parse(message);
+  //       if(!address || !subscription_id || !topics){
+  //         const res = {success: false, error: "Invalid params, subscription rejected"}
+  //         connection.socket.send(JSON.stringify(res)) 
+  //         return
+  //       }
+  //       connection.socket.send(JSON.stringify({success:true}));
+  //     }catch(e){
+  //       connection.socket.send({error: e.message});
+  //       return
+  //     }
+  //   })
+  //   connection.socket.on('disconnect', message => {
+  //     try{
+  //       const payload = JSON.parse(message);
+  //     }catch(e){
+  //       connection.socket.send({error: e.message});
+  //     }
+  //   })
+  // })
 
   server.get('/api/cycleinfo', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
