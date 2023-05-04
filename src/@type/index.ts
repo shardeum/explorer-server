@@ -71,7 +71,7 @@ export interface WrappedDataContractCode {
   accountType: AccountType.ContractCode
 
   // variant data: Contract code related and addresses
-  codeHash: Buffer
+  codeHash: { data: Buffer }
   codeByte: Buffer
   contractAddress: string
 }
