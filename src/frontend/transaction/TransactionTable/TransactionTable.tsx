@@ -31,9 +31,9 @@ const tempHeader: IColumnProps<Transaction | TokenTxs>[] = [
       <Chip
         title={showTxMethod(item)}
         color={
-          'wrappedEVMAccount' in item && item?.wrappedEVMAccount?.readableReceipt?.status === 1
-            ? 'success'
-            : 'error'
+          'wrappedEVMAccount' in item && item?.wrappedEVMAccount?.readableReceipt?.status === 0
+            ? 'error'
+            : 'success'
         }
         size="medium"
       />

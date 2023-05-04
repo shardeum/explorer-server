@@ -366,6 +366,7 @@ export async function queryReceiptByReceiptId(receiptId: string) {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) receipt.result = JSON.parse(receipt.result)
+      if (receipt.receipt) receipt.receipt = JSON.parse(receipt.receipt)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
     }
     if (config.verbose) console.log('Receipt receiptId', receipt)

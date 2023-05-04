@@ -1,6 +1,7 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import Web3Utils from 'web3-utils'
+import { utils } from 'ethers'
 
 import { AnchorLink, Button, ContentLayout, CopyButton, Spacer, Tab, Table } from '../components'
 import { DetailCard } from '../account/DetailCard'
@@ -55,6 +56,19 @@ export const Token: React.FC = () => {
     {
       key: 'tokenValue',
       value: 'Quantity',
+      render: (val: unknown) => (
+        <>
+          {' '}
+          {val
+            ? utils
+                .formatUnits(
+                  val as any,
+                  account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                )
+                .toString()
+            : ''}
+        </>
+      ),
     },
   ]
 
@@ -115,6 +129,17 @@ export const Token: React.FC = () => {
                     key: 'Balance :',
                     value: Web3Utils.fromWei(account?.account?.balance, 'ether'),
                   },
+                  {
+                    key: 'Max Total Supply :',
+                    value: account?.contractInfo?.totalSupply
+                      ? utils
+                          .formatUnits(
+                            account?.contractInfo?.totalSupply,
+                            account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                          )
+                          .toString()
+                      : '',
+                  },
                   { key: 'Holders :', value: tokenHolders },
                   { key: 'Transfers :', value: total },
                 ]}
@@ -159,7 +184,16 @@ export const Token: React.FC = () => {
             <div className={styles.divider} />
             <div>
               <div className={styles.title}>BALANCE</div>
-              <div className={styles.value}>{tokenBalance}</div>
+              <div className={styles.value}>
+                {tokenBalance
+                  ? utils
+                      .formatUnits(
+                        tokenBalance,
+                        account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                      )
+                      .toString()
+                  : ''}
+              </div>
             </div>
           </div>
         )}
