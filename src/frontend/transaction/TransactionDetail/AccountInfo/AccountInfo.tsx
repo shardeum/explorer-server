@@ -27,10 +27,10 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
         ethAddress: account?.data?.ethAddress,
         accountType: 'Contract Storage',
         storageKey: account?.data?.key,
-        value: Web3Utils.hexToNumberString(
+        valueRaw: rlp.decode(toBuffer(bufferToHex(account?.data?.value?.data))).toString('hex'),
+        decodedValueDec: Web3Utils.hexToNumberString(
           '0x' + rlp.decode(toBuffer(bufferToHex(account?.data?.value?.data))).toString('hex')
         ),
-        nonce: account?.data?.account?.nonce,
       }
     else if (account?.data?.accountType === AccountType.ContractCode)
       return {
@@ -40,10 +40,6 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
         accountType: 'Contract Code',
         codeHash: bufferToHex(account?.data?.codeHash?.data),
         codeByte: bufferToHex(account?.data?.codeByte?.data),
-        value: Web3Utils.hexToNumberString(
-          '0x' + rlp.decode(toBuffer(bufferToHex(account?.data?.value?.data))).toString('hex')
-        ),
-        nonce: account?.data?.account?.nonce,
       }
   })
   return (
