@@ -240,15 +240,9 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'contractAddress',
           value: 'Token',
-<<<<<<< HEAD
-          render: (val: unknown, item: any): JSX.Element => {
-            return item?.contractInfo?.name ? (
-              item?.contractInfo?.name
-=======
           render: (val: string | TransactionType, item: Transaction | TokenTxs) => {
             return (item as TokenTxs)?.contractInfo?.name ? (
               (item as TokenTxs)?.contractInfo?.name
->>>>>>> d28e410 (TransactionTable: Use types other than `any` or `unknown`)
             ) : (
               <AnchorLink href={`/token/${val}`} label={val as string} size="small" ellipsis width={150} />
             )

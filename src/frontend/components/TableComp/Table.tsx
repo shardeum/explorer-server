@@ -19,11 +19,8 @@ interface ITableBody<T> {
   row: T
 }
 
-<<<<<<< HEAD
-export function Table<T>({ columns, data }: ITableProps<T>): JSX.Element {
-=======
+
 export function Table<T = unknown>({ columns, data }: ITableProps<T>) {
->>>>>>> b48979f (frontend: Add generics to `Table`)
   return (
     <div className={styles.Table}>
       <table>
