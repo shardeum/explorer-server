@@ -1,6 +1,7 @@
-require('dotenv').config()
+import * as dotenv from 'dotenv'
+dotenv.config()
 
-import { Collector } from './class/Collector'
+import { Collector, Data, NewData } from './class/Collector'
 import * as ioclient from 'socket.io-client'
 import * as crypto from '@shardus/crypto-utils'
 import * as Storage from './storage'
@@ -19,46 +20,24 @@ import {
   toggleNeedSyncing,
   lastSyncedCycle,
   updateLastSyncedCycle,
-  compareReceiptsCountByCycles,
   downloadReceiptsBetweenCycles,
 } from './class/DataSync'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL, config } from './config'
+import { config as CONFIG, ARCHIVER_URL } from './config'
 import axios from 'axios'
 if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
 }
 
-interface RequestParams {
-  counter: string
-}
-interface RequestQuery {
-  page: string
-  count: string
-  from: string
-  to: string
-  cycle: number
-  partition: number
-  txid: string
-  ethHash: string
-  address: string
-  txType: string
-  startCycle: string
-  start: string
-  end: string
-  marker: string
-  type: string //contract query
-}
-
-export const checkAndSyncData = async () => {
+export const checkAndSyncData = async (): Promise<void> => {
   let lastStoredReceiptCount = await receipt.queryReceiptCount()
   let lastStoredCycleCount = await cycle.queryCycleCount()
   let totalReceiptsToSync = 0
   let totalCyclesToSync = 0
   let lastStoredReceiptCycle = 0
-  let response = await axios.get(`${ARCHIVER_URL}/totalData`)
+  const response = await axios.get(`${ARCHIVER_URL}/totalData`)
   if (response.data && response.data.totalReceipts >= 0 && response.data.totalCycles >= 0) {
     totalReceiptsToSync = response.data.totalReceipts
     totalCyclesToSync = response.data.totalCycles
@@ -77,7 +56,7 @@ export const checkAndSyncData = async () => {
     // lastStoredReceiptCount = lastStoredReceiptCount - receiptResult.receiptsToMatchCount
 
     // Added new method of comparing receipts by cycle
-    let lastStoredReceiptInfo = await receipt.queryLatestReceipts(1)
+    const lastStoredReceiptInfo = await receipt.queryLatestReceipts(1)
     if (lastStoredReceiptInfo && lastStoredReceiptInfo.length > 0)
       lastStoredReceiptCycle = lastStoredReceiptInfo[0].cycle
     const receiptResult = await compareWithOldReceiptsData(lastStoredReceiptCount)
@@ -131,7 +110,7 @@ export const checkAndSyncData = async () => {
 }
 
 // Setup Log Directory
-const start = async () => {
+const start = async (): Promise<void> => {
   await Storage.initializeDB()
 
   const collector = new Collector()
@@ -144,7 +123,7 @@ const start = async () => {
         console.log('connected to archive server')
       })
 
-      socketClient.on('RECEIPT', async (data: any) => {
+      socketClient.on('RECEIPT', async (data: NewData) => {
         // console.log('RECEIVED RECEIPT')
         try {
           collector.processReceipt(data)
@@ -158,10 +137,10 @@ const start = async () => {
     return
   }
 
-  let lastStoredCycles = await archivedCycle.queryAllArchivedCycles(1)
+  const lastStoredCycles = await archivedCycle.queryAllArchivedCycles(1)
   let lastStoredCycleCounter = 0
   let lastestCycleToSync = 0
-  let response = await axios.get(`${ARCHIVER_URL}/full-archive/1`)
+  const response = await axios.get(`${ARCHIVER_URL}/full-archive/1`)
   if (response.data && response.data.archivedCycles && response.data.archivedCycles.length > 0) {
     lastestCycleToSync = response.data.archivedCycles[0].cycleRecord.counter
     console.log('lastestCycleToSync', lastestCycleToSync)
@@ -211,7 +190,7 @@ const start = async () => {
     console.log('connected to archive server')
   })
 
-  socketClient.on('ARCHIVED_CYCLE', async (data: any) => {
+  socketClient.on('ARCHIVED_CYCLE', async (data: Data) => {
     console.log(
       'RECEIVED ARCHIVED_CYCLE',
       data.archivedCycles &&
