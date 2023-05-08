@@ -1,6 +1,6 @@
 // require("dotenv").config();
 
-import { LOG_SUBSCRIPTIONS } from './subscription/'
+import { addLogSubscriptions, evmLogDiscovery, LOG_SUBSCRIPTIONS_BY_ADDRESS, removeLogSubscription } from './subscription/'
 import * as Storage from './storage'
 import * as ArchivedCycle from './storage/archivedCycle'
 import * as Transaction from './storage/transaction'
@@ -146,74 +146,49 @@ const start = async (): Promise<void> => {
   })
 
   server.get('/subscription_list', (req,reply)=>{
-    reply.send([...LOG_SUBSCRIPTIONS.entries()]);
+    reply.send([...LOG_SUBSCRIPTIONS_BY_ADDRESS.entries()]);
   })
-  server.post('/evm_log_subscribe',(req,reply) => {
+  server.post('/api/evm_log_subscribe',(req,reply) => {
     try{
       const payload = req.body as any
-      let { subscription_id, address, topics } = payload
+      let { subscription_id, address, topics, ipport } = payload
 
       if( !subscription_id || 
           !address ||
-          !Array.isArray(topics)
+          !Array.isArray(topics) ||
+          !ipport
         ){
         throw new Error("Parameters are invalid");
       }
       
-
       if(typeof address === "string") {
         address = [address]
       }
 
-      for(const el of address){
-
-        if(LOG_SUBSCRIPTIONS.has(el)){
-          const subbed_entries_to_this_address = LOG_SUBSCRIPTIONS.get(el)
-          subbed_entries_to_this_address.push(payload);
-          LOG_SUBSCRIPTIONS.set(el, subbed_entries_to_this_address);
-          reply.send({success: true});
-          return
-        }
-          LOG_SUBSCRIPTIONS.set(el,[{subscription_id, address, topics}])
-          reply.send({success: true});
-          return
+      if(address.length === 0 && topics.length > 0){
+        address = ["AllContracts"] 
       }
-      
-
+      addLogSubscriptions(address, topics, subscription_id, ipport);      
+      reply.send({success: true})
     }catch(e:any){
       reply.send({success: false, error: e.message});
     }
   })
+  server.post('/api/evm_log_unsubscribe',(req,reply) => {
+    try{
+      const payload = req.body as any
+      let { subscription_id, ipport } = payload
 
-  // server.get('/evm_log_subscription', { websocket: true }, 
-  //            (connection:SocketStream, req:FastifyRequest) => {
-  //  
-  //    let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
-  //    socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
-  //    clients.list.set(socket_id, connection);
-  //
-  //   connection.socket.on('message', message => {
-  //     try{
-  //       const {address, subscription_id, topics} = JSON.parse(message);
-  //       if(!address || !subscription_id || !topics){
-  //         const res = {success: false, error: "Invalid params, subscription rejected"}
-  //         connection.socket.send(JSON.stringify(res)) 
-  //         return
-  //       }
-  //       connection.socket.send(JSON.stringify({success:true}));
-  //     }catch(e){
-  //       connection.socket.send({error: e.message});
-  //       return
-  //     }
-  //   })
-  //   connection.socket.on('disconnect', message => {
-  //     try{
-  //       const payload = JSON.parse(message);
-  //     }catch(e){
-  //       connection.socket.send({error: e.message});
-  //     }
-  //   })
-  // })
+      if(!subscription_id || !ipport) {
+        reply.send({success: false})
+      }
+
+      removeLogSubscription(subscription_id, ipport)
+      reply.send({success: true})
+    }catch(e:any){
+      reply.send({success: false, error: e.message});
+    }
+  })
 
   server.get('/api/cycleinfo', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
@@ -1437,6 +1412,7 @@ const start = async (): Promise<void> => {
         throw err
       }
       console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
+      setInterval(evmLogDiscovery, 15 * 1000);
     }
   )
 }
