@@ -44,7 +44,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
   })
   return (
     <div className={styles.AccountInfo}>
-      <pre>{JSON.stringify(accountsInfo, null, 2)}</pre>
+      <pre>{JSON.stringify(accountsInfo, null, 4)}</pre>
     </div>
   )
 }

@@ -10,7 +10,7 @@ interface ReceiptProps {
 export const Receipt: React.FC<ReceiptProps> = ({ receipt }) => {
   return (
     <div className={styles.Receipt}>
-      <pre>{JSON.stringify(receipt, null, 2)}</pre>
+      <pre>{JSON.stringify(receipt, null, 4)}</pre>
     </div>
   )
 }
