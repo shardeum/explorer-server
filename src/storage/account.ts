@@ -296,14 +296,14 @@ export async function queryAccounts(skip = 0, limit = 10, type = undefined) {
       const sql = `SELECT * FROM accounts WHERE accountType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
       accounts = await db.all(sql, [AccountType.Account])
     }
+    if (accounts.length > 0) {
+      accounts.forEach((account: any) => {
+        if (account.account) account.account = JSON.parse(account.account)
+        if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+      })
+    }
   } catch (e) {
     console.log(e)
-  }
-  if (accounts.length > 0) {
-    accounts.forEach((account: any) => {
-      if (account.account) account.account = JSON.parse(account.account)
-      if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
-    })
   }
   if (config.verbose) console.log('Accounts accounts', accounts)
   return accounts
@@ -517,7 +517,12 @@ export async function processAccountData(accounts: any) {
 
   for (let j = 0; j < accounts.length; j++) {
     let account = accounts[j]
-    if (typeof account.data === 'string') account.data = JSON.parse(account.data)
+    try {
+      if (typeof account.data === 'string') account.data = JSON.parse(account.data)
+    } catch (e) {
+      console.log('Error in parsing account data', account.data)
+      continue
+    }
     const accountType = account.data.accountType
     let accObj
     if (

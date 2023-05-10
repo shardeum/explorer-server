@@ -168,13 +168,13 @@ export async function queryLogs(
       inputs = [...inputs, ...[startCycle, endCycle]]
     }
     logs = await db.all(sql + sqlQueryExtension, inputs)
+    if (logs.length > 0) {
+      logs.forEach((log: any) => {
+        if (log.log) log.log = JSON.parse(log.log)
+      })
+    }
   } catch (e) {
     console.log(e)
-  }
-  if (logs.length > 0) {
-    logs.forEach((log: any) => {
-      if (log.log) log.log = JSON.parse(log.log)
-    })
   }
   if (config.verbose) console.log('Log logs', logs)
   return logs
