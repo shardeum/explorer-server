@@ -38,7 +38,7 @@ export interface Transaction<O extends object = object, D extends object = objec
   originTxData: O
 
   // not in the database schema
-  data?: D
+  data: D
   tokenTxs?: TokenTx[]
   contractInfo?: object
 }
