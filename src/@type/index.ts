@@ -43,30 +43,51 @@ export interface BaseAccount {
  * that is held in memory for awhile but eventually cleared.  This would mean that we have to be able to pull these
  * from disk again, and that could be a bit tricky.
  */
-export interface WrappedEVMAccount extends BaseAccount {
-  // accountType: AccountType // determines how the shardus address will be computed and what variant data is present
-  ethAddress: string //account address in EVM space. can have different meanings depending on account type
-  hash: string //account hash
-  timestamp: number //account timestamp.  last time a TX changed it
+interface BaseWrappedEVMAccount extends BaseAccount {
+  ethAddress: string // account address in EVM space. can have different meanings depending on account type
+  hash: string // account hash
+  timestamp: number // account timestamp.  last time a TX changed it
+}
 
-  //variant data: account
-  account?: Account //actual EVM account. if this is type Account
-  //variant data: contract storage
-  key?: string //EVM CA storage key
-  value?: Buffer //EVM buffer value if this is of type CA_KVP
-  //variant data: Contract code related and addresses
-  codeHash?: Buffer
-  codeByte?: Buffer
-  contractAddress?: string
-  //variant data: Receipt related
-  receipt?: TxReceipt
-  readableReceipt?: ReadableReceipt
-  amountSpent?: string
-  txId?: string
-  txFrom?: string
-  contractInfo?: ERC20ContractDetail
-  tokenTx?: TokenTx
-  balance?: number // For debug tx
+export type WrappedEVMAccount = BaseWrappedEVMAccount &
+  (WrappedDataReceipt | WrappedDataAccount | WrappedDataContractStorage | WrappedDataContractCode)
+
+export interface WrappedDataAccount {
+  accountType: AccountType.Account
+
+  // variant data: account
+  account: Account
+}
+
+export interface WrappedDataContractStorage {
+  accountType: AccountType.ContractStorage
+
+  // variant data: contract storage
+  key: string // EVM CA storage key
+  value: Buffer // EVM buffer value if this is of type CA_KVP
+}
+
+export interface WrappedDataContractCode {
+  accountType: AccountType.ContractCode
+
+  // variant data: Contract code related and addresses
+  codeHash: Buffer
+  codeByte: Buffer
+  contractAddress: string
+}
+
+export interface WrappedDataReceipt {
+  accountType: AccountType.Receipt
+
+  // variant data: Receipt related
+  receipt: TxReceipt
+  readableReceipt: ReadableReceipt
+  amountSpent: string
+  txId: string
+  txFrom: string
+  contractInfo: ERC20ContractDetail
+  tokenTx: TokenTx
+  balance: string // For debug tx
 }
 
 export interface ReadableReceipt {
