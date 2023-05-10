@@ -301,13 +301,13 @@ export async function processReceiptData(
           }
           if ('amountSpent' in txObj.wrappedEVMAccount) {
             const obj = {
+              ...tx,
               txId: txObj.txId,
               txHash: txObj.txHash,
               cycle: txObj.cycle,
               timestamp: txObj.timestamp,
               transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
               contractInfo,
-              ...tx,
             }
             if (tx.tokenType === TransactionType.ERC_1155) {
               combineTokenTransactions2.push(obj)
