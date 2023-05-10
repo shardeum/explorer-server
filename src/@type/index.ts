@@ -136,7 +136,7 @@ export interface TokenTx<C = string> {
   tokenValue: string
   tokenType: TransactionType
   tokenEvent: string
-  tokenOperator?: string
+  tokenOperator?: string | null
   transactionFee: string
 
   // references another tx
