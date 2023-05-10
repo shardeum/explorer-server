@@ -468,7 +468,11 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
         hash: account.hash,
         accountType: account.data.accountType,
       }
-      if (accountType === AccountType.Account && bufferToHex(accObj.account.codeHash.data) !== EOA_CodeHash) {
+      if (
+        accountType === AccountType.Account &&
+        accObj.account.codeHash?.data &&
+        bufferToHex(accObj.account.codeHash.data) !== EOA_CodeHash
+      ) {
         const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
         accObj.contractInfo = contractInfo
         accObj.contractType = contractType
