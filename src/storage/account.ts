@@ -427,7 +427,7 @@ type RawAccount = {
     ethAddress: string
     account: WrappedEVMAccount
   }
-  timestamp: bigint
+  timestamp: number
   hash: string
 }
 
