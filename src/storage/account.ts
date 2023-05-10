@@ -180,6 +180,7 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
             account: account as unknown as WrappedEVMAccount,
             hash: account.hash,
             accountType: account.accountType,
+            ethAddress: '',
           }
         }
         const accountExist = await queryAccountByAddress(accObj.accountId)
