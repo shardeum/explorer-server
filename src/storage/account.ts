@@ -128,7 +128,8 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
     if (config.verbose) console.log('No partitionMaps')
     return
   }
-  for (const [partition, receiptsInPartition] of Object.entries(archivedCycle.receipt.partitionMaps)) {
+  for (const [partitionStr, receiptsInPartition] of Object.entries(archivedCycle.receipt.partitionMaps)) {
+    const partition = Number(partitionStr)
     for (const txId in receiptsInPartition) {
       if (skipTxs.includes(txId)) continue
       // eslint-disable-next-line security/detect-object-injection
