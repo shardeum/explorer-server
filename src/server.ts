@@ -121,9 +121,11 @@ const start = async () => {
   })
 
   server.get('/subscription_list', (req,reply)=>{
+    if(!CONFIG.subscription.enabled) reply.send({success: false, error: "Subscription not serving"})
     reply.send([...LOG_SUBSCRIPTIONS_BY_ADDRESS.entries()]);
   })
   server.post('/api/evm_log_subscribe',(req,reply) => {
+    if(!CONFIG.subscription.enabled) reply.send({success: false, error: "Subscription not serving"})
     try{
       const payload = req.body as any
       let { subscription_id, address, topics, ipport } = payload
@@ -150,6 +152,7 @@ const start = async () => {
     }
   })
   server.post('/api/evm_log_unsubscribe',(req,reply) => {
+    if(!CONFIG.subscription.enabled) reply.send({success: false, error: "Subscription not serving"})
     try{
       const payload = req.body as any
       let { subscription_id, ipport } = payload
@@ -1374,7 +1377,9 @@ const start = async () => {
         throw err
       }
       console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
-      setInterval(evmLogDiscovery, 15 * 1000);
+      if(CONFIG.subscription.enabled) {
+        setInterval(evmLogDiscovery, 15 * 1000);
+      }
     }
   )
 }
