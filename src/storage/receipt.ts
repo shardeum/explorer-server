@@ -279,6 +279,8 @@ export async function processReceiptData(
                 account: {
                   nonce: '0',
                   balance: '0',
+                  ethAddress: '',
+                  accountType: AccountType.Account,
                 },
                 hash: 'Ox',
                 accountType: AccountType.Account,
