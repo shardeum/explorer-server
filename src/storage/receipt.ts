@@ -251,6 +251,8 @@ export async function processReceiptData(
         } else {
           if (
             transactionExist.cycle <= txObj.cycle &&
+            transactionExist.wrappedEVMAccount.timestamp &&
+            txObj.wrappedEVMAccount.timestamp &&
             transactionExist.wrappedEVMAccount.timestamp < txObj.wrappedEVMAccount.timestamp
           ) {
             await Transaction.updateTransaction(tx.txId, txObj)
