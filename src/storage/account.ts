@@ -160,7 +160,7 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
 
       for (const accountDatum of accountData) {
         account = accountDatum.data
-        let accObj: Partial<Account>
+        let accObj: Account
         if (account.accountType === AccountType.Account) {
           accObj = {
             accountId: accountDatum.accountId,
