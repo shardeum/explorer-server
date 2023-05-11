@@ -159,7 +159,7 @@ export async function processTransactionData(transactions: Transaction<object, {
       accountType === AccountType.InternalTxReceipt
     ) {
       const txObj = {
-        txId: transaction.data.txId,
+        txId: transaction.data?.txId,
         result: ['passed'], // temp placeholder
         cycle: transaction.cycle,
         // partition: Number(partition), // We don't know the partition now
@@ -457,7 +457,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
       } else {
         if (
           transactionExist.cycle < transactionInfo.cycle &&
-          transactionExist.wrappedEVMAccount.timestamp < transactionInfo.wrappedEVMAccount.timestamp
+          (transactionExist.wrappedEVMAccount.timestamp ?? 0) < transactionInfo.wrappedEVMAccount.timestamp
         ) {
           await updateTransaction(txId, transactionInfo)
         }
