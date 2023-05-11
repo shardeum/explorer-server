@@ -134,12 +134,17 @@ export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx<C>[]): Pr
   }
 }
 
-export async function processTransactionData(transactions: Transaction<object, {
+export async function processTransactionData(
+  transactions: Transaction<
+    object,
+    {
   accountType: AccountType
   txId: string
   ethAddress: string
   readableReceipt: ReadableReceipt
-}>[]): Promise<void> {
+    }
+  >[]
+): Promise<void> {
   console.log('transactions size', transactions.length)
   if (transactions && transactions.length <= 0) return
   const bucketSize = 1000
@@ -375,7 +380,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         // Contract Account
         // eslint-disable-next-line security/detect-object-injection
         transactionData = archivedCycle?.receipt?.partitionTxs?.[partition][txId].filter(
-          (acc: Transaction<object, {accountType: AccountType, ethAddress: string}>) => {
+          (acc: Transaction<object, { accountType: AccountType; ethAddress: string }>) => {
           return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
         })
         if (transactionData.length > 0) {
