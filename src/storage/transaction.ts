@@ -503,10 +503,10 @@ export async function queryTransactionCount(
         const sql = `SELECT COUNT(*) FROM transactions WHERE txFrom=? OR txTo=? OR nominee=?`
         transactions = await db.get(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         console.log('txType', txType)
         const sql = `SELECT COUNT(*) FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=?`
-        transactions = await db.get(sql, [address, address, address, txType])
+        transactions = await db.get(sql, [address, address, address, ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -514,7 +514,7 @@ export async function queryTransactionCount(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -525,14 +525,14 @@ export async function queryTransactionCount(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) AND transactionType=?`
-        transactions = await db.get(sql, [address, address, address, txType])
+        transactions = await db.get(sql, [address, address, address, ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -541,7 +541,7 @@ export async function queryTransactionCount(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=?`
-        transactions = await db.get(sql, [address, address, address, txType])
+        transactions = await db.get(sql, [address, address, address, ty])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
           const sql = `SELECT COUNT(*) FROM tokenTxs WHERE contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT tokenType=?`
@@ -562,9 +562,9 @@ export async function queryTransactionCount(
         const sql = `SELECT COUNT(*) FROM transactions`
         transactions = await db.get(sql, [])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE transactionType!=?`
-        transactions = await db.get(sql, [txType])
+        transactions = await db.get(sql, [ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -572,7 +572,7 @@ export async function queryTransactionCount(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -583,14 +583,14 @@ export async function queryTransactionCount(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE transactionType=?`
-        transactions = await db.get(sql, [txType])
+        transactions = await db.get(sql, [ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -599,7 +599,7 @@ export async function queryTransactionCount(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE tokenType=?`
-        transactions = await db.get(sql, [txType])
+        transactions = await db.get(sql, [ty])
       }
     } else {
       const sql = `SELECT COUNT(*) FROM transactions`
@@ -628,9 +628,9 @@ export async function queryTransactions(
         const sql = `SELECT * FROM transactions WHERE txFrom=? OR txTo=? OR nominee=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [address, address, address, txType])
+        transactions = await db.all(sql, [address, address, address, ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -638,7 +638,7 @@ export async function queryTransactions(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -649,14 +649,14 @@ export async function queryTransactions(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) AND transactionType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [address, address, address, txType])
+        transactions = await db.all(sql, [address, address, address, ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -665,7 +665,7 @@ export async function queryTransactions(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [address, address, address, txType])
+        transactions = await db.all(sql, [address, address, address, ty])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
           const sql = `SELECT * FROM tokenTxs WHERE contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
@@ -683,9 +683,9 @@ export async function queryTransactions(
       }
     } else if (txType) {
       if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE transactionType!=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [txType])
+        transactions = await db.all(sql, [ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -693,7 +693,7 @@ export async function queryTransactions(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -704,14 +704,14 @@ export async function queryTransactions(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE transactionType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [txType])
+        transactions = await db.all(sql, [ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -720,7 +720,7 @@ export async function queryTransactions(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE tokenType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [txType])
+        transactions = await db.all(sql, [ty])
       }
     } else {
       const sql = `SELECT * FROM transactions ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
@@ -828,9 +828,9 @@ export async function queryTransactionsBetweenCycles(
         const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [start, end, address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [start, end, address, address, address, txType])
+        transactions = await db.all(sql, [start, end, address, address, address, ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -838,7 +838,7 @@ export async function queryTransactionsBetweenCycles(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -849,14 +849,14 @@ export async function queryTransactionsBetweenCycles(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [start, end, address, address, address, txType])
+        transactions = await db.all(sql, [start, end, address, address, address, ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -865,7 +865,7 @@ export async function queryTransactionsBetweenCycles(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [start, end, address, address, address, txType])
+        transactions = await db.all(sql, [start, end, address, address, address, ty])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
           const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -885,9 +885,9 @@ export async function queryTransactionsBetweenCycles(
       }
     } else if (txType) {
       if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND transactionType!=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-        transactions = db.all(sql, [start, end, txType])
+        transactions = await db.all(sql, [start, end, ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -895,7 +895,7 @@ export async function queryTransactionsBetweenCycles(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -906,14 +906,14 @@ export async function queryTransactionsBetweenCycles(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND transactionType=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [start, end, txType])
+        transactions = await db.all(sql, [start, end, ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -922,7 +922,7 @@ export async function queryTransactionsBetweenCycles(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE cycle BETWEEN ? and ? AND tokenType=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-        transactions = await db.all(sql, [start, end, txType])
+        transactions = await db.all(sql, [start, end, ty])
       }
     } else {
       const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
@@ -960,9 +960,9 @@ export async function queryTransactionCountBetweenCycles(
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?)`
         transactions = await db.get(sql, [start, end, address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=?`
-        transactions = await db.get(sql, [start, end, address, address, address, txType])
+        transactions = await db.get(sql, [start, end, address, address, address, ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -970,7 +970,7 @@ export async function queryTransactionCountBetweenCycles(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -981,14 +981,14 @@ export async function queryTransactionCountBetweenCycles(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType=?`
-        transactions = await db.get(sql, [start, end, address, address, address, txType])
+        transactions = await db.get(sql, [start, end, address, address, address, ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -997,7 +997,7 @@ export async function queryTransactionCountBetweenCycles(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=?`
-        transactions = await db.get(sql, [start, end, address, address, address, txType])
+        transactions = await db.get(sql, [start, end, address, address, address, ty])
       } else if (txType === TransactionSearchType.TokenTransfer) {
         if (filterAddress) {
           const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT tokenType=?`
@@ -1022,9 +1022,9 @@ export async function queryTransactionCountBetweenCycles(
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ?`
         transactions = await db.get(sql, [start, end])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        txType = TransactionType.InternalTxReceipt
+        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND transactionType!=?`
-        transactions = await db.get(sql, [start, end, txType])
+        transactions = await db.get(sql, [start, end, ty])
       } else if (
         txType === TransactionSearchType.Receipt ||
         txType === TransactionSearchType.NodeRewardReceipt ||
@@ -1032,7 +1032,7 @@ export async function queryTransactionCountBetweenCycles(
         txType === TransactionSearchType.UnstakeReceipt ||
         txType === TransactionSearchType.InternalTxReceipt
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
@@ -1043,14 +1043,14 @@ export async function queryTransactionCountBetweenCycles(
             ? TransactionType.UnstakeReceipt
             : TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND transactionType=?`
-        transactions = await db.get(sql, [start, end, txType])
+        transactions = await db.get(sql, [start, end, ty])
       } else if (
         txType === TransactionSearchType.EVM_Internal ||
         txType === TransactionSearchType.ERC_20 ||
         txType === TransactionSearchType.ERC_721 ||
         txType === TransactionSearchType.ERC_1155
       ) {
-        txType =
+        const ty =
           txType === TransactionSearchType.EVM_Internal
             ? TransactionType.EVM_Internal
             : txType === TransactionSearchType.ERC_20
@@ -1059,7 +1059,7 @@ export async function queryTransactionCountBetweenCycles(
             ? TransactionType.ERC_721
             : TransactionType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE cycle BETWEEN ? and ? AND tokenType=?`
-        transactions = await db.get(sql, [start, end, txType])
+        transactions = await db.get(sql, [start, end, ty])
       }
     } else {
       const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ?`
@@ -1084,7 +1084,7 @@ export async function queryTransactionCountByCycles(start: number, end: number, 
       txType === TransactionSearchType.UnstakeReceipt ||
       txType === TransactionSearchType.InternalTxReceipt
     ) {
-      txType =
+      const ty =
         txType === TransactionSearchType.Receipt
           ? TransactionType.Receipt
           : txType === TransactionSearchType.NodeRewardReceipt
@@ -1095,7 +1095,7 @@ export async function queryTransactionCountByCycles(start: number, end: number, 
           ? TransactionType.UnstakeReceipt
           : TransactionType.InternalTxReceipt
       const sql = `SELECT cycle, COUNT(*) FROM transactions WHERE transactionType=? GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
-      transactions = await db.all(sql, [txType, start, end])
+      transactions = await db.all(sql, [ty, start, end])
     } else {
       const sql = `SELECT cycle, COUNT(*) FROM transactions GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
       transactions = await db.all(sql, [start, end])
