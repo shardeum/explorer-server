@@ -14,7 +14,7 @@ import fastifyCors from '@fastify/cors'
 import { Server, IncomingMessage, ServerResponse } from 'http'
 import fastifyNextjs from '@fastify/nextjs'
 import axios from 'axios'
-import { AccountSearchType, AccountType, TransactionSearchType } from './@type'
+import { AccountSearchType, AccountType, TokenTx, TransactionSearchType } from './@type'
 import * as StatsStorage from './stats'
 import * as ValidatorStats from './stats/validatorStats'
 import * as TransactionStats from './stats/transactionStats'
@@ -438,7 +438,7 @@ const start = async (): Promise<void> => {
     const itemsPerPage = 10
     let totalPages = 0
     let totalTransactions = 0
-    let transactions
+    let transactions: (Transaction.Transaction<object, object> | TokenTx<string>)[]
     let txType: TransactionSearchType
     let filterAddressTokenBalance = 0
     if (query.txType) {

@@ -312,7 +312,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         continue
       }
       // console.log('accountList', archivedCycle.receipt.partitionTxs[partition][txId])
-      let transactionExist: Transaction = await queryTransactionByTxId(txId)
+      let transactionExist = await queryTransactionByTxId(txId)
       if (config.verbose) console.log('transactionExist', transactionExist)
       if (transactionExist) continue
       let transactionData = partitionTx.filter((acc: Transaction<object, { accountType: AccountType }>) => {
@@ -332,7 +332,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         // Other types of tx like init_network, node_reward
         continue // skip other types of tx for now // will open it back after changes are made in client to display it
       }
-      const transactionInfo: Partial<Transaction> = {
+      const transactionInfo = {
         txId,
         // eslint-disable-next-line security/detect-object-injection
         result: receiptsInPartition[txId],
@@ -381,7 +381,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         if (transactionData.length > 0) {
           if (config.verbose) console.log('contract transactionData', txId, transactionData)
           const accountId = transactionData[0].accountId
-          const accountExist: Account.Account = await Account.queryAccountByAddress(accountId)
+          const accountExist = await Account.queryAccountByAddress(accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           const account = transactionData[0].data
           const accObj: Account.Account = {
@@ -432,7 +432,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
             if (!accountExist) {
               // Account is not created in the EVM yet
               // Make a sample account with that address to show the account info in the explorer
-              const accObj: Partial<Account.Account> = {
+              const accObj: Account.Account = {
                 accountId: tokenTx.tokenTo.slice(2).toLowerCase() + '0'.repeat(24),
                 cycle: archivedCycle.cycleRecord.counter,
                 timestamp: transactionInfo.timestamp,
@@ -749,7 +749,7 @@ export async function queryTransactions(
   return transactions
 }
 
-export async function queryTransactionByTxId(txId: string, detail = false): Promise<Transaction> {
+export async function queryTransactionByTxId(txId: string, detail = false): Promise<Transaction | null> {
   try {
     const sql = `SELECT * FROM transactions WHERE txId=?`
     const transaction: DbTransaction = await db.get(sql, [txId])
@@ -770,9 +770,13 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
   } catch (e) {
     console.log(e)
   }
+  return null
 }
 
-export async function queryTransactionByHash(txHash: string, detail = false): Promise<DbTransaction<object>> {
+export async function queryTransactionByHash(
+  txHash: string,
+  detail = false
+): Promise<Transaction<object> | null> {
   try {
     const sql = `SELECT * FROM transactions WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
     const transaction: DbTransaction = await db.get(sql, [txHash])
@@ -796,6 +800,7 @@ export async function queryTransactionByHash(txHash: string, detail = false): Pr
   } catch (e) {
     console.log(e)
   }
+  return null
 }
 
 export async function queryTransactionsForCycle(cycleNumber: number): Promise<Transaction[]> {
