@@ -407,7 +407,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
       if (config.verbose) console.log('ERC20', contractAddress, data.length, from)
       if (contractAddress === null && data.length > 2) {
         if (config.verbose) console.log('ERC 20 Token', transactionInfo.wrappedEVMAccount.readableReceipt)
-        const methodCode = data.substring(0, 10)
+        const methodCode = data.substring(0, 10) as keyof typeof ERC20_METHOD_DIC
         if (config.verbose) console.log(methodCode)
         // eslint-disable-next-line security/detect-object-injection
         if (ERC20_METHOD_DIC[methodCode] === 'transfer' || ERC20_METHOD_DIC[methodCode] === 'transferFrom') {
@@ -440,9 +440,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
                 account: {
                   nonce: '0',
                   balance: '0',
-                  ethAddress: undefined,
-                  accountType: undefined,
-                },
+                } as WrappedEVMAccount,
                 accountType: AccountType.Account,
                 hash: 'Ox',
               }

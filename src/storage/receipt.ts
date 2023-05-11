@@ -1,7 +1,7 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { AccountType, TokenTx, TransactionType, WrappedAccount } from '../@type'
+import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccount } from '../@type'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
@@ -279,9 +279,7 @@ export async function processReceiptData(
                 account: {
                   nonce: '0',
                   balance: '0',
-                  ethAddress: '',
-                  accountType: AccountType.Account,
-                },
+                } as WrappedEVMAccount,
                 hash: 'Ox',
                 accountType: AccountType.Account,
               }
