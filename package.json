@@ -13,6 +13,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "serve": "npm run prepare && npm run build && node dist/server.js",
     "lint": "eslint './src/**/*.ts'",
     "lint-windows": "eslint ./src/**/*.ts",
     "test": "echo \"Error: no test specified\" && exit 1",

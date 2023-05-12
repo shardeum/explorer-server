@@ -103,7 +103,7 @@ const start = async () => {
   })
   server
     .register(fastifyNextjs, {
-      dev: process.env.NODE_ENV !== 'production',
+      dev: CONFIG.env !== 'production',
       logLevel: 'debug',
       noServeAssets: false,
     })
