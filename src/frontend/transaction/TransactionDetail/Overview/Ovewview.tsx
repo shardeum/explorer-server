@@ -18,7 +18,7 @@ interface OvewviewProps {
   transaction: Transaction
 }
 
-export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
+export const Ovewview: React.FC<OvewviewProps> = ({transaction}) => {
   const renderErc20Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
@@ -35,7 +35,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.card}>
               {items.map((item, index) => (
                 <div key={index} className={styles.row}>
-                  <Icon name="right_arrow" color="black" size="small" />
+                  <Icon name="right_arrow" color="black" size="small"/>
                   <span>From</span>
                   <Link href={`/account/${item.tokenFrom}`} className={styles.anchor}>
                     {item.tokenFrom}
@@ -151,7 +151,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Type:</div>
             <div className={styles.value}>
-              <Chip title={showTxMethod(transaction)} color="info" className={styles.chip} />
+              <Chip title={showTxMethod(transaction)} color="info" className={styles.chip}/>
             </div>
           </div>
 
@@ -192,7 +192,12 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   {transaction?.txTo}
                 </Link>
               ) : (
-                <div>Contract Creation</div>
+                <div>
+                  <Link href={`/account/${transaction?.wrappedEVMAccount?.readableReceipt?.contractAddress}`}
+                        className={styles.link}>
+                    {transaction?.wrappedEVMAccount?.readableReceipt?.contractAddress}
+                  </Link> (Contract created)
+                </div>
               )}
             </div>
           </div>

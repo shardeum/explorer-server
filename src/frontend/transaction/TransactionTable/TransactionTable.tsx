@@ -9,6 +9,7 @@ import { showTxMethod } from '../../utils/showMethod'
 import { TokenTxs, Transaction, TransactionSearchType, TransactionType } from '../../types'
 import { Table } from '../../components/TableComp'
 import { IColumnProps } from '../../components/TableComp/Table'
+import { ReadableReceipt } from '../../../@type';
 
 interface ITransactionTable {
   data: (Transaction | TokenTxs)[]
@@ -16,7 +17,7 @@ interface ITransactionTable {
   txType?: TransactionSearchType
 }
 
-const tempHeader: IColumnProps<Transaction | TokenTxs>[] = [
+const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTxs>[] = [
   {
     key: 'txHash',
     value: 'Txn Hash',
@@ -53,10 +54,10 @@ const tempHeader: IColumnProps<Transaction | TokenTxs>[] = [
 export const TransactionTable: React.FC<ITransactionTable> = (props) => {
   const { data, txType = TransactionSearchType.All } = props
 
-  const [header, setHeader] = useState<IColumnProps<Transaction | TokenTxs>[]>([])
+  const [header, setHeader] = useState<IColumnProps<ReadableReceipt | Transaction | TokenTxs>[]>([])
 
   useEffect(() => {
-    let tHeader: IColumnProps<Transaction | TokenTxs>[] = []
+    let tHeader: IColumnProps<ReadableReceipt | Transaction | TokenTxs>[] = []
 
     if (
       txType === TransactionSearchType.AllExceptInternalTx ||
@@ -73,13 +74,13 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           ),
         },
         {
-          key: 'wrappedEVMAccount.readableReceipt.to',
+          key: 'wrappedEVMAccount.readableReceipt',
           value: 'To',
-          render: (val: string | TransactionType) =>
-            val ? (
-              <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          render: (val: ReadableReceipt) =>
+            val?.to ? (
+              <AnchorLink href={`/account/${val.to}`} label={val.to} size="small" ellipsis width={150} />
             ) : (
-              'Contract Creation'
+              <AnchorLink href={`/account/${val.contractAddress}`} label={val.contractAddress + '(Contract created)'} size="small" ellipsis width={150} />
             ),
         },
         {
