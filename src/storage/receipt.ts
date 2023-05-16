@@ -214,14 +214,14 @@ export async function processReceiptData(
         txReceipt.data.accountType === AccountType.Receipt
           ? TransactionType.Receipt
           : txReceipt.data.accountType === AccountType.NodeRewardReceipt
-          ? TransactionType.NodeRewardReceipt
-          : txReceipt.data.accountType === AccountType.StakeReceipt
-          ? TransactionType.StakeReceipt
-          : txReceipt.data.accountType === AccountType.UnstakeReceipt
-          ? TransactionType.UnstakeReceipt
-          : txReceipt.data.accountType === AccountType.InternalTxReceipt
-          ? TransactionType.InternalTxReceipt
-          : (-1 as TransactionType)
+            ? TransactionType.NodeRewardReceipt
+            : txReceipt.data.accountType === AccountType.StakeReceipt
+              ? TransactionType.StakeReceipt
+              : txReceipt.data.accountType === AccountType.UnstakeReceipt
+                ? TransactionType.UnstakeReceipt
+                : txReceipt.data.accountType === AccountType.InternalTxReceipt
+                  ? TransactionType.InternalTxReceipt
+                  : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
         const txObj = {
@@ -309,7 +309,7 @@ export async function processReceiptData(
             }
             if (tx.tokenType === TransactionType.ERC_1155) {
               combineTokenTransactions2.push(obj)
-          } else {
+            } else {
               combineTokenTransactions.push(obj)
             }
           }
@@ -384,11 +384,11 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
     const receipts: DbReceipt[] = await db.all(sql)
 
     receipts.forEach((receipt: DbReceipt) => {
-        if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-        if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
+      if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-        if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
-      })
+      if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
+    })
 
     if (config.verbose) console.log('Receipt latest', receipts)
     return receipts
@@ -406,11 +406,11 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
     receipts = await db.all(sql)
 
     receipts.forEach((receipt: DbReceipt) => {
-        if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-        if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
+      if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-        if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
-      })
+      if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
+    })
   } catch (e) {
     console.log(e)
   }
@@ -446,7 +446,7 @@ export async function queryReceiptCountByCycles(start: number, end: number): Pro
     return {
       receipts: receipt['COUNT(*)'],
       cycle: receipt.cycle
-  }
+    }
   })
 }
 
@@ -461,11 +461,11 @@ export async function queryReceiptsBetweenCycles(
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql, [start, end])
     receipts.forEach((receipt: DbReceipt) => {
-        if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-        if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
+      if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-        if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
-      })
+      if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
+    })
   } catch (e) {
     console.log(e)
   }
