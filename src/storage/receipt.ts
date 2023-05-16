@@ -120,9 +120,10 @@ export async function processReceiptData(receipts: any) {
         }
         if (
           accountType === AccountType.Account &&
+          'codeHash' in accObj.account &&
           bufferToHex(accObj.account.codeHash.data) !== EOA_CodeHash
         ) {
-          const accountExist: any = await Account.queryAccountByAccountId(accObj.accountId)
+          const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
             const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
@@ -156,7 +157,7 @@ export async function processReceiptData(receipts: any) {
             }
           }
         }
-        if (accountType === AccountType.ContractStorage) {
+        if (accountType === AccountType.ContractStorage && 'key' in accObj.account) {
           storageKeyValueMap[accObj.account.key + accObj.ethAddress] = accObj.account
         }
       } else if (
