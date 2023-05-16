@@ -5,39 +5,31 @@ export const initializeDB = async () => {
   await db.runCreate(
     'CREATE TABLE if not exists `archivedCycles` (`cycleMarker` TEXT NOT NULL UNIQUE PRIMARY KEY, `counter` NUMBER NOT NULL, `cycleRecord` JSON NOT NULL, `data` JSON, `receipt` JSON, `summary` JSON)'
   )
-  //   await db.runCreate(
-  //     'CREATE TABLE if not exists `cycle` (`counter` BIGINT NOT NULL UNIQUE PRIMARY KEY, `networkId` TEXT NOT NULL,  `safetyMode` BOOLEAN, `safetyNum` BIGINT,`networkStateHash` BIGINT, `networkDataHash` JSON, `networkReceiptHash` JSON, `networkSummaryHash` JSON, `certificate` JSON NOT NULL, `previous` TEXT NOT NULL, `marker` TEXT NOT NULL, `start` BIGINT NOT NULL, `duration` BIGINT NOT NULL, `active` BIGINT NOT NULL, `syncing` BIGINT NOT NULL, `desired` BIGINT NOT NULL, `expired` BIGINT NOT NULL, `joined` JSON NOT NULL, `joinedArchivers` JSON NOT NULL,`leavingArchivers` JSON NOT NULL, `joinedConsensors` JSON NOT NULL,`refreshedArchivers` JSON NOT NULL, `refreshedConsensors` JSON NOT NULL, `activated` JSON NOT NULL, `activatedPublicKeys` JSON NOT NULL, `removed` JSON NOT NULL, `returned` JSON NOT NULL, `lost` JSON NOT NULL, `refuted` JSON NOT NULL)'
-  //   );
   await db.runCreate(
     'CREATE TABLE if not exists `cycles` (`cycleMarker` TEXT NOT NULL UNIQUE PRIMARY KEY, `counter` NUMBER NOT NULL, `cycleRecord` JSON NOT NULL)'
   )
-  // await db.runCreate('Drop INDEX if exists `cycles_idx`');
   await db.runCreate('CREATE INDEX if not exists `cycles_idx` ON `cycles` (`counter` DESC)')
   await db.runCreate(
     'CREATE TABLE if not exists `accounts` (`accountId` TEXT NOT NULL UNIQUE PRIMARY KEY, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `ethAddress` TEXT NOT NULL, `account` TEXT NOT NULL, `hash` TEXT NOT NULL, `accountType` INTEGER NOT NULL, `contractInfo` JSON, `contractType` INTEGER)'
   )
-  // await db.runCreate('Drop INDEX if exists `accounts_idx`');
   await db.runCreate(
     'CREATE INDEX if not exists `accounts_idx` ON `accounts` (`cycle` DESC, `timestamp` DESC, `accountType` ASC, `ethAddress`, `contractInfo`, `contractType` ASC)'
   )
   await db.runCreate(
     'CREATE TABLE if not exists `transactions` (`txId` TEXT NOT NULL, `result` JSON NOT NULL, `cycle` NUMBER NOT NULL, `partition` NUMBER, `timestamp` BIGINT NOT NULL, `wrappedEVMAccount` JSON NOT NULL, `accountId` TEXT NOT NULL,  `txFrom` TEXT NOT NULL, `txTo` TEXT NOT NULL, `nominee` TEXT, `txHash` TEXT NOT NULL, `transactionType` INTEGER NOT NULL, originTxData JSON, PRIMARY KEY (`txId`, `txHash`))'
   )
-  // await db.runCreate('Drop INDEX if exists `transactions_idx`');
   await db.runCreate(
     'CREATE INDEX if not exists `transactions_idx` ON `transactions` (`cycle` DESC, `timestamp` DESC, `transactionType` DESC, `txId`, `txHash`, `txFrom`, `txTo`, `nominee`)'
   )
   await db.runCreate(
     'CREATE TABLE if not exists `tokenTxs` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `txId` TEXT, `txHash` TEXT NOT NULL, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `contractAddress` TEXT NOT NULL, `contractInfo` JSON, `tokenFrom` TEXT NOT NULL, `tokenTo` TEXT NOT NULL, `tokenValue` TEXT NOT NULL, `tokenType` INTEGER NOT NULL, `tokenEvent` TEXT NOT NULL, `tokenOperator` TEXT, `transactionFee` TEXT NOT NULL, FOREIGN KEY (`txId`, `txHash`) REFERENCES transactions(`txId`, `txHash`))'
   )
-  // await db.runCreate('Drop INDEX if exists `tokenTxs_idx`');
   await db.runCreate(
     'CREATE INDEX if not exists `tokenTxs_idx` ON `tokenTxs` (`cycle` DESC, `timestamp` DESC, `txId`, `txHash`, `contractAddress`, `tokenFrom`, `tokenTo`, `tokenType`, `tokenOperator`)'
   )
   await db.runCreate(
     'CREATE TABLE if not exists `tokens` (`ethAddress` TEXT NOT NULL, `contractAddress` TEXT NOT NULL, `tokenType` INTEGER NOT NULL, `tokenValue` TEXT NOT NULL, PRIMARY KEY (`ethAddress`, `contractAddress`))'
   )
-  // await db.runCreate('Drop INDEX if exists `tokens_idx`');
   await db.runCreate(
     'CREATE INDEX if not exists `tokens_idx` ON `tokens` (`ethAddress`, `contractAddress`, `tokenType`, `tokenValue` DESC)'
   )

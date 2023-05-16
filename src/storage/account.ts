@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
@@ -6,18 +5,10 @@ import {
   AccountType,
   AccountSearchType,
   WrappedEVMAccount,
-  ERC20ContractDetail,
-  TokenTx,
   TransactionType,
 } from '../@type'
-import { getWeb3, ERC20_METHOD_DIC } from './transaction'
-// import ERC20ABI from 'human-standard-token-abi';
-import * as Transaction from './transaction'
 import { bufferToHex } from 'ethereumjs-util'
-import { sleep } from '../utils'
-import ERC20_ABI from '../utils/abis/ERC20.json'
-import ERC721_ABI from '../utils/abis/ERC721.json'
-import { decodeTx, getContractInfo } from '../class/TxDecoder'
+import { getContractInfo } from '../class/TxDecoder'
 
 export interface Account {
   accountId: string
@@ -34,11 +25,7 @@ export interface Account {
 export interface Token {
   ethAddress: string
   contractAddress: string
-  // contractInfo?: string
   tokenValue: string
-  // Seems we have to set tokenType by ContractType here
-  // tokenType: ContractType.ERC_20 | ContractType.ERC_721 | ContractType.ERC_1155
-  // tokenType: TransactionType.ERC_20 | TransactionType.ERC_721 | TransactionType.ERC_1155
   tokenType: TransactionType
 }
 
@@ -48,13 +35,6 @@ export enum ContractType {
   ERC_721,
   ERC_1155,
 }
-
-// export function isAccount(obj: WrappedEVMAccount): obj is WrappedEVMAccount {
-//   return (
-//     (obj as WrappedEVMAccount).accountType === AccountType.Account &&
-//     (obj as WrappedEVMAccount).ethAddress !== undefined
-//   );
-// }
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
@@ -67,17 +47,6 @@ export async function insertAccount(account: Account) {
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Account', account.ethAddress || account.accountId)
   } catch (e) {
-    // const accountExist = await queryAccountByAddress(account.accountId);
-    // if (accountExist) {
-    //   // console.log(accountExist, account);
-    //   if (!accountExist.contractInfo) delete accountExist.contractInfo;
-    //   if (JSON.stringify(account) === JSON.stringify(accountExist)) {
-    //     console.log('same data', 'account');
-    //     return;
-    //   } else {
-    //     console.log('not same data');
-    //   }
-    // }
     console.log(e)
     console.log('Unable to insert Account or it is already stored in to database', account.accountId)
   }
@@ -100,7 +69,7 @@ export async function bulkInsertAccounts(accounts: Account[]) {
   }
 }
 
-export async function updateAccount(accountId: string, account: Account) {
+export async function updateAccount(_accountId: string, account: Account) {
   try {
     const sql = `UPDATE accounts SET cycle = $cycle, timestamp = $timestamp, account = $account, hash = $hash WHERE accountId = $accountId `
     await db.run(sql, {
@@ -381,19 +350,6 @@ export async function queryTokensByAddress(address: string, detail = false) {
     const sql = `SELECT * FROM tokens WHERE ethAddress=?`
     let tokens = (await db.all(sql, [address])) as Token[]
     if (detail) {
-      // const combineObjects = tokens.reduce((previousValue, currentValue) => {
-      //   // console.log('current', currentValue);
-      //   // console.log('previous', previousValue);
-      //   if (currentValue && previousValue)
-      //     return [
-      //       ...Object.values(previousValue),
-      //       ...Object.values(currentValue),
-      //     ];
-      //   else return Object.values(currentValue);
-      // }, {});
-
-      // const uniqueAddresses = [...new Set(combineObjects)];
-
       let filterTokens = []
       for (let i = 0; i < tokens.length; i++) {
         const { contractAddress, tokenValue } = tokens[i]
@@ -401,31 +357,6 @@ export async function queryTokensByAddress(address: string, detail = false) {
           contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
         )
         if (accountExist && accountExist.contractType) {
-          // try {
-          //   let balance
-          //   const web3: any = await getWeb3()
-          //   if (accountExist.contractType === ContractType.ERC_20) {
-          //     // ERC20 Token
-          //     const Token = new web3.eth.Contract(ERC20_ABI.abi, contractAddress)
-          //     balance = await Token.methods.balanceOf(address).call()
-          //     if (config.verbose) console.log('ERC20 Balance', address, contractAddress, balance)
-          //   } else if (accountExist.contractType === ContractType.ERC_721) {
-          //     // ERC721 Token
-          //     const Token = new web3.eth.Contract(ERC721_ABI.abi, contractAddress)
-          //     balance = await Token.methods.balanceOf(address).call()
-          //     if (config.verbose) console.log('ERC721 Balance', address, contractAddress, balance)
-          //   }
-          //   if (balance) {
-          //     filterTokens.push({
-          //       contractAddress: contractAddress,
-          //       contractInfo: accountExist.contractInfo,
-          //       contractType: accountExist.contractType,
-          //       balance,
-          //     })
-          //   }
-          // } catch (e) {
-          //   console.log('Error in token balance query', e)
-          // }
           filterTokens.push({
             contractAddress: contractAddress,
             contractInfo: accountExist.contractInfo,
@@ -444,39 +375,13 @@ export async function queryTokensByAddress(address: string, detail = false) {
 }
 
 export async function queryTokenBalance(contractAddress: string, addressToSearch: string) {
-  let balance
-  // const accountExist = await queryAccountByAccountId(
-  //   contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
-  // )
-  // if (accountExist && accountExist.contractType) {
-  //   try {
-  //     const web3: any = await getWeb3()
-  //     if (accountExist.contractType === ContractType.ERC_20) {
-  //       // ERC20 Token
-  //       const Token = new web3.eth.Contract(ERC20_ABI.abi, contractAddress)
-  //       balance = await Token.methods.balanceOf(addressToSearch).call()
-  //       if (config.verbose) console.log('ERC20 Balance', addressToSearch, contractAddress, balance)
-  //     } else if (accountExist.contractType === ContractType.ERC_721) {
-  //       // ERC721 Token
-  //       const Token = new web3.eth.Contract(ERC721_ABI.abi, contractAddress)
-  //       balance = await Token.methods.balanceOf(addressToSearch).call()
-  //       if (config.verbose) console.log('ERC721 Balance', addressToSearch, contractAddress, balance)
-  //     }
-  //   } catch (e) {
-  //     console.log('Error in token balance query', e)
-  //     return { success: false, error: 'error in token balance query' }
-  //   }
-  // } else {
-  //   return { success: false, error: 'contractAddress is not found' }
-  // }
-
   const sql = `SELECT * FROM tokens WHERE ethAddress=? AND contractAddress=?`
   let token = (await db.get(sql, [addressToSearch, contractAddress])) as Token
   if (config.verbose) console.log('Token balance', token)
   if (!token) return { success: false, error: 'tokenBalance is not found' }
   return {
     success: true,
-    balance: token ? token.tokenValue : balance,
+    balance: token?.tokenValue,
   }
 }
 

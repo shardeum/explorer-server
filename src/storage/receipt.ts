@@ -1,16 +1,10 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { getWeb3, ERC20_METHOD_DIC } from './transaction'
-// import ERC20ABI from 'human-standard-token-abi';
-import { AccountType, TokenTx, TransactionType } from '../@type'
+import { AccountType, TransactionType } from '../@type'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
-import { sleep } from '../utils'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
-import ERC20_ABI from '../utils/abis/ERC20.json'
-import ERC721_ABI from '../utils/abis/ERC721.json'
-import ERC1155_ABI from '../utils/abis/ERC1155.json'
 import { bufferToHex } from 'ethereumjs-util'
 
 export interface Receipt {
@@ -84,21 +78,15 @@ export async function processReceiptData(receipts: any) {
   let combineTokenTransactions2 = [] // For TransactionType (ERC1155)
   let combineTokens = [] // For Tokens owned by an address
   for (let i = 0; i < receipts.length; i++) {
-    const { accounts, cycle, result, sign, tx, receipt } = receipts[i]
+    const { accounts, cycle, result, tx, receipt } = receipts[i]
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
-      // console.log('Skip', tx.txId);
       continue
     }
-    // await insertReceipt({
-    //   ...receipts[i],
-    //   receiptId: tx.txId,
-    //   timestamp: tx.timestamp,
-    // });
+
     let txReceipt = receipt
     combineReceipts.push(receipts[i])
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
-    // console.log('Save', tx.txId);
     let storageKeyValueMap = {}
     for (let j = 0; j < accounts.length; j++) {
       const account = accounts[j]
@@ -252,9 +240,6 @@ export async function processReceiptData(receipts: any) {
           }
         }
         const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap)
-        // console.log('txs', txs)
-        // console.log('accs', accs)
-        // console.log('tokens', tokens)
         for (let i = 0; i < accs.length; i++) {
           if (accs[i] === ZERO_ETH_ADDRESS) continue
           if (!combineAccounts1.some((a) => a.ethAddress === accs[i])) {

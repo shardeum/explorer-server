@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
@@ -27,16 +26,6 @@ export async function insertCycle(cycle: Cycle) {
     if (config.verbose)
       console.log('Successfully inserted Cycle', cycle.cycleRecord.counter, cycle.cycleMarker)
   } catch (e) {
-    // const cycleExist = await queryCycleByMarker(cycle.cycleMarker);
-    // if (cycleExist) {
-    //   // console.log(cycleExist, cycle)
-    //   if (JSON.stringify(cycle) === JSON.stringify(cycleExist)) {
-    //     console.log('same data', 'Cycle');
-    //     return;
-    //   } else {
-    //     console.log('not same data');
-    //   }
-    // }
     console.log(e)
     console.log(
       'Unable to insert cycle or it is already stored in to database',

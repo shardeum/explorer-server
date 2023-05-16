@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 import * as db from './sqlite3storage'
 import { extractValues } from './sqlite3storage'
 import { config } from '../config/index'
@@ -33,23 +32,6 @@ export async function insertArchivedCycle(archivedCycle: any) {
       archivedCycle.cycleRecord.marker
     )
   } catch (e) {
-    // const archivedCycleExist = await queryArchivedCycleByMarker(
-    //   archivedCycle.cycleMarker
-    // );
-    // if (archivedCycleExist) {
-    //   if (archivedCycle._id) delete archivedCycle._id;
-    //   if (archivedCycleExist.counter) delete archivedCycleExist.counter;
-    //   if (archivedCycle.counter) delete archivedCycle.counter;
-    //   console.log(archivedCycleExist, archivedCycle);
-    //   if (
-    //     JSON.stringify(archivedCycle) === JSON.stringify(archivedCycleExist)
-    //   ) {
-    //     console.log('same data', 'archivedCycle');
-    //     return;
-    //   } else {
-    //     console.log('not same data');
-    //   }
-    // }
     console.log(e)
     console.log(
       'Unable to insert archive cycle or it is already stored in to database',
@@ -60,10 +42,6 @@ export async function insertArchivedCycle(archivedCycle: any) {
 
 export async function updateArchivedCycle(marker: string, archivedCycle: any) {
   try {
-    // if (archivedCycle.cycleMarker) delete archivedCycle.cycleMarker;
-    // const values = extractValues(archivedCycle);
-    // const sql = `UPDATE archivedCycles SET counter=?, cycleRecord=?, data=?, receipt=?, summary=? WHERE cycleMarker=${marker}`;
-
     const sql = `UPDATE archivedCycles SET cycleRecord = $cycleRecord, data = $data, receipt = $receipt, summary = $summary WHERE cycleMarker = $cycleMarker `
     await db.run(sql, {
       $cycleRecord: archivedCycle.cycleRecord && JSON.stringify(archivedCycle.cycleRecord),
@@ -121,56 +99,6 @@ export async function queryAllArchivedCyclesBetween(start: number, end: number) 
   }
 }
 
-// export async function queryAllCycleRecords() {
-//   const cycleRecords = await Collection.find({
-//     filter: {},
-//     sort: {
-//       'cycleRecord.counter': -1,
-//     },
-//     project: {
-//       _id: 0,
-//       cycleMarker: 0,
-//       receipt: 0,
-//       data: 0,
-//       summary: 0,
-//     },
-//   });
-//   return cycleRecords.map((item: any) => item.cycleRecord);
-// }
-
-// export async function queryLatestCycleRecords(count = 1) {
-//   const cycleRecords = await Collection.find({
-//     filter: {},
-//     sort: {
-//       'cycleRecord.counter': -1,
-//     },
-//     limit: count,
-//     project: {
-//       _id: 0,
-//       cycleMarker: 0,
-//       receipt: 0,
-//       data: 0,
-//       summary: 0,
-//     },
-//   });
-//   return cycleRecords.map((item: any) => item.cycleRecord);
-// }
-
-// export async function queryCycleRecordsBetween(start: number, end: number) {
-//   const cycleRecords = await Collection.find({
-//     filter: {
-//       $and: [
-//         {'cycleRecord.counter': {$gte: start}},
-//         {'cycleRecord.counter': {$lte: end}},
-//       ],
-//     },
-//     sort: {
-//       'cycleRecord.counter': -1,
-//     },
-//   });
-//   return cycleRecords.map((item: any) => item.cycleRecord);
-// }
-
 export async function queryArchivedCycleByMarker(marker: string) {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE cycleMarker=? LIMIT 1`
@@ -204,21 +132,3 @@ export async function queryArchivedCycleByCounter(counter: number) {
     console.log(e)
   }
 }
-
-// export const queryCyclesByTimestamp = async (timestamp: number) => {
-//   //TODO need to limit 1
-//   const data = await Collection.find({
-//     filter: {'cycleRecord.start': {$lte: timestamp}},
-//     sort: {
-//       'cycleRecord.counter': -1,
-//     },
-//   });
-//   if (data.length > 0) return data[0];
-// };
-
-// export async function queryArchivedCyleCount() {
-//   const ArchivedCyleCount = await Collection.count();
-//   if (config.verbose) console.log('ArchivedCycle count', ArchivedCyleCount);
-//   console.log('ArchivedCyleCount', ArchivedCyleCount);
-//   return ArchivedCyleCount;
-// }

@@ -3,8 +3,6 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 import {
   AccountType,
-  InternalTXType,
-  ReadableReceipt,
   TokenTx,
   TransactionType,
   TransactionSearchType,
@@ -38,13 +36,6 @@ export interface Transaction {
   originTxData: any
 }
 
-export function isTransaction(obj: WrappedEVMAccount): obj is WrappedEVMAccount {
-  return (
-    (obj as WrappedEVMAccount).accountType === AccountType.Receipt &&
-    (obj as WrappedEVMAccount).txId !== undefined
-  )
-}
-
 export async function insertTransaction(transaction: Transaction) {
   try {
     const fields = Object.keys(transaction).join(', ')
@@ -54,16 +45,6 @@ export async function insertTransaction(transaction: Transaction) {
     await db.run(sql, values)
     if (config.verbose) console.log('Successfully inserted Transaction', transaction.txId, transaction.txHash)
   } catch (e) {
-    // const transactionExist = await queryTransactionByTxId(transaction.txId);
-    // if (transactionExist) {
-    //   // console.log(transactionExist, transaction);
-    //   if (JSON.stringify(transaction) === JSON.stringify(transactionExist)) {
-    //     console.log('same data', 'transaction');
-    //     return;
-    //   } else {
-    //     console.log('not same data');
-    //   }
-    // }
     console.log(e)
     console.log('Unable to insert Transaction or it is already stored in to database', transaction.txId)
   }
@@ -86,7 +67,7 @@ export async function bulkInsertTransactions(transactions: Transaction[]) {
   }
 }
 
-export async function updateTransaction(txId: string, transaction: Transaction) {
+export async function updateTransaction(_txId: string, transaction: Transaction) {
   try {
     const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, accountId = $accountId, txHash = $txHash WHERE txId = $txId `
     await db.run(sql, {
@@ -289,7 +270,6 @@ export async function processTransactionData(transactions: any) {
 
 export async function insertOrUpdateTransaction(archivedCycle: any) {
   const skipTxs: string[] = []
-  const transactions: any = []
   if (!archivedCycle.receipt) {
     if (config.verbose) console.log('No Receipt')
     return
@@ -952,8 +932,6 @@ export async function queryTransactionCountBetweenCycles(
   let transactions
   try {
     if (address) {
-      // const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? )`
-      // transactions = await db.get(sql, [start, end, address, address])
       if (!txType) { // (!txType || txType === TransactionSearchType.All)
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?)`
         transactions = await db.get(sql, [start, end, address, address, address])
@@ -1014,8 +992,6 @@ export async function queryTransactionCountBetweenCycles(
         }
       }
     } else if (txType || txType === TransactionSearchType.All) {
-      // const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND transactionType=?`
-      // transactions = await db.get(sql, [start, end, txType])
       if (txType === TransactionSearchType.All) {
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ?`
         transactions = await db.get(sql, [start, end])

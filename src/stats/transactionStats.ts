@@ -12,10 +12,6 @@ export interface TransactionStats {
   timestamp: number
 }
 
-export function isTransaction(obj: TransactionStats): obj is TransactionStats {
-  return obj.cycle && obj.totalTxs && obj.timestamp ? true : false
-}
-
 export async function insertTransactionStats(transactionStats: TransactionStats): Promise<void> {
   try {
     const fields = Object.keys(transactionStats).join(', ')
