@@ -292,8 +292,8 @@ export async function processReceiptData(receipts: any) {
           if (accountExist && accountExist.contractInfo) {
             contractInfo = accountExist.contractInfo
           }
-          if (txs[i].tokenType === TransactionType.ERC_1155) {
-            combineTokenTransactions2.push({
+          if ('amountSpent' in txObj.wrappedEVMAccount) {
+            const obj = {
               txId: txObj.txId,
               txHash: txObj.txHash,
               cycle: txObj.cycle,
@@ -301,17 +301,12 @@ export async function processReceiptData(receipts: any) {
               transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
               contractInfo,
               ...txs[i],
-            })
+            }
+            if (tx[i].tokenType === TransactionType.ERC_1155) {
+              combineTokenTransactions2.push(obj)
           } else {
-            combineTokenTransactions.push({
-              txId: txObj.txId,
-              txHash: txObj.txHash,
-              cycle: txObj.cycle,
-              timestamp: txObj.timestamp,
-              contractInfo,
-              transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
-              ...txs[i],
-            })
+              combineTokenTransactions.push(obj)
+            }
           }
         }
         combineTokens = [...combineTokens, ...tokens]
