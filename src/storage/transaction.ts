@@ -347,6 +347,12 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         wrappedEVMAccount: transactionData[0].data,
         accountId: transactionData[0].accountId,
         txHash: txReceipt.ethAddress,
+
+        transactionType: null,
+        txFrom: null,
+        txTo: null,
+        originTxData: null,
+        data: null,
       }
       const { contractAddress, data, from, to } = transactionInfo.wrappedEVMAccount.readableReceipt
 
