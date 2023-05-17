@@ -1,6 +1,6 @@
-import { CoinStats } from "./coinStats"
-import { TransactionStats } from "./transactionStats"
-import { ValidatorStats } from "./validatorStats"
+import { CoinStats } from './coinStats'
+import { TransactionStats } from './transactionStats'
+import { ValidatorStats } from './validatorStats'
 
 /***
 This is the copied code from 'storage/sqlite3storage.ts'
