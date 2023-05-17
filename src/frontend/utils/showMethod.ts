@@ -5,6 +5,9 @@ export const showTxMethod = (tx: Transaction | TokenTxs): string => {
 
   const methodCode = data && data.length > 10 ? data.substring(0, 10) : null
 
+  // `ERC_TOKEN_METHOD_DIC` is only an object without methods, so object
+  // injection is probably okay here
+  /* eslint-disable security/detect-object-injection */
   return 'tokenEvent' in tx && tx?.tokenEvent
     ? tx.tokenEvent
     : 'wrappedEVMAccount' in tx && tx?.wrappedEVMAccount?.readableReceipt.from.length === 64
@@ -18,6 +21,7 @@ export const showTxMethod = (tx: Transaction | TokenTxs): string => {
       ? ERC_TOKEN_METHOD_DIC[methodCode]
       : 'Transfer'
     : 'Contract'
+  /* eslint-enable security/detect-object-injection */
 }
 
 export const ERC_TOKEN_METHOD_DIC = {
