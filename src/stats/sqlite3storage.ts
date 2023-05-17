@@ -4,7 +4,7 @@ import { ValidatorStats } from './validatorStats'
 
 /***
 This is the copied code from 'storage/sqlite3storage.ts'
-Later, extract the common functions into one place and refactor it to be able to use them in both places.
+TODO Later, extract the common functions into one place and refactor it to be able to use them in both places.
 ***/
 import sqlite3Lib from 'sqlite3'
 const sqlite3 = sqlite3Lib.verbose()
