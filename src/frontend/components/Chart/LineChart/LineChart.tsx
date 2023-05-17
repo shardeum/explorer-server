@@ -17,7 +17,7 @@ interface LineChartProps {
   name?: string
 }
 
-export const LineChart: React.FC<LineChartProps> = (props: LineChartProps)  => {
+export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
   const router = useRouter()
 
   const { title, centerTitle, subTitle, data, height = 300, name } = props
@@ -183,4 +183,5 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps)  => {
       options={option}
       // allowChartUpdate={true}
     />
-  )}
+  )
+}
