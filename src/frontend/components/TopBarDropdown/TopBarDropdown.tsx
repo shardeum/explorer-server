@@ -22,7 +22,7 @@ interface TopBarDropdownProps {
 }
 
 export const TopBarDropdown: React.FC<TopBarDropdownProps> = (props) => {
-  const { label, selected, options, className, buttonClassName, menuClassName, onSelect } = props
+  const { label, selected, options, className, buttonClassName, menuClassName } = props
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
 
