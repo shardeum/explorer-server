@@ -473,13 +473,13 @@ export const getWeb3 = function (): Promise<Web3> {
 
 export async function queryTransactionCount(
   address?: string,
-  txType?: TransactionSearchType,
+  txType?: TransactionType | TransactionSearchType,
   filterAddress?: string
 ): Promise<number> {
   let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (address) {
-      if (!txType ) { // (!txType || txType === TransactionSearchType.All)
+      if (!txType) { // (!txType || txType === TransactionSearchType.All)
         const sql = `SELECT COUNT(*) FROM transactions WHERE txFrom=? OR txTo=? OR nominee=?`
         transactions = await db.get(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
