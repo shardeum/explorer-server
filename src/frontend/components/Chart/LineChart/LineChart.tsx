@@ -84,6 +84,7 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps)  => {
               // const data = this?.series?.options?.data
 
               const item = data?.findIndex((d: number[]) => d[0] === timestamp)
+              /* eslint-disable security/detect-object-injection */
               return `<span><b>${Highcharts.dateFormat(
                 '%A, %B %d, %Y',
                 new Date(timestamp).getTime()
@@ -96,7 +97,8 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps)  => {
       <span>Apoptosized Validators: <b>${data[item][6]}</b></span><br />
       <span>Cycle Number: <b>${data[item][7]}</b></span>`
             }
-          : function () {
+          : /* eslint-enable security/detect-object-injection */
+            function () {
               const timestamp = this?.x
 
               const data = this?.series?.options?.data
