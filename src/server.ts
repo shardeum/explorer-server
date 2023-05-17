@@ -1,6 +1,6 @@
 // require("dotenv").config();
 
-import { addLogSubscriptions, evmLogDiscovery, LOG_SUBSCRIPTIONS_BY_ADDRESS, removeLogSubscription } from './subscription/'
+import { addLogSubscriptions, evmLogDiscovery, LOG_SUBSCRIPTIONS_BY_ADDRESS, removeLogSubscription, removeLogSubscriptionBySocketId } from './subscription/'
 import * as Storage from './storage'
 import * as ArchivedCycle from './storage/archivedCycle'
 import * as Transaction from './storage/transaction'
@@ -28,6 +28,7 @@ import * as ValidatorStats from './stats/validatorStats'
 import * as TransactionStats from './stats/transactionStats'
 import * as CoinStats from './stats/coinStats'
 import fastifyRateLimit from '@fastify/rate-limit'
+import { socketClient, socketHandlers } from './subscription/websocket'
 import * as usage from './middleware/usage'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
@@ -144,53 +145,32 @@ const start = async (): Promise<void> => {
   server.get('/port', (req, reply) => {
     reply.send({ port: CONFIG.port.server })
   })
-
-  server.get('/subscription_list', (req,reply)=>{
-    if(!CONFIG.subscription.enabled) reply.send({success: false, error: "Subscription not serving"})
-    reply.send([...LOG_SUBSCRIPTIONS_BY_ADDRESS.entries()]);
-  })
-  server.post('/api/evm_log_subscribe',(req,reply) => {
-    if(!CONFIG.subscription.enabled) reply.send({success: false, error: "Subscription not serving"})
-    try{
-      const payload = req.body as any
-      let { subscription_id, address, topics, ipport } = payload
-
-      if( !subscription_id || 
-          !address ||
-          !Array.isArray(topics) ||
-          !ipport
-        ){
-        throw new Error("Parameters are invalid");
+  server.get('/evm_log_subscription', { websocket: true }, 
+             (connection:SocketStream, req:FastifyRequest) => {
+   
+     let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
+     socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
+     connection.socket.id = socket_id;
+     socketClient.set(socket_id, connection);
+  
+    connection.socket.on('message', message => {
+      try{
+        const payload = JSON.parse(message);
+        socketHandlers.onMessage(connection, payload);
+        return
+      }catch(e){
+        connection.socket.send(JSON.stringify({error: e.message}));
+        return
       }
-      
-      if(typeof address === "string") {
-        address = [address]
+    })
+    connection.socket.on('close', message => {
+      try{
+        removeLogSubscriptionBySocketId(connection.socket.id)
+        socketClient.delete(connection.socket.id);
+      }catch(e){
+        console.error(e);
       }
-
-      if(address.length === 0 && topics.length > 0){
-        address = ["AllContracts"] 
-      }
-      addLogSubscriptions(address, topics, subscription_id, ipport);      
-      reply.send({success: true})
-    }catch(e:any){
-      reply.send({success: false, error: e.message});
-    }
-  })
-  server.post('/api/evm_log_unsubscribe',(req,reply) => {
-    if(!CONFIG.subscription.enabled) reply.send({success: false, error: "Subscription not serving"})
-    try{
-      const payload = req.body as any
-      let { subscription_id, ipport } = payload
-
-      if(!subscription_id || !ipport) {
-        reply.send({success: false})
-      }
-
-      removeLogSubscription(subscription_id, ipport)
-      reply.send({success: true})
-    }catch(e:any){
-      reply.send({success: false, error: e.message});
-    }
+    })
   })
 
   server.get('/api/cycleinfo', async (_request, reply) => {
