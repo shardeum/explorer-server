@@ -20,7 +20,7 @@ export async function runCreate(createStatement: string): Promise<void> {
   await run(createStatement)
 }
 
-export async function run(sql: string, params = [] || {}): Promise<{ id: number; }> {
+export async function run(sql: string, params = [] || {}): Promise<{ id: number }> {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err: Error) {
       if (err) {
@@ -62,7 +62,9 @@ export async function all<T>(sql: string, params = []): Promise<T[]> {
   })
 }
 
-export function extractValues(object: CoinStats | ValidatorStats | TransactionStats): string[] {
+export function extractValues(
+  object: CoinStats | ValidatorStats | TransactionStats
+): (string | number | boolean)[] {
   try {
     const inputs = []
     for (let value of Object.values(object)) {

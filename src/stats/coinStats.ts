@@ -52,9 +52,9 @@ export async function queryLatestCoinStats(count?: number): Promise<CoinStats[]>
 }
 
 export async function queryAggregatedCoinStats(): Promise<{
-      totalSupplyChange: number
-      totalStakeChange: number
-    }> {
+  totalSupplyChange: number
+  totalStakeChange: number
+}> {
   try {
     const sql = `SELECT IFNULL(sum(totalSupplyChange), 0) as totalSupplyChange, IFNULL(sum(totalStakeChange), 0) as totalStakeChange FROM coin_stats`
     const coinStats: {
