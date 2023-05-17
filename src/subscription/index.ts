@@ -5,6 +5,7 @@ import { stringify } from "qs";
 import { config } from '../config';
 import axios from "axios";
 import * as db from '../storage/sqlite3storage'
+import { socketClient } from "./websocket";
 
 type contract_address = string;
 type strigified_subscription = string;
@@ -19,16 +20,25 @@ export const LOG_SUBSCRIPTIONS_BY_ADDRESS = new Map<contract_address, Map<strigi
 
 export const LOG_SUBSCRIPTIONS_BY_ID = new Map<string, {address: string[], topics: string[]}>();
 
-export const IPPORT_BY_LOG_STRINGIFIED = new Map<string, Set<string>>();
+export const SOCKETID_BY_LOG_STRINGIFIED = new Map<string, Set<string>>();
+
+export const LOG_SUBSCRIPTIONS_BY_SOCKETID = new Map<string, Set<string>>();
 
 // implement this function at O(1)
 export const addLogSubscriptions = (
   addresses: string[], 
   topics: string[], 
   subscription_id: string, 
-  rpcIpport: string
+  socketId: string
 ) => {
 
+
+    if(!LOG_SUBSCRIPTIONS_BY_SOCKETID.has(socketId)){
+      LOG_SUBSCRIPTIONS_BY_SOCKETID.set(socketId, new Set([subscription_id]));
+    }
+    else{
+      LOG_SUBSCRIPTIONS_BY_SOCKETID.get(socketId).add(subscription_id);
+    }
 
     if(!LOG_SUBSCRIPTIONS_BY_ID.has(subscription_id)){
       LOG_SUBSCRIPTIONS_BY_ID.set(subscription_id,{ address: addresses, topics});
@@ -39,11 +49,11 @@ export const addLogSubscriptions = (
     const stringified = crypto.stringify(filter_obj)
     console.log("stringified",stringified);
 
-    if(!IPPORT_BY_LOG_STRINGIFIED.has(stringified)){
-      IPPORT_BY_LOG_STRINGIFIED.set(stringified, new Set([rpcIpport]))
+    if(!SOCKETID_BY_LOG_STRINGIFIED.has(stringified)){
+      SOCKETID_BY_LOG_STRINGIFIED.set(stringified, new Set([socketId]))
     }
     else{
-      IPPORT_BY_LOG_STRINGIFIED.get(stringified).add(rpcIpport)
+      SOCKETID_BY_LOG_STRINGIFIED.get(stringified).add(socketId)
     }
 
     if(!LOG_SUBSCRIPTIONS_BY_ADDRESS.has(addr)){
@@ -66,10 +76,10 @@ export const addLogSubscriptions = (
   // console.log(LOG_SUBSCRIPTIONS_BY_ADDRESS);
 }
 
-export const removeLogSubscription = (subscription_id: string, rpcIpport: string) => {
+export const removeLogSubscription = (subscription_id: string, socketId: string) => {
 
     if(!LOG_SUBSCRIPTIONS_BY_ID.has(subscription_id)){
-      return true
+      return 
     }
 
     const { address, topics } = LOG_SUBSCRIPTIONS_BY_ID.get(subscription_id)
@@ -80,10 +90,10 @@ export const removeLogSubscription = (subscription_id: string, rpcIpport: string
     const filter_obj = {address: addr, topics: topics}
     const stringified = crypto.stringify(filter_obj)
 
-    if(IPPORT_BY_LOG_STRINGIFIED.has(stringified)){
-      IPPORT_BY_LOG_STRINGIFIED.get(stringified).delete(rpcIpport); 
-      if(IPPORT_BY_LOG_STRINGIFIED.get(stringified).size === 0){
-        IPPORT_BY_LOG_STRINGIFIED.delete(stringified);
+    if(SOCKETID_BY_LOG_STRINGIFIED.has(stringified)){
+      SOCKETID_BY_LOG_STRINGIFIED.get(stringified).delete(socketId); 
+      if(SOCKETID_BY_LOG_STRINGIFIED.get(stringified).size === 0){
+        SOCKETID_BY_LOG_STRINGIFIED.delete(stringified);
       }
     }
 
@@ -114,18 +124,38 @@ export const removeLogSubscription = (subscription_id: string, rpcIpport: string
   // console.log(LOG_SUBSCRIPTIONS_BY_ADDRESS)
   LOG_SUBSCRIPTIONS_BY_ID.delete(subscription_id);
   // console.log(LOG_SUBSCRIPTIONS_BY_ADDRESS);
+  LOG_SUBSCRIPTIONS_BY_SOCKETID.get(socketId).delete(subscription_id);
 }
+
+
+// this is O(n), can't improve any more than that
+// this will only be call when an rpc disconnect happen, which is not frequent
+export const removeLogSubscriptionBySocketId = (socket_id: string): void => {
+  if(!LOG_SUBSCRIPTIONS_BY_SOCKETID.has(socket_id)) return
+
+  const subscription_ids = LOG_SUBSCRIPTIONS_BY_SOCKETID.get(socket_id)
+
+  for(const subscription_id of Array.from(subscription_ids)){
+    // O(1)
+    removeLogSubscription(subscription_id, socket_id);
+  }
+
+  if(LOG_SUBSCRIPTIONS_BY_SOCKETID.get(socket_id).size === 0){
+    LOG_SUBSCRIPTIONS_BY_SOCKETID.delete(socket_id);
+  }
+}
+
 // these value will get populated later
 export const evmLogDiscoveryMeta = {
   lastObservedTimestamp: 0,
 }
 
-export async function evmLogDiscovery() {
+export async function evmLogDiscovery(): Promise<void> {
   const currentObservingTimestamp = Date.now();
   // console.log("Discovering Logs...", evmLogDiscoveryMeta);
   // console.log("LOG_SUBSCRIPTIONS_BY_ADDRESS",LOG_SUBSCRIPTIONS_BY_ADDRESS);
   // console.log("LOG_SUBSCRIPTIONS_BY_ID",LOG_SUBSCRIPTIONS_BY_ID);
-  // console.log("IPPORT_BY_LOG_STRINGIFIED",IPPORT_BY_LOG_STRINGIFIED);
+  // console.log("LOG_SUBSCRIPTIONS_BY_SOCKETID",LOG_SUBSCRIPTIONS_BY_SOCKETID);
   for(const [key, value] of LOG_SUBSCRIPTIONS_BY_ADDRESS){
     const contract_address = (key === "AllContracts") ? null : key
     const stringifies =[...value.keys()]
@@ -139,17 +169,23 @@ export async function evmLogDiscovery() {
       // no async await.
       if(rows.length > 0){
         const subscribers_for_this_group_of_logs = Array.from(value.get(stringifies[i]));
-        const requested_RPCs = IPPORT_BY_LOG_STRINGIFIED.get(stringifies[i])
+        const requested_RPCs = SOCKETID_BY_LOG_STRINGIFIED.get(stringifies[i])
 
         if(!requested_RPCs)continue
 
-        for(const ipport of Array.from(requested_RPCs)){
-          const ip = ipport.split("__")[0]
-          const port = ipport.split("__")[1]
-          axios.post(`http://${ip}:${port}` + "/webhook/evm_log", { 
-            logs: rows, 
-            subscribers: subscribers_for_this_group_of_logs  
-          });
+        for(const socketId of Array.from(requested_RPCs)){
+          const conn = socketClient.get(socketId)
+          if(!socketClient.has(socketId) || 
+              conn.socket.readyState === 2 || 
+              conn.socket.readyState === 3){
+            conn.socket.close();
+            continue
+          }
+          conn.socket.send(JSON.stringify({
+            method: "log_found",
+            logs: rows,
+            subscribers: subscribers_for_this_group_of_logs
+          }));
         }
       }
     }
@@ -203,7 +239,7 @@ async function getLogs(
       else sql += ` WHERE timestamp BETWEEN ? AND ?` 
       inputs = [...inputs, ...[startTime, endTime]]
     }
-    console.log(sql, inputs);
+    // console.log(sql, inputs);
     logs = await db.all(sql,inputs)
   } catch (e) {
     console.log(e)
