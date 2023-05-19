@@ -148,49 +148,59 @@ export const removeLogSubscriptionBySocketId = (socket_id: string): void => {
 // these value will get populated later
 export const evmLogDiscoveryMeta = {
   lastObservedTimestamp: 0,
+  lastDiscoveryDuration: 0,
 }
 
 export async function evmLogDiscovery(): Promise<void> {
+  const perf_start = performance.now()
   const currentObservingTimestamp = Date.now();
   // console.log("Discovering Logs...", evmLogDiscoveryMeta);
   // console.log("LOG_SUBSCRIPTIONS_BY_ADDRESS",LOG_SUBSCRIPTIONS_BY_ADDRESS);
   // console.log("LOG_SUBSCRIPTIONS_BY_ID",LOG_SUBSCRIPTIONS_BY_ID);
   // console.log("LOG_SUBSCRIPTIONS_BY_SOCKETID",LOG_SUBSCRIPTIONS_BY_SOCKETID);
-  for(const [key, value] of LOG_SUBSCRIPTIONS_BY_ADDRESS){
-    const contract_address = (key === "AllContracts") ? null : key
-    const stringifies =[...value.keys()]
-    for(let i = 0; i<stringifies.length; i++){
-      const { topics } = JSON.parse(stringifies[i])
-      const startTime = evmLogDiscoveryMeta.lastObservedTimestamp 
+  try{
 
-      const rows = await getLogs(startTime, currentObservingTimestamp, contract_address, topics[0],topics[1], topics[2], topics[3]);
-      // console.log("LOGS:",rows, "SUBSCRIBERS",value.get(stringifies[i]))
+    for(const [key, value] of LOG_SUBSCRIPTIONS_BY_ADDRESS){
+      const contract_address = (key === "AllContracts") ? null : key
+      const stringifies =[...value.keys()]
+      for(let i = 0; i<stringifies.length; i++){
+        const { topics } = JSON.parse(stringifies[i])
+        const startTime = evmLogDiscoveryMeta.lastObservedTimestamp 
 
-      // no async await.
-      if(rows.length > 0){
-        const subscribers_for_this_group_of_logs = Array.from(value.get(stringifies[i]));
-        const requested_RPCs = SOCKETID_BY_LOG_STRINGIFIED.get(stringifies[i])
+        const rows = await getLogs(startTime, currentObservingTimestamp, contract_address, topics[0],topics[1], topics[2], topics[3]);
+        // console.log("LOGS:",rows, "SUBSCRIBERS",value.get(stringifies[i]))
 
-        if(!requested_RPCs)continue
+        // no async await.
+        if(rows.length > 0){
+          const subscribers_for_this_group_of_logs = Array.from(value.get(stringifies[i]));
+          const requested_RPCs = SOCKETID_BY_LOG_STRINGIFIED.get(stringifies[i])
 
-        for(const socketId of Array.from(requested_RPCs)){
-          const conn = socketClient.get(socketId)
-          if(!socketClient.has(socketId) || 
-              conn.socket.readyState === 2 || 
-              conn.socket.readyState === 3){
-            conn.socket.close();
-            continue
+          if(!requested_RPCs)continue
+
+          for(const socketId of Array.from(requested_RPCs)){
+            const conn = socketClient.get(socketId)
+            if(!socketClient.has(socketId) || 
+                conn.socket.readyState === 2 || 
+                conn.socket.readyState === 3){
+              conn.socket.close();
+              continue
+            }
+            conn.socket.send(JSON.stringify({
+              method: "log_found",
+              logs: rows,
+              subscribers: subscribers_for_this_group_of_logs
+            }));
           }
-          conn.socket.send(JSON.stringify({
-            method: "log_found",
-            logs: rows,
-            subscribers: subscribers_for_this_group_of_logs
-          }));
         }
       }
     }
+  }catch(e: any){
+    console.error(e);
   }
+  const perf_duration = performance.now() - perf_start
+  console.log("Perf Duration", perf_duration);
   evmLogDiscoveryMeta.lastObservedTimestamp = currentObservingTimestamp
+  setTimeout(evmLogDiscovery, 15 * 1000);
 }
 
 async function getLogs(

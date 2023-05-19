@@ -1358,7 +1358,7 @@ const start = async () => {
       }
       console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
       if(CONFIG.subscription.enabled) {
-        setInterval(evmLogDiscovery, 15 * 1000);
+        evmLogDiscovery();
       }
     }
   )
