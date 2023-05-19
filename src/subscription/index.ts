@@ -235,8 +235,8 @@ async function getLogs(
       inputs = [topic0]
     }
     if (startTime >= 0 && endTime >= 0) {
-      if (inputs.length > 0) sql += ` AND timestamp BETWEEN ? AND ?` 
-      else sql += ` WHERE timestamp BETWEEN ? AND ?` 
+      if (inputs.length > 0) sql += ` AND inserted_at BETWEEN ? AND ?` 
+      else sql += ` WHERE inserted_at BETWEEN ? AND ?` 
       inputs = [...inputs, ...[startTime, endTime]]
     }
     // console.log(sql, inputs);
