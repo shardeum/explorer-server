@@ -45,7 +45,7 @@ export const initializeDB = async (): Promise<void> => {
     'CREATE INDEX if not exists `tokens_idx` ON `tokens` (`ethAddress`, `contractAddress`, `tokenType`, `tokenValue` DESC)'
   )
   await db.runCreate(
-    'CREATE TABLE if not exists `logs` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `txHash` TEXT NOT NULL,  `blockNumber` TEXT NOT NULL, `contractAddress` TEXT NOT NULL, `log` JSON NOT NULL, `topic0` TEXT NOT NULL, `topic1` TEXT, `topic2` TEXT, `topic3` TEXT)'
+    "CREATE TABLE if not exists `logs` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `txHash` TEXT NOT NULL,  `blockNumber` TEXT NOT NULL, `contractAddress` TEXT NOT NULL, `log` JSON NOT NULL, `topic0` TEXT NOT NULL, `topic1` TEXT, `topic2` TEXT, `topic3` TEXT, `inserted_at` BIGINT NOT NULL DEFAULT (CAST(strftime('%s','now') AS INTEGER)*1000))"
   )
   // await db.runCreate('Drop INDEX if exists `logs_idx`');
   await db.runCreate(
