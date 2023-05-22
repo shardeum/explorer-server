@@ -9,16 +9,16 @@ interface detailProps {
   receiptParam?: boolean
 }
 
-type TransactionDetailHookResult = {
+interface TransactionDetailHookResult<D extends object> {
   transactionData: Transaction
-  receiptData: unknown
+  receiptData: D
   showReceipt: boolean
   setShowReceipt: (show: boolean) => void
 }
 
-export const useTransactionDetailHook = (id: string): TransactionDetailHookResult => {
+export const useTransactionDetailHook = <D extends object>(id: string): TransactionDetailHookResult<D> => {
   const [transactionData, setTransactionData] = useState<Transaction>({} as Transaction)
-  const [receiptData, setReceiptData] = useState({})
+  const [receiptData, setReceiptData] = useState({} as D)
   const [showReceipt, setShowReceipt] = useState(false)
 
   const getTransaction = useCallback(async () => {
