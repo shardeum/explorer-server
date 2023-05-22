@@ -61,7 +61,7 @@ export const useTransactionDetailHook = <D extends object>(id: string): Transact
     }
 
     fetchData()
-  }, [id, showReceipt])
+  }, [id, showReceipt, getReceipt, getTransaction])
 
   return {
     transactionData,
