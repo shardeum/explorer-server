@@ -69,7 +69,7 @@ export const Header: React.FC<Record<string, never>> = () => {
         </Menu>
       )
     }
-    return
+    return <> </>
   }
 
   return (
