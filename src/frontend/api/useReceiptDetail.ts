@@ -13,26 +13,26 @@ type ReceiptDetailResult = {
   }
 }
 
-export const useReceiptDetail = (txHash: string): ReceiptDetailResult => {
-  const { data: transactionData } = useSWR<{ transactions: Transaction }>(
+export const useReceiptDetail = (txHash: string): ReceiptDetailResult | null => {
+  const { data: transactionData } = useSWR<{ transactions: Transaction[] }>(
     `${PATHS.TRANSACTION_DETAIL}?txHash=${txHash}&type=requery`,
     fetcher
   )
+
+  let transaction: Transaction | null = null
   const { data: receiptData } = useSWR<{ receipts: Receipt }>(() => {
-    if (transactionData?.transactions?.[0]) {
-      return `${PATHS.RECEIPT_DETAIL}?txId=${transactionData?.transactions?.[0].txId}`
+    if (transactionData && (transaction = transactionData?.transactions?.[0])) {
+      return `${PATHS.RECEIPT_DETAIL}?txId=${transaction.txId}`
     }
     return null
   }, fetcher)
-  if (receiptData?.receipts) {
+
+  if (transaction && receiptData) {
     return {
       data: {
         receiptData: receiptData?.receipts,
-        transactionData: transactionData?.transactions?.[0],
+        transactionData: transaction,
       },
     }
-  }
-  return {
-    data: null,
-  }
+  } else return null
 }
