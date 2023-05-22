@@ -5,8 +5,8 @@ import { LineChart } from '../../components'
 import styles from './ChartDetail.module.scss'
 
 export interface ChartDetailProps {
-  validatorStats: unknown[]
-  transactionStats: unknown[]
+  validatorStats: number[][]
+  transactionStats: number[][]
 }
 
 export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
