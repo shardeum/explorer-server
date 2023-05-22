@@ -6,14 +6,14 @@ import { Icon } from '../../components'
 import styles from './CardDetail.module.scss'
 
 export interface CardDetailProps {
-  totalCycles: string | number
-  totalNodes: string | number
-  totalTransactions: string
-  totalRewardTxs: string
-  totalStakeTxs: string
-  totalUnstakeTxs: string
-  totalAccounts: string
-  totalContracts: string
+  totalCycles: number
+  totalNodes: number
+  totalTransactions: number
+  totalRewardTxs: number
+  totalStakeTxs: number
+  totalUnstakeTxs: number
+  totalAccounts: number
+  totalContracts: number
   totalStakedSHM: number
   totalSHM: number
 }
