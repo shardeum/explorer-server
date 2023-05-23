@@ -62,7 +62,7 @@ export const Token: React.FC = () => {
           {val
             ? utils
                 .formatUnits(
-                  val as any,
+                  val as number,
                   account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
                 )
                 .toString()
@@ -74,7 +74,7 @@ export const Token: React.FC = () => {
 
   const tabs = [
     {
-      key: TransactionSearchType.AllExceptInternalTx,
+      key: TransactionSearchType.AllExceptInternalTx as number,
       value: 'Transfer',
       content: <TransactionTable data={transactions} txType={tokenType} />,
     },
