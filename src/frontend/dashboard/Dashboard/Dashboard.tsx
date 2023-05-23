@@ -31,7 +31,7 @@ export const Dashboard: React.FC = () => {
 
   const cyclesList = cycles.map((row) => {
     return {
-      key: row?.cycleRecord?.counter || '',
+      key: row?.cycleRecord?.counter ?? -1,
       value: moment(row?.cycleRecord?.start * 1000).calendar(),
       activeNodes: row?.cycleRecord?.active || 0,
     }
