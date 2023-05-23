@@ -3,12 +3,22 @@ import useSWR from 'swr'
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
+import { ValidatorStats } from '../../stats/validatorStats';
+import { TransactionStats } from '../../stats/transactionStats';
+
+type StatsResult = {
+  validatorStats: ValidatorStats[]
+  transactionStats: TransactionStats[]
+  totalSHM: number
+  totalStakedSHM: number
+  loading: boolean
+}
 
 export const useStats = (query: {
   validatorStatsCount?: number
   transactionStatsCount?: number
   fetchCoinStats?: boolean
-}) => {
+}): StatsResult => {
   const { validatorStatsCount, transactionStatsCount, fetchCoinStats } = query
 
   // set query paths to `null` if we shouldn't fetch them
@@ -21,9 +31,9 @@ export const useStats = (query: {
   const coinStatsQuery = fetchCoinStats ? `${PATHS.STATS_COIN}` : null
 
   // get responses
-  const validatorStatsResponse = useSWR(validatorStatsQuery, fetcher)
-  const transactionStatsResponse = useSWR(transactionStatsQuery, fetcher)
-  const coinStatsResponse = useSWR(coinStatsQuery, fetcher)
+  const validatorStatsResponse = useSWR<{validatorStats: ValidatorStats[]}>(validatorStatsQuery, fetcher)
+  const transactionStatsResponse = useSWR<{transactionStats: TransactionStats[]}>(transactionStatsQuery, fetcher)
+  const coinStatsResponse = useSWR<{totalSupply: number, totalStaked: number}>(coinStatsQuery, fetcher)
 
   // get values
   const validatorStats = validatorStatsResponse?.data?.validatorStats || []

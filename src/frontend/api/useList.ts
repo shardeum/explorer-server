@@ -17,7 +17,20 @@ interface useListParam {
   filters?: Filters
 }
 
-export const useList = (param: useListParam) => {
+type ListResult = {
+  page: number
+  limit: number
+  filter: Filters
+  data: unknown[]
+  total: number
+  loading: boolean
+  error: unknown
+  setPage: (page: number) => void
+  setLimit: (limit: number) => void
+  setFilter: (filter: Filters) => void
+}
+
+export const useList = (param: useListParam): ListResult => {
   const { path, filters = {} } = param
 
   const [page, setPage] = useState<number>(1)
@@ -26,7 +39,7 @@ export const useList = (param: useListParam) => {
   const [responeData, setResponseData] = useState<Response>()
   const [error, setError] = useState()
 
-  async function fetchData() {
+  async function fetchData(): Promise<void> {
     try {
       const lists = await api.get(path, {
         params: { ...filter, page, limit },

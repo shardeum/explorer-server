@@ -5,7 +5,15 @@ const TABLET_PRO_BREAKPOINT = 960
 const TABLET_BREAKPOINT = 820
 const MOBILE_BREAKPOINT = 576
 
-export function useLayoutBreakpoint() {
+type LayoutBreakpointResult = {
+  isDesktop: boolean
+  isLaptop: boolean
+  isTabletPro: boolean
+  isTablet: boolean
+  isMobile: boolean
+}
+
+export function useLayoutBreakpoint(): LayoutBreakpointResult {
   const [isDesktop, setIsDesktop] = useState<boolean>()
   const [isLaptop, setIsLaptop] = useState<boolean>()
   const [isTabletPro, setIsTabletPro] = useState<boolean>()

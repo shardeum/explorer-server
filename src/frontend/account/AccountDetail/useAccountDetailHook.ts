@@ -8,7 +8,20 @@ interface detailProps {
   txType?: TransactionSearchType
 }
 
-export const useAccountDetailHook = ({ id, txType }: detailProps) => {
+export type AccountDetails = {
+  account: Account;
+  accountType: AccountType;
+  transactions: Transaction[];
+  totalPages: number;
+  totalTransactions: number;
+  tokens: Token[];
+  page: number;
+  transactionType: TransactionSearchType;
+  setPage: (page: number) => void;
+  setTransactionType: (type: TransactionSearchType) => void;
+}
+
+export const useAccountDetailHook = ({id, txType}: detailProps): AccountDetails => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalPages, setTotalPages] = useState<number>(1)
@@ -48,7 +61,8 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
   useEffect(() => {
     setTransactions([])
     setAccount(undefined)
-    async function fetchData() {
+
+    async function fetchData(): Promise<void> {
       const accounts = await getAddress()
 
       if (

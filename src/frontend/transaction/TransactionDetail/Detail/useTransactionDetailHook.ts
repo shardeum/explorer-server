@@ -1,6 +1,7 @@
 import { ChangeEvent, ChangeEventHandler, useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../../../api'
 import { Transaction } from '../../../types'
+import { Receipt } from '../../../../storage/receipt';
 // import { Account, AccountSearchType, Token, Transaction, TransactionSearchType } from '../types'
 
 interface detailProps {
@@ -8,7 +9,14 @@ interface detailProps {
   receiptParam?: boolean
 }
 
-export const useTransactionDetailHook = (id: string) => {
+type TransactionDetailHookResult = {
+  transactionData: Transaction
+  receiptData: unknown
+  showReceipt: boolean
+  setShowReceipt: (show: boolean) => void
+}
+
+export const useTransactionDetailHook = (id: string): TransactionDetailHookResult => {
   const [transactionData, setTransactionData] = useState<Transaction>({} as Transaction)
   const [receiptData, setReceiptData] = useState({})
   const [showReceipt, setShowReceipt] = useState(false)
@@ -41,7 +49,7 @@ export const useTransactionDetailHook = (id: string) => {
 
   useEffect(() => {
     if (!id) return
-    async function fetchData() {
+    async function fetchData(): Promise<void> {
       if (showReceipt) {
         const data = await getReceipt()
         setReceiptData(data?.receiptData)

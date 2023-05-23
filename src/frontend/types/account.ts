@@ -76,3 +76,11 @@ export interface Token {
   contractType: ContractType
   balance: string
 }
+
+
+export type PagedAccountData = {
+  accounts: Account[];
+  totalPages: number;
+  totalAccounts: number;
+  totalContracts: number;
+}

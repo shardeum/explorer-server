@@ -4,11 +4,20 @@ import { Account, AccountQuery } from '../types'
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
+import { PagedAccountData } from '../types/account';
 
-export const useAccount = (query: AccountQuery) => {
+export type AccountResult = {
+  accounts: Account[];
+  totalPages: number;
+  totalAccounts: number;
+  totalContracts: number;
+  loading: boolean;
+}
+
+export const useAccount = (query: AccountQuery): AccountResult => {
   const { page, count, type } = query
 
-  const createUrl = () => {
+  const createUrl = (): string => {
     let url = `${PATHS.ACCOUNT}?page=${page}`
 
     if (count) url = `${PATHS.ACCOUNT}?count=${count}`
@@ -18,7 +27,7 @@ export const useAccount = (query: AccountQuery) => {
     return url
   }
 
-  const { data } = useSWR(createUrl(), fetcher)
+  const {data} = useSWR<PagedAccountData>(createUrl(), fetcher)
   const accounts: Account[] = data?.accounts || []
 
   const res = {

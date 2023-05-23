@@ -3,7 +3,7 @@ import { utils } from 'ethers'
 import { TokenTxs, TransactionType } from '../types'
 import BN from 'bn.js'
 
-export const calculateValue = (value: string | BN) => {
+export const calculateValue = (value: string | BN): string => {
   try {
     return round(Web3Utils.fromWei(value, 'ether'))
   } catch (e) {
@@ -11,7 +11,7 @@ export const calculateValue = (value: string | BN) => {
   }
 }
 
-export const calculateFullValue = (value: string | BN) => {
+export const calculateFullValue = (value: string | BN): string => {
   try {
     return Web3Utils.fromWei(value, 'ether')
   } catch (e) {
@@ -60,7 +60,7 @@ export const shortTokenValue = (str: string): string => {
   else return str.slice(0, 10) + '...'
 }
 
-const countDecimals = (value: string | BN) => {
+const countDecimals = (value: string | BN): number => {
   if (value instanceof BN) {
     value = value.toString()
   }
@@ -69,7 +69,7 @@ const countDecimals = (value: string | BN) => {
   return 0
 }
 
-export const round = (value: string) => {
+export const round = (value: string): string => {
   const decimals = countDecimals(value)
   if (decimals === 0) {
     return value

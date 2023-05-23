@@ -11,6 +11,7 @@ export default class MyDocument extends Document {
             // Google Tag Manager
             config.GTM_Id && config.GTM_Id !== '' && (
               <Script
+                id={config.GTM_Id}
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                   __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

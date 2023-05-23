@@ -2,7 +2,16 @@ import { useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../../api'
 import { Cycle } from '../../types'
 
-export const useCycleHook = () => {
+type CycleHookResult = {
+  cycles: Cycle[]
+  loading: boolean
+  page: number
+  totalCycle: number
+  setPage: (page: number) => void
+  limit: number
+}
+
+export const useCycleHook = (): CycleHookResult => {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [page, setPage] = useState<number>(1)
   const [totalCycle, setTotalCycle] = useState<number>(0)
@@ -19,12 +28,12 @@ export const useCycleHook = () => {
 
     const from = to - limit + 1
 
-    return { counter, to, from }
+    return {counter, to, from}
   }, [page])
 
   useEffect(() => {
-    async function fetchData() {
-      const { counter, to, from } = await getLatestCounter()
+    async function fetchData(): Promise<void> {
+      const {counter, to, from} = await getLatestCounter()
 
       const data = await api.get(`${PATHS.CYCLE}?from=${from}&to=${to}`)
 

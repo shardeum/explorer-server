@@ -16,7 +16,7 @@ export function isTransaction(obj: TransactionStats): obj is TransactionStats {
   return obj.cycle && obj.totalTxs && obj.timestamp ? true : false
 }
 
-export async function insertTransactionStats(transactionStats: TransactionStats) {
+export async function insertTransactionStats(transactionStats: TransactionStats): Promise<void> {
   try {
     const fields = Object.keys(transactionStats).join(', ')
     const placeholders = Object.keys(transactionStats).fill('?').join(', ')
@@ -35,7 +35,7 @@ export async function insertTransactionStats(transactionStats: TransactionStats)
   }
 }
 
-export async function bulkInsertTransactionsStats(transactionsStats: TransactionStats[]) {
+export async function bulkInsertTransactionsStats(transactionsStats: TransactionStats[]): Promise<void> {
   try {
     const fields = Object.keys(transactionsStats[0]).join(', ')
     const placeholders = Object.keys(transactionsStats[0]).fill('?').join(', ')
@@ -58,7 +58,7 @@ export async function bulkInsertTransactionsStats(transactionsStats: Transaction
   }
 }
 
-export async function queryLatestTransactionStats(count: number) {
+export async function queryLatestTransactionStats(count: number): Promise<TransactionStats[]> {
   try {
     const sql = `SELECT * FROM transactions ORDER BY cycle DESC LIMIT ${count ? count : 100}`
     const transactionsStats: TransactionStats[] = await db.all(sql)
@@ -72,7 +72,7 @@ export async function queryLatestTransactionStats(count: number) {
   }
 }
 
-export async function queryTransactionStatsBetween(startCycle: number, endCycle: number) {
+export async function queryTransactionStatsBetween(startCycle: number, endCycle: number): Promise<TransactionStats[]> {
   try {
     const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC LIMIT 100`
     const transactionsStats: TransactionStats[] = await db.all(sql, [startCycle, endCycle])

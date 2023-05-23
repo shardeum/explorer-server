@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import HighchartsReact from 'highcharts-react-official'
 import Highcharts from 'highcharts/highstock'
 
@@ -9,7 +9,7 @@ interface BarChartProps<D> {
 
 // TODO: have to refactor the code
 
-export const BarChart = <D,>({ title }: BarChartProps<D>) => {
+export const BarChart = <D,>({ title }: BarChartProps<D>): ReactNode => {
   const option = {
     chart: {
       type: 'column',

@@ -9,7 +9,7 @@ export interface CoinStats {
   totalStakeChange: number
 }
 
-export async function insertCoinStats(coinStats: CoinStats) {
+export async function insertCoinStats(coinStats: CoinStats): Promise<void> {
   try {
     const fields = Object.keys(coinStats).join(', ')
     const placeholders = Object.keys(coinStats).fill('?').join(', ')
@@ -22,7 +22,7 @@ export async function insertCoinStats(coinStats: CoinStats) {
   }
 }
 
-export async function bulkInsertCoinsStats(coinStats: CoinStats[]) {
+export async function bulkInsertCoinsStats(coinStats: CoinStats[]): Promise<void> {
   try {
     const fields = Object.keys(coinStats[0]).join(', ')
     const placeholders = Object.keys(coinStats[0]).fill('?').join(', ')
@@ -40,7 +40,7 @@ export async function bulkInsertCoinsStats(coinStats: CoinStats[]) {
   }
 }
 
-export async function queryLatestCoinStats(count?: number) {
+export async function queryLatestCoinStats(count?: number): Promise<CoinStats[]> {
   try {
     const sql = `SELECT * FROM coin_stats ORDER BY cycle DESC LIMIT ${count ? count : 100}`
     const coinStats: CoinStats[] = await db.all(sql)
@@ -51,7 +51,10 @@ export async function queryLatestCoinStats(count?: number) {
   }
 }
 
-export async function queryAggregatedCoinStats() {
+export async function queryAggregatedCoinStats(): Promise<{
+      totalSupplyChange: number
+      totalStakeChange: number
+    }> {
   try {
     const sql = `SELECT IFNULL(sum(totalSupplyChange), 0) as totalSupplyChange, IFNULL(sum(totalStakeChange), 0) as totalStakeChange FROM coin_stats`
     const coinStats: {

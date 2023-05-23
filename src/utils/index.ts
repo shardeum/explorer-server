@@ -14,7 +14,7 @@ Example of def:
 Returns a string with the first error encountered or and empty string ''.
 Errors are: "[name] is required" or "[name] must be, [type]"
 */
-export function validateTypes(inp: object, def: object) {
+export function validateTypes(inp: object, def: object): string {
   if (inp === undefined) return 'input is undefined'
   if (inp === null) return 'input is null'
   if (typeof inp !== 'object') return 'input must be object, not ' + typeof inp
@@ -60,7 +60,7 @@ export function validateTypes(inp: object, def: object) {
   return ''
 }
 
-export async function sleep(time: number) {
+export async function sleep(time: number): Promise<boolean> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true)

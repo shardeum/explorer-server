@@ -20,7 +20,7 @@ interface ITableBody<T> {
 }
 
 
-export function Table<T = unknown>({ columns, data }: ITableProps<T>) {
+export function Table<T = unknown>({ columns, data }: ITableProps<T>): ReactNode {
   return (
     <div className={styles.Table}>
       <table>
@@ -46,11 +46,11 @@ export function Table<T = unknown>({ columns, data }: ITableProps<T>) {
 }
 
 
-export function TableHeaderItem({ value }: { value: string | ReactNode }) {
+export function TableHeaderItem({ value }: { value: string | ReactNode }): ReactNode {
   return <th>{typeof value === 'string' ? <span>{value}</span> : value}</th>
 }
 
-export function TableBodyItem<T>({ col, row }: ITableBody<T>) {
+export function TableBodyItem<T>({ col, row }: ITableBody<T>): ReactNode {
   const value = get(row, col.key)
 
   return (

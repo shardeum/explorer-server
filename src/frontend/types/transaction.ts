@@ -79,16 +79,16 @@ export const TransactionSearchList: {
   key: TransactionSearchType
   value: string
 }[] = [
-  { key: TransactionSearchType.AllExceptInternalTx, value: 'All Transactions' },
+  {key: TransactionSearchType.AllExceptInternalTx, value: 'All Transactions'},
   // {
   //   key: TransactionSearchType.NodeRewardReceipt,
   //   value: "Node Reward Transactions",
   // },
-  { key: TransactionSearchType.StakeReceipt, value: 'Stake Transactions' },
-  { key: TransactionSearchType.UnstakeReceipt, value: 'Unstake Transactions' },
-  { key: TransactionSearchType.EVM_Internal, value: 'Internal Transactions' },
-  { key: TransactionSearchType.ERC_20, value: 'ERC 20 Token Transactions' },
-  { key: TransactionSearchType.ERC_721, value: 'ERC 721 Token Transactions' },
+  {key: TransactionSearchType.StakeReceipt, value: 'Stake Transactions'},
+  {key: TransactionSearchType.UnstakeReceipt, value: 'Unstake Transactions'},
+  {key: TransactionSearchType.EVM_Internal, value: 'Internal Transactions'},
+  {key: TransactionSearchType.ERC_20, value: 'ERC 20 Token Transactions'},
+  {key: TransactionSearchType.ERC_721, value: 'ERC 721 Token Transactions'},
   {
     key: TransactionSearchType.ERC_1155,
     value: 'ERC 1155 Token Transactions',
@@ -121,3 +121,13 @@ export interface Log {
   topics: string[]
   data: string
 }
+
+
+export type PagedTransaction = {
+  transactions: Transaction[]
+  totalPages: number
+  totalTransactions: number
+  totalRewardTxs: number
+  totalStakeTxs: number
+  totalUnstakeTxs: number
+};

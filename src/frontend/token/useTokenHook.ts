@@ -8,7 +8,24 @@ interface detailProps {
   address?: string
 }
 
-export const useTokenHook = ({ id, address }: detailProps) => {
+type TokenHookResult = {
+  account?: Account
+  transactions: Transaction[]
+  tokens: Token[]
+  tokenHolders: number
+  total?: number
+  page: number
+  transactionType: number | string
+  filteredAddress: string
+  activeTab: number | string
+  tokenBalance: string
+  setPage: (page: number) => void
+  setTransactionType: (transactionType: number | string) => void
+  onAddressChange: (e: ChangeEvent<HTMLInputElement>) => void
+  onTabChange: (e: TransactionSearchType) => void
+}
+
+export const useTokenHook = ({id, address}: detailProps): TokenHookResult => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [tokens, setTokens] = useState<Token[]>([])
@@ -26,7 +43,7 @@ export const useTokenHook = ({ id, address }: detailProps) => {
     setFilteredAddress(e.target.value)
   }, [])
 
-  const onTabChange = useCallback((tab: string | number) => {
+  const onTabChange = useCallback((tab: TransactionSearchType) => {
     setActiveTab(tab)
   }, [])
 
@@ -62,14 +79,14 @@ export const useTokenHook = ({ id, address }: detailProps) => {
   }, [id])
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchData(): Promise<void> {
       const accounts = await getAddress()
 
       if (
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
-        const { total, transactions, tokenBalance } = await getTransaction()
+        const {total, transactions, tokenBalance} = await getTransaction()
 
         setTransactions(transactions as Transaction[])
         setTotal(total)
@@ -81,7 +98,7 @@ export const useTokenHook = ({ id, address }: detailProps) => {
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
-        const { tokenHolders, tokens } = await getToken()
+        const {tokenHolders, tokens} = await getToken()
         setTokenHolders(tokenHolders)
         setTokens(tokens)
       }

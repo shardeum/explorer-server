@@ -2,7 +2,19 @@ import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../api'
 import { Transaction } from '../types'
 
-export const useLogHook = (addr?: string, tps?: string) => {
+type LogHookResult = {
+  address: string
+  topic: string
+  page: number
+  setPage: (page: number) => void
+  transactions: Transaction[]
+  total: number
+  onSearch: () => void
+  onAddressChange: (e: ChangeEvent<HTMLInputElement>) => void
+  onTopicChange: (e: ChangeEvent<HTMLInputElement>) => void
+}
+
+export const useLogHook = (addr?: string, tps?: string): LogHookResult => {
   const [address, setAddress] = useState<string>('')
   const [topic, setTopic] = useState<string>('')
   const [page, setPage] = useState<number>(1)

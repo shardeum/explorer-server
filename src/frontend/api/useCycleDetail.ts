@@ -5,7 +5,11 @@ import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
 
-export const useCycleDetail = (id: string) => {
+type CycleDetailResult = {
+  data: Cycle
+}
+
+export const useCycleDetail = (id: string): CycleDetailResult => {
   let cycleNumber: string | null = null
   const regex = /[a-z]/i
   if (!regex.test(id)) {
@@ -13,7 +17,7 @@ export const useCycleDetail = (id: string) => {
   }
 
   const queryPath = cycleNumber ? `${PATHS.CYCLE}/${id}` : `${PATHS.CYCLE}?marker=${id}`
-  const response = useSWR(queryPath, fetcher)
+  const response = useSWR<{ cycle: Cycle, cycles: Cycle[] }>(queryPath, fetcher)
 
   let cycle: Cycle
   if (cycleNumber) {

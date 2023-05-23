@@ -25,19 +25,20 @@ crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
 import { config as CONFIG, ARCHIVER_URL, RPC_DATA_SERVER_URL } from './config'
-import { count } from 'console'
 import {
   coinStatsCacheRecord,
   isCacheRecordValid,
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
+import { AccountResponse,
+  AddressResponse, CoinResponse, ErrorResponse, LogResponse, ReceiptResponse, TokenResponse, TransactionResponse } from './types'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
 
 console.log(process.argv)
-let port = process.argv[2]
+const port = process.argv[2]
 if (port) {
   CONFIG.port.server = port
 }
@@ -81,13 +82,13 @@ let txHashQueryCache = new Map()
 const txHashQueryCacheSize = 1000
 
 async function getLatestCycleNumber(): Promise<number> {
-  let latestCycleRecords = await Cycle.queryLatestCycleRecords(1)
-  let latestCycleNumber = latestCycleRecords.length > 0 ? latestCycleRecords[0].counter : 0
+  const latestCycleRecords = await Cycle.queryLatestCycleRecords(1)
+  const latestCycleNumber = latestCycleRecords.length > 0 ? latestCycleRecords[0].counter : 0
   return latestCycleNumber
 }
 
 // Setup Log Directory
-const start = async () => {
+const start = async (): Promise<void> => {
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
 
@@ -205,7 +206,7 @@ const start = async () => {
       if (query.accountType) {
         accountType = parseInt(query.accountType)
       }
-      let account = await Account.queryAccountByAddress(query.address.toLowerCase(), accountType)
+      const account = await Account.queryAccountByAddress(query.address.toLowerCase(), accountType)
       if (account) accounts = [account]
     } else if (query.type) {
       const type: number = parseInt(query.type)
@@ -281,7 +282,7 @@ const start = async () => {
       })
       return
     }
-    const res: any = {
+    const res: AccountResponse = {
       success: true,
       accounts,
     }
@@ -314,7 +315,7 @@ const start = async () => {
       return
     }
     const query = _request.query as RequestQuery
-    let accounts = []
+    const accounts = []
     let account
     if (query.accountType)
       account = await Account.queryAccountByAddress(query.address.toLowerCase(), parseInt(query.accountType))
@@ -344,7 +345,7 @@ const start = async () => {
         return
       }
     }
-    const res: any = {
+    const res: AddressResponse = {
       success: true,
       accounts,
     }
@@ -366,7 +367,6 @@ const start = async () => {
     const itemsPerPage = 10
     let totalPages = 0
     let totalTokenHolders = 0
-    let totalContracts = 0
     let tokens
     if (query.address) {
       tokens = await Account.queryTokensByAddress(query.address.toLowerCase(), true)
@@ -404,7 +404,7 @@ const start = async () => {
       })
       return
     }
-    const res: any = {
+    const res: TokenResponse = {
       success: true,
       totalTokenHolders,
     }
@@ -476,7 +476,7 @@ const start = async () => {
         endCycle,
         query.address && query.address.toLowerCase()
       )
-      const res: any = {
+      const res: TransactionResponse = {
         success: true,
         totalTransactions,
       }
@@ -544,7 +544,7 @@ const start = async () => {
         filterAddress
       )
       if (query.filterAddress) {
-        let result = await Account.queryTokenBalance(address, filterAddress)
+        const result = await Account.queryTokenBalance(address, filterAddress)
         if (result.success) filterAddressTokenBalance = result.balance
       }
     } else if (query.page) {
@@ -588,11 +588,11 @@ const start = async () => {
         return
       }
       if (query.type === 'requery') {
-        let transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+        const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
         if (transaction) {
           transactions = [transaction]
           txHashQueryCache.set(query.txHash, { success: true, transactions })
-          const res: any = {
+          const res: TransactionResponse = {
             success: true,
             transactions,
           }
@@ -620,12 +620,12 @@ const start = async () => {
         }
         acceptedTx = result.data.txStatus.accepted
       }
-      let found = txHashQueryCache.get(query.txHash)
+      const found = txHashQueryCache.get(query.txHash)
       if (found) {
         if (found.success) return found
         if (!acceptedTx) return found
       }
-      let transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
       if (transaction) transactions = [transaction]
       if (transaction) txHashQueryCache.set(query.txHash, { success: true, transactions })
       else
@@ -635,13 +635,13 @@ const start = async () => {
         })
       if (txHashQueryCache.size > txHashQueryCacheSize + 10) {
         // Remove old data
-        let extra = txHashQueryCache.size - txHashQueryCacheSize
-        let arrayTemp = Array.from(txHashQueryCache)
+        const extra = txHashQueryCache.size - txHashQueryCacheSize
+        const arrayTemp = Array.from(txHashQueryCache)
         arrayTemp.splice(0, extra)
         txHashQueryCache = new Map(arrayTemp)
       }
     } else if (query.txId) {
-      let transaction = await Transaction.queryTransactionByTxId(query.txId)
+      const transaction = await Transaction.queryTransactionByTxId(query.txId)
       transactions = [transaction]
     } else {
       reply.send({
@@ -650,7 +650,7 @@ const start = async () => {
       })
       return
     }
-    const res: any = {
+    const res: TransactionResponse = {
       success: true,
       transactions,
     }
@@ -696,7 +696,7 @@ const start = async () => {
     }
     const query = _request.query as RequestQuery
     let transactions = []
-    const res: any = {
+    const res: TransactionResponse = {
       success: true,
       transactions,
     }
@@ -708,7 +708,7 @@ const start = async () => {
       return
     }
     if (query.type === 'requery') {
-      let transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
       if (transaction) {
         transactions = [transaction]
         txHashQueryCache.set(query.txHash, { success: true, transactions })
@@ -735,12 +735,12 @@ const start = async () => {
       acceptedTx = result.data.txStatus.accepted
     }
     if (res.success) {
-      let found = txHashQueryCache.get(query.txHash)
+      const found = txHashQueryCache.get(query.txHash)
       if (found) {
         if (found.success) return found
         if (!acceptedTx) return found
       }
-      let transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
       // console.log('transaction result', query.txHash, transactions)
       if (transaction) {
         res.transactions.push(transaction)
@@ -757,18 +757,20 @@ const start = async () => {
           console.log(`Archiver ${ARCHIVER_URL} is not responding`, e)
         }
       }
-      if (!transaction) {
-        delete res.transactions
-        res.success = false
-        res.error = 'This transaction is not found!'
-      }
+
       txHashQueryCache.set(query.txHash, res)
       if (txHashQueryCache.size > txHashQueryCacheSize + 10) {
         // Remove old data
-        let extra = txHashQueryCache.size - txHashQueryCacheSize
-        let arrayTemp = Array.from(txHashQueryCache)
+        const extra = txHashQueryCache.size - txHashQueryCacheSize
+        const arrayTemp = Array.from(txHashQueryCache)
         arrayTemp.splice(0, extra)
         txHashQueryCache = new Map(arrayTemp)
+      }
+
+      if (!transaction) {
+        delete res.transactions
+        reply.send({result: res, success: false, error: 'This transaction is not found!'})
+        return
       }
     }
     reply.send(res)
@@ -817,7 +819,8 @@ const start = async () => {
   })
 
   server.get('/api/archive', async (_request, reply) => {
-    let err = utils.validateTypes(_request.query as object, {
+    const err = utils.validateTypes(_request.query as object, {
+
       start: 's?',
       end: 's?',
       count: 's?',
@@ -830,8 +833,8 @@ const start = async () => {
     const query = _request.query as RequestQuery
     let archivedCycles = []
     if (query.start && query.end) {
-      let from = parseInt(query.start)
-      let to = parseInt(query.end)
+      const from = parseInt(query.start)
+      const to = parseInt(query.end)
       if (!(from >= 0 && to >= from) || Number.isNaN(from) || Number.isNaN(to)) {
         reply.send({
           success: false,
@@ -839,7 +842,7 @@ const start = async () => {
         })
         return
       }
-      let count = to - from
+      const count = to - from
       if (count > 100) {
         reply.send({
           success: false,
@@ -850,7 +853,7 @@ const start = async () => {
       archivedCycles = await ArchivedCycle.queryAllArchivedCyclesBetween(from, to)
     }
     if (query.count) {
-      let count = parseInt(query.count)
+      const count = parseInt(query.count)
       if (count > 100) {
         reply.send({
           success: false,
@@ -861,7 +864,7 @@ const start = async () => {
       archivedCycles = await ArchivedCycle.queryAllArchivedCycles(count)
     }
     if (query.marker) {
-      let archivedCycle = await ArchivedCycle.queryArchivedCycleByMarker(query.marker)
+      const archivedCycle = await ArchivedCycle.queryArchivedCycleByMarker(query.marker)
       if (archivedCycle) {
         archivedCycles.push(archivedCycle)
       }
@@ -920,7 +923,7 @@ const start = async () => {
       } else endCycle = await Cycle.queryCycleCount()
       console.log('endCycle', endCycle, 'startCycle', startCycle)
       totalReceipts = await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle)
-      const res: any = {
+      const res: ReceiptResponse = {
         success: true,
         totalReceipts,
       }
@@ -975,7 +978,7 @@ const start = async () => {
       })
       return
     }
-    const res: any = {
+    const res: ReceiptResponse = {
       success: true,
       receipts,
     }
@@ -1010,7 +1013,7 @@ const start = async () => {
     let totalPages = 0
     let totalLogs = 0
     let logs
-    let transactions = []
+    const transactions = []
     if (query.count) {
       const count: number = parseInt(query.count)
       //max 1000 logs
@@ -1024,7 +1027,7 @@ const start = async () => {
       logs = await Log.queryLogs(0, count)
       totalLogs = await Log.queryLogCount(query.type)
     } else if (query.address || query.topic0 || query.startCycle || query.endCycle) {
-      let address: string = query.address ? query.address.toLowerCase() : ''
+      const address: string = query.address ? query.address.toLowerCase() : ''
 
       let startCycle: number
       let endCycle: number
@@ -1039,7 +1042,7 @@ const start = async () => {
           reply.send({ success: false, error: 'Invalid end cycle number' })
           return
         }
-        let count = startCycle - endCycle
+        const count = startCycle - endCycle
         if (count > 100) {
           reply.send({
             success: false,
@@ -1087,8 +1090,8 @@ const start = async () => {
         )
         if (query.type === 'txs') {
           for (let i = 0; i < logs.length; i++) {
-            const transaction = await Transaction.queryTransactionByHash(logs[i].txHash)
-            console.log(logs[i].txHash, transaction)
+            const transaction = await Transaction.queryTransactionByHash(logs[i].txHash) // eslint-disable-line security/detect-object-injection
+            console.log(logs[i].txHash, transaction) // eslint-disable-line security/detect-object-injection
             transactions.push(transaction)
           }
         }
@@ -1100,9 +1103,10 @@ const start = async () => {
       })
       return
     }
-    const res: any = {
+    const res: LogResponse = {
       success: true,
       logs,
+      totalLogs,
     }
     if (query.page) {
       res.totalPages = totalPages
@@ -1110,7 +1114,6 @@ const start = async () => {
     if (query.type === 'txs') {
       res.transactions = transactions
     }
-    res.totalLogs = totalLogs
     reply.send(res)
   })
 
@@ -1172,7 +1175,7 @@ const start = async () => {
       return
     }
     if (query.responseType && query.responseType === 'array') {
-      let temp_array = []
+      const temp_array = []
       validatorStats.forEach((item) =>
         temp_array.push([
           item.timestamp * 1000,
@@ -1252,7 +1255,7 @@ const start = async () => {
       return
     }
     if (query.responseType && query.responseType === 'array') {
-      let temp_array = []
+      const temp_array = []
       transactionStats.forEach((item) =>
         temp_array.push([
           item.timestamp * 1000,
@@ -1283,7 +1286,7 @@ const start = async () => {
       coinStatsCacheRecord.setData(latestCycleNumber, coinStats)
     }
 
-    let res: any
+    let res: CoinResponse | ErrorResponse
     if (coinStats) {
       res = {
         success: true,

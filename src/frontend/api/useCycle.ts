@@ -5,10 +5,15 @@ import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
 
-export const useCycle = (query: CycleQuery) => {
-  const { count } = query
+export type CycleResult = {
+  data: Cycle[]
+  loading: boolean
+}
 
-  const { data } = useSWR(`${PATHS.CYCLE}?count=${count}`, fetcher)
+export const useCycle = (query: CycleQuery): CycleResult => {
+  const {count} = query
+
+  const {data} = useSWR<{ cycles: Cycle[] }>(`${PATHS.CYCLE}?count=${count}`, fetcher)
 
   const cycles: Cycle[] = data?.cycles || []
 

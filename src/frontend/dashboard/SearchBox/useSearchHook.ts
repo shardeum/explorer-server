@@ -2,7 +2,13 @@ import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import { isTransactionHash, isNodeAccount } from '../../utils/getSearchRoute'
 
-export const useSearchHook = () => {
+type SearchHookResult = {
+  search: string
+  setSearch: (search: string) => void
+  onSearch: () => void
+}
+
+export const useSearchHook = (): SearchHookResult => {
   const router = useRouter()
 
   const [search, setSearch] = useState<string>('')

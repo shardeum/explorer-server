@@ -4,11 +4,22 @@ import { Transaction, TransactionQuery } from '../types'
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
+import { PagedTransaction } from '../types/transaction';
 
-export const useTransaction = (query: TransactionQuery) => {
-  const { page, count, txType } = query
+type TransactionResult = {
+  transactions: Transaction[]
+  totalPages: number
+  totalTransactions: number
+  totalRewardTxs: number
+  totalStakeTxs: number
+  totalUnstakeTxs: number
+  loading: boolean
+}
 
-  const createUrl = () => {
+export const useTransaction = (query: TransactionQuery): TransactionResult => {
+  const {page, count, txType} = query
+
+  const createUrl = (): string => {
     let url = `${PATHS.TRANSACTION}?page=${page}`
 
     if (count) url = `${PATHS.TRANSACTION}?count=${count}`
@@ -18,7 +29,7 @@ export const useTransaction = (query: TransactionQuery) => {
     return url
   }
 
-  const { data } = useSWR(createUrl(), fetcher)
+  const {data} = useSWR<PagedTransaction>(createUrl(), fetcher)
 
   const transactions: Transaction[] = data?.transactions || []
 
@@ -28,7 +39,7 @@ export const useTransaction = (query: TransactionQuery) => {
     totalTransactions: data?.totalTransactions || 0,
     totalRewardTxs: data?.totalRewardTxs || 0,
     totalStakeTxs: data?.totalStakeTxs || 0,
-    totalUnstakeTxs: data?.totalUnStakeTxs || 0,
+    totalUnstakeTxs: data?.totalUnstakeTxs || 0,
     loading: !data,
   }
 

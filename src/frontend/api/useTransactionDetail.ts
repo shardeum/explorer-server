@@ -5,8 +5,12 @@ import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
 
-export const useTransactionDetail = (id: string) => {
-  const { data } = useSWR(`${PATHS.TRANSACTION_DETAIL}?txHash=${id}&type=requery`, fetcher)
+export type TransactionDetailResult = {
+  data: Transaction | undefined
+}
+
+export const useTransactionDetail = (id: string): TransactionDetailResult => {
+  const { data } = useSWR<{transactions: Transaction[]}>(`${PATHS.TRANSACTION_DETAIL}?txHash=${id}&type=requery`, fetcher)
 
   const transactions = data?.transactions
 

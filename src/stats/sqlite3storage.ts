@@ -10,13 +10,13 @@ import sqlite3Lib from 'sqlite3'
 const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 
-export async function init() {
+export async function init(): Promise<void> {
   db = new sqlite3.Database('statsDB.sqlite3')
   await run('PRAGMA journal_mode=WAL')
   console.log('Stats Database initialized.')
 }
 
-export async function runCreate(createStatement: string) {
+export async function runCreate(createStatement: string): Promise<void> {
   await run(createStatement)
 }
 
@@ -62,7 +62,7 @@ export async function all<T>(sql: string, params = []): Promise<T[]> {
   })
 }
 
-export function extractValues(object: CoinStats | ValidatorStats | TransactionStats) {
+export function extractValues(object: CoinStats | ValidatorStats | TransactionStats): string[] {
   try {
     const inputs = []
     for (let value of Object.values(object)) {
