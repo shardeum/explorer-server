@@ -19,15 +19,15 @@ export enum AccountType {
 }
 
 export enum TransactionType {
-  Receipt, // EVM Receipt
-  NodeRewardReceipt,
-  StakeReceipt,
-  UnstakeReceipt,
-  EVM_Internal,
-  ERC_20,
-  ERC_721,
-  ERC_1155,
-  InternalTxReceipt,
+  Receipt = 1, // EVM Receipt
+  NodeRewardReceipt = 2,
+  StakeReceipt = 3,
+  UnstakeReceipt = 4,
+  EVM_Internal = 5,
+  ERC_20 = 6,
+  ERC_721 = 7,
+  ERC_1155 = 8,
+  InternalTxReceipt = 9,
 }
 
 export interface BaseAccount {
@@ -206,16 +206,16 @@ export enum AccountSearchType {
 }
 
 export enum TransactionSearchType {
-  All, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt + InternalTxReceipt
-  Receipt, // EVM Receipt
-  NodeRewardReceipt,
-  StakeReceipt,
-  UnstakeReceipt,
-  EVM_Internal,
-  ERC_20,
-  ERC_721,
-  ERC_1155,
-  TokenTransfer, // token txs of a contract
-  InternalTxReceipt,
-  AllExceptInternalTx, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt
+  All = 1, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt + InternalTxReceipt
+  Receipt = 2, // EVM Receipt
+  NodeRewardReceipt = 3,
+  StakeReceipt = 4,
+  UnstakeReceipt = 4,
+  EVM_Internal = 6,
+  ERC_20 = 7,
+  ERC_721 = 8,
+  ERC_1155 = 9,
+  TokenTransfer = 10, // token txs of a contract
+  InternalTxReceipt = 11,
+  AllExceptInternalTx = 12, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt
 }
