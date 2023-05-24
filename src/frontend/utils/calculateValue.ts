@@ -26,7 +26,7 @@ export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, 
 
       return tokenTx.tokenValue === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         ? round(utils.formatUnits(tokenTx.tokenValue, 0))
-        : round(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
+        : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
 
       // : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
     } else if (txType === TransactionType.ERC_721) {
@@ -41,10 +41,10 @@ export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, 
           ? 'True'
           : 'False'
         : tokenTx.tokenValue.length != 130
-        ? tokenTx.tokenValue
-        : tokenId
-        ? shortTokenValue(Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66)))
-        : shortTokenValue(Web3Utils.hexToNumberString('0x' + tokenTx.tokenValue.substring(66, 130)))
+          ? tokenTx.tokenValue
+          : tokenId
+            ? shortTokenValue(Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66)))
+            : shortTokenValue(Web3Utils.hexToNumberString('0x' + tokenTx.tokenValue.substring(66, 130)))
     }
   } catch (e) {
     return 'error in calculating tokenValue'
@@ -76,4 +76,13 @@ export const round = (value: string): string => {
   }
   if (decimals < 10) return value
   return Number(value).toFixed(10)
+}
+
+export const roundTokenValue = (value: string) => {
+  const decimals = countDecimals(value)
+  if (decimals === 0) {
+    return value
+  }
+  if (decimals < 18) return value
+  return Number(value).toFixed(18)
 }
