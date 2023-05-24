@@ -18,12 +18,6 @@ export const TransactionDetail: React.FC = () => {
 
   const { transactionData, receiptData, setShowReceipt, showReceipt } = useTransactionDetailHook(id)
 
-  useEffect(() => {
-    const receipt = router?.query?.receipt === 'true' ? true : false
-    setShowReceipt(receipt)
-    setActiveTab(receipt ? receiptTabs[0].key : tabs[0].key)
-  }, [router?.query?.receipt])
-
   const tabs = useMemo(() => [
     {
       key: 'overview',
@@ -50,6 +44,11 @@ export const TransactionDetail: React.FC = () => {
     },
   ], [receiptData])
 
+  useEffect(() => {
+    const receipt = router?.query?.receipt === 'true' ? true : false
+    setShowReceipt(receipt)
+    setActiveTab(receipt ? receiptTabs[0].key : tabs[0].key)
+  }, [router?.query?.receipt, receiptTabs, setShowReceipt, tabs])
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction]
 
   const [activeTab, setActiveTab] = useState(showReceipt ? receiptTabs[0].key : tabs[0].key)
