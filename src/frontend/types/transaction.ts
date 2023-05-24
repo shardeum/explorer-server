@@ -1,3 +1,5 @@
+import { TransactionSearchType, TransactionType } from "../../@type"
+
 export interface TokenTxs {
   contractAddress: string
   contractInfo: ContractInfo
@@ -73,21 +75,6 @@ export interface TransactionQuery {
   txType?: number
 }
 
-export enum TransactionSearchType {
-  All, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt + InternalTxReceipt
-  Receipt,
-  NodeRewardReceipt,
-  StakeReceipt,
-  UnstakeReceipt,
-  EVM_Internal,
-  ERC_20,
-  ERC_721,
-  ERC_1155,
-  TokenTransfer, // token txs of a contract
-  InternalTxReceipt,
-  AllExceptInternalTx, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt (exclude InternalTxReceipt)
-}
-
 export const TransactionSearchList: {
   key: TransactionSearchType
   value: string
@@ -107,18 +94,6 @@ export const TransactionSearchList: {
     value: 'ERC 1155 Token Transactions',
   },
 ]
-
-export enum TransactionType {
-  Receipt,
-  NodeRewardReceipt,
-  StakeReceipt,
-  UnstakeReceipt,
-  EVM_Internal,
-  ERC_20,
-  ERC_721,
-  ERC_1155,
-  InternalTxReceipt,
-}
 
 export interface TransactionStatus {
   txHash: string
