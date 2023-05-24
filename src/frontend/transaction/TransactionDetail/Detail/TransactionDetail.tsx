@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { ContentLayout } from '../../../components'
 import { Tab } from '../../../components/Tab'
 import { breadcrumbsList } from '../../../types'
@@ -24,7 +24,7 @@ export const TransactionDetail: React.FC = () => {
     setActiveTab(receipt ? receiptTabs[0].key : tabs[0].key)
   }, [router?.query?.receipt])
 
-  const tabs = [
+  const tabs = useMemo(() => [
     {
       key: 'overview',
       value: 'Overview',
@@ -35,9 +35,9 @@ export const TransactionDetail: React.FC = () => {
       value: 'Json View',
       content: <JsonView transaction={transactionData} />,
     },
-  ]
+  ], [transactionData])
 
-  const receiptTabs = [
+  const receiptTabs = useMemo(() => [
     {
       key: 'fullReceipt',
       value: 'Full Receipt',
@@ -48,7 +48,7 @@ export const TransactionDetail: React.FC = () => {
       value: 'Account Info',
       content: <AccountInfo receipt={receiptData} />,
     },
-  ]
+  ], [receiptData])
 
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction]
 
