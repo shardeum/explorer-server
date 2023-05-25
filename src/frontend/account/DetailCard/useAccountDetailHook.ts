@@ -4,7 +4,7 @@ import { Account, AccountSearchType, Transaction, TransactionSearchType } from '
 
 interface detailProps {
   id: string
-  txType?: string
+  txType?: TransactionSearchType
 }
 
 export const useAccountDetailHook = ({ id, txType }: detailProps) => {
