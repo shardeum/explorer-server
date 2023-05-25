@@ -20,7 +20,7 @@ export const AccountDetail: React.FC = () => {
   const router = useRouter()
 
   const id = router?.query?.id
-  const txType = router?.query?.txType as unknown as TransactionSearchType
+  const txType: TransactionSearchType = parseInt(router?.query?.txType as string)
 
   const siblingCount = 3
   const pageSize = 10
@@ -28,7 +28,7 @@ export const AccountDetail: React.FC = () => {
   const { account, accountType, totalTransactions, page, tokens, transactions, setTransactionType, setPage } =
     useAccountDetailHook({
       id: id as string,
-      txType: txType,
+      txType,
     })
 
   const tabs = [
