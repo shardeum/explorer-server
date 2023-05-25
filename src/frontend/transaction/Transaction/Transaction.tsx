@@ -6,7 +6,7 @@ import { useTransaction } from '../../api'
 import { ContentLayout, Dropdown, Pagination, PaginationPrevNext } from '../../components'
 import { TransactionTable } from '../TransactionTable'
 
-import { breadcrumbsList, TransactionSearchList } from '../../types'
+import { breadcrumbsList, TransactionSearchList, TransactionSearchType } from '../../types'
 
 import styles from './Transaction.module.scss'
 
@@ -15,7 +15,7 @@ const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.transaction]
 export const Transaction: React.FC = () => {
   const router = useRouter()
 
-  const txType = Number(router?.query?.txType)
+  const txType: TransactionSearchType = parseInt(router?.query?.txType as string)
 
   const tType = txType ? TransactionSearchList.filter((t) => t.key === txType)[0] : TransactionSearchList[0]
 
