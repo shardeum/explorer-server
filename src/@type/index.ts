@@ -210,7 +210,7 @@ export enum TransactionSearchType {
   Receipt = 2, // EVM Receipt
   NodeRewardReceipt = 3,
   StakeReceipt = 4,
-  UnstakeReceipt = 4,
+  UnstakeReceipt = 5,
   EVM_Internal = 6,
   ERC_20 = 7,
   ERC_721 = 8,
