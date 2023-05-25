@@ -492,9 +492,9 @@ export const getWeb3 = function () {
 }
 
 export async function queryTransactionCount(
-  address = undefined,
-  txType = undefined,
-  filterAddress = undefined
+  address?: string,
+  txType?: TransactionSearchType,
+  filterAddress?: string
 ) {
   let transactions
   try {
@@ -617,9 +617,9 @@ export async function queryTransactionCount(
 export async function queryTransactions(
   skip = 0,
   limit = 10,
-  address = undefined,
-  txType = undefined,
-  filterAddress = undefined
+  address?: string,
+  txType?: TransactionSearchType,
+  filterAddress?: string
 ) {
   let transactions
   try {
@@ -682,6 +682,8 @@ export async function queryTransactions(
         }
       }
     } else if (txType) {
+      // txType should be non-zero as TransactionSearchType starts at 1, so
+      // this conditional is pretty sane
       if (txType === TransactionSearchType.AllExceptInternalTx) {
         const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE transactionType!=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
@@ -815,9 +817,9 @@ export async function queryTransactionsBetweenCycles(
   limit = 10,
   start,
   end,
-  address = undefined,
-  txType = undefined,
-  filterAddress = undefined
+  address?: string,
+  txType?: TransactionSearchType,
+  filterAddress?: string
 ) {
   let transactions
   try {
@@ -947,9 +949,9 @@ export async function queryTransactionsBetweenCycles(
 export async function queryTransactionCountBetweenCycles(
   start,
   end,
-  address = undefined,
-  txType = undefined,
-  filterAddress = undefined
+  address?: string,
+  txType?: TransactionSearchType,
+  filterAddress?: string
 ) {
   let transactions
   try {
@@ -1074,7 +1076,11 @@ export async function queryTransactionCountBetweenCycles(
   return transactions
 }
 
-export async function queryTransactionCountByCycles(start: number, end: number, txType = undefined) {
+export async function queryTransactionCountByCycles(
+  start: number,
+  end: number,
+  txType?: TransactionSearchType
+) {
   let transactions
   try {
     if (
