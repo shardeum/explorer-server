@@ -72,7 +72,7 @@ export interface Transaction {
 export interface TransactionQuery {
   page?: number
   count?: number
-  txType?: number
+  txType?: TransactionSearchType
 }
 
 export const TransactionSearchList: {

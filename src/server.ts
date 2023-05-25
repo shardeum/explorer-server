@@ -439,7 +439,7 @@ const start = async () => {
     let totalPages = 0
     let totalTransactions = 0
     let transactions
-    let txType: number
+    let txType: TransactionSearchType
     let filterAddressTokenBalance = 0
     if (query.txType) {
       txType = parseInt(query.txType)
