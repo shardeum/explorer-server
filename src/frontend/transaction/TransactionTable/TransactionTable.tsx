@@ -51,7 +51,7 @@ const tempHeader: IColumnProps<Transaction | TokenTxs>[] = [
 ]
 
 export const TransactionTable: React.FC<ITransactionTable> = (props) => {
-  const { data, txType = 1 } = props
+  const { data, txType = TransactionSearchType.All } = props
 
   const [header, setHeader] = useState<IColumnProps<Transaction | TokenTxs>[]>([])
 
