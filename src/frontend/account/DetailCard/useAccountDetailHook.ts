@@ -7,7 +7,15 @@ interface detailProps {
   txType?: TransactionSearchType
 }
 
-export const useAccountDetailHook = ({ id, txType }: detailProps) => {
+type AccountDetailHookResult = {
+  account?: Account
+  transactions?: Transaction
+  total?: number
+  page: number
+  setPage: React.Dispatch<React.SetStateAction<number>>
+}
+
+export const useAccountDetailHook = ({ id, txType }: detailProps): AccountDetailHookResult => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<Transaction>()
   const [total, setTotal] = useState<number>()
@@ -36,7 +44,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps) => {
   }, [id])
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchData(): Promise<void> {
       const accounts = await getAddress()
 
       if (
