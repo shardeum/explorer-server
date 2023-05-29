@@ -46,7 +46,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({transaction}) => {
                   </Link>
                   <span>For</span>
                   {/* TODO: calculate amount and token*/}
-                  <div>{calculateTokenValue(item, item.tokenType)}&nbsp;</div>
+                  <div>{calculateTokenValue(item, item.tokenType, null, true)}&nbsp;</div>
                   <Link href={`/account/${item.contractAddress}`} className={styles.anchor}>
                     {item.tokenType === TransactionType.EVM_Internal
                       ? 'SHM'

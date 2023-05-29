@@ -19,14 +19,16 @@ export const calculateFullValue = (value: string | BN): string => {
   }
 }
 
-export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, tokenId = false): string => {
+export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, tokenId = false, fullValue = true): string => {
   try {
     if (txType === TransactionType.ERC_20 || txType === TransactionType.EVM_Internal) {
       const decimalsValue = tokenTx.contractInfo.decimals ? parseInt(tokenTx.contractInfo.decimals) : 18
 
       return tokenTx.tokenValue === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         ? round(utils.formatUnits(tokenTx.tokenValue, 0))
-        : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
+        : fullValue
+          ? utils.formatUnits(tokenTx.tokenValue, decimalsValue)
+          : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
 
       // : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
     } else if (txType === TransactionType.ERC_721) {
