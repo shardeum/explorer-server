@@ -74,7 +74,7 @@ export const useList = (param: useListParam): ListResult => {
     setFilter,
 
     data: responeData?.lists || [],
-    total: responeData!.count,
+    total: responeData?.count || 0,
     loading: !responeData,
     error,
   }
