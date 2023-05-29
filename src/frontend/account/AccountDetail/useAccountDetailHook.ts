@@ -69,11 +69,11 @@ export const useAccountDetailHook = ({id, txType}: detailProps): AccountDetails 
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
+        setAccount(accounts[0])
         const { totalTransactions, transactions } = await getTransaction()
 
         setTransactions(transactions as Transaction[])
         setTotalTransactions(totalTransactions)
-        setAccount(accounts[0])
         setTotalPages(totalPages)
       }
 

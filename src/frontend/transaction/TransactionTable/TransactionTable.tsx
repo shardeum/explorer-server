@@ -108,12 +108,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenTo',
           value: 'To',
-          render: (val: string | TransactionType) =>
-            val ? (
+          render: (val: string | TransactionType) => (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ) : (
-              'Contract Creation'
-            ),
         },
         {
           key: 'tokenType',
@@ -140,11 +136,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenTo',
           value: 'To',
-          render: (val: unknown) =>
-            val ? (
+          render: (val: unknown) => (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ) : (
-              'Contract Creation'
             ),
         },
         {
@@ -179,11 +172,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenTo',
           value: 'To',
-          render: (val: unknown) =>
-            val ? (
+          render: (val: unknown) => (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ) : (
-              'Contract Creation'
             ),
         },
         {
@@ -219,11 +209,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'tokenTo',
           value: 'To',
-          render: (val: unknown) =>
-            val ? (
+          render: (val: unknown) => (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ) : (
-              'Contract Creation'
             ),
         },
         {

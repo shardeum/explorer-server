@@ -32,7 +32,7 @@ export function Table<T = unknown>({ columns, data }: ITableProps<T>): ReactNode
           </tr>
         </thead>
         <tbody>
-          {data.map((row, index) => (
+          {data && data.map((row, index) => (
             <tr key={index}>
               {columns.map((col: IColumnProps<T>) => (
                 <TableBodyItem<T> col={col} row={row} key={col.key} />
