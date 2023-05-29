@@ -21,9 +21,9 @@ export const useCycleDetail = (id: string): CycleDetailResult => {
 
   let cycle: Cycle
   if (cycleNumber) {
-    cycle = response?.data?.cycle
+    cycle = response.data!.cycle
   } else {
-    cycle = response?.data?.cycles?.[0]
+    cycle = response.data!.cycles[0]
   }
 
   return {
