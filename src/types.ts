@@ -31,7 +31,7 @@ export type TransactionResponse = {
   totalPages?: number
   totalStakeTxs?: number
   totalRewardTxs?: number
-  totalUnStakeTxs?: number
+  totalUnstakeTxs?: number
   totalTransactions?: number
   filterAddressTokenBalance?: number
 }

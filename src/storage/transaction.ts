@@ -499,7 +499,7 @@ export async function queryTransactionCount(
   let transactions
   try {
     if (address) {
-      if (!txType || txType === TransactionSearchType.All) {
+      if (!txType ) { // (!txType || txType === TransactionSearchType.All)
         const sql = `SELECT COUNT(*) FROM transactions WHERE txFrom=? OR txTo=? OR nominee=?`
         transactions = await db.get(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -958,7 +958,7 @@ export async function queryTransactionCountBetweenCycles(
     if (address) {
       // const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? )`
       // transactions = await db.get(sql, [start, end, address, address])
-      if (!txType || txType === TransactionSearchType.All) {
+      if (!txType) { // (!txType || txType === TransactionSearchType.All)
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?)`
         transactions = await db.get(sql, [start, end, address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {

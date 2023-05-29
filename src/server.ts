@@ -669,8 +669,8 @@ const start = async (): Promise<void> => {
           const totalStakeTxs = await Transaction.queryTransactionCount(null, txType)
           res.totalStakeTxs = totalStakeTxs
           txType = TransactionSearchType.UnstakeReceipt
-          const totalUnStakeTxs = await Transaction.queryTransactionCount(null, txType)
-          res.totalUnStakeTxs = totalUnStakeTxs
+          const totalUnstakeTxs = await Transaction.queryTransactionCount(null, txType)
+          res.totalUnstakeTxs = totalUnstakeTxs
         } else {
           const totalRewardTxs = await Transaction.queryTransactionCount(null, txType)
           res.totalRewardTxs = totalRewardTxs
