@@ -110,6 +110,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           value: 'To',
           render: (val: string | TransactionType) => (
               <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          )
         },
         {
           key: 'tokenType',
