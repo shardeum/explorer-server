@@ -80,7 +80,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
             val?.to ? (
               <AnchorLink href={`/account/${val.to}`} label={val.to} size="small" ellipsis width={150} />
             ) : (
-              <AnchorLink href={`/account/${val.contractAddress}`} label={val.contractAddress + '(Contract created)'} size="small" ellipsis width={150} />
+              <AnchorLink href={`/account/${val.contractAddress}`} label={'Contract creation'} size="small" ellipsis width={150} />
             ),
         },
         {
