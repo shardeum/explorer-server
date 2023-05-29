@@ -15,9 +15,7 @@ export const useTransactionDetail = (id: string): TransactionDetailResult => {
     fetcher
   )
 
-  const transactions = data?.transactions
-
   return {
-    data: transactions?.[0] as Transaction,
+    data: data?.transactions?.[0],
   }
 }

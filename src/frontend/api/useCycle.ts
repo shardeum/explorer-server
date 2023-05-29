@@ -15,10 +15,8 @@ export const useCycle = (query: CycleQuery): CycleResult => {
 
   const { data } = useSWR<{ cycles: Cycle[] }>(`${PATHS.CYCLE}?count=${count}`, fetcher)
 
-  const cycles: Cycle[] = data?.cycles || []
-
   return {
-    data: cycles,
+    data: data?.cycles || [],
     loading: !data,
   }
 }

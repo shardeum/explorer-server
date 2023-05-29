@@ -8,8 +8,8 @@ import { PagedAccountData } from '../types/account'
 
 type ContractResult = {
   data: Account[]
-  totalPages?: number
-  total?: number
+  totalPages: number
+  total: number
   loading: boolean
 }
 
@@ -18,12 +18,10 @@ export const useContract = (query: ContractQuery): ContractResult => {
 
   const { data } = useSWR<PagedAccountData>(`${PATHS.ACCOUNT}?page=${page}&type=${type}`, fetcher)
 
-  const contracts: Account[] = data?.accounts || []
-
   return {
-    data: contracts,
-    totalPages: data?.totalPages,
-    total: data?.totalAccounts,
+    data: data?.accounts || [],
+    totalPages: data?.totalPages || 0,
+    total: data?.totalAccounts || 0,
     loading: !data,
   }
 }

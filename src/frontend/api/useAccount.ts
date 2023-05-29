@@ -28,15 +28,12 @@ export const useAccount = (query: AccountQuery): AccountResult => {
   }
 
   const { data } = useSWR<PagedAccountData>(createUrl(), fetcher)
-  const accounts: Account[] = data?.accounts || []
 
-  const res = {
-    accounts,
+  return {
+    accounts: data?.accounts || [],
     totalPages: data?.totalPages || 0,
     totalAccounts: data?.totalAccounts || 0,
     totalContracts: data?.totalContracts || 0,
     loading: !data,
   }
-
-  return res
 }

@@ -33,7 +33,7 @@ export const useTransaction = (query: TransactionQuery): TransactionResult => {
 
   const transactions: Transaction[] = data?.transactions || []
 
-  const res = {
+  return {
     transactions,
     totalPages: data?.totalPages || 0,
     totalTransactions: data?.totalTransactions || 0,
@@ -42,6 +42,4 @@ export const useTransaction = (query: TransactionQuery): TransactionResult => {
     totalUnstakeTxs: data?.totalUnstakeTxs || 0,
     loading: !data,
   }
-
-  return res
 }

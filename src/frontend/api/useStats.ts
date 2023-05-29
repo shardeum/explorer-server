@@ -39,10 +39,30 @@ export const useStats = (query: {
   const coinStatsResponse = useSWR<{ totalSupply: number; totalStaked: number }>(coinStatsQuery, fetcher)
 
   // get values
-  const validatorStats = validatorStatsResponse?.data?.validatorStats || []
-  const transactionStats = transactionStatsResponse?.data?.transactionStats || []
-  const totalSHM = coinStatsResponse?.data?.totalSupply || 0
-  const totalStakedSHM = coinStatsResponse?.data?.totalStaked || 0
+  const validatorStats =
+    typeof validatorStatsResponse.data === 'object' &&
+    validatorStatsResponse.data != null &&
+    'validatorStats' in validatorStatsResponse.data
+      ? validatorStatsResponse.data.validatorStats as number[][]
+      : []
+  const transactionStats =
+    typeof transactionStatsResponse.data === 'object' &&
+    transactionStatsResponse.data != null &&
+    'transactionStats' in transactionStatsResponse.data
+      ? transactionStatsResponse.data.transactionStats as number[][]
+      : []
+  const totalSHM =
+    typeof coinStatsResponse.data === 'object' &&
+    coinStatsResponse.data != null &&
+    'totalSupply' in coinStatsResponse.data
+      ? Number(coinStatsResponse.data.totalSupply)
+      : 0
+  const totalStakedSHM =
+    typeof coinStatsResponse.data === 'object' &&
+    coinStatsResponse.data != null &&
+    'totalStaked' in coinStatsResponse.data
+      ? Number(coinStatsResponse.data.totalStaked)
+      : 0
 
   return {
     validatorStats,
