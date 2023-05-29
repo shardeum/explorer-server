@@ -4,7 +4,7 @@ import { Transaction, TransactionQuery } from '../types'
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
-import { PagedTransaction } from '../types/transaction';
+import { PagedTransaction } from '../types/transaction'
 
 type TransactionResult = {
   transactions: Transaction[]
@@ -17,7 +17,7 @@ type TransactionResult = {
 }
 
 export const useTransaction = (query: TransactionQuery): TransactionResult => {
-  const {page, count, txType} = query
+  const { page, count, txType } = query
 
   const createUrl = (): string => {
     let url = `${PATHS.TRANSACTION}?page=${page}`
@@ -29,7 +29,7 @@ export const useTransaction = (query: TransactionQuery): TransactionResult => {
     return url
   }
 
-  const {data} = useSWR<PagedTransaction>(createUrl(), fetcher)
+  const { data } = useSWR<PagedTransaction>(createUrl(), fetcher)
 
   const transactions: Transaction[] = data?.transactions || []
 

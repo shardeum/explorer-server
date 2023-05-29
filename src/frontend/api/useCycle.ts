@@ -11,9 +11,9 @@ export type CycleResult = {
 }
 
 export const useCycle = (query: CycleQuery): CycleResult => {
-  const {count} = query
+  const { count } = query
 
-  const {data} = useSWR<{ cycles: Cycle[] }>(`${PATHS.CYCLE}?count=${count}`, fetcher)
+  const { data } = useSWR<{ cycles: Cycle[] }>(`${PATHS.CYCLE}?count=${count}`, fetcher)
 
   const cycles: Cycle[] = data?.cycles || []
 

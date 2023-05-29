@@ -3,8 +3,8 @@ import useSWR from 'swr'
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
-import { ValidatorStats } from '../../stats/validatorStats';
-import { TransactionStats } from '../../stats/transactionStats';
+import { ValidatorStats } from '../../stats/validatorStats'
+import { TransactionStats } from '../../stats/transactionStats'
 
 type StatsResult = {
   validatorStats: ValidatorStats[]
@@ -31,9 +31,12 @@ export const useStats = (query: {
   const coinStatsQuery = fetchCoinStats ? `${PATHS.STATS_COIN}` : null
 
   // get responses
-  const validatorStatsResponse = useSWR<{validatorStats: ValidatorStats[]}>(validatorStatsQuery, fetcher)
-  const transactionStatsResponse = useSWR<{transactionStats: TransactionStats[]}>(transactionStatsQuery, fetcher)
-  const coinStatsResponse = useSWR<{totalSupply: number, totalStaked: number}>(coinStatsQuery, fetcher)
+  const validatorStatsResponse = useSWR<{ validatorStats: ValidatorStats[] }>(validatorStatsQuery, fetcher)
+  const transactionStatsResponse = useSWR<{ transactionStats: TransactionStats[] }>(
+    transactionStatsQuery,
+    fetcher
+  )
+  const coinStatsResponse = useSWR<{ totalSupply: number; totalStaked: number }>(coinStatsQuery, fetcher)
 
   // get values
   const validatorStats = validatorStatsResponse?.data?.validatorStats || []

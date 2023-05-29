@@ -17,7 +17,7 @@ export const useCycleDetail = (id: string): CycleDetailResult => {
   }
 
   const queryPath = cycleNumber ? `${PATHS.CYCLE}/${id}` : `${PATHS.CYCLE}?marker=${id}`
-  const response = useSWR<{ cycle: Cycle, cycles: Cycle[] }>(queryPath, fetcher)
+  const response = useSWR<{ cycle: Cycle; cycles: Cycle[] }>(queryPath, fetcher)
 
   let cycle: Cycle
   if (cycleNumber) {

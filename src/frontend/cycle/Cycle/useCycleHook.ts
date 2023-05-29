@@ -28,12 +28,12 @@ export const useCycleHook = (): CycleHookResult => {
 
     const from = to - limit + 1
 
-    return {counter, to, from}
+    return { counter, to, from }
   }, [page])
 
   useEffect(() => {
     async function fetchData(): Promise<void> {
-      const {counter, to, from} = await getLatestCounter()
+      const { counter, to, from } = await getLatestCounter()
 
       const data = await api.get(`${PATHS.CYCLE}?from=${from}&to=${to}`)
 

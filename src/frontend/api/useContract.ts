@@ -4,13 +4,13 @@ import { Account, ContractQuery } from '../types'
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
-import { PagedAccountData } from '../types/account';
+import { PagedAccountData } from '../types/account'
 
 type ContractResult = {
-  data: Account[];
-  totalPages: number;
-  total: number;
-  loading: boolean;
+  data: Account[]
+  totalPages?: number
+  total?: number
+  loading: boolean
 }
 
 export const useContract = (query: ContractQuery): ContractResult => {
