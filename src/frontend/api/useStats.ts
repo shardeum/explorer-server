@@ -43,13 +43,13 @@ export const useStats = (query: {
     typeof validatorStatsResponse.data === 'object' &&
     validatorStatsResponse.data != null &&
     'validatorStats' in validatorStatsResponse.data
-      ? validatorStatsResponse.data.validatorStats as number[][]
+      ? validatorStatsResponse.data.validatorStats
       : []
   const transactionStats =
     typeof transactionStatsResponse.data === 'object' &&
     transactionStatsResponse.data != null &&
     'transactionStats' in transactionStatsResponse.data
-      ? transactionStatsResponse.data.transactionStats as number[][]
+      ? transactionStatsResponse.data.transactionStats
       : []
   const totalSHM =
     typeof coinStatsResponse.data === 'object' &&
