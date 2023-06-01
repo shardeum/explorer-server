@@ -161,31 +161,6 @@ export class Collector {
       await insertOrUpdateCycle(archivedCycle)
       await insertOrUpdateTransaction(archivedCycle)
       await insertOrUpdateAccount(archivedCycle)
-      // if (CONFIG.verbose)
-      //   console.log(
-      //     !needSyncing,
-      //     !dataSyncing,
-      //     archivedCycle.cycleRecord.counter - lastSyncedCycle,
-      //     syncCycleInterval
-      //   );
-      // if (
-      //   !needSyncing &&
-      //   !dataSyncing &&
-      //   archivedCycle.cycleRecord.counter - lastSyncedCycle ===
-      //     syncCycleInterval
-      // ) {
-      //   const cycleToSyncTo = lastSyncedCycle + syncCycleInterval - 20;
-      //   console.log(
-      //     'Sync and Update Old ArchivedCycle Data',
-      //     cycleToSyncTo,
-      //     lastSyncedCycle
-      //   );
-      //   toggleDataSyncing();
-      //   await syncArchivedCycles(cycleToSyncTo, lastSyncedCycle);
-      //   toggleDataSyncing();
-      //   updateLastSyncedCycle(cycleToSyncTo);
-      //   console.log('lastSyncedCycle', lastSyncedCycle);
-      // }
     }
   }
 
