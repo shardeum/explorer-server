@@ -159,7 +159,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             const web3 = new Web3()
             const result = web3.eth.abi.decodeParameters(['uint256[]', 'uint256[]'], log.data)
             if (config.verbose) console.log('Transfer Batch Decoding', result)
-            if (result && result['0'] && result['1'] && result['0'].length === result['1'].length) {
+            if (result?.['0'] && result['1'] && result['0'].length === result['1'].length) {
               for (let i = 0; i < result['0'].length; i++) {
                 // Created a specail technique to extract the repective tokenValue of each tokenId/value transfer
                 /* eslint-disable security/detect-object-injection */
@@ -285,7 +285,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             let tokenValue = '0'
             let calculatedKey = Web3.utils
               .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: storageKey })
-              .slice(2)
+              ?.slice(2)
             let contractStorage
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
@@ -300,7 +300,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                 for (let i = 0; i < 20; i++) {
                   calculatedKey = Web3.utils
                     .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: '' + i })
-                    .slice(2)
+                    ?.slice(2)
                   // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
@@ -339,7 +339,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             let tokenValue = '0'
             let calculatedKey = Web3.utils
               .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: storageKey })
-              .slice(2)
+              ?.slice(2)
             // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             let contractStorage
             if (
@@ -355,7 +355,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                 for (let i = 0; i < 20; i++) {
                   calculatedKey = Web3.utils
                     .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: '' + i })
-                    .slice(2)
+                    ?.slice(2)
                   // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
@@ -406,7 +406,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
         ['address[]', 'uint256[]'],
         'readableReceipt' in tx.wrappedEVMAccount ? tx.wrappedEVMAccount.readableReceipt.data.slice(10) : ''
       )
-      if (result && result['0'] && result['1'] && result['0'].length === result['1'].length) {
+      if (result?.['0'] && result['1'] && result['0'].length === result['1'].length) {
         for (let i = 0; i < result['0'].length; i++) {
           const tokenTx = {
             tokenType: TransactionType.EVM_Internal,
