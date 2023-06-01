@@ -93,7 +93,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
         insertLog(logToSave)
       })
 
-      let tokenTx: TokenTx
+      let tokenTx: TokenTx | null = null
       if (log.topics) {
         if (log.topics.includes(ERC_TOKEN_TRANSFER_EVENT)) {
           if (!TransferTX && txs.length > 0) {
@@ -287,7 +287,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             let calculatedKey = Web3.utils
               .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: storageKey })
               ?.slice(2)
-            let contractStorage
+            let contractStorage: { ethAddress: string; account: { value: string } }
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
               !storageKeyValueMap[calculatedKey + log.address]
@@ -342,7 +342,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: storageKey })
               ?.slice(2)
             // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
-            let contractStorage
+            let contractStorage: { ethAddress: string; account: { value: string } }
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
               !storageKeyValueMap[calculatedKey + log.address]
@@ -441,7 +441,12 @@ export const getContractInfo = async (
   contractAddress: string
 ): Promise<{ contractInfo: unknown; contractType: ContractType }> => {
   let contractType: ContractType = ContractType.GENERIC
-  const contractInfo: any = {}
+  const contractInfo: {
+    name?: string
+    symbol?: string
+    totalSupply?: string
+    decimals?: string
+  } = {}
   let foundCorrectContract = false
   try {
     const web3 = (await getWeb3()) as Web3
