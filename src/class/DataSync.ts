@@ -551,6 +551,8 @@ export async function downloadReceiptsByCycle(
   for (const { cycle, receipts } of data) {
     let page = 1
     let totalDownloadedReceipts = 0
+
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const response = await axios.get(
         `${ARCHIVER_URL}/receipt?startCycle=${cycle}&endCycle=${cycle}&page=${page}`
