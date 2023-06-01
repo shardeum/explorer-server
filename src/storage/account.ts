@@ -133,7 +133,7 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
     for (const txId in receiptsInPartition) {
       if (skipTxs.includes(txId)) continue
       // eslint-disable-next-line security/detect-object-injection
-      if (!archivedCycle.receipt.partitionTxs[partition][txId]) {
+      if (!archivedCycle.receipt.partitionTxs?.[partition][txId]) {
         console.log(
           `txId ${txId} is not found in partitionTxs`,
           // eslint-disable-next-line security/detect-object-injection
