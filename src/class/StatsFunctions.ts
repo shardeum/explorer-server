@@ -141,10 +141,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt.stakeInfo.stake
             ) {
-              const stakeAmountBN = new BN(
-                current.wrappedEVMAccount.readableReceipt.stakeInfo.stake,
-                16
-              )
+              const stakeAmountBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake, 16)
               return sum.add(stakeAmountBN)
             } else {
               return sum
