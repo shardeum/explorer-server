@@ -6,8 +6,9 @@ import * as Transaction from '../storage/transaction'
 import { TransactionSearchType, TransactionType } from '../@type'
 import BN from 'bn.js'
 import BigNumber from 'decimal.js'
+import { CycleRecord } from '@shardus/types/build/src/p2p/CycleCreatorTypes'
 
-export const insertValidatorStats = async (cycleRecord) => {
+export const insertValidatorStats = async (cycleRecord: CycleRecord): Promise<void> => {
   const validatorsInfo: ValidatorStats.ValidatorStats = {
     cycle: cycleRecord.counter,
     active: cycleRecord.active,
@@ -21,7 +22,10 @@ export const insertValidatorStats = async (cycleRecord) => {
   await ValidatorStats.insertValidatorStats(validatorsInfo)
 }
 
-export const recordOldValidatorsStats = async (latestCycle: number, lastStoredCycle: number) => {
+export const recordOldValidatorsStats = async (
+  latestCycle: number,
+  lastStoredCycle: number
+): Promise<void> => {
   let combineValidatorsStats: ValidatorStats.ValidatorStats[] = []
   const bucketSize = 100
   let startCycle = lastStoredCycle + 1
@@ -52,7 +56,10 @@ export const recordOldValidatorsStats = async (latestCycle: number, lastStoredCy
   }
 }
 
-export const recordTransactionsStats = async (latestCycle: number, lastStoredCycle: number) => {
+export const recordTransactionsStats = async (
+  latestCycle: number,
+  lastStoredCycle: number
+): Promise<void> => {
   let combineTransactionStats: TransactionStats.TransactionStats[] = []
   const bucketSize = 50
   let startCycle = lastStoredCycle + 1
@@ -102,7 +109,7 @@ export const recordTransactionsStats = async (latestCycle: number, lastStoredCyc
   }
 }
 
-export const recordCoinStats = async (latestCycle: number, lastStoredCycle: number) => {
+export const recordCoinStats = async (latestCycle: number, lastStoredCycle: number): Promise<void> => {
   const bucketSize = 50
   let startCycle = lastStoredCycle + 1
   let endCycle = startCycle + bucketSize
@@ -222,7 +229,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
   }
 }
 
-export const patchStatsBetweenCycles = async (startCycle: number, endCycle: number) => {
+export const patchStatsBetweenCycles = async (startCycle: number, endCycle: number): Promise<void> => {
   await recordOldValidatorsStats(endCycle, startCycle - 1)
   await recordTransactionsStats(endCycle, startCycle - 1)
   await recordCoinStats(endCycle, startCycle - 1)
