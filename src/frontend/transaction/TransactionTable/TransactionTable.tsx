@@ -74,7 +74,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           ),
         },
         {
-          key: 'wrappedEVMAccount.readableReceipt',
+          key: 'wrappedEVMAccount.readableReceipt.to',
           value: 'To',
           render: (val: ReadableReceipt) =>
             val?.to ? (
