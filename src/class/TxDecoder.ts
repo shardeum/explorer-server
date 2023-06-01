@@ -57,9 +57,9 @@ const ERC_721_BALANCE = '0x3'
 const ERC_1155_BALANCE = '0x3' // This is not correct; have to research and update it later
 
 export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): Promise<DecodeTxResult> => {
-  let txs: TokenTx[] = []
-  let accs: string[] = []
-  let tokens: Token[] = []
+  const txs: TokenTx[] = []
+  const accs: string[] = []
+  const tokens: Token[] = []
 
   if (tx.wrappedEVMAccount.readableReceipt.status === 0) {
     return {
@@ -71,7 +71,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
 
   const data = tx.wrappedEVMAccount.readableReceipt.data
 
-  let methodCode = data.length > 10 ? data.substr(0, 10) : null
+  const methodCode = data.length > 10 ? data.substring(0, 10) : null
 
   const logs = tx.wrappedEVMAccount.readableReceipt && tx.wrappedEVMAccount.readableReceipt.logs
   // console.log('tx', tx.txId, tx.wrappedEVMAccount.readableReceipt)
@@ -160,7 +160,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
           else if (log.topics[3] === ZERO_ADDRESS) tokenEvent = 'Burn'
           try {
             const web3 = new Web3()
-            let result = web3.eth.abi.decodeParameters(['uint256[]', 'uint256[]'], log.data)
+            const result = web3.eth.abi.decodeParameters(['uint256[]', 'uint256[]'], log.data)
             if (config.verbose) console.log('Transfer Batch Decoding', result)
             if (result && result['0'] && result['1'] && result['0'].length === result['1'].length) {
               for (let i = 0; i < result['0'].length; i++) {
@@ -276,7 +276,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
             tokenTx.tokenType === TransactionType.ERC_20 ||
             tokenTx.tokenType === TransactionType.ERC_721)
         ) {
-          let storageKey =
+          const storageKey =
             tokenTx.tokenType === TransactionType.ERC_20
               ? ERC_20_BALANCE
               : tokenTx.tokenType === TransactionType.ERC_721
@@ -293,7 +293,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
               !storageKeyValueMap[calculatedKey + log.address]
             ) {
               if (Object.keys(storageKeyValueMap).length === 0) {
-                let shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey.substring(8)
+                const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                 contractStorage = await queryAccountByAccountId(shardusAddress)
                 // console.log('contractStorage', contractStorage)
               }
@@ -304,7 +304,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
                     .slice(2)
                   // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
-                    let shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey.substring(8)
+                    const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
                     // console.log('contractStorage', contractStorage)
                     break
@@ -348,7 +348,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
               !storageKeyValueMap[calculatedKey + log.address]
             ) {
               if (Object.keys(storageKeyValueMap).length === 0) {
-                let shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey.substring(8)
+                const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                 contractStorage = await queryAccountByAccountId(shardusAddress)
                 // console.log('contractStorage', contractStorage)
               }
@@ -359,7 +359,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
                     .slice(2)
                   // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
-                    let shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey.substring(8)
+                    const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
                     // console.log('contractStorage', contractStorage)
                     break
@@ -436,7 +436,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
 
 export const getContractInfo = async (contractAddress) => {
   let contractType: ContractType = ContractType.GENERIC
-  let contractInfo: any = {}
+  const contractInfo: any = {}
   let foundCorrectContract = false
   try {
     const web3: any = await getWeb3()
