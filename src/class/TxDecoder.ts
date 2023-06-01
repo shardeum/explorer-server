@@ -2,7 +2,7 @@ import { TokenTx, TransactionType, DecodeTxResult } from '../@type'
 import { getWeb3, Transaction } from '../storage/transaction'
 import Web3 from 'web3'
 import { ContractType, Token, queryAccountByAccountId } from '../storage/account'
-import * as Log from '../storage/log'
+import { Log, insertLog } from '../storage/log'
 import { config } from '../config/index'
 import ERC20_ABI from '../utils/abis/ERC20.json'
 import ERC721_ABI from '../utils/abis/ERC721.json'
@@ -82,7 +82,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
     // console.log('storageKeyValueMap', storageKeyValueMap)
     for (let i = 0; i < logs.length; i++) {
       let log = logs[i]
-      const logToSave = {
+      const logToSave: Log = {
         cycle: tx.cycle,
         timestamp: tx.timestamp,
         txHash: tx.txHash,
@@ -93,7 +93,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
       for (let j = 0; j < log.topics.length; j++) {
         logToSave[`topic${j}`] = log.topics[j]
       }
-      Log.insertLog(logToSave)
+      insertLog(logToSave)
 
       let tokenTx: TokenTx
       if (log.topics) {
