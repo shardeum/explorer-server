@@ -21,22 +21,22 @@ if (process.env.PORT) {
 const measure_time = false
 let start_time
 
-const start = async () => {
+const start = async (): Promise<void> => {
   await Storage.initializeDB()
 
   await StatsStorage.initializeStatsDB()
   let lastCheckedCycleForValidators = -1
   let lastCheckedCycleForTxs = -1
   let lastCheckedCycleForCoinStats = -1
-  let waitCycleForStats = 5 // Calculate transactions count per Cycle after 5 cycles
+  const waitCycleForStats = 5 // Calculate transactions count per Cycle after 5 cycles
 
-  let lastStoredValidators = await ValidatorStats.queryLatestValidatorStats(1)
+  const lastStoredValidators = await ValidatorStats.queryLatestValidatorStats(1)
   if (lastStoredValidators.length > 0) lastCheckedCycleForValidators = lastStoredValidators[0].cycle
 
-  let lastStoredTransactions = await TransactionStats.queryLatestTransactionStats(1)
+  const lastStoredTransactions = await TransactionStats.queryLatestTransactionStats(1)
   if (lastStoredTransactions.length > 0) lastCheckedCycleForTxs = lastStoredTransactions[0].cycle
 
-  let lastStoredCoinStats = await CoinStats.queryLatestCoinStats(1)
+  const lastStoredCoinStats = await CoinStats.queryLatestCoinStats(1)
   if (lastStoredCoinStats.length > 0) lastCheckedCycleForCoinStats = lastStoredCoinStats[0].cycle
 
   console.log('lastCheckedCycleForValidators', lastCheckedCycleForValidators)
@@ -44,12 +44,12 @@ const start = async () => {
   cron.schedule('* * * * *', async () => {
     console.log('Running cron task....')
     if (measure_time && start_time) {
-      var end_time = process.hrtime(start_time)
+      const end_time = process.hrtime(start_time)
       console.log('End Time', end_time)
       start_time = process.hrtime()
     }
-    let latestCycleRecord = await Cycle.queryLatestCycleRecords(1)
-    let latestCycleCounter = latestCycleRecord.length > 0 ? latestCycleRecord[0].counter : 0
+    const latestCycleRecord = await Cycle.queryLatestCycleRecords(1)
+    const latestCycleCounter = latestCycleRecord.length > 0 ? latestCycleRecord[0].counter : 0
     console.log('latestCycleCounter', latestCycleCounter)
     if (latestCycleCounter > lastCheckedCycleForValidators) {
       if (latestCycleCounter - lastCheckedCycleForValidators === 1)

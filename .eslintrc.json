@@ -20,7 +20,7 @@
     "**/class/**/*.ts",
     "server.ts",
     "rpc_data_server.ts",
-    "aggregator.ts",
+    "collector.ts",
     "**/@type/index.ts"
   ],
   "rules": {
