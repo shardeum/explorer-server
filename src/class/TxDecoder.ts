@@ -8,6 +8,7 @@ import ERC20_ABI from '../utils/abis/ERC20.json'
 import ERC721_ABI from '../utils/abis/ERC721.json'
 import ERC1155_ABI from '../utils/abis/ERC1155.json'
 import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
+import { AbiItem } from 'web3-utils'
 
 const ERC_721_INTERFACE = '0x80ac58cd'
 const ERC_1155_INTERFACE = '0xd9b67a26'
@@ -443,8 +444,8 @@ export const getContractInfo = async (
   const contractInfo: any = {}
   let foundCorrectContract = false
   try {
-    const web3: any = await getWeb3()
-    const Token = new web3.eth.Contract(ERC20_ABI.abi, contractAddress)
+    const web3 = (await getWeb3()) as Web3
+    const Token = new web3.eth.Contract(ERC20_ABI.abi as unknown as AbiItem, contractAddress)
     contractInfo.name = await Token.methods.name().call()
     if (config.verbose) console.log('Token Name', contractInfo.name)
     contractInfo.symbol = await Token.methods.symbol().call()
@@ -460,8 +461,8 @@ export const getContractInfo = async (
   }
   if (!foundCorrectContract) {
     try {
-      const web3: any = await getWeb3()
-      const Token = new web3.eth.Contract(ERC721_ABI.abi, contractAddress)
+      const web3 = (await getWeb3()) as Web3
+      const Token = new web3.eth.Contract(ERC721_ABI.abi as unknown as AbiItem, contractAddress)
       const result = await Token.methods.supportsInterface(ERC_721_INTERFACE).call()
       if (result) {
         if (!contractInfo.name) contractInfo.name = await Token.methods.name().call()
@@ -476,8 +477,8 @@ export const getContractInfo = async (
   }
   if (!foundCorrectContract) {
     try {
-      const web3: any = await getWeb3()
-      const Token = new web3.eth.Contract(ERC1155_ABI.abi, contractAddress)
+      const web3 = (await getWeb3()) as Web3
+      const Token = new web3.eth.Contract(ERC1155_ABI.abi as unknown as AbiItem, contractAddress)
       const result = await Token.methods.supportsInterface(ERC_1155_INTERFACE).call()
       if (result) {
         foundCorrectContract = true
