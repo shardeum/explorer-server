@@ -121,8 +121,8 @@ export class Collector {
       }
       if (archivedCycle._id) delete archivedCycle._id // temp fix because Archiver sending with _id
       const existingArchivedCycle = await ArchivedCycle.queryArchivedCycleByMarker(archivedCycle.cycleMarker)
-      if (existingArchivedCycle && existingArchivedCycle._id) delete existingArchivedCycle._id
-      if (existingArchivedCycle && existingArchivedCycle.counter) delete existingArchivedCycle.counter
+      if (existingArchivedCycle?._id) delete existingArchivedCycle._id
+      if (existingArchivedCycle?.counter) delete existingArchivedCycle.counter
       if (JSON.stringify(archivedCycle) === JSON.stringify(existingArchivedCycle)) {
         console.log('Skip same data')
         continue
