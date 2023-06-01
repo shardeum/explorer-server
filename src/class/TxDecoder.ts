@@ -37,13 +37,6 @@ const ERC_TOKEN_METHOD_DIC = {
   '0xe8e33700': 'Add Liquidity',
 }
 
-const ERC_TOKEN_EVENT_DIC = {
-  Approval: '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925', // ERC20, ERC721
-  Transfer: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', // ERC20, ERC721
-  ApprovalForAll: '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31', // ERC721, ERC1155
-  TransferSingle: '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', // ERC1155
-  TransferBatch: '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', // ERC1155
-}
 const ERC_TOKEN_APPROVAL_EVENT = '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
 const ERC_TOKEN_TRANSFER_EVENT = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 const ERC_TOKEN_APPROVAL_FOR_ALL_EVENT = '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31'
@@ -58,62 +51,12 @@ const UNISWAP_SWAP_EVENT = '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3
 const UNISWAP_SYNC_EVENT = '0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1'
 const UNISWAP_DEPOSIT_EVENT = '0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c'
 const UNISWAP_WITHDRAWAL_EVENT = '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65'
-const UNISWAP_MINT_EVENT = '0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f'
-const UNISWAP_BURN_EVENT = '0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496'
 
 const ERC_20_BALANCE = '0x0'
 const ERC_721_BALANCE = '0x3'
 const ERC_1155_BALANCE = '0x3' // This is not correct; have to research and update it later
 
 export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): Promise<DecodeTxResult> => {
-  // let methodCode = tx.data.substr(0, 10);
-  //   let TokenTx = {};
-  //   let TokenApprove = {};
-  //   let tokenTx = false;
-  //   if (ERC_TOKEN_METHOD_DIC[methodCode] === 'Transfer') {
-  //     // console.log(tx.data)
-  //     // Token transfer transaction
-  //     TokenTx.tokenFrom = deployerAddress;
-  //     TokenTx.tokenTo = `0x${tx.data.substring(34, 74)}`;
-  //     // TokenTx.tokenValue = Web3.utils.fromWei(`0x${tx.data.substring(74)}`, "ether");
-  //     // TokenTx.tokenValue = ethers.BigNumber.from(`0x${tx.data.substring(74)}`);
-  //     TokenTx.tokenValue = `0x${tx.data.substring(74)}`;
-  //     console.log('TokenTx', 'Transfer', TokenTx);
-  //     tokenTx = true;
-  //   } else if (ERC_TOKEN_METHOD_DIC[methodCode] === 'Transfer From') {
-  //     // console.log(tx.data)
-  //     // Token transferFrom transaction
-  //     TokenTx.tokenFrom = `0x${tx.data.substring(34, 74)}`;
-  //     TokenTx.tokenTo = `0x${tx.data.substring(98, 138)}`;
-  //     // TokenTx.tokenValue = Web3.utils.fromWei(`0x${tx.data.substring(138)}`, "ether");
-  //     // TokenTx.tokenValue = ethers.BigNumber.from(`0x${tx.data.substring(138)}`);
-  //     TokenTx.tokenValue = `0x${tx.data.substring(138)}`;
-  //     console.log('TokenTx', 'TransferFrom', TokenTx);
-  //     tokenTx = true;
-  //   } else if (ERC_TOKEN_METHOD_DIC[methodCode] === 'Approve') {
-  //     // console.log(tx.data)
-  //     // Token approve transaction
-  //     TokenApprove.tokenFrom = deployerAddress;
-  //     TokenApprove.tokenTo = `0x${tx.data.substring(34, 74)}`;
-  //     // TokenApprove.tokenValue = Web3.utils.fromWei(`0x${tx.data.substring(74)}`, "ether");
-  //     // TokenApprove.tokenValue = ethers.BigNumber.from(`0x${tx.data.substring(74)}`);
-  //     TokenApprove.tokenValue = `0x${tx.data.substring(74)}`;
-  //     console.log('TokenApprove', 'Approve', TokenApprove);
-  //     tokenTx = true;
-  //   } else {
-  //     console.log('Other methods', methodCode);
-  //   }
-
-  // txReceipt = await provider.getTransactionReceipt(tx.hash);
-  // console.log('txReceipt', txReceipt)
-
-  // receipt = await web3.eth.getTransactionReceipt(tx.hash);
-  // console.log('receipt', receipt);
-
-  //   const iface = new ethers.utils.Interface(TokenABI);
-  //   let decodedData = iface.parseTransaction({data: tx.data, tokenValue: tx.value});
-  //   console.log(decodedData.args);
-
   let txs: TokenTx[] = []
   let accs: string[] = []
   let tokens: Token[] = []
@@ -244,19 +187,6 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
                 ) {
                   accs.push(tokenTx.tokenTo.toLowerCase())
                 }
-                // Skip saving ERC1155 tokens of an address for now
-                // if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
-                //   tokens.push({
-                //     ethAddress: tokenTx.tokenFrom,
-                //     contractAddress: log.address,
-                //   })
-                // }
-                // if (tokenTx.tokenTo !== ZERO_ETH_ADDRESS) {
-                //   tokens.push({
-                //     ethAddress: tokenTx.tokenTo,
-                //     contractAddress: log.address,
-                //   })
-                // }
               }
               continue
             }
@@ -357,7 +287,6 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
             let calculatedKey = Web3.utils
               .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: storageKey })
               .slice(2)
-            // console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
             let contractStorage
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
@@ -536,12 +465,9 @@ export const getContractInfo = async (contractAddress) => {
         if (!contractInfo.symbol) contractInfo.symbol = await Token.methods.symbol().call()
         foundCorrectContract = true
         contractType = ContractType.ERC_721
-        // await sleep(200); // Awaiting a bit to refresh the service points of the validator
       }
     } catch (e) {
-      // console.log(e);
       console.log('Non ERC 721 Contract', contractAddress) // It could be not ERC 20 Contract
-      // await sleep(100); // Awaiting a bit to refresh the service points of the validator
     }
   }
   if (!foundCorrectContract) {
@@ -552,12 +478,9 @@ export const getContractInfo = async (contractAddress) => {
       if (result) {
         foundCorrectContract = true
         contractType = ContractType.ERC_1155
-        // await sleep(200); // Awaiting a bit to refresh the service points of the validator
       }
     } catch (e) {
-      // console.log(e);
       console.log('Non ERC 1155 Contract', contractAddress) // It could be not ERC 20 Contract
-      // await sleep(100); // Awaiting a bit to refresh the service points of the validator
     }
   }
   return { contractInfo, contractType }
