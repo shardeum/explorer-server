@@ -30,6 +30,7 @@ export const updateLastSyncedCycle = (cycle: number): void => {
 export const compareWithOldArchivedCyclesData = async (
   lastCycleCounter: number
 ): Promise<{ success: boolean; cycle: number }> => {
+  let downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
   const response = await axios.get(
     `${ARCHIVER_URL}/full-archive?start=${lastCycleCounter - 20}&end=${lastCycleCounter}`
   )
@@ -74,7 +75,7 @@ export async function compareWithOldReceiptsData(
 ): Promise<{ success: boolean; matchedCycle: number }> {
   const endCycle = lastStoredReceiptCycle
   const startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
-  let downloadedReceiptCountByCycles: string | any[]
+  let downloadedReceiptCountByCycles: { cycle: number; receipts: number }[]
   const response = await axios.get(
     `${ARCHIVER_URL}/receipt?start=${lastStoredReceiptCycle - 10}&end=${lastStoredReceiptCycle}`
   )
@@ -108,6 +109,7 @@ export async function compareWithOldReceiptsData(
 export const compareWithOldCyclesData = async (
   lastCycleCounter: number
 ): Promise<{ success: boolean; cycle: number }> => {
+  let downloadedCycles: Cycle.Cycle[]
   const response = await axios.get(
     `${ARCHIVER_URL}/cycleinfo?start=${lastCycleCounter - 10}&end=${lastCycleCounter - 1}`
   )
@@ -236,7 +238,7 @@ export const downloadAndInsertArchivedCycles = async (
         complete = true
         console.log('Download completed')
       }
-      const downloadedArchivedCycles = response.data.archivedCycles
+      const downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[] = response.data.archivedCycles
       console.log(`Downloaded archived cycles`, downloadedArchivedCycles.length)
       downloadedArchivedCycles.sort((a, b) => (a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1))
       await insertArchivedCycleData(downloadedArchivedCycles)
@@ -505,7 +507,7 @@ export async function compareReceiptsCountByCycles(
   endCycle: number
 ): Promise<{ cycle: number; receipts: number }[]> {
   const unMatchedCycle = []
-  let downloadedReceiptCountByCycle
+  let downloadedReceiptCountByCycle: { cycle: number; receipts: number }[]
   const response = await axios.get(
     `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
   )
