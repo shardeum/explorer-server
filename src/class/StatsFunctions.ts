@@ -34,16 +34,16 @@ export const recordOldValidatorsStats = async (
     if (endCycle > latestCycle) endCycle = latestCycle
     const cycles = await Cycle.queryCycleRecordsBetween(startCycle, endCycle)
     if (cycles.length > 0) {
-      for (let j = 0; j < cycles.length; j++) {
+      for (const cycle of cycles) {
         combineValidatorsStats.push({
-          cycle: cycles[j].counter,
-          active: cycles[j].cycleRecord.active,
-          activated: cycles[j].cycleRecord.activated.length,
-          syncing: cycles[j].cycleRecord.syncing,
-          joined: cycles[j].cycleRecord.joinedConsensors.length,
-          removed: cycles[j].cycleRecord.removed.length,
-          apoped: cycles[j].cycleRecord.apoptosized.length,
-          timestamp: cycles[j].cycleRecord.start,
+          cycle: cycle.counter,
+          active: cycle.cycleRecord.active,
+          activated: cycle.cycleRecord.activated.length,
+          syncing: cycle.cycleRecord.syncing,
+          joined: cycle.cycleRecord.joinedConsensors.length,
+          removed: cycle.cycleRecord.removed.length,
+          apoped: cycle.cycleRecord.apoptosized.length,
+          timestamp: cycle.cycleRecord.start,
         })
       }
       await ValidatorStats.bulkInsertValidatorsStats(combineValidatorsStats)
@@ -84,18 +84,22 @@ export const recordTransactionsStats = async (
         endCycle,
         TransactionSearchType.InternalTxReceipt
       )
-      for (let j = 0; j < cycles.length; j++) {
-        const txsCycle = transactions.filter((a) => a.cycle === cycles[j].counter)
-        const internalTxsCycle = internalTransactions.filter((a) => a.cycle === cycles[j].counter)
-        const stakeTxsCycle = stakeTransactions.filter((a) => a.cycle === cycles[j].counter)
-        const unstakeTxsCycle = unstakeTransactions.filter((a) => a.cycle === cycles[j].counter)
+      for (const cycle of cycles) {
+        const txsCycle = transactions.filter((a: { cycle: number }) => a.cycle === cycle.counter)
+        const internalTxsCycle = internalTransactions.filter(
+          (a: { cycle: number }) => a.cycle === cycle.counter
+        )
+        const stakeTxsCycle = stakeTransactions.filter((a: { cycle: number }) => a.cycle === cycle.counter)
+        const unstakeTxsCycle = unstakeTransactions.filter(
+          (a: { cycle: number }) => a.cycle === cycle.counter
+        )
         combineTransactionStats.push({
-          cycle: cycles[j].counter,
+          cycle: cycle.counter,
           totalTxs: txsCycle.length > 0 ? txsCycle[0].transactions : 0,
           totalInternalTxs: internalTxsCycle.length > 0 ? internalTxsCycle[0].transactions : 0,
           totalStakeTxs: stakeTxsCycle.length > 0 ? stakeTxsCycle[0].transactions : 0,
           totalUnstakeTxs: unstakeTxsCycle.length > 0 ? unstakeTxsCycle[0].transactions : 0,
-          timestamp: cycles[j].cycleRecord.start,
+          timestamp: cycle.cycleRecord.start,
         })
       }
       // console.log('combineTransactionStats', combineTransactionStats)
@@ -118,9 +122,9 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
     const cycles = await Cycle.queryCycleRecordsBetween(startCycle, endCycle)
     if (cycles.length > 0) {
       let combineCoinStats: CoinStats.CoinStats[] = []
-      for (let i = 0; i < cycles.length; i++) {
+      for (const cycle of cycles) {
         // Fetch transactions
-        const transactions = await Transaction.queryTransactionsForCycle(cycles[i].counter)
+        const transactions = await Transaction.queryTransactionsForCycle(cycle.counter)
 
         // Filter transactions
         const stakeTransactions = transactions.filter(
@@ -208,15 +212,15 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           }
 
           const coinStatsForCycle = {
-            cycle: cycles[i].counter,
+            cycle: cycle.counter,
             totalSupplyChange: weiBNToEth(nodeRewardAmount.sub(nodePenaltyAmount).sub(gasBurnt)),
             totalStakeChange: weiBNToEth(stakeAmount.sub(unStakeAmount)),
-            timestamp: cycles[i].cycleRecord.start,
+            timestamp: cycle.cycleRecord.start,
           }
           // await CoinStats.insertCoinStats(coinStatsForCycle)
           combineCoinStats.push(coinStatsForCycle)
         } catch (e) {
-          console.log(`Failed to record coin stats for cycle ${cycles[i].counter}`, e)
+          console.log(`Failed to record coin stats for cycle ${cycle.counter}`, e)
         }
       }
       await CoinStats.bulkInsertCoinsStats(combineCoinStats)
