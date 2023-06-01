@@ -2,17 +2,17 @@ import sqlite3Lib from 'sqlite3'
 const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 
-export async function init() {
+export async function init(): Promise<void> {
   db = new sqlite3.Database('db.sqlite3')
   await run('PRAGMA journal_mode=WAL')
   console.log('Database initialized.')
 }
 
-export async function runCreate(createStatement: string) {
+export async function runCreate(createStatement: string): Promise<void> {
   await run(createStatement)
 }
 
-export async function run(sql: string, params: object = {}) {
+export async function run(sql: string, params: object = {}): Promise<{ id: number }> {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err: Error) {
       if (err) {
@@ -65,6 +65,8 @@ export function extractValues(object: object): string[] {
   } catch (e) {
     console.log(e)
   }
+
+  return []
 }
 
 export function extractValuesFromArray(arr: object[]): string[] {
@@ -81,4 +83,6 @@ export function extractValuesFromArray(arr: object[]): string[] {
   } catch (e) {
     console.log(e)
   }
+
+  return []
 }

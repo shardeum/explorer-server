@@ -91,7 +91,7 @@ export async function processReceiptData(
   let combineTransactions: Transaction.Transaction[] = []
   let combineTokenTransactions: TokenTx<object>[] = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2: TokenTx<object>[] = [] // For TransactionType (ERC1155)
-  let combineTokens = [] // For Tokens owned by an address
+  let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   for (const receiptObj of receipts) {
     const { accounts, cycle, result, tx, receipt } = receiptObj
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
@@ -359,7 +359,7 @@ export async function processReceiptData(
   if (!cleanReceiptsMapByCycle) resetReceiptsMap()
 }
 
-export async function queryReceiptByReceiptId(receiptId: string): Promise<Receipt> {
+export async function queryReceiptByReceiptId(receiptId: string): Promise<Receipt | null> {
   try {
     const sql = `SELECT * FROM receipts WHERE receiptId=?`
     const receipt: DbReceipt = await db.get(sql, [receiptId])
@@ -374,6 +374,8 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
   } catch (e) {
     console.log(e)
   }
+
+  return null
 }
 
 export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
@@ -393,10 +395,12 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
   } catch (e) {
     console.log(e)
   }
+
+  return []
 }
 
 export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]> {
-  let receipts: DbReceipt[]
+  let receipts: DbReceipt[] = []
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql)
@@ -416,7 +420,7 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
 }
 
 export async function queryReceiptCount(): Promise<number> {
-  let receipts: { 'COUNT(*)': number }
+  let receipts: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM receipts`
     receipts = await db.get(sql, [])
@@ -429,7 +433,7 @@ export async function queryReceiptCount(): Promise<number> {
 }
 
 export async function queryReceiptCountByCycles(start: number, end: number): Promise<{ receipts: number, cycle: number }[]> {
-  let receipts: { cycle: number; 'COUNT(*)': number }[]
+  let receipts: { cycle: number; 'COUNT(*)': number }[] = []
   try {
     const sql = `SELECT cycle, COUNT(*) FROM receipts GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
     receipts = await db.all(sql, [start, end])
@@ -452,7 +456,7 @@ export async function queryReceiptsBetweenCycles(
   start: number,
   end: number
 ): Promise<Receipt[]> {
-  let receipts: DbReceipt[]
+  let receipts: DbReceipt[] = []
   try {
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? and ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     receipts = await db.all(sql, [start, end])
@@ -471,7 +475,7 @@ export async function queryReceiptsBetweenCycles(
 }
 
 export async function queryReceiptCountBetweenCycles(start: number, end: number): Promise<number> {
-  let receipts: { 'COUNT(*)': number }
+  let receipts: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM receipts WHERE cycle BETWEEN ? and ?`
     receipts = await db.get(sql, [start, end])

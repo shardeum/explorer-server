@@ -22,7 +22,7 @@ type DbLog = Log & {
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
-export async function insertLog(log: Log) {
+export async function insertLog(log: Log): Promise<void> {
   try {
     const fields = Object.keys(log).join(', ')
     const placeholders = Object.keys(log).fill('?').join(', ')
@@ -40,7 +40,7 @@ export async function insertLog(log: Log) {
   }
 }
 
-export async function bulkInsertLogs(logs: Log[]) {
+export async function bulkInsertLogs(logs: Log[]): Promise<void> {
   try {
     const fields = Object.keys(logs[0]).join(', ')
     const placeholders = Object.keys(logs[0]).fill('?').join(', ')
@@ -66,7 +66,7 @@ export async function queryLogCount(
   topic1?: string,
   topic2?: string,
   topic3?: string
-) {
+): Promise<number> {
   let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = { 'COUNT(txHash)': 0 }
   try {
     let sql = 'SELECT COUNT(txHash) FROM logs '
@@ -129,7 +129,7 @@ export async function queryLogs(
   topic1?: string,
   topic2?: string,
   topic3?: string
-) {
+): Promise<Log[]> {
   let logs: DbLog[] = []
   try {
     let sql = 'SELECT * FROM logs '
@@ -184,7 +184,7 @@ export async function queryLogs(
   return logs
 }
 
-export async function queryLogCountBetweenCycles(startCycleNumber: number, endCycleNumber: number) {
+export async function queryLogCountBetweenCycles(startCycleNumber: number, endCycleNumber: number): Promise<number> {
   let logs: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM logs WHERE cycle BETWEEN ? AND ?`
@@ -204,7 +204,7 @@ export async function queryLogsBetweenCycles(
   limit = 10000,
   startCycleNumber: number,
   endCycleNumber: number
-) {
+): Promise<Log[]> {
   let logs: DbLog[] = []
   try {
     const sql = `SELECT * FROM logs WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`

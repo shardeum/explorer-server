@@ -1,6 +1,6 @@
 import * as db from './sqlite3storage'
 
-export const initializeDB = async () => {
+export const initializeDB = async (): Promise<void> => {
   await db.init()
   await db.runCreate(
     'CREATE TABLE if not exists `archivedCycles` (`cycleMarker` TEXT NOT NULL UNIQUE PRIMARY KEY, `counter` NUMBER NOT NULL, `cycleRecord` JSON NOT NULL, `data` JSON, `receipt` JSON, `summary` JSON)'

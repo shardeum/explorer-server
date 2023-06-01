@@ -633,7 +633,7 @@ export async function queryTransactions(
   txType?: TransactionSearchType,
   filterAddress?: string,
 ): Promise<(DbTransaction<object> | DbTokenTx)[]> {
-  let transactions: (DbTransaction | DbTokenTx)[]
+  let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {
       if (!txType || TransactionSearchType.All) {
@@ -843,7 +843,7 @@ export async function queryTransactionsBetweenCycles(
   txType?: TransactionSearchType,
   filterAddress?: string,
 ): Promise<(DbTransaction<object> | DbTokenTx)[]> {
-  let transactions: (DbTransaction | DbTokenTx)[]
+  let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {
       // const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=?) ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`

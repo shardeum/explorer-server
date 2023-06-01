@@ -22,7 +22,7 @@ export function isCycle(obj: Cycle): obj is Cycle {
   return (obj as Cycle).cycleRecord !== undefined && (obj as Cycle).cycleMarker !== undefined
 }
 
-export async function insertCycle(cycle: Cycle) {
+export async function insertCycle(cycle: Cycle): Promise<void> {
   try {
     const fields = Object.keys(cycle).join(', ')
     const placeholders = Object.keys(cycle).fill('?').join(', ')
@@ -41,7 +41,7 @@ export async function insertCycle(cycle: Cycle) {
   }
 }
 
-export async function bulkInsertCycles(cycles: Cycle[]) {
+export async function bulkInsertCycles(cycles: Cycle[]): Promise<void> {
   try {
     const fields = Object.keys(cycles[0]).join(', ')
     const placeholders = Object.keys(cycles[0]).fill('?').join(', ')
@@ -58,7 +58,7 @@ export async function bulkInsertCycles(cycles: Cycle[]) {
   }
 }
 
-export async function updateCycle(marker: string, cycle: Cycle) {
+export async function updateCycle(marker: string, cycle: Cycle): Promise<void> {
   try {
     const sql = `UPDATE cycles SET counter = $counter, cycleRecord = $cycleRecord WHERE cycleMarker = $marker `
     await db.run(sql, {
@@ -73,7 +73,7 @@ export async function updateCycle(marker: string, cycle: Cycle) {
   }
 }
 
-export async function insertOrUpdateCycle(cycle: Cycle) {
+export async function insertOrUpdateCycle(cycle: Cycle): Promise<void> {
   if (cycle && cycle.cycleRecord && cycle.cycleMarker) {
     const cycleInfo: Cycle = {
       counter: cycle.cycleRecord.counter,
@@ -94,7 +94,7 @@ export async function insertOrUpdateCycle(cycle: Cycle) {
   }
 }
 
-export async function queryLatestCycleRecords(count: number) {
+export async function queryLatestCycleRecords(count: number): Promise<Cycle[]> {
   try {
     const sql = `SELECT * FROM cycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
     const cycleRecords: DbCycle[] = await db.all(sql)
@@ -104,10 +104,12 @@ export async function queryLatestCycleRecords(count: number) {
       })
     }
     if (config.verbose) console.log('cycle count', cycleRecords)
-    return cycleRecords
+    return cycleRecords as unknown as Cycle[]
   } catch (e) {
     console.log(e)
   }
+
+  return []
 }
 
 export async function queryCycleRecordsBetween(start: number, end: number): Promise<Cycle[]> {
@@ -124,9 +126,10 @@ export async function queryCycleRecordsBetween(start: number, end: number): Prom
   } catch (e) {
     console.log(e)
   }
+  return []
 }
 
-export async function queryCycleByMarker(marker: string) {
+export async function queryCycleByMarker(marker: string): Promise<Cycle | null> {
   try {
     const sql = `SELECT * FROM cycles WHERE cycleMarker=? LIMIT 1`
     const cycleRecord: DbCycle = await db.get(sql, [marker])
@@ -134,13 +137,15 @@ export async function queryCycleByMarker(marker: string) {
       if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
     }
     if (config.verbose) console.log('cycle marker', cycleRecord)
-    return cycleRecord
+    return cycleRecord as unknown as Cycle
   } catch (e) {
     console.log(e)
   }
+
+  return null
 }
 
-export async function queryCycleByCounter(counter: number) {
+export async function queryCycleByCounter(counter: number): Promise<Cycle | null> {
   try {
     const sql = `SELECT * FROM cycles WHERE counter=? LIMIT 1`
     const cycleRecord: DbCycle = await db.get(sql, [counter])
@@ -148,10 +153,12 @@ export async function queryCycleByCounter(counter: number) {
       if (cycleRecord.cycleRecord) cycleRecord.cycleRecord = JSON.parse(cycleRecord.cycleRecord)
     }
     if (config.verbose) console.log('cycle counter', cycleRecord)
-    return cycleRecord
+    return cycleRecord as unknown as Cycle
   } catch (e) {
     console.log(e)
   }
+
+  return null
 }
 
 export async function queryCycleCount(): Promise<number> {

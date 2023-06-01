@@ -353,7 +353,7 @@ export async function queryAccountsBetweenCycles(
   return accounts
 }
 
-export async function queryTokensByAddress(address: string, detail = false): Promise<object[] | null> {
+export async function queryTokensByAddress(address: string, detail = false): Promise<object[]> {
   try {
     const sql = `SELECT * FROM tokens WHERE ethAddress=?`
     const tokens = (await db.all(sql, [address])) as Token[]
@@ -378,7 +378,7 @@ export async function queryTokensByAddress(address: string, detail = false): Pro
   } catch (e) {
     console.log(e)
   }
-  return null
+  return []
 }
 
 export async function queryTokenBalance(
@@ -433,9 +433,9 @@ type RawAccount = {
   hash: string
 }
 
-export async function processAccountData(accounts: RawAccount[]): Promise<Account[] | null> {
+export async function processAccountData(accounts: RawAccount[]): Promise<Account[]> {
   console.log('accounts size', accounts.length)
-  if (accounts && accounts.length <= 0) return
+  if (accounts && accounts.length <= 0) return []
   const bucketSize = 1000
   let combineAccounts1: Account[] = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
   let combineAccounts2: Account[] = [] // For AccountType (NetworkAccount, NodeAccount)

@@ -27,7 +27,7 @@ export function isArchivedCycle(obj: ArchivedCycle): obj is ArchivedCycle {
   return (obj as ArchivedCycle).cycleRecord !== undefined && (obj as ArchivedCycle).cycleMarker !== undefined
 }
 
-export async function insertArchivedCycle(archivedCycle: ArchivedCycle) {
+export async function insertArchivedCycle(archivedCycle: ArchivedCycle): Promise<void> {
   try {
     archivedCycle.counter = archivedCycle.cycleRecord.counter
     const fields = Object.keys(archivedCycle).join(', ')
@@ -49,7 +49,7 @@ export async function insertArchivedCycle(archivedCycle: ArchivedCycle) {
   }
 }
 
-export async function updateArchivedCycle(marker: string, archivedCycle: ArchivedCycle) {
+export async function updateArchivedCycle(marker: string, archivedCycle: ArchivedCycle): Promise<void> {
   try {
     const sql = `UPDATE archivedCycles SET cycleRecord = $cycleRecord, data = $data, receipt = $receipt, summary = $summary WHERE cycleMarker = $cycleMarker `
     await db.run(sql, {
@@ -70,7 +70,7 @@ export async function updateArchivedCycle(marker: string, archivedCycle: Archive
   }
 }
 
-export async function queryAllArchivedCycles(count?: number) {
+export async function queryAllArchivedCycles(count?: number): Promise<ArchivedCycle[]> {
   try {
     const sql = `SELECT * FROM archivedCycles ORDER BY counter DESC LIMIT ${count ? count : 100}`
     const archivedCycles: DbArchivedCycle[] = await db.all(sql)
@@ -83,10 +83,11 @@ export async function queryAllArchivedCycles(count?: number) {
       })
     }
     if (config.verbose) console.log('ArchivedCycle lastest', archivedCycles)
-    return archivedCycles
+    return archivedCycles as unknown as ArchivedCycle[]
   } catch (e) {
     console.log(e)
   }
+  return []
 }
 
 export async function queryAllArchivedCyclesBetween(start: number, end: number): Promise<ArchivedCycle[]> {
@@ -106,9 +107,10 @@ export async function queryAllArchivedCyclesBetween(start: number, end: number):
   } catch (e) {
     console.log(e)
   }
+  return []
 }
 
-export async function queryArchivedCycleByMarker(marker: string) {
+export async function queryArchivedCycleByMarker(marker: string): Promise<ArchivedCycle | null> {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE cycleMarker=? LIMIT 1`
     const archivedCycles: DbArchivedCycle = await db.get(sql, [marker])
@@ -123,9 +125,10 @@ export async function queryArchivedCycleByMarker(marker: string) {
   } catch (e) {
     console.log(e)
   }
+  return null
 }
 
-export async function queryArchivedCycleByCounter(counter: number) {
+export async function queryArchivedCycleByCounter(counter: number): Promise<ArchivedCycle | null> {
   try {
     const sql = `SELECT * FROM archivedCycles WHERE counter=? LIMIT 1`
     const archivedCycles: DbArchivedCycle = await db.get(sql, [counter])
@@ -140,4 +143,5 @@ export async function queryArchivedCycleByCounter(counter: number) {
   } catch (e) {
     console.log(e)
   }
+  return null
 }
