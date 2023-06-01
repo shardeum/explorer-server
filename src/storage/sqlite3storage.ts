@@ -33,9 +33,9 @@ export async function run(sql: string, params = [] || {}) {
   })
 }
 
-export async function get(sql: string, params = []) {
+export async function get<T>(sql: string, params = []) {
   return new Promise((resolve, reject) => {
-    db.get(sql, params, (err: Error, result: unknown) => {
+    db.get(sql, params, (err: Error, result: T) => {
       if (err) {
         console.log('Error running sql: ' + sql)
         console.log(err)
@@ -47,9 +47,9 @@ export async function get(sql: string, params = []) {
   })
 }
 
-export async function all(sql: string, params = []) {
+export async function all<T>(sql: string, params = []) {
   return new Promise((resolve, reject) => {
-    db.all(sql, params, (err: Error, rows: unknown[]) => {
+    db.all(sql, params, (err: Error, rows: T[]) => {
       if (err) {
         console.log('Error running sql: ' + sql)
         console.log(err)
