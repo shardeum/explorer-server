@@ -54,8 +54,10 @@ export const compareWithOldArchivedCyclesData = async (
   let success = false
   let cycle = 0
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
+    /* eslint-disable security/detect-object-injection */
     const downloadedArchivedCycle = downloadedArchivedCycles[i]
     const oldArchivedCycle = oldArchivedCycles[i]
+    /* eslint-enable security/detect-object-injection */
     if (oldArchivedCycle.counter) delete oldArchivedCycle.counter
     console.log(downloadedArchivedCycle.cycleRecord.counter, oldArchivedCycle.cycleRecord.counter)
     if (JSON.stringify(downloadedArchivedCycle) !== JSON.stringify(oldArchivedCycle)) {
@@ -90,8 +92,10 @@ export async function compareWithOldReceiptsData(
   let success = false
   let matchedCycle = 0
   for (let i = 0; i < downloadedReceiptCountByCycles.length; i++) {
+    /* eslint-disable security/detect-object-injection */
     const downloadedReceipt = downloadedReceiptCountByCycles[i]
     const oldReceipt = oldReceiptCountByCycle[i]
+    /* eslint-enable security/detect-object-injection */
     console.log(downloadedReceipt, oldReceipt)
     if (downloadedReceipt.cycle !== oldReceipt.cycle || downloadedReceipt.receipts !== oldReceipt.receipts) {
       return {
@@ -130,8 +134,10 @@ export const compareWithOldCyclesData = async (
   let success = false
   let cycle = 0
   for (let i = 0; i < downloadedCycles.length; i++) {
+    /* eslint-disable security/detect-object-injection */
     const downloadedCycle = downloadedCycles[i]
     const oldCycle = oldCycles[i]
+    /* eslint-enable security/detect-object-injection */
     console.log(downloadedCycle.counter, oldCycle.cycleRecord.counter)
     if (JSON.stringify(downloadedCycle) !== JSON.stringify(oldCycle.cycleRecord)) {
       return {
@@ -149,8 +155,10 @@ export const insertArchivedCycleData = async (
   downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
 ): Promise<void> => {
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
+    /* eslint-disable security/detect-object-injection */
     const counter = downloadedArchivedCycles[i].cycleRecord.counter
     const downloadedArchivedCycle = downloadedArchivedCycles[i]
+    /* eslint-enable security/detect-object-injection */
 
     if (!downloadedArchivedCycle) {
       console.log('Unable to download archivedCycle for counter', counter)
@@ -366,6 +374,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
         const bucketSize = 1000
         let combineCycles = []
         for (let i = 0; i < cycles.length; i++) {
+          // eslint-disable-next-line security/detect-object-injection
           const cycle = cycles[i]
           if (!cycle.marker || cycle.counter < 0) {
             console.log('Invalid Cycle Received', cycle)
@@ -522,9 +531,7 @@ export async function compareReceiptsCountByCycles(
   const existingReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
   if (config.verbose) console.log('downloadedReceiptCountByCycle', downloadedReceiptCountByCycle)
   if (config.verbose) console.log('existingReceiptCountByCycle', existingReceiptCountByCycle)
-  for (let i = 0; i < downloadedReceiptCountByCycle.length; i++) {
-    const downloadedReceipt = downloadedReceiptCountByCycle[i]
-
+  for (const downloadedReceipt of downloadedReceiptCountByCycle) {
     const existingReceipt = existingReceiptCountByCycle.find(
       (rc: { cycle: number }) => rc.cycle === downloadedReceipt.cycle
     )
