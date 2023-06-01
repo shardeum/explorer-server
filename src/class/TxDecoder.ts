@@ -77,10 +77,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
 
   if (logs && logs.length > 0) {
     let TransferTX = false
-    // console.log('logs', tx.txId, logs)
-    // console.log('storageKeyValueMap', storageKeyValueMap)
-    for (let i = 0; i < logs.length; i++) {
-      let log = logs[i]
+    for (const log of logs) {
       const logToSave: Log = {
         cycle: tx.cycle,
         timestamp: tx.timestamp,
@@ -88,11 +85,12 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
         blockNumber: log.blockNumber, // TODO: Currently, blockNumber is saved as hexString. Look into which way (as number or as hexString) would be better for faster lookup. Add index to blockNumber when initializing the database.
         contractAddress: log.address,
         log: log,
-      } as Log.Log
-      for (let j = 0; j < log.topics.length; j++) {
-        logToSave[`topic${j}`] = log.topics[j]
+        topic0: '',
       }
-      insertLog(logToSave)
+      log.topics.forEach((topic: string, j: number) => {
+        logToSave[`topic${j}`] = topic
+        insertLog(logToSave)
+      })
 
       let tokenTx: TokenTx
       if (log.topics) {
@@ -164,8 +162,10 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             if (result && result['0'] && result['1'] && result['0'].length === result['1'].length) {
               for (let i = 0; i < result['0'].length; i++) {
                 // Created a specail technique to extract the repective tokenValue of each tokenId/value transfer
+                /* eslint-disable security/detect-object-injection */
                 const id = `${Web3.utils.padLeft(Web3.utils.numberToHex(result['0'][i]), 64)}`
                 const value = `${Web3.utils.padLeft(Web3.utils.numberToHex(result['1'][i]), 64)}`.slice(2)
+                /* eslint-enable security/detect-object-injection */
                 const tokenValue = id + value
                 tokenTx = {
                   tokenType: TransactionType.ERC_1155,
@@ -398,6 +398,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
       }
     }
   }
+  // eslint-disable-next-line security/detect-object-injection
   if (ERC_TOKEN_METHOD_DIC[methodCode] === 'Disperse ETH') {
     try {
       const web3 = new Web3()
@@ -410,8 +411,10 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
           const tokenTx = {
             tokenType: TransactionType.EVM_Internal,
             tokenFrom: tx.txTo,
+            /* eslint-disable security/detect-object-injection */
             tokenTo: result['0'][i].toLowerCase(),
             tokenValue: result['1'][i],
+            /* eslint-enable security/detect-object-injection */
             tokenEvent: 'Internal Transfer',
           } as TokenTx
           txs.push({
