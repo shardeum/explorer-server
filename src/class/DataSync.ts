@@ -13,22 +13,23 @@ export let lastSyncedCycle = 0
 export let syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
 export let dataSyncing = false
 
-export const toggleNeedSyncing = () => {
+export const toggleNeedSyncing = (): void => {
   needSyncing = !needSyncing
   if (config.verbose) console.log('needSyncing', needSyncing)
 }
 
-export const toggleDataSyncing = () => {
+export const toggleDataSyncing = (): void => {
   dataSyncing = !dataSyncing
   if (config.verbose) console.log('dataSyncing', dataSyncing)
 }
 
-export const updateLastSyncedCycle = (cycle) => {
+export const updateLastSyncedCycle = (cycle: number): void => {
   lastSyncedCycle = cycle
 }
 
-export const compareWithOldArchivedCyclesData = async (lastCycleCounter) => {
-  let downloadedArchivedCycles
+export const compareWithOldArchivedCyclesData = async (
+  lastCycleCounter: number
+): Promise<{ success: boolean; cycle: number }> => {
   const response = await axios.get(
     `${ARCHIVER_URL}/full-archive?start=${lastCycleCounter - 20}&end=${lastCycleCounter}`
   )
@@ -46,7 +47,9 @@ export const compareWithOldArchivedCyclesData = async (lastCycleCounter) => {
     lastCycleCounter
   )
   downloadedArchivedCycles.sort((a, b) => (a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1))
-  oldArchivedCycles.sort((a, b) => (a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1))
+  oldArchivedCycles.sort((a: { cycleRecord: { counter: number } }, b: { cycleRecord: { counter: number } }) =>
+    a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
+  )
   let success = false
   let cycle = 0
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
@@ -66,7 +69,9 @@ export const compareWithOldArchivedCyclesData = async (lastCycleCounter) => {
   return { success, cycle }
 }
 
-export async function compareWithOldReceiptsData(lastStoredReceiptCycle: number = 0) {
+export async function compareWithOldReceiptsData(
+  lastStoredReceiptCycle = 0
+): Promise<{ success: boolean; matchedCycle: number }> {
   let endCycle = lastStoredReceiptCycle
   let startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
   let downloadedReceiptCountByCycles: string | any[]
@@ -100,8 +105,9 @@ export async function compareWithOldReceiptsData(lastStoredReceiptCycle: number 
   return { success, matchedCycle }
 }
 
-export const compareWithOldCyclesData = async (lastCycleCounter) => {
-  let downloadedCycles
+export const compareWithOldCyclesData = async (
+  lastCycleCounter: number
+): Promise<{ success: boolean; cycle: number }> => {
   const response = await axios.get(
     `${ARCHIVER_URL}/cycleinfo?start=${lastCycleCounter - 10}&end=${lastCycleCounter - 1}`
   )
@@ -116,7 +122,9 @@ export const compareWithOldCyclesData = async (lastCycleCounter) => {
   }
   let oldCycles = await Cycle.queryCycleRecordsBetween(lastCycleCounter - 10, lastCycleCounter + 1)
   downloadedCycles.sort((a, b) => (a.counter > b.counter ? 1 : -1))
-  oldCycles.sort((a, b) => (a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1))
+  oldCycles.sort((a: { cycleRecord: { counter: number } }, b: { cycleRecord: { counter: number } }) =>
+    a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
+  )
   let success = false
   let cycle = 0
   for (let i = 0; i < downloadedCycles.length; i++) {
@@ -135,7 +143,9 @@ export const compareWithOldCyclesData = async (lastCycleCounter) => {
   return { success, cycle }
 }
 
-export const insertArchivedCycleData = async (downloadedArchivedCycles) => {
+export const insertArchivedCycleData = async (
+  downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
+): Promise<void> => {
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
     let counter = downloadedArchivedCycles[i].cycleRecord.counter
     let downloadedArchivedCycle = downloadedArchivedCycles[i]
@@ -203,7 +213,10 @@ export const calculateNetworkHash = (data: object): string => {
   return calculatedHash
 }
 
-export const downloadAndInsertArchivedCycles = async (cycleToSyncTo: number, startCycle: number = 0) => {
+export const downloadAndInsertArchivedCycles = async (
+  cycleToSyncTo: number,
+  startCycle = 0
+): Promise<void> => {
   let complete = false
   let start = startCycle
   let end = start + 100
@@ -235,7 +248,10 @@ export const downloadAndInsertArchivedCycles = async (cycleToSyncTo: number, sta
   }
 }
 
-export const checkStateMetaData = (downloadedArchivedCycle, counter) => {
+export const checkStateMetaData = (
+  downloadedArchivedCycle: ArchivedCycle.ArchivedCycle,
+  counter: number
+): { isDataSynced: boolean; isReceiptSynced: boolean; isSummarySynced: boolean } => {
   let isDataSynced = false
   let isReceiptSynced = false
   let isSummarySynced = false
@@ -289,10 +305,10 @@ export const checkStateMetaData = (downloadedArchivedCycle, counter) => {
 
 export const downloadAndInsertReceiptsAndCycles = async (
   totalReceiptsToSync: number,
-  fromReceipt: number = 0,
+  fromReceipt = 0,
   totalCyclesToSync: number,
-  fromCycle: number = 0
-) => {
+  fromCycle = 0
+): Promise<void> => {
   let completeForReceipt = false
   let completeForCycle = false
   let startReceipt = fromReceipt
@@ -383,7 +399,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
   console.log('Sync Cycle and Receipt data completed!')
 }
 
-export const downloadAndSyncGenesisAccounts = async () => {
+export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
   let completeSyncingAccounts = false
   let completeSyncTransactions = false
   let startAccount = 0
@@ -464,7 +480,7 @@ export const downloadAndSyncGenesisAccounts = async () => {
   console.log('Sync Genesis accounts and transaction receipts completed!')
 }
 
-export const checkIfAnyReceiptsMissing = async (cycle) => {
+export const checkIfAnyReceiptsMissing = async (cycle: number): Promise<void> => {
   if (config.verbose) console.log(!needSyncing, !dataSyncing, cycle - lastSyncedCycle, syncCycleInterval)
   if (!needSyncing && !dataSyncing && cycle - lastSyncedCycle >= syncCycleInterval) {
     const cycleToSyncTo = lastSyncedCycle + syncCycleInterval - 5
@@ -484,7 +500,10 @@ export const checkIfAnyReceiptsMissing = async (cycle) => {
   }
 }
 
-export async function compareReceiptsCountByCycles(startCycle: number, endCycle: number) {
+export async function compareReceiptsCountByCycles(
+  startCycle: number,
+  endCycle: number
+): Promise<{ cycle: number; receipts: number }[]> {
   let unMatchedCycle = []
   let downloadedReceiptCountByCycle
   const response = await axios.get(
@@ -504,7 +523,9 @@ export async function compareReceiptsCountByCycles(startCycle: number, endCycle:
   for (let i = 0; i < downloadedReceiptCountByCycle.length; i++) {
     const downloadedReceipt = downloadedReceiptCountByCycle[i]
 
-    let existingReceipt = existingReceiptCountByCycle.find((rc) => rc.cycle === downloadedReceipt.cycle)
+    let existingReceipt = existingReceiptCountByCycle.find(
+      (rc: { cycle: number }) => rc.cycle === downloadedReceipt.cycle
+    )
     if (config.verbose) console.log(downloadedReceipt, existingReceipt)
     if (existingReceipt) {
       if (downloadedReceipt.receipts !== existingReceipt.receipts) {
@@ -515,9 +536,10 @@ export async function compareReceiptsCountByCycles(startCycle: number, endCycle:
   return unMatchedCycle
 }
 
-export async function downloadReceiptsByCycle(data: any[] = []) {
-  for (let i = 0; i < data.length; i++) {
-    const { cycle, receipts } = data[i]
+export async function downloadReceiptsByCycle(
+  data: { cycle: number; receipts: number }[] = []
+): Promise<void> {
+  for (const { cycle, receipts } of data) {
     let page = 1
     let totalDownloadedReceipts = 0
     while (true) {
@@ -549,8 +571,10 @@ export async function downloadReceiptsByCycle(data: any[] = []) {
   }
 }
 
-export const downloadReceiptsBetweenCycles = async (startCycle, totalCyclesToSync) => {
-  // totalCyclesToSync = response.data.cycleInfo[0].counter
+export const downloadReceiptsBetweenCycles = async (
+  startCycle: number,
+  totalCyclesToSync: number
+): Promise<void> => {
   let endCycle = startCycle + 100
   for (; startCycle < totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
