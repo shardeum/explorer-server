@@ -56,7 +56,7 @@ const ERC_20_BALANCE = '0x0'
 const ERC_721_BALANCE = '0x3'
 const ERC_1155_BALANCE = '0x3' // This is not correct; have to research and update it later
 
-export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): Promise<DecodeTxResult> => {
+export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {}): Promise<DecodeTxResult> => {
   const txs: TokenTx[] = []
   const accs: string[] = []
   const tokens: Token[] = []
@@ -434,7 +434,9 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: any = {}): P
   return decodeTxResult
 }
 
-export const getContractInfo = async (contractAddress) => {
+export const getContractInfo = async (
+  contractAddress: string
+): Promise<{ contractInfo: unknown; contractType: ContractType }> => {
   let contractType: ContractType = ContractType.GENERIC
   const contractInfo: any = {}
   let foundCorrectContract = false
