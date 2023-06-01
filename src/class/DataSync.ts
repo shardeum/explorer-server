@@ -10,7 +10,7 @@ import { config, ARCHIVER_URL } from '../config'
 export let needSyncing = false
 
 export let lastSyncedCycle = 0
-export let syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
+export const syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
 export let dataSyncing = false
 
 export const toggleNeedSyncing = (): void => {
@@ -42,7 +42,7 @@ export const compareWithOldArchivedCyclesData = async (
       } to cycle ${lastCycleCounter}  from archiver server`
     )
   }
-  let oldArchivedCycles = await ArchivedCycle.queryAllArchivedCyclesBetween(
+  const oldArchivedCycles = await ArchivedCycle.queryAllArchivedCyclesBetween(
     lastCycleCounter - 19,
     lastCycleCounter
   )
@@ -53,7 +53,7 @@ export const compareWithOldArchivedCyclesData = async (
   let success = false
   let cycle = 0
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
-    let downloadedArchivedCycle = downloadedArchivedCycles[i]
+    const downloadedArchivedCycle = downloadedArchivedCycles[i]
     const oldArchivedCycle = oldArchivedCycles[i]
     if (oldArchivedCycle.counter) delete oldArchivedCycle.counter
     console.log(downloadedArchivedCycle.cycleRecord.counter, oldArchivedCycle.cycleRecord.counter)
@@ -72,8 +72,8 @@ export const compareWithOldArchivedCyclesData = async (
 export async function compareWithOldReceiptsData(
   lastStoredReceiptCycle = 0
 ): Promise<{ success: boolean; matchedCycle: number }> {
-  let endCycle = lastStoredReceiptCycle
-  let startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
+  const endCycle = lastStoredReceiptCycle
+  const startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
   let downloadedReceiptCountByCycles: string | any[]
   const response = await axios.get(
     `${ARCHIVER_URL}/receipt?start=${lastStoredReceiptCycle - 10}&end=${lastStoredReceiptCycle}`
@@ -85,7 +85,7 @@ export async function compareWithOldReceiptsData(
       `Can't fetch receipts data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${ARCHIVER_URL}`
     )
   }
-  let oldReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
+  const oldReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
   let success = false
   let matchedCycle = 0
   for (let i = 0; i < downloadedReceiptCountByCycles.length; i++) {
@@ -120,7 +120,7 @@ export const compareWithOldCyclesData = async (
       }  from archiver server`
     )
   }
-  let oldCycles = await Cycle.queryCycleRecordsBetween(lastCycleCounter - 10, lastCycleCounter + 1)
+  const oldCycles = await Cycle.queryCycleRecordsBetween(lastCycleCounter - 10, lastCycleCounter + 1)
   downloadedCycles.sort((a, b) => (a.counter > b.counter ? 1 : -1))
   oldCycles.sort((a: { cycleRecord: { counter: number } }, b: { cycleRecord: { counter: number } }) =>
     a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
@@ -128,7 +128,7 @@ export const compareWithOldCyclesData = async (
   let success = false
   let cycle = 0
   for (let i = 0; i < downloadedCycles.length; i++) {
-    let downloadedCycle = downloadedCycles[i]
+    const downloadedCycle = downloadedCycles[i]
     const oldCycle = oldCycles[i]
     console.log(downloadedCycle.counter, oldCycle.cycleRecord.counter)
     if (JSON.stringify(downloadedCycle) !== JSON.stringify(oldCycle.cycleRecord)) {
@@ -147,8 +147,8 @@ export const insertArchivedCycleData = async (
   downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
 ): Promise<void> => {
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
-    let counter = downloadedArchivedCycles[i].cycleRecord.counter
-    let downloadedArchivedCycle = downloadedArchivedCycles[i]
+    const counter = downloadedArchivedCycles[i].cycleRecord.counter
+    const downloadedArchivedCycle = downloadedArchivedCycles[i]
 
     if (!downloadedArchivedCycle) {
       console.log('Unable to download archivedCycle for counter', counter)
@@ -222,7 +222,7 @@ export const downloadAndInsertArchivedCycles = async (
   let end = start + 100
   while (!complete) {
     if (end >= cycleToSyncTo) {
-      let res = await axios.get(`${ARCHIVER_URL}/full-archive/1`)
+      const res = await axios.get(`${ARCHIVER_URL}/full-archive/1`)
       if (res.data && res.data.archivedCycles && res.data.archivedCycles.length > 0) {
         cycleToSyncTo = res.data.archivedCycles[0].cycleRecord.counter
         console.log('cycleToSyncTo', cycleToSyncTo)
@@ -320,7 +320,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
   if (!patchData) completeForReceipt = true
   while (!completeForReceipt || !completeForCycle) {
     if (endReceipt >= totalReceiptsToSync || endCycle >= totalCyclesToSync) {
-      let res = await axios.get(`${ARCHIVER_URL}/totalData`)
+      const res = await axios.get(`${ARCHIVER_URL}/totalData`)
       if (res.data && res.data.totalCycles && res.data.totalReceipts) {
         if (totalReceiptsToSync < res.data.totalReceipts) {
           completeForReceipt = false
@@ -361,7 +361,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
       if (response && response.data && response.data.cycleInfo) {
         console.log(`Downloaded cycles`, response.data.cycleInfo.length)
         const cycles = response.data.cycleInfo
-        let bucketSize = 1000
+        const bucketSize = 1000
         let combineCycles = []
         for (let i = 0; i < cycles.length; i++) {
           const cycle = cycles[i]
@@ -504,7 +504,7 @@ export async function compareReceiptsCountByCycles(
   startCycle: number,
   endCycle: number
 ): Promise<{ cycle: number; receipts: number }[]> {
-  let unMatchedCycle = []
+  const unMatchedCycle = []
   let downloadedReceiptCountByCycle
   const response = await axios.get(
     `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
@@ -517,13 +517,13 @@ export async function compareReceiptsCountByCycles(
     )
     return
   }
-  let existingReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
+  const existingReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
   if (config.verbose) console.log('downloadedReceiptCountByCycle', downloadedReceiptCountByCycle)
   if (config.verbose) console.log('existingReceiptCountByCycle', existingReceiptCountByCycle)
   for (let i = 0; i < downloadedReceiptCountByCycle.length; i++) {
     const downloadedReceipt = downloadedReceiptCountByCycle[i]
 
-    let existingReceipt = existingReceiptCountByCycle.find(
+    const existingReceipt = existingReceiptCountByCycle.find(
       (rc: { cycle: number }) => rc.cycle === downloadedReceipt.cycle
     )
     if (config.verbose) console.log(downloadedReceipt, existingReceipt)
