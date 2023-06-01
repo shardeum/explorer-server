@@ -274,7 +274,7 @@ export async function queryAccounts(
       const sql = `SELECT * FROM accounts WHERE accountType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
       accounts = await db.all(sql, [AccountType.Account])
     }
-    accounts.forEach((account: any) => {
+    accounts.forEach((account: DbAccount) => {
       if (account.account) account.account = JSON.parse(account.account)
       if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
     })
