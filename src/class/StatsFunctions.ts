@@ -138,8 +138,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           // Calculate total staked amount in cycle
           const stakeAmount = stakeTransactions.reduce((sum, current) => {
             if (
-              current.wrappedEVMAccount.readableReceipt &&
-              current.wrappedEVMAccount.readableReceipt.stakeInfo &&
+              'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt.stakeInfo.stake
             ) {
               const stakeAmountBN = new BN(
@@ -154,8 +153,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           // Calculate total unstaked amount in cycle
           const unStakeAmount = unstakeTransactions.reduce((sum, current) => {
             if (
-              current.wrappedEVMAccount.readableReceipt &&
-              current.wrappedEVMAccount.readableReceipt.stakeInfo &&
+              'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt.stakeInfo.stake
             ) {
               const unStakeAmountBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake, 16)
@@ -167,8 +165,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           // Calculate total node rewards in cycle
           const nodeRewardAmount = unstakeTransactions.reduce((sum, current) => {
             if (
-              current.wrappedEVMAccount.readableReceipt &&
-              current.wrappedEVMAccount.readableReceipt.stakeInfo &&
+              'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt.stakeInfo.reward
             ) {
               const rewardBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.reward, 16)
@@ -180,8 +177,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           // Calculate total reward penalties in cycle
           const nodePenaltyAmount = unstakeTransactions.reduce((sum, current) => {
             if (
-              current.wrappedEVMAccount.readableReceipt &&
-              current.wrappedEVMAccount.readableReceipt.stakeInfo &&
+              'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt.stakeInfo.penalty
             ) {
               const penaltyBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.penalty, 16)
@@ -192,7 +188,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           }, new BN(0))
           // Calculate total gas burnt in cycle
           const gasBurnt = transactions.reduce((sum, current) => {
-            if (current.wrappedEVMAccount.amountSpent) {
+            if ('amountSpent' in current.wrappedEVMAccount && current.wrappedEVMAccount.amountSpent) {
               const amountSpentBN = new BN(current.wrappedEVMAccount.amountSpent, 16)
               return sum.add(amountSpentBN)
             } else {
