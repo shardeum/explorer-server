@@ -5,7 +5,6 @@ import * as Account from '../storage/account'
 import * as Transaction from '../storage/transaction'
 import * as Cycle from '../storage/cycle'
 import * as Receipt from '../storage/receipt'
-import { sleep } from '../utils'
 import { config, ARCHIVER_URL } from '../config'
 
 export let needSyncing = false
@@ -66,46 +65,6 @@ export const compareWithOldArchivedCyclesData = async (lastCycleCounter) => {
   }
   return { success, cycle }
 }
-
-// export const compareWithOldReceiptsData = async (lastReceiptCount) => {
-//   let downloadedReceipts
-//   const response = await axios.get(
-//     `${ARCHIVER_URL}/receipt?start=${lastReceiptCount - 10}&end=${lastReceiptCount}`
-//   )
-//   if (response && response.data && response.data.receipts) {
-//     downloadedReceipts = response.data.receipts
-//   } else {
-//     throw Error(
-//       `Can't fetch data from receipt ${
-//         lastReceiptCount - 20
-//       } to receipt ${lastReceiptCount}  from archiver server`
-//     )
-//   }
-//   let oldReceipts = await Receipt.queryReceipts(lastReceiptCount - 10, lastReceiptCount)
-//   // downloadedReceipts.sort((a, b) =>
-//   //   a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
-//   // );
-//   // oldReceipts.sort((a, b) =>
-//   //   a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
-//   // );
-//   let success = false
-//   let receiptsToMatchCount = 10
-//   for (let i = 0; i < downloadedReceipts.length; i++) {
-//     let downloadedReceipt = downloadedReceipts[i]
-//     const oldReceipt = oldReceipts[i]
-//     if (oldReceipt.counter) delete oldReceipt.counter
-//     console.log(downloadedReceipt.receiptId, oldReceipt.receiptId)
-//     if (downloadedReceipt.receiptId !== oldReceipt.receiptId) {
-//       return {
-//         success,
-//         receiptsToMatchCount,
-//       }
-//     }
-//     success = true
-//     receiptsToMatchCount++
-//   }
-//   return { success, receiptsToMatchCount }
-// }
 
 export async function compareWithOldReceiptsData(lastStoredReceiptCycle: number = 0) {
   let endCycle = lastStoredReceiptCycle
@@ -178,7 +137,6 @@ export const compareWithOldCyclesData = async (lastCycleCounter) => {
 
 export const insertArchivedCycleData = async (downloadedArchivedCycles) => {
   for (let i = 0; i < downloadedArchivedCycles.length; i++) {
-    // let marker = downloadedArchivedCycles[i].cycleRecord.marker;
     let counter = downloadedArchivedCycles[i].cycleRecord.counter
     let downloadedArchivedCycle = downloadedArchivedCycles[i]
 
@@ -224,7 +182,6 @@ export const insertArchivedCycleData = async (downloadedArchivedCycles) => {
         } else {
           await ArchivedCycle.insertArchivedCycle(downloadedArchivedCycle)
         }
-        // await Storage.insertArchivedCycle(downloadedArchivedCycle);
         await Cycle.insertOrUpdateCycle(downloadedArchivedCycle)
         await Transaction.insertOrUpdateTransaction(downloadedArchivedCycle)
         await Account.insertOrUpdateAccount(downloadedArchivedCycle)
@@ -329,94 +286,6 @@ export const checkStateMetaData = (downloadedArchivedCycle, counter) => {
   }
   return { isDataSynced, isReceiptSynced, isSummarySynced }
 }
-
-// export const validateOldArchivedCycleData = async lastStoredCycleCounter => {
-//   let startCycle = 1;
-//   let lastCycle = 100;
-//   while (lastStoredCycleCounter) {
-//     if (lastCycle > lastStoredCycleCounter) {
-//       lastCycle = lastStoredCycleCounter;
-//     }
-//     const archivedCycles = await Storage.queryAllArchivedCyclesBetween(
-//       startCycle,
-//       lastCycle
-//     );
-//     if (archivedCycles && archivedCycles.length > 0) {
-//       for (let i = 0; i < archivedCycles.length; i++) {
-//         const archivedCycle = archivedCycles[i];
-//         const counter = archivedCycle.cycleRecord.counter;
-//         if (counter === startCycle) {
-//           const {isDataSynced, isReceiptSynced, isSummarySynced} =
-//             checkStateMetaData(archivedCycle, counter);
-//           if (!isDataSynced && !isReceiptSynced && !isSummarySynced) {
-//             if (counter < 5) {
-//               // exception for cycle 1, 2, 3, 4
-//               continue;
-//             }
-//             let res = await axios.get(
-//               `${ARCHIVER_URL}/full-archive?start=${counter}&end=${counter}`
-//             );
-//             if (res && res.data && res.data.length > 0) {
-//               await Storage.updateArchivedCycle(
-//                 archivedCycle.cycleMarker,
-//                 res.data[0]
-//               );
-//             }
-//             await Transaction.insertOrUpdateTransaction(archivedCycle);
-//             await Account.insertOrUpdateAccount(archivedCycle);
-//             console.log(
-//               `Successfully updated ArchivedCycle for counter ${counter}`
-//             );
-//           }
-//         } else {
-
-//         }
-//       }
-//     } else {
-//       console.log(
-//         `No archived cycles record found ${startCycle} and ${lastCycle}`
-//       );
-//       console.log(
-//         `Downloading archive from cycle ${startCycle} to cycle ${lastCycle}`
-//       );
-//       const response = await axios.get(
-//         `${ARCHIVER_URL}/full-archive?start=${startCycle}&end=${lastCycle}`
-//       );
-//       if (response && response.data && response.data.archivedCycles) {
-//         // collector = collector.concat(response.data.archivedCycles);
-//         const downloadedArchivedCycles = response.data.archivedCycles;
-//         console.log(
-//           `Downloaded archived cycles`,
-//           downloadedArchivedCycles.length
-//         );
-//         downloadedArchivedCycles.sort((a, b) =>
-//           a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
-//         );
-//         await insertArchivedCycleData(downloadedArchivedCycles);
-//       } else {
-//         console.log('Invalid download response');
-//       }
-//     }
-//     startCycle = lastCycle;
-//     lastCycle += 100;
-//   }
-// };
-
-// export const validateOldArchivedCycleData = async lastStoredCycleCounter => {
-//   let startCycle = 1;
-//   let lastCycle = 100;
-//   while (lastStoredCycleCounter) {
-//     if (lastCycle > lastStoredCycleCounter) {
-//       lastCycle = lastStoredCycleCounter;
-//     }
-//     const archivedCycles = await Storage.queryAllArchivedCyclesBetween(
-//       startCycle,
-//       lastCycle
-//     );
-//     if (archivedCycles && archivedCycles.length > 0) {
-//     }
-//   }
-// };
 
 export const downloadAndInsertReceiptsAndCycles = async (
   totalReceiptsToSync: number,
@@ -643,9 +512,6 @@ export async function compareReceiptsCountByCycles(startCycle: number, endCycle:
       }
     } else unMatchedCycle.push(downloadedReceipt)
   }
-  // if (unMatchedCycle.length === 0) {
-  //   unMatchedCycle = downloadedReceiptCountByCycle
-  // }
   return unMatchedCycle
 }
 
