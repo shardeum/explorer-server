@@ -40,7 +40,15 @@ const nextConfig = {
             },
             {
               key: 'Content-Security-Policy',
-              value: "self",
+              value: "default-src self",
+            },
+            {
+              key: 'Content-Security-Policy',
+              value: "style-src self",
+            },
+            {
+              key: 'Content-Security-Policy',
+              value: "font-src self",
             },
           ],
         },
