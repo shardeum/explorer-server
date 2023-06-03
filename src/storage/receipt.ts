@@ -261,7 +261,7 @@ export async function processReceiptData(
         }
         const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap)
         for (const acc of accs) {
-          if (acc === ZERO_ETH_ADDRESS) return
+          if (acc === ZERO_ETH_ADDRESS) continue
           if (!combineAccounts1.some((a) => a.ethAddress === acc)) {
             const addressToCreate = acc
             const accountExist = await Account.queryAccountByAccountId(
