@@ -61,7 +61,7 @@ const start = async (): Promise<void> => {
     }
     if (txStatusCollector.has(params.hash)) {
       res.success = true
-      res.txStatus = txStatusCollector.get(params.hash)
+      res.txStatus = txStatusCollector.get(params.hash) || null
       res.reason = 'This tx is found!'
     }
     reply.send(res)
@@ -73,7 +73,7 @@ const start = async (): Promise<void> => {
     const lastestTenTxsKeys = keyArrayTemp.slice(-10)
     const lastestTenTxs: (object | null)[] = []
     if (lastestTenTxsKeys.length > 0) {
-      lastestTenTxsKeys.forEach((key) => lastestTenTxs.push(txStatusCollector.get(key)))
+      lastestTenTxsKeys.forEach((key) => lastestTenTxs.push(txStatusCollector.get(key) || null))
     }
     const res = {
       success: true,
