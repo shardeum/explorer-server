@@ -13,7 +13,7 @@ if (process.env.PORT) {
 }
 
 console.log(process.argv)
-let port = process.argv[2]
+const port = process.argv[2]
 if (port) {
   CONFIG.port.rpc_data_collector = port
 }
@@ -23,8 +23,8 @@ interface RequestParams {
   hash: string
 }
 
-let txStatusCollector: Map<string, object> = new Map()
-let txKeysMap: Map<string, boolean> = new Map()
+const txStatusCollector: Map<string, object> = new Map()
+const txKeysMap: Map<string, boolean> = new Map()
 const txCollectorMaxSize = 10000
 const batchCleanSize = 500
 
@@ -50,7 +50,7 @@ const start = async () => {
       return
     }
     const params = _request.params as RequestParams
-    let res = {
+    const res = {
       success: false,
       reason: 'This tx hash is not found!',
       txStatus: null,
@@ -65,13 +65,13 @@ const start = async () => {
 
   // Debug endpoint
   server.get('/api/txs', async (_request, reply) => {
-    let keyArrayTemp = Array.from(txKeysMap.keys())
+    const keyArrayTemp = Array.from(txKeysMap.keys())
     const lastestTenTxsKeys = keyArrayTemp.slice(-10)
-    let lastestTenTxs = []
+    const lastestTenTxs = []
     if (lastestTenTxsKeys.length > 0) {
       lastestTenTxsKeys.forEach((key) => lastestTenTxs.push(txStatusCollector.get(key)))
     }
-    let res = {
+    const res = {
       success: true,
       txSize: txStatusCollector.size,
       keySize: txKeysMap.size,
@@ -101,7 +101,7 @@ const start = async () => {
         // arrayTemp.splice(0, batchCleanSize)
         // txStatusCollector = new Map(arrayTemp)
 
-        let keyArrayTemp = Array.from(txKeysMap.keys())
+        const keyArrayTemp = Array.from(txKeysMap.keys())
         for (let i = 0; i < batchCleanSize; i++) {
           const key = keyArrayTemp[i]
           txStatusCollector.delete(key)
