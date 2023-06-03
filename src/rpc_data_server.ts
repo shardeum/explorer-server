@@ -97,10 +97,6 @@ const start = async () => {
       }
       // Remove old data
       if (txStatusCollector.size >= txCollectorMaxSize + batchCleanSize) {
-        // let arrayTemp = Array.from(txStatusCollector)
-        // arrayTemp.splice(0, batchCleanSize)
-        // txStatusCollector = new Map(arrayTemp)
-
         const keyArrayTemp = Array.from(txKeysMap.keys())
         for (let i = 0; i < batchCleanSize; i++) {
           const key = keyArrayTemp[i]
