@@ -7,7 +7,7 @@ import {
   TransactionType,
   TransactionSearchType,
   WrappedEVMAccount,
-  ReadableReceipt,
+  WrappedDataReceipt,
 } from '../@type'
 import ERC20ABI from 'human-standard-token-abi'
 import Web3 from 'web3'
@@ -134,17 +134,41 @@ export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx<C>[]): Pr
   }
 }
 
-export async function processTransactionData(
-  transactions: Transaction<
-    object,
-    {
-  accountType: AccountType
-  txId: string
-  ethAddress: string
-  readableReceipt: ReadableReceipt
+interface RawTransaction {
+  accountId: string
+  cycleNumber: number
+  data: WrappedEVMAccount,
+  originTxData: {
+    duration: number
+    internalTXType: TransactionType
+    isInternalTx: boolean
+    nominator: string
+    nominee: string
+    sign: {
+      owner: string
+      sig: string
     }
-  >[]
-): Promise<void> {
+    timestamp: number
+  }
+  result: { txIdShort: string; txResult: string }
+  sign: {
+    owner: string
+    sig: string
+  }
+  timestamp: number
+  txId: string
+}
+
+function isReceiptData(obj?: WrappedEVMAccount | null): obj is WrappedEVMAccount & WrappedDataReceipt {
+    const accountType = obj?.accountType
+    return accountType === AccountType.Receipt ||
+      accountType === AccountType.NodeRewardReceipt ||
+      accountType === AccountType.StakeReceipt ||
+      accountType === AccountType.UnstakeReceipt ||
+      accountType === AccountType.InternalTxReceipt
+}
+
+export async function processTransactionData(transactions: RawTransaction[]): Promise<void> {
   console.log('transactions size', transactions.length)
   if (transactions && transactions.length <= 0) return
   const bucketSize = 1000
@@ -155,18 +179,11 @@ export async function processTransactionData(
   let combineTokenTransactions2: TokenTx<Record<string, never>>[] = [] // For TransactionType (ERC1155)
   let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   for (const transaction of transactions) {
-    const accountType = transaction.data && transaction.data.accountType
-    if (
-      accountType === AccountType.Receipt ||
-      accountType === AccountType.NodeRewardReceipt ||
-      accountType === AccountType.StakeReceipt ||
-      accountType === AccountType.UnstakeReceipt ||
-      accountType === AccountType.InternalTxReceipt
-    ) {
+    if (isReceiptData(transaction.data)) {
       const txObj = {
         txId: transaction.data?.txId,
         result: ['passed'], // temp placeholder
-        cycle: transaction.cycle,
+        cycle: transaction.cycleNumber,
         // partition: Number(partition), // We don't know the partition now
         timestamp: transaction.timestamp,
         wrappedEVMAccount: transaction.data,
@@ -187,7 +204,7 @@ export async function processTransactionData(
           ? transaction.data.readableReceipt.to
           : transaction.data.readableReceipt.contractAddress,
         originTxData: {},
-      } as Transaction
+      }
 
       const { txs, accs, tokens } = await decodeTx(txObj)
       for (const acc of accs) {
