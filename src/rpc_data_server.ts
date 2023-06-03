@@ -1,4 +1,5 @@
-require('dotenv').config()
+import dotenv from 'dotenv'
+dotenv.config()
 
 import * as Fastify from 'fastify'
 import * as crypto from '@shardus/crypto-utils'
