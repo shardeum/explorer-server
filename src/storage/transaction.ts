@@ -404,8 +404,9 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         // eslint-disable-next-line security/detect-object-injection
         transactionData = archivedCycle?.receipt?.partitionTxs?.[partition][txId].filter(
           (acc: Transaction<object, { accountType: AccountType; ethAddress: string }>) => {
-          return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
-        })
+            return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
+          }
+        )
         if (transactionData.length > 0) {
           if (config.verbose) console.log('contract transactionData', txId, transactionData)
           const accountId = transactionData[0].accountId
@@ -529,7 +530,8 @@ export async function queryTransactionCount(
   let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (address) {
-      if (!txType) { // (!txType || txType === TransactionSearchType.All)
+      if (!txType) {
+        // (!txType || txType === TransactionSearchType.All)
         const sql = `SELECT COUNT(*) FROM transactions WHERE txFrom=? OR txTo=? OR nominee=?`
         transactions = await db.get(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -648,7 +650,7 @@ export async function queryTransactions(
   limit = 10,
   address?: string,
   txType?: TransactionSearchType,
-  filterAddress?: string,
+  filterAddress?: string
 ): Promise<(DbTransaction<object> | DbTokenTx)[]> {
   let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
@@ -765,7 +767,7 @@ export async function queryTransactions(
         (transaction as Transaction).result = JSON.parse(transaction.result)
       if ('contractInfo' in transaction && transaction.contractInfo)
         (transaction as TokenTx).contractInfo = JSON.parse(transaction.contractInfo)
-      })
+    })
 
     if (config.verbose) console.log('transactions', transactions)
   } catch (e) {
@@ -858,7 +860,7 @@ export async function queryTransactionsBetweenCycles(
   end: number,
   address?: string,
   txType?: TransactionSearchType,
-  filterAddress?: string,
+  filterAddress?: string
 ): Promise<(DbTransaction<object> | DbTokenTx)[]> {
   let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
@@ -997,7 +999,8 @@ export async function queryTransactionCountBetweenCycles(
   let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (address) {
-      if (!txType) { // (!txType || txType === TransactionSearchType.All)
+      if (!txType) {
+        // (!txType || txType === TransactionSearchType.All)
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (txFrom=? OR txTo=? OR nominee=?)`
         transactions = await db.get(sql, [start, end, address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -1151,7 +1154,7 @@ export async function queryTransactionCountByCycles(
   return transactions.map((receipt) => {
     return {
       cycle: receipt.cycle,
-      transactions: receipt['COUNT(*)']
+      transactions: receipt['COUNT(*)'],
     }
-    })
-  }
+  })
+}
