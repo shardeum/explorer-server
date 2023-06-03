@@ -121,9 +121,9 @@ export async function queryLogCount(
 export async function queryLogs(
   skip = 0,
   limit = 10,
-  startCycle = 0,
-  endCycle = 0,
-  type = undefined,
+  startCycle?: number,
+  endCycle?: number,
+  type?: string,
   contractAddress?: string,
   topic0?: string,
   topic1?: string,
