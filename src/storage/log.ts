@@ -196,7 +196,7 @@ export async function queryLogCountBetweenCycles(startCycleNumber: number, endCy
     console.log('Log count between cycle', logs)
   }
 
-  return logs ? logs['COUNT(*)'] : 0
+  return logs['COUNT(*)'] || 0
 }
 
 export async function queryLogsBetweenCycles(

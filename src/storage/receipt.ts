@@ -429,7 +429,7 @@ export async function queryReceiptCount(): Promise<number> {
   }
   if (config.verbose) console.log('Receipt count', receipts)
 
-  return receipts ? receipts['COUNT(*)'] : 0
+  return receipts['COUNT(*)'] || 0
 }
 
 export async function queryReceiptCountByCycles(start: number, end: number): Promise<{ receipts: number, cycle: number }[]> {
@@ -484,7 +484,7 @@ export async function queryReceiptCountBetweenCycles(start: number, end: number)
   }
   if (config.verbose) console.log('Receipt receipts count between cycles', receipts)
 
-  return receipts ? receipts['COUNT(*)'] : 0
+  return receipts['COUNT(*)'] || 0
 }
 
 export function resetReceiptsMap(): void {

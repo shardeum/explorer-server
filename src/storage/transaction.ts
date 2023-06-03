@@ -467,7 +467,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
       } else {
         if (
           transactionExist.cycle < transactionInfo.cycle &&
-          (transactionExist.wrappedEVMAccount.timestamp ?? 0) < transactionInfo.wrappedEVMAccount.timestamp
+          (transactionExist.wrappedEVMAccount.timestamp || 0) < transactionInfo.wrappedEVMAccount.timestamp
         ) {
           await updateTransaction(txId, transactionInfo)
         }
@@ -623,7 +623,7 @@ export async function queryTransactionCount(
   }
   if (config.verbose) console.log('transactions count', transactions)
 
-  return transactions ? transactions['COUNT(*)'] : 0
+  return transactions['COUNT(*)'] || 0
 }
 
 export async function queryTransactions(
@@ -1093,7 +1093,7 @@ export async function queryTransactionCountBetweenCycles(
 
   if (config.verbose) console.log('transactions count between cycles', transactions)
 
-  return transactions ? transactions['COUNT(*)'] : 0
+  return transactions['COUNT(*)'] || 0
 }
 
 export async function queryTransactionCountByCycles(

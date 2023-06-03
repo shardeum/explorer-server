@@ -236,7 +236,7 @@ export async function queryAccountCount(type?: ContractType | AccountSearchType)
     console.log(e)
   }
   if (config.verbose) console.log('Account count', accounts)
-  return accounts ? accounts['COUNT(*)'] : 0
+  return accounts['COUNT(*)'] || 0
 }
 
 export async function queryAccounts(
@@ -327,7 +327,7 @@ export async function queryAccountCountBetweenCycles(
   if (config.verbose) {
     console.log('Account count between cycle', accounts)
   }
-  return accounts['COUNT(*)']
+  return accounts['COUNT(*)'] || 0
 }
 
 export async function queryAccountsBetweenCycles(
@@ -405,7 +405,7 @@ export async function queryTokenHolderCount(contractAddress: string): Promise<nu
   }
   if (config.verbose) console.log('Token holder count', tokens)
 
-  return tokens ? tokens['COUNT(*)'] : 0
+  return tokens['COUNT(*)'] || 0
 }
 
 export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: string): Promise<Token[]> {
