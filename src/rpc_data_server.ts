@@ -125,7 +125,7 @@ const start = async (): Promise<void> => {
     })
   })
 
-  server.listen(Number(CONFIG.port.rpc_data_collector), '0.0.0.0', async (err) => {
+  server.listen({ host: '0.0.0.0', port: Number(CONFIG.port.rpc_data_collector) }, (err) => {
     if (err) {
       server.log.error(err)
       console.log(err)
