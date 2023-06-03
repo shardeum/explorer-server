@@ -85,7 +85,12 @@ export interface WrappedDataContractCode {
 
 /** Variant data: receipt related */
 export interface WrappedDataReceipt {
-  accountType: AccountType.Receipt
+  accountType:
+    | AccountType.Receipt
+    | AccountType.NodeRewardReceipt
+    | AccountType.StakeReceipt
+    | AccountType.UnstakeReceipt
+    | AccountType.InternalTxReceipt
 
   /** For debug tx */
   balance: string
