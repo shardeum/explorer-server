@@ -28,18 +28,18 @@ const txKeysMap: Map<string, boolean> = new Map()
 const txCollectorMaxSize = 10000
 const batchCleanSize = 500
 
-const start = async () => {
+const start = async (): Promise<void> => {
   const server: Fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = Fastify.fastify({
     logger: false,
   })
 
   server.register(fastifyCors)
 
-  server.get('/', (req, reply: any) => {
+  server.get('/', (_req, reply) => {
     reply.send({ message: 'Shardeum JSON RPC Data Server!' })
   })
 
-  server.get('/port', (req, reply) => {
+  server.get('/port', (_req, reply) => {
     reply.send({ port })
   })
 
@@ -50,7 +50,11 @@ const start = async () => {
       return
     }
     const params = _request.params as RequestParams
-    const res = {
+    const res: {
+      success: boolean
+      txStatus: object | null
+      reason: string
+    } = {
       success: false,
       reason: 'This tx hash is not found!',
       txStatus: null,
@@ -67,7 +71,7 @@ const start = async () => {
   server.get('/api/txs', async (_request, reply) => {
     const keyArrayTemp = Array.from(txKeysMap.keys())
     const lastestTenTxsKeys = keyArrayTemp.slice(-10)
-    const lastestTenTxs = []
+    const lastestTenTxs: (object | null)[] = []
     if (lastestTenTxsKeys.length > 0) {
       lastestTenTxsKeys.forEach((key) => lastestTenTxs.push(txStatusCollector.get(key)))
     }
@@ -80,12 +84,21 @@ const start = async () => {
     reply.send(res)
   })
 
+  function isValidTransactionInfo(obj: unknown): obj is { txHash: string; injected: boolean } {
+    return typeof obj === 'object' &&
+      obj != null &&
+      'txHash' in obj &&
+      typeof obj.txHash === 'string' &&
+      'injected' in obj &&
+      typeof obj.injected === 'boolean'
+  }
+
   server.post('/tx/status', async (_request, reply) => {
-    const transactionInfos: any = _request.body
+    const transactionInfos = _request.body
     let success = false
-    if (transactionInfos.length > 0) {
+    if (Array.isArray(transactionInfos) && transactionInfos.length > 0) {
       for (const transactionInfo of transactionInfos) {
-        if (transactionInfo.txHash) {
+        if (isValidTransactionInfo(transactionInfo)) {
           if (txStatusCollector.has(transactionInfo.txHash)) {
             txStatusCollector.delete(transactionInfo.txHash)
             txKeysMap.delete(transactionInfo.txHash)
