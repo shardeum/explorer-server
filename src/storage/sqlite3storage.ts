@@ -73,10 +73,9 @@ export function extractValuesFromArray(arr: object[]): string[] {
   try {
     const inputs: string[] = []
     for (const object of arr) {
-      for (const value of Object.values(object)) {
-        if (typeof value === 'object') {
-          inputs.push(JSON.stringify(value))
-        }
+      for (let value of Object.values(object)) {
+        if (typeof value === 'object') value = JSON.stringify(value);
+        inputs.push(value)
       }
     }
     return inputs
