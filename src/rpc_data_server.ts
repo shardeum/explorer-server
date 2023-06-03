@@ -112,6 +112,7 @@ const start = async (): Promise<void> => {
       if (txStatusCollector.size >= txCollectorMaxSize + batchCleanSize) {
         const keyArrayTemp = Array.from(txKeysMap.keys())
         for (let i = 0; i < batchCleanSize; i++) {
+          // eslint-disable-next-line security/detect-object-injection
           const key = keyArrayTemp[i]
           txStatusCollector.delete(key)
           txKeysMap.delete(key)
