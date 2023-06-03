@@ -12,7 +12,7 @@ export async function runCreate(createStatement: string): Promise<void> {
   await run(createStatement)
 }
 
-export async function run(sql: string, params: object = {}): Promise<{ id: number }> {
+export async function run(sql: string, params: unknown[] | object = []): Promise<{ id: number }> {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err: Error) {
       if (err) {
@@ -26,7 +26,7 @@ export async function run(sql: string, params: object = {}): Promise<{ id: numbe
   })
 }
 
-export async function get<T>(sql: string, params: object = {}): Promise<T> {
+export async function get<T>(sql: string, params: unknown[] | object = []): Promise<T> {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err: Error, result: T) => {
       if (err) {
@@ -40,7 +40,7 @@ export async function get<T>(sql: string, params: object = {}): Promise<T> {
   })
 }
 
-export async function all<T>(sql: string, params: object = {}): Promise<T[]> {
+export async function all<T>(sql: string, params: unknown[] | object = []): Promise<T[]> {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err: Error, rows: T[]) => {
       if (err) {
