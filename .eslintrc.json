@@ -19,7 +19,6 @@
     "**/storage/*.ts",
     "**/class/**/*.ts",
     "server.ts",
-    "rpc_data_server.ts",
     "collector.ts",
     "**/@type/index.ts"
   ],
