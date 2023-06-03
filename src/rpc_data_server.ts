@@ -2,7 +2,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import * as Fastify from 'fastify'
-import * as crypto from '@shardus/crypto-utils'
 import * as utils from './utils'
 import fastifyCors from '@fastify/cors'
 import { Server, IncomingMessage, ServerResponse } from 'http'
