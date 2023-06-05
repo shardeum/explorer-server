@@ -17,7 +17,6 @@
   ],
   "ignorePatterns": [
     "collector.ts",
-    "**/@type/index.ts"
   ],
   "rules": {
     "no-empty": [
