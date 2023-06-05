@@ -18,31 +18,37 @@ export const TransactionDetail: React.FC = () => {
 
   const { transactionData, receiptData, setShowReceipt, showReceipt } = useTransactionDetailHook(id)
 
-  const tabs = useMemo(() => [
-    {
-      key: 'overview',
-      value: 'Overview',
-      content: <Ovewview transaction={transactionData} />,
-    },
-    {
-      key: 'jsonview',
-      value: 'Json View',
-      content: <JsonView transaction={transactionData} />,
-    },
-  ], [transactionData])
+  const tabs = useMemo(
+    () => [
+      {
+        key: 'overview',
+        value: 'Overview',
+        content: <Ovewview transaction={transactionData} />,
+      },
+      {
+        key: 'jsonview',
+        value: 'Json View',
+        content: <JsonView transaction={transactionData} />,
+      },
+    ],
+    [transactionData]
+  )
 
-  const receiptTabs = useMemo(() => [
-    {
-      key: 'fullReceipt',
-      value: 'Full Receipt',
-      content: <Receipt receipt={receiptData} />,
-    },
-    {
-      key: 'accountInfo',
-      value: 'Account Info',
-      content: <AccountInfo receipt={receiptData} />,
-    },
-  ], [receiptData])
+  const receiptTabs = useMemo(
+    () => [
+      {
+        key: 'fullReceipt',
+        value: 'Full Receipt',
+        content: <Receipt receipt={receiptData} />,
+      },
+      {
+        key: 'accountInfo',
+        value: 'Account Info',
+        content: <AccountInfo receipt={receiptData} />,
+      },
+    ],
+    [receiptData]
+  )
 
   useEffect(() => {
     const receipt = router?.query?.receipt === 'true' ? true : false

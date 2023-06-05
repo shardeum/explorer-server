@@ -29,7 +29,6 @@ interface SeriesData {
   visible?: boolean
 }
 
-
 export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
   const { title, centerTitle, subTitle, data, height = 300, name } = props
 

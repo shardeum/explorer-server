@@ -31,7 +31,7 @@ export const Tab = <K extends Key>(props: TabProps<K>): JSX.Element => {
     ))
   }
 
-  const renderContent = (): (JSX.Element | "")[] => {
+  const renderContent = (): (JSX.Element | '')[] => {
     return tabs.map((tab) => (tab.key === activeTab ? <div key={tab.key}>{tab.content}</div> : ''))
   }
 

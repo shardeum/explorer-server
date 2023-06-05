@@ -9,7 +9,7 @@ import { showTxMethod } from '../../utils/showMethod'
 import { TokenTxs, Transaction, TransactionSearchType, TransactionType } from '../../types'
 import { Table } from '../../components/TableComp'
 import { IColumnProps } from '../../components/TableComp/Table'
-import { ReadableReceipt } from '../../../@type';
+import { ReadableReceipt } from '../../../@type'
 
 interface ITransactionTable {
   data: (Transaction | TokenTxs)[]
@@ -109,8 +109,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           key: 'tokenTo',
           value: 'To',
           render: (val: string | TransactionType) => (
-              <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-          )
+            <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          ),
         },
         {
           key: 'tokenType',
@@ -138,8 +138,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           key: 'tokenTo',
           value: 'To',
           render: (val: unknown) => (
-              <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ),
+            <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          ),
         },
         {
           key: 'tokenType',
@@ -174,8 +174,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           key: 'tokenTo',
           value: 'To',
           render: (val: unknown) => (
-              <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ),
+            <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          ),
         },
         {
           key: 'tokenType',
@@ -211,8 +211,8 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           key: 'tokenTo',
           value: 'To',
           render: (val: unknown) => (
-              <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
-            ),
+            <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          ),
         },
         {
           key: 'tokenType',
