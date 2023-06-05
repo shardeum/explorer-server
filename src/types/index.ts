@@ -13,33 +13,6 @@ export enum TransactionType {
   InternalTxReceipt = 8,
 }
 
-export interface ReadableReceipt {
-  status?: boolean | string | number
-  transactionHash: string
-  transactionIndex: string
-  blockNumber: string
-  nonce: string
-  blockHash: string
-  cumulativeGasUsed: string
-  gasUsed: string
-  logs: any[]
-  logBloom: string
-  contractAddress: string | null
-  from: string
-  to: string
-  value: string
-  data: string
-  stakeInfo?: {
-    nominee?: string
-    stakeAmount?: string
-    totalStakeAmount?: string
-    totalUnstakeAmount?: string
-    stake?: string
-    reward?: string
-    penalty?: string
-  }
-}
-
 export interface ERC20ContractDetail {
   name: string
   decimals: string
@@ -123,4 +96,5 @@ export enum TransactionSearchType {
 }
 
 export * from './account'
+export * from './receipt'
 export * from './serverResponseTypes'
