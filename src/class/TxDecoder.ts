@@ -1,4 +1,4 @@
-import { TokenTx, TransactionType, DecodeTxResult } from '../@type'
+import { TokenTx, TransactionType, DecodeTxResult } from '../types'
 import { getWeb3, Transaction } from '../storage/transaction'
 import Web3 from 'web3'
 import { Account, ContractType, Token, queryAccountByAccountId } from '../storage/account'

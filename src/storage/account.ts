@@ -1,7 +1,7 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { AccountType, AccountSearchType, WrappedEVMAccount, TransactionType } from '../@type'
+import { AccountType, AccountSearchType, WrappedEVMAccount, TransactionType } from '../types'
 import { bufferToHex } from 'ethereumjs-util'
 import { getContractInfo } from '../class/TxDecoder'
 import { ArchivedCycle } from './archivedCycle'

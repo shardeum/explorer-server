@@ -1,7 +1,7 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccount } from '../@type'
+import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccount } from '../types'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'

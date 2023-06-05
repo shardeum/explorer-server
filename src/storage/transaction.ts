@@ -8,7 +8,7 @@ import {
   TransactionSearchType,
   WrappedEVMAccount,
   WrappedDataReceipt,
-} from '../@type'
+} from '../types'
 import ERC20ABI from 'human-standard-token-abi'
 import Web3 from 'web3'
 import * as Account from './account'
