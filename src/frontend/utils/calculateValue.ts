@@ -19,7 +19,12 @@ export const calculateFullValue = (value: string | BN): string => {
   }
 }
 
-export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, tokenId = false, fullValue = true): string => {
+export const calculateTokenValue = (
+  tokenTx: TokenTxs,
+  txType: TransactionType,
+  tokenId = false,
+  fullValue = true
+): string => {
   try {
     if (txType === TransactionType.ERC_20 || txType === TransactionType.EVM_Internal) {
       const decimalsValue = tokenTx.contractInfo.decimals ? parseInt(tokenTx.contractInfo.decimals) : 18
@@ -27,8 +32,8 @@ export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, 
       return tokenTx.tokenValue === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         ? round(utils.formatUnits(tokenTx.tokenValue, 0))
         : fullValue
-          ? utils.formatUnits(tokenTx.tokenValue, decimalsValue)
-          : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
+        ? utils.formatUnits(tokenTx.tokenValue, decimalsValue)
+        : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
 
       // : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
     } else if (txType === TransactionType.ERC_721) {
@@ -43,10 +48,10 @@ export const calculateTokenValue = (tokenTx: TokenTxs, txType: TransactionType, 
           ? 'True'
           : 'False'
         : tokenTx.tokenValue.length != 130
-          ? tokenTx.tokenValue
-          : tokenId
-            ? shortTokenValue(Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66)))
-            : shortTokenValue(Web3Utils.hexToNumberString('0x' + tokenTx.tokenValue.substring(66, 130)))
+        ? tokenTx.tokenValue
+        : tokenId
+        ? shortTokenValue(Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66)))
+        : shortTokenValue(Web3Utils.hexToNumberString('0x' + tokenTx.tokenValue.substring(66, 130)))
     }
   } catch (e) {
     return 'error in calculating tokenValue'
@@ -80,7 +85,7 @@ export const round = (value: string): string => {
   return Number(value).toFixed(10)
 }
 
-export const roundTokenValue = (value: string) => {
+export const roundTokenValue = (value: string): string => {
   const decimals = countDecimals(value)
   if (decimals === 0) {
     return value

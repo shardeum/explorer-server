@@ -31,8 +31,16 @@ import {
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
-import { AccountResponse,
-  AddressResponse, CoinResponse, ErrorResponse, LogResponse, ReceiptResponse, TokenResponse, TransactionResponse } from './types'
+import {
+  AccountResponse,
+  AddressResponse,
+  CoinResponse,
+  ErrorResponse,
+  LogResponse,
+  ReceiptResponse,
+  TokenResponse,
+  TransactionResponse,
+} from './types'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -455,7 +463,12 @@ const start = async (): Promise<void> => {
         return
       }
       // Temp change to show the last <count> transactions excluding internal txs
-      transactions = await Transaction.queryTransactions(0, count, null, TransactionSearchType.AllExceptInternalTx)
+      transactions = await Transaction.queryTransactions(
+        0,
+        count,
+        null,
+        TransactionSearchType.AllExceptInternalTx
+      )
     } else if (query.startCycle) {
       const startCycle: number = parseInt(query.startCycle)
       if (startCycle < 0 || Number.isNaN(startCycle)) {
@@ -545,7 +558,7 @@ const start = async (): Promise<void> => {
       )
       if (query.filterAddress) {
         const result = await Account.queryTokenBalance(address, filterAddress)
-        if (result.success) filterAddressTokenBalance = result.balance
+        if (result.success) filterAddressTokenBalance = Number(result.balance)
       }
     } else if (query.page) {
       const page: number = parseInt(query.page)
@@ -769,7 +782,7 @@ const start = async (): Promise<void> => {
 
       if (!transaction) {
         delete res.transactions
-        reply.send({result: res, success: false, error: 'This transaction is not found!'})
+        reply.send({ result: res, success: false, error: 'This transaction is not found!' })
         return
       }
     }
@@ -820,7 +833,6 @@ const start = async (): Promise<void> => {
 
   server.get('/api/archive', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
-
       start: 's?',
       end: 's?',
       count: 's?',

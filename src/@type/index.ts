@@ -54,8 +54,12 @@ interface BaseWrappedEVMAccount extends BaseAccount {
  * that is held in memory for awhile but eventually cleared.  This would mean that we have to be able to pull these
  * from disk again, and that could be a bit tricky.
  */
-export type WrappedEVMAccount = BaseWrappedEVMAccount &
-  (WrappedDataReceipt | WrappedDataAccount | WrappedDataContractStorage | WrappedDataContractCode)
+export type WrappedEVMAccount = BaseWrappedEVMAccount & { readableReceipt: ReadableReceipt } & (
+    | WrappedDataReceipt
+    | WrappedDataAccount
+    | WrappedDataContractStorage
+    | WrappedDataContractCode
+  )
 
 /** Variant data: account */
 export interface WrappedDataAccount {
