@@ -18,7 +18,6 @@
   "ignorePatterns": [
     "**/storage/*.ts",
     "**/class/**/*.ts",
-    "server.ts",
     "collector.ts",
     "**/@type/index.ts"
   ],
