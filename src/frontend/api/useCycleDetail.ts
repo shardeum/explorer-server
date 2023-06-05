@@ -6,7 +6,7 @@ import { fetcher } from './fetcher'
 import { PATHS } from './paths'
 
 type CycleDetailResult = {
-  data: Cycle
+  data: Cycle | null
 }
 
 export const useCycleDetail = (id: string): CycleDetailResult => {
@@ -19,11 +19,11 @@ export const useCycleDetail = (id: string): CycleDetailResult => {
   const queryPath = cycleNumber ? `${PATHS.CYCLE}/${id}` : `${PATHS.CYCLE}?marker=${id}`
   const response = useSWR<{ cycle: Cycle; cycles: Cycle[] }>(queryPath, fetcher)
 
-  let cycle: Cycle
+  let cycle: Cycle | null
   if (cycleNumber) {
-    cycle = response.data!.cycle
+    cycle = response.data?.cycle || null
   } else {
-    cycle = response.data!.cycles[0]
+    cycle = response.data?.cycles[0] || null
   }
 
   return {
