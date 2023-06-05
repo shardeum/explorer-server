@@ -62,7 +62,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
   const accs: string[] = []
   const tokens: Token[] = []
 
-  if ('readableReceipt' in tx.wrappedEVMAccount && tx.wrappedEVMAccount.readableReceipt.status === 0) {
+  if ('readableReceipt' in tx.wrappedEVMAccount && tx.wrappedEVMAccount.readableReceipt?.status === 0) {
     return {
       txs,
       accs,
@@ -70,11 +70,11 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
     }
   }
 
-  const data = 'readableReceipt' in tx.wrappedEVMAccount ? tx.wrappedEVMAccount.readableReceipt.data : ''
+  const data = 'readableReceipt' in tx.wrappedEVMAccount ? tx.wrappedEVMAccount.readableReceipt?.data : ''
 
-  const methodCode = data.length > 10 ? data.substring(0, 10) : null
+  const methodCode = data && data.length > 10 ? data.substring(0, 10) : null
 
-  const logs = 'readableReceipt' in tx.wrappedEVMAccount && tx.wrappedEVMAccount.readableReceipt.logs
+  const logs = 'readableReceipt' in tx.wrappedEVMAccount && tx.wrappedEVMAccount.readableReceipt?.logs
 
   if (logs && logs.length > 0) {
     let TransferTX = false
@@ -405,7 +405,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
       const web3 = new Web3()
       const result = web3.eth.abi.decodeParameters(
         ['address[]', 'uint256[]'],
-        'readableReceipt' in tx.wrappedEVMAccount ? tx.wrappedEVMAccount.readableReceipt.data.slice(10) : ''
+        'readableReceipt' in tx.wrappedEVMAccount ? tx.wrappedEVMAccount.readableReceipt?.data.slice(10) || '' : ''
       )
       if (result?.['0'] && result['1'] && result['0'].length === result['1'].length) {
         for (let i = 0; i < result['0'].length; i++) {
