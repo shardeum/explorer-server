@@ -17,7 +17,7 @@ const nextConfig = {
     return config
   },
   env: {
-    BASE_URL: process.env.BASE_URL,
+    HOST: process.env.HOST,
   },
 }
 

@@ -1,16 +1,16 @@
 // config variables
 import { config as CONFIG } from '../../config'
-if (process.env.PORT) {
-  CONFIG.port.server = process.env.PORT
-}
 
-console.log(process.argv)
 const port = process.argv[2]
 if (port) {
   CONFIG.port.server = port
 }
-console.log('Port', CONFIG.port.server)
-const BASE_URL = `http://localhost:${CONFIG.port.server}`
+let BASE_URL = `http://${CONFIG.host}:${CONFIG.port.server}`
+
+if (CONFIG.apiUrl != '')
+  BASE_URL = CONFIG.apiUrl
+
+console.log('BASE_URL', BASE_URL)
 
 export const PATHS = {
   BASE_URL,
