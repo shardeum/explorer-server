@@ -151,8 +151,15 @@ export const Token: React.FC = () => {
                     { key: 'Name', value: account?.contractInfo?.name },
                     { key: 'Symbol :', value: account?.contractInfo?.symbol },
                     {
-                      key: 'Total Supply :',
-                      value: account?.contractInfo?.totalSupply,
+                      key: 'Max Total Supply :',
+                      value: account?.contractInfo?.totalSupply
+                      ? utils
+                          .formatUnits(
+                            account?.contractInfo?.totalSupply,
+                            account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                          )
+                          .toString()
+                      : '',
                     },
                   ]}
                 />

@@ -92,9 +92,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
       }
       log.topics.forEach((topic: string, j: number) => {
         logToSave[`topic${j}`] = topic
-        insertLog(logToSave)
       })
-
+      insertLog(logToSave)
       let tokenTx: TokenTx | null = null
       if (log.topics) {
         if (log.topics.includes(ERC_TOKEN_TRANSFER_EVENT)) {

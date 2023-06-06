@@ -58,8 +58,8 @@ export async function bulkInsertLogs(logs: Log[]): Promise<void> {
 }
 
 export async function queryLogCount(
-  startCycle = 0,
-  endCycle = 0,
+  startCycle = undefined,
+  endCycle = undefined,
   type = undefined,
   contractAddress?: string,
   topic0?: string,
@@ -105,8 +105,6 @@ export async function queryLogCount(
       else sql += `WHERE cycle BETWEEN ? AND ?`
       inputs = [...inputs, ...[startCycle, endCycle]]
     }
-    console.log(sql)
-    console.log(inputs)
     logs = await db.get(sql, inputs)
   } catch (e) {
     console.log(e)
