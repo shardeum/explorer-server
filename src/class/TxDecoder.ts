@@ -1,7 +1,7 @@
 import { TokenTx, TransactionType, DecodeTxResult } from '../@type'
 import { getWeb3, Transaction } from '../storage/transaction'
 import Web3 from 'web3'
-import { ContractType, Token, queryAccountByAccountId } from '../storage/account'
+import { Account, ContractType, Token, queryAccountByAccountId } from '../storage/account'
 import { Log, insertLog } from '../storage/log'
 import { config } from '../config/index'
 import ERC20_ABI from '../utils/abis/ERC20.json'
@@ -289,7 +289,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             let calculatedKey = Web3.utils
               .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: storageKey })
               ?.slice(2)
-            let contractStorage: { ethAddress: string; account: { value: string } }
+            let contractStorage: Account | null = null
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
               !storageKeyValueMap[calculatedKey + log.address]
@@ -320,7 +320,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             ) {
               // console.log(storageKeyValueMap[calculatedKey + log.address].value)
               const value = contractStorage
-                ? contractStorage.account.value
+                ? contractStorage.account['value']
                 : storageKeyValueMap[calculatedKey + log.address].value
               const decode = rlp.decode(toBuffer(bufferToHex(value.data))).toString('hex')
               // if (tokenTx.tokenType === TransactionType.ERC_20) {
@@ -344,7 +344,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: storageKey })
               ?.slice(2)
             // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
-            let contractStorage: { ethAddress: string; account: { value: string } }
+            let contractStorage: Account | null = null
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
               !storageKeyValueMap[calculatedKey + log.address]
@@ -378,7 +378,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               (contractStorage && contractStorage.ethAddress === log.address)
             ) {
               const value = contractStorage
-                ? contractStorage.account.value
+                ? contractStorage.account['value']
                 : storageKeyValueMap[calculatedKey + log.address].value
               // console.log(storageKeyValueMap[calculatedKey + log.address].value)
               const decode = rlp.decode(toBuffer(bufferToHex(value.data))).toString('hex')
@@ -402,7 +402,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
     }
   }
   // eslint-disable-next-line security/detect-object-injection
-  if (ERC_TOKEN_METHOD_DIC[methodCode] === 'Disperse ETH') {
+  if (methodCode && ERC_TOKEN_METHOD_DIC[methodCode] === 'Disperse ETH') {
     try {
       const web3 = new Web3()
       const result = web3.eth.abi.decodeParameters(

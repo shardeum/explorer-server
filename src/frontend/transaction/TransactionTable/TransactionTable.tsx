@@ -74,14 +74,14 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           ),
         },
         {
-          key: 'wrappedEVMAccount.readableReceipt.to',
+          key: 'wrappedEVMAccount.readableReceipt',
           value: 'To',
-          render: (val: ReadableReceipt) =>
-            val?.to ? (
+          render: (val: ReadableReceipt) =>  
+            val && (val?.to ? (
               <AnchorLink href={`/account/${val.to}`} label={val.to} size="small" ellipsis width={150} />
             ) : (
               <AnchorLink href={`/account/${val.contractAddress}`} label={'Contract creation'} size="small" ellipsis width={150} />
-            ),
+            ))
         },
         {
           key: 'wrappedEVMAccount.readableReceipt.value',
