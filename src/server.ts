@@ -40,7 +40,7 @@ import {
   ReceiptResponse,
   TokenResponse,
   TransactionResponse,
-} from './types'
+} from './@type/serverResponseTypes'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
