@@ -1,41 +1,17 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { AccountType, AccountSearchType, WrappedEVMAccount, TransactionType } from '../types'
+import { AccountType, AccountSearchType, WrappedEVMAccount, Account, Token, ContractType } from '../types'
 import { bufferToHex } from 'ethereumjs-util'
 import { getContractInfo } from '../class/TxDecoder'
 import { ArchivedCycle } from './archivedCycle'
-
-export interface Account {
-  accountId: string
-  cycle: number
-  timestamp: number
-  ethAddress: string
-  account: WrappedEVMAccount
-  hash: string
-  accountType: AccountType
-  contractType?: ContractType
-  contractInfo?: unknown
-}
 
 type DbAccount = Account & {
   account: string
   contractInfo: string
 }
 
-export interface Token {
-  ethAddress: string
-  contractAddress: string
-  tokenValue: string
-  tokenType: TransactionType
-}
-
-export enum ContractType {
-  GENERIC,
-  ERC_20,
-  ERC_721,
-  ERC_1155,
-}
+export { type Account, type Token } from '../types'
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
@@ -144,12 +120,12 @@ export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promi
       // eslint-disable-next-line security/detect-object-injection
       const accountData = archivedCycle.receipt.partitionTxs[partition][txId].filter(
         (acc?: { data?: { accountType: AccountType } }) => {
-        return (
-          acc?.data?.accountType === AccountType.Account ||
-          acc?.data?.accountType === AccountType.NetworkAccount ||
-          acc?.data?.accountType === AccountType.NodeAccount ||
-          acc?.data?.accountType === AccountType.NodeAccount2
-        )
+          return (
+            acc?.data?.accountType === AccountType.Account ||
+            acc?.data?.accountType === AccountType.NetworkAccount ||
+            acc?.data?.accountType === AccountType.NodeAccount ||
+            acc?.data?.accountType === AccountType.NodeAccount2
+          )
         }
       )
       let account: Account
@@ -299,7 +275,10 @@ export async function queryAccountByAccountId(accountId: string): Promise<Accoun
   return null
 }
 
-export async function queryAccountByAddress(address: string, accountType = AccountType.Account): Promise<Account | null> {
+export async function queryAccountByAddress(
+  address: string,
+  accountType = AccountType.Account
+): Promise<Account | null> {
   try {
     const sql = `SELECT * FROM accounts WHERE accountType=? AND ethAddress=? ORDER BY accountType ASC LIMIT 1`
     const account: DbAccount = await db.get(sql, [accountType, address])

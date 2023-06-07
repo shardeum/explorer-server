@@ -1,3 +1,17 @@
+import { Transaction } from './transaction'
+import { Account } from './account'
+export interface Receipt {
+  receiptId: string
+  tx: Transaction
+  cycle: number
+  timestamp: number
+  result: object
+  accounts: Account[]
+  sign: {
+    owner: string
+    sig: string
+  }
+}
 export interface ReadableReceipt {
   status?: boolean | string | number
   transactionHash: string
@@ -11,7 +25,7 @@ export interface ReadableReceipt {
   logBloom: string
   contractAddress: string | null
   from: string
-  to: string
+  to: string | null
   value: string
   data: string
   stakeInfo?: {

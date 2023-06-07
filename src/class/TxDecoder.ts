@@ -1,7 +1,7 @@
-import { TokenTx, TransactionType, DecodeTxResult } from '../types'
-import { getWeb3, Transaction } from '../storage/transaction'
+import { TokenTx, TransactionType, DecodeTxResult, Transaction, ContractType } from '../types'
+import { getWeb3 } from '../storage/transaction'
 import Web3 from 'web3'
-import { Account, ContractType, Token, queryAccountByAccountId } from '../storage/account'
+import { Account, Token, queryAccountByAccountId } from '../storage/account'
 import { Log, insertLog } from '../storage/log'
 import { config } from '../config/index'
 import ERC20_ABI from '../utils/abis/ERC20.json'
@@ -281,8 +281,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             tokenTx.tokenType === TransactionType.ERC_20
               ? ERC_20_BALANCE
               : tokenTx.tokenType === TransactionType.ERC_721
-                ? ERC_721_BALANCE
-                : ERC_1155_BALANCE
+              ? ERC_721_BALANCE
+              : ERC_1155_BALANCE
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
             let calculatedKey = Web3.utils
@@ -406,7 +406,9 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
       const web3 = new Web3()
       const result = web3.eth.abi.decodeParameters(
         ['address[]', 'uint256[]'],
-        'readableReceipt' in tx.wrappedEVMAccount ? tx.wrappedEVMAccount.readableReceipt?.data.slice(10) || '' : ''
+        'readableReceipt' in tx.wrappedEVMAccount
+          ? tx.wrappedEVMAccount.readableReceipt?.data.slice(10) || ''
+          : ''
       )
       if (result?.['0'] && result['1'] && result['0'].length === result['1'].length) {
         for (let i = 0; i < result['0'].length; i++) {

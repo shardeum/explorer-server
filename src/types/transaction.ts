@@ -1,5 +1,36 @@
-import { Token } from "../storage/account"
-import { WrappedEVMAccount } from "./account"
+import { WrappedEVMAccount, Token } from './account'
+
+export interface Transaction {
+  txId: string
+  result: Result
+  cycle: number
+  partition: number
+  timestamp: number
+  wrappedEVMAccount: WrappedEVMAccount
+  accountId: string
+  transactionType: TransactionType
+  txHash: string
+  txFrom: string
+  txTo: string
+  nominee?: string
+  originTxData: unknown
+  tokenTxs?: TokenTx[]
+  contractInfo?: ContractInfo
+  txStatus?: TransactionStatus
+  data?: unknown
+}
+
+export interface Result {
+  txIdShort: string
+  txResult: string
+}
+
+export interface TransactionStatus {
+  txHash: string
+  accepted: boolean
+  injected: boolean
+  reason: string
+}
 
 export enum TransactionType {
   Receipt = 0, // EVM Receipt
@@ -13,7 +44,30 @@ export enum TransactionType {
   InternalTxReceipt = 8,
 }
 
-export interface TokenTx<C = string> {
+// export interface TokenTx {
+//   contractAddress: string
+//   contractInfo?: ContractInfo
+//   cycle: number
+//   timestamp: number
+//   tokenEvent: string
+//   tokenFrom: string
+//   tokenOperator: unknown
+//   tokenTo: string
+//   tokenType: number
+//   tokenValue: string
+//   transactionFee: string
+//   txHash: string
+//   txId: string
+// }
+
+export interface ContractInfo {
+  totalSupply: number
+  decimals: string
+  name: string
+  symbol: string
+}
+
+export interface TokenTx<C = object> {
   cycle: number
   timestamp: number
   contractAddress: string

@@ -3,17 +3,21 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 import {
   AccountType,
+  Transaction,
   TokenTx,
   TransactionType,
   TransactionSearchType,
   WrappedEVMAccount,
   WrappedDataReceipt,
+  WrappedAccount,
 } from '../types'
 import ERC20ABI from 'human-standard-token-abi'
 import Web3 from 'web3'
 import * as Account from './account'
 import { decodeTx, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
 import { ArchivedCycle } from './archivedCycle'
+
+export { type Transaction } from '../types'
 
 export const ERC20_METHOD_DIC = {
   '0xa9059cbb': 'transfer',
@@ -22,28 +26,28 @@ export const ERC20_METHOD_DIC = {
 
 export let Collection: unknown
 
-export interface Transaction<O extends object = object, D extends object = object> {
-  txId: string
-  result: object
-  cycle: number
-  timestamp: number
-  partition?: number
-  wrappedEVMAccount: WrappedEVMAccount
-  accountId: string
-  transactionType: TransactionType
-  txHash: string
-  txFrom: string
-  txTo: string
-  nominee?: string
-  originTxData: O
+// export interface Transaction<O extends object = object, D extends object = object> {
+//   txId: string
+//   result: object
+//   cycle: number
+//   timestamp: number
+//   partition?: number
+//   wrappedEVMAccount: WrappedEVMAccount
+//   accountId: string
+//   transactionType: TransactionType
+//   txHash: string
+//   txFrom: string
+//   txTo: string
+//   nominee?: string
+//   originTxData: O
 
-  // not in the database schema
-  data?: D
-  tokenTxs?: TokenTx[]
-  contractInfo?: object
-}
+//   // not in the database schema
+//   data?: D
+//   tokenTxs?: TokenTx[]
+//   contractInfo?: object
+// }
 
-type DbTransaction<D extends object = object> = Transaction<D> & {
+type DbTransaction<D extends object = object> = Transaction & {
   wrappedEVMAccount: string
   contractInfo: string
   result: string
@@ -137,7 +141,7 @@ export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx<C>[]): Pr
 interface RawTransaction {
   accountId: string
   cycleNumber: number
-  data: WrappedEVMAccount,
+  data: WrappedEVMAccount
   originTxData: {
     duration: number
     internalTXType: TransactionType
@@ -160,12 +164,14 @@ interface RawTransaction {
 }
 
 function isReceiptData(obj?: WrappedEVMAccount | null): obj is WrappedEVMAccount & WrappedDataReceipt {
-    const accountType = obj?.accountType
-    return accountType === AccountType.Receipt ||
-      accountType === AccountType.NodeRewardReceipt ||
-      accountType === AccountType.StakeReceipt ||
-      accountType === AccountType.UnstakeReceipt ||
-      accountType === AccountType.InternalTxReceipt
+  const accountType = obj?.accountType
+  return (
+    accountType === AccountType.Receipt ||
+    accountType === AccountType.NodeRewardReceipt ||
+    accountType === AccountType.StakeReceipt ||
+    accountType === AccountType.UnstakeReceipt ||
+    accountType === AccountType.InternalTxReceipt
+  )
 }
 
 export async function processTransactionData(transactions: RawTransaction[]): Promise<void> {
@@ -180,11 +186,11 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
   let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   for (const transaction of transactions) {
     if (isReceiptData(transaction.data)) {
-      const txObj = {
+      const txObj: Transaction = {
         txId: transaction.data?.txId,
-        result: ['passed'], // temp placeholder
+        result: { txIdShort: '', txResult: '' }, // temp placeholder
         cycle: transaction.cycleNumber,
-        // partition: Number(partition), // We don't know the partition now
+        partition: 0, // Setting to 0
         timestamp: transaction.timestamp,
         wrappedEVMAccount: transaction.data,
         accountId: transaction.accountId,
@@ -337,7 +343,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
       let transactionExist = await queryTransactionByTxId(txId)
       if (config.verbose) console.log('transactionExist', transactionExist)
       if (transactionExist) continue
-      let transactionData = partitionTx.filter((acc: Transaction<object, { accountType: AccountType }>) => {
+      let transactionData = partitionTx.filter((acc: WrappedAccount) => {
         return (
           acc?.data?.accountType === AccountType.Receipt ||
           acc?.data?.accountType === AccountType.NodeRewardReceipt ||
@@ -354,7 +360,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         // Other types of tx like init_network, node_reward
         continue // skip other types of tx for now // will open it back after changes are made in client to display it
       }
-      const transactionInfo = {
+      const transactionInfo: Transaction = {
         txId,
         // eslint-disable-next-line security/detect-object-injection
         result: receiptsInPartition[txId],
@@ -371,11 +377,17 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         originTxData: {},
         data: {},
       }
-      const { contractAddress, data, from, to } = transactionInfo.wrappedEVMAccount.readableReceipt
+      let contractAddress, data, from, to
+      if ('readableReceipt' in transactionInfo.wrappedEVMAccount) {
+        contractAddress = transactionInfo.wrappedEVMAccount.readableReceipt.contractAddress
+        data = transactionInfo.wrappedEVMAccount.readableReceipt.data
+        from = transactionInfo.wrappedEVMAccount.readableReceipt.from
+        to = transactionInfo.wrappedEVMAccount.readableReceipt.to
+      }
 
       // Contract creation
       if (!to) {
-        if (config.verbose) console.log('Token', transactionInfo.wrappedEVMAccount?.readableReceipt)
+        if (config.verbose) console.log('Token', transactionInfo.wrappedEVMAccount['readableReceipt'])
         // var provider = 'http://localhost:8080';
         // var web3Provider = new Web3.providers.HttpProvider(provider);
         // var web3Provider = new Web3(web3Provider);
@@ -403,7 +415,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         // Contract Account
         // eslint-disable-next-line security/detect-object-injection
         transactionData = archivedCycle?.receipt?.partitionTxs?.[partition][txId].filter(
-          (acc: Transaction<object, { accountType: AccountType; ethAddress: string }>) => {
+          (acc: WrappedAccount) => {
             return acc?.data?.accountType === AccountType.Account && acc?.data?.ethAddress === contractAddress
           }
         )
@@ -435,12 +447,12 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
       // Token Tx
       if (config.verbose) console.log('ERC20', contractAddress, data.length, from)
       if (contractAddress === null && data.length > 2) {
-        if (config.verbose) console.log('ERC 20 Token', transactionInfo.wrappedEVMAccount.readableReceipt)
+        if (config.verbose) console.log('ERC 20 Token', transactionInfo.wrappedEVMAccount['readableReceipt'])
         const methodCode = data.substring(0, 10) as keyof typeof ERC20_METHOD_DIC
         if (config.verbose) console.log(methodCode)
         // eslint-disable-next-line security/detect-object-injection
         if (ERC20_METHOD_DIC[methodCode] === 'transfer' || ERC20_METHOD_DIC[methodCode] === 'transferFrom') {
-          const tokenTx = {} as TokenTx
+          const tokenTx = {} as any
           // eslint-disable-next-line security/detect-object-injection
           if (ERC20_METHOD_DIC[methodCode] === 'transfer') {
             // Token transfer transaction
@@ -454,7 +466,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
             tokenTx.tokenValue = `0x${data.substring(114)}`
           }
           if (config.verbose) console.log('tokenTx', tokenTx)
-          transactionInfo.wrappedEVMAccount.tokenTx = tokenTx
+          transactionInfo['tokenTxs'] = tokenTx
           if (tokenTx.tokenTo) {
             const accountExist = await Account.queryAccountByAddress(tokenTx.tokenTo)
             if (config.verbose) console.log('tokenTx.tokenTo', tokenTx.tokenTo, accountExist)
@@ -790,7 +802,7 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
       const sql = `SELECT * FROM tokenTxs WHERE txId=?`
       const tokenTxs: DbTokenTx[] = await db.all(sql, [txId])
       if (tokenTxs.length > 0) {
-        (transaction as Transaction).tokenTxs = tokenTxs
+        ;(transaction as Transaction).tokenTxs = tokenTxs
       }
     }
     if (config.verbose) console.log('transaction txId', transaction)
@@ -801,10 +813,7 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
   return null
 }
 
-export async function queryTransactionByHash(
-  txHash: string,
-  detail = false
-): Promise<Transaction<object> | null> {
+export async function queryTransactionByHash(txHash: string, detail = false): Promise<Transaction | null> {
   try {
     const sql = `SELECT * FROM transactions WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
     const transaction: DbTransaction = await db.get(sql, [txHash])

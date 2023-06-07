@@ -1,21 +1,4 @@
-import { TransactionSearchType, TransactionType } from '../../types'
-
-export interface TokenTxs {
-  contractAddress: string
-  contractInfo: ContractInfo
-  cycle: number
-  timestamp: number
-  tokenEvent: string
-  tokenFrom: string
-  tokenOperator: unknown
-  tokenTo: string
-  tokenType: number
-  tokenValue: string
-  transactionFee: string
-  txHash: string
-  txId: string
-  _id: number
-}
+import { TransactionSearchType, Transaction } from '../../types'
 
 export interface ReadableReceipt {
   blockHash: string
@@ -46,29 +29,6 @@ export interface WrappedEVMAccount {
   amountSpent?: string
 }
 
-export interface Result {
-  txIdShort: string
-  txResult: string
-}
-
-export interface Transaction {
-  txId: string
-  result: Result
-  cycle: number
-  partition: number
-  timestamp: number
-  wrappedEVMAccount: WrappedEVMAccount
-  accountId: string
-  transactionType: TransactionType
-  txHash: string
-  txFrom: string
-  txTo: string
-  nominee?: string
-  originTxData: unknown
-  tokenTxs: TokenTxs[]
-  txStatus: TransactionStatus
-}
-
 export interface TransactionQuery {
   page?: number
   count?: number
@@ -91,13 +51,6 @@ export const TransactionSearchList: {
     },
   ]
 
-export interface TransactionStatus {
-  txHash: string
-  accepted: boolean
-  injected: boolean
-  reason: string
-}
-
 export interface StakeInfo {
   nominee: string
   stake?: string,
@@ -105,13 +58,6 @@ export interface StakeInfo {
   penalty?: string,
   reward?: string,
   totalUnstakeAmount?: string
-}
-
-export interface ContractInfo {
-  totalSupply: number
-  decimals: string
-  name: string
-  symbol: string
 }
 
 export interface Log {

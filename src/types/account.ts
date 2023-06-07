@@ -1,8 +1,34 @@
-import { Account } from 'ethereumjs-util'
+import { Account as EVMAccount } from 'ethereumjs-util'
 import { TxReceipt } from '@ethereumjs/vm/dist/types'
 import { ReadableReceipt } from './receipt'
 import { ERC20ContractDetail, NetworkParameters } from '.'
-import { TokenTx } from './transaction'
+import { TokenTx, TransactionType } from './transaction'
+
+export interface Account {
+  accountId: string
+  cycle: number
+  timestamp: number
+  ethAddress: string
+  account: WrappedEVMAccount
+  hash: string
+  accountType: AccountType
+  contractType?: ContractType
+  contractInfo?: unknown
+}
+
+export interface Token {
+  ethAddress: string
+  contractAddress: string
+  tokenValue: string
+  tokenType: TransactionType
+}
+
+export enum ContractType {
+  GENERIC,
+  ERC_20,
+  ERC_721,
+  ERC_1155,
+}
 
 export enum AccountType {
   Account, //  EOA or CA
@@ -70,7 +96,7 @@ export type WrappedEVMAccount = BaseWrappedEVMAccount &
 /** Variant data: account */
 export interface WrappedDataAccount {
   accountType: AccountType.Account
-  account: Account
+  account: EVMAccount
 }
 
 /** Variant data: contract storage */
@@ -135,14 +161,6 @@ export interface NetworkAccount extends BaseAccount {
   id: string
   current: NetworkParameters
   next: NetworkParameters | object
-  hash: string
-  timestamp: number
-}
-
-export interface NodeAccount extends BaseAccount {
-  id: string
-  balance: number
-  nodeRewardTime: number
   hash: string
   timestamp: number
 }

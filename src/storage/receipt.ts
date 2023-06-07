@@ -1,24 +1,11 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccount } from '../types'
+import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccount, Receipt } from '../types'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
 import { bufferToHex } from 'ethereumjs-util'
-
-export interface Receipt {
-  receiptId: string
-  tx: Transaction.Transaction
-  cycle: number
-  timestamp: number
-  result: object
-  accounts: Account.Account[]
-  sign: {
-    owner: string
-    sig: string
-  }
-}
 
 type DbReceipt = Receipt & {
   tx: string
