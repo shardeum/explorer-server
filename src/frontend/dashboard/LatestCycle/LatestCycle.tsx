@@ -2,7 +2,7 @@ import moment from 'moment'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { AnchorLink, Button } from '../../components'
-import { Cycle } from '../../types'
+import { Cycle } from '../../../types'
 
 import styles from './LatestCycle.module.scss'
 

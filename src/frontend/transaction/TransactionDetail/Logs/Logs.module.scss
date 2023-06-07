@@ -1,17 +1,43 @@
 @import '../../../../styles/index.scss';
 
+
 .Logs {
   padding-top: spacing(16);
 
   .logItem {
     display: grid;
     grid-template-columns: 10% 90%;
-    // border-bottom: border(indigo);
+    border-bottom: border(gray);
+    padding-bottom: spacing(8);
+
     margin-bottom: spacing(16);
 
     @include tablet {
       grid-template-columns: 100%;
     }
+  }
+
+  .box {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color(bg);
+    @include fontStyle(small, semi-bold);
+  }
+
+  .smallbox {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    @include fontStyle(small);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: spacing(8);
+    background-color: color(bg);
   }
 
   .count {

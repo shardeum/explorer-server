@@ -1,6 +1,6 @@
-import { Transaction, TokenTxs, TransactionType } from '../types'
+import { Transaction, TokenTx, TransactionType } from '../../types'
 
-export const showTxMethod = (tx: Transaction | TokenTxs): string => {
+export const showTxMethod = (tx: Transaction | TokenTx): string => {
   const data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt.data : null
 
   const methodCode = data && data.length > 10 ? data.substring(0, 10) : null

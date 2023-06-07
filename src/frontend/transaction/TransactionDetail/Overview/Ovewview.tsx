@@ -6,7 +6,7 @@ import Web3Utils from 'web3-utils'
 import { Chip, Icon } from '../../../components'
 import { Item } from './Item'
 
-import { Transaction, TransactionType } from '../../../types'
+import { Transaction, TransactionType } from '../../../../types'
 import { showTxMethod } from '../../../utils/showMethod'
 
 import styles from './Ovewview.module.scss'

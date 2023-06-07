@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import { Cycle } from '../types'
+import { Cycle } from '../../types'
 
 import { fetcher } from './fetcher'
 

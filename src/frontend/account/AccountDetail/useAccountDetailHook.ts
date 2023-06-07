@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../../api'
-import { Account, AccountType, ContractType, Token, Transaction, TransactionSearchType } from '../../types'
+import { Account, AccountType, ContractType, Token, Transaction, TransactionSearchType } from '../../../types'
 import { BigNumberish, utils } from 'ethers'
 
 interface detailProps {

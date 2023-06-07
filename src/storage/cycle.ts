@@ -1,20 +1,14 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
+import { Cycle } from '../types'
 import { config } from '../config/index'
-import { P2P, StateManager } from '@shardus/types'
 import { checkIfAnyReceiptsMissing } from '../class/DataSync'
 
 export let Collection: unknown
 
-export interface Cycle {
-  cycleMarker: StateManager.StateMetaDataTypes.CycleMarker
-  counter: number
-  cycleRecord: P2P.CycleCreatorTypes.CycleRecord
-}
+export { type Cycle } from '../types'
 
-export interface DbCycle {
-  cycleMarker: string
-  counter: number
+type DbCycle = Cycle & {
   cycleRecord: string
 }
 

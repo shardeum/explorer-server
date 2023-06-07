@@ -3,8 +3,7 @@ import { PATHS } from './paths'
 import useSWR from 'swr'
 
 import { fetcher } from './fetcher'
-import { Transaction } from '../types'
-import { Receipt } from '../../storage/receipt'
+import { Transaction, Receipt } from '../../types'
 
 type ReceiptDetailResult = {
   data: {

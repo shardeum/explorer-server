@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import { Transaction } from '../types'
+import { Transaction } from '../../types'
 
 import { fetcher } from './fetcher'
 

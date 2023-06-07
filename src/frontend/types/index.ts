@@ -1,6 +1,6 @@
 export type { TransactionQuery } from './transaction'
-export type { CycleQuery, Cycle } from './cycle'
-export type { AccountQuery, Token } from './account'
+export type { CycleQuery } from './cycle'
+export type { AccountQuery } from './account'
 export type { ContractQuery } from './contract'
 
 export { TransactionSearchList } from './transaction'

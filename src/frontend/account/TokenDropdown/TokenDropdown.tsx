@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 import styles from './TokenDropdown.module.scss'
 import { Button, Icon, Menu, MenuItem, SortButton } from '../../components'
 import ReactTooltip from 'react-tooltip'
-import { Token } from '../../types'
+import { Token } from '../../../types'
 
 interface TokenDropdownProps {
   tokens: Token[]

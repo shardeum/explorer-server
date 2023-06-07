@@ -5,6 +5,7 @@ import { Tab } from '../../../components/Tab'
 import { breadcrumbsList } from '../../../types'
 import { JsonView } from '../JsonView'
 import { Ovewview } from '../Overview'
+import { Logs } from '../Logs'
 import { Receipt } from '../Receipt'
 import { AccountInfo } from '../AccountInfo'
 
@@ -24,6 +25,11 @@ export const TransactionDetail: React.FC = () => {
         key: 'overview',
         value: 'Overview',
         content: <Ovewview transaction={transactionData} />,
+      },
+      {
+        key: 'log',
+        value: 'Logs',
+        content: <Logs transaction={transactionData} />,
       },
       {
         key: 'jsonview',

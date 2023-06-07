@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 import { Button, Dropdown } from '../../../components'
-import { Transaction } from '../../../types'
+import { Transaction } from '../../../../types'
 import { Log } from '../../../types/transaction'
 
 import styles from './Logs.module.scss'
@@ -18,13 +18,11 @@ export const Logs: React.FC<LogsProps> = ({ transaction }) => {
         transaction?.wrappedEVMAccount?.readableReceipt?.logs &&
         transaction?.wrappedEVMAccount?.readableReceipt?.logs.map((log: Log, index: number) => (
           <div className={styles.logItem} key={index}>
-            <Button apperance="outlined" className={styles.count}>
-              {log.logIndex}
-            </Button>
+            <div className={styles.box}>{log.logIndex}</div>
             <div>
               <div className={styles.item}>
                 <div className={styles.title}>Address</div>
-                <Link href="/account/123" className={styles.link}>
+                <Link href={`/account/${log.address}`} className={styles.link}>
                   {log.address}
                 </Link>
               </div>
@@ -34,26 +32,26 @@ export const Logs: React.FC<LogsProps> = ({ transaction }) => {
                   {log.topics &&
                     log.topics.map((topic: string, index: number) => (
                       <div className={styles.row} key={index}>
-                        <Button apperance="outlined" className={styles.btn}>
+                        <div className={styles.smallbox}>
                           {index}
-                        </Button>
+                        </div>
                         <Dropdown
                           items={['Dec', 'Hex']}
                           apperance="outlined"
                           buttonClassName={styles.dropdown}
                         />
-                        <Link href="/contract/123" className={styles.link}>
+                        <div className={styles.link}>
                           {topic}
-                        </Link>
+                        </div>
                       </div>
                     ))}
                 </div>
               </div>
               <div className={styles.item}>
                 <div className={styles.title}>Data</div>
-                <Link href="/account/123" className={styles.link}>
+                <div className={styles.link}>
                   {log.data}
-                </Link>
+                </div>
               </div>
             </div>
           </div>

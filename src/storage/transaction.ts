@@ -26,28 +26,7 @@ export const ERC20_METHOD_DIC = {
 
 export let Collection: unknown
 
-// export interface Transaction<O extends object = object, D extends object = object> {
-//   txId: string
-//   result: object
-//   cycle: number
-//   timestamp: number
-//   partition?: number
-//   wrappedEVMAccount: WrappedEVMAccount
-//   accountId: string
-//   transactionType: TransactionType
-//   txHash: string
-//   txFrom: string
-//   txTo: string
-//   nominee?: string
-//   originTxData: O
-
-//   // not in the database schema
-//   data?: D
-//   tokenTxs?: TokenTx[]
-//   contractInfo?: object
-// }
-
-type DbTransaction<D extends object = object> = Transaction & {
+type DbTransaction = Transaction & {
   wrappedEVMAccount: string
   contractInfo: string
   result: string
@@ -650,7 +629,7 @@ export async function queryTransactions(
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
-): Promise<(DbTransaction<object> | DbTokenTx)[]> {
+): Promise<(DbTransaction | DbTokenTx)[]> {
   let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {
@@ -857,7 +836,7 @@ export async function queryTransactionsBetweenCycles(
   address?: string,
   txType?: TransactionSearchType,
   filterAddress?: string
-): Promise<(DbTransaction<object> | DbTokenTx)[]> {
+): Promise<(DbTransaction | DbTokenTx)[]> {
   let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {

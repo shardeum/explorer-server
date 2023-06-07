@@ -13,7 +13,7 @@ export interface Account {
   hash: string
   accountType: AccountType
   contractType?: ContractType
-  contractInfo?: unknown
+  contractInfo?: any
 }
 
 export interface Token {

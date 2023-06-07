@@ -179,7 +179,11 @@ export const insertArchivedCycleData = async (
       } else {
         await ArchivedCycle.insertArchivedCycle(downloadedArchivedCycle)
       }
-      await Cycle.insertOrUpdateCycle(downloadedArchivedCycle)
+      await Cycle.insertOrUpdateCycle({
+        counter: downloadedArchivedCycle.counter,
+        cycleMarker: downloadedArchivedCycle.cycleMarker,
+        cycleRecord: downloadedArchivedCycle.cycleRecord,
+      })
       await Transaction.insertOrUpdateTransaction(downloadedArchivedCycle)
       await Account.insertOrUpdateAccount(downloadedArchivedCycle)
       console.log(`Successfully synced ArchivedCycle for counter ${counter}`)

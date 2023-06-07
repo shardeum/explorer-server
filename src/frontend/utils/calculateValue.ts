@@ -1,6 +1,6 @@
 import Web3Utils from 'web3-utils'
 import { utils } from 'ethers'
-import { TokenTxs, TransactionType } from '../types'
+import { TokenTx, TransactionType } from '../types'
 import BN from 'bn.js'
 
 export const calculateValue = (value: string | BN): string => {
@@ -20,7 +20,7 @@ export const calculateFullValue = (value: string | BN): string => {
 }
 
 export const calculateTokenValue = (
-  tokenTx: TokenTxs,
+  tokenTx: TokenTx,
   txType: TransactionType,
   tokenId = false,
   fullValue = true

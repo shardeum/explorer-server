@@ -1,5 +1,5 @@
 import React from 'react'
-import { Transaction } from '../../../types'
+import { Transaction } from '../../../../types'
 
 import styles from './JsonView.module.scss'
 

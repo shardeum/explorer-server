@@ -8,7 +8,7 @@ export let Collection: unknown
 export interface ArchivedCycle {
   _id: string,
   counter: number
-  cycleRecord: P2P.CycleCreatorTypes.CycleRecord
+  cycleRecord: P2P.CycleCreatorTypes.CycleData
   cycleMarker: StateManager.StateMetaDataTypes.CycleMarker
   data?: StateManager.StateMetaDataTypes.StateData
   receipt?: StateManager.StateMetaDataTypes.Receipt

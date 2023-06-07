@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../../../api'
-import { Transaction } from '../../../types'
+import { Transaction } from '../../../../types'
 
 interface TransactionDetailHookResult<D extends object> {
   transactionData: Transaction

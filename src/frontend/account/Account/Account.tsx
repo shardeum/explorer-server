@@ -6,7 +6,8 @@ import { useAccount } from '../../api'
 import { AnchorLink, ContentLayout, Pagination } from '../../components'
 import { Table } from '../../components/TableComp'
 import { IColumnProps } from '../../components/TableComp/Table'
-import { Account as AccountT, breadcrumbsList } from '../../types'
+import { breadcrumbsList } from '../../types'
+import { Account as AccountT } from '../../../types'
 
 import styles from './Account.module.scss'
 

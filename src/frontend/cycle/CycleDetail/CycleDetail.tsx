@@ -2,6 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 
 import { useCycleDetail } from '../../api'
+import { P2P } from '@shardus/types'
 
 import { ContentLayout, PaginationPrevNext } from '../../components'
 
@@ -120,8 +121,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Joined Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.joinedConsensors?.length > 0
-                  ? data?.cycleRecord?.joinedConsensors?.map((item: { id: string }, index: number) => {
-                      return <div key={index}>{item.id}</div>
+                  ? data?.cycleRecord?.joinedConsensors?.map((item: P2P.JoinTypes.JoinedConsensor) => {
+                      return <div key={item.id}>{item.id}</div>
                     })
                   : '-'}
               </div>
@@ -131,8 +132,8 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Activated Nodes</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.activated?.length > 0
-                  ? data?.cycleRecord?.activated?.map((item: { id: string }) => {
-                      return <div key={item.id}>{item.id}</div>
+                  ? data?.cycleRecord?.activated?.map((item: string) => {
+                      return <div key={item}>{item}</div>
                     })
                   : '-'}
               </div>
@@ -143,7 +144,7 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.value}>
                 {data?.cycleRecord?.refreshedArchivers?.length > 0
                   ? data?.cycleRecord?.refreshedArchivers?.map(
-                      (item: { publicKey: string }, index: number) => {
+                      (item: P2P.ArchiversTypes.JoinedArchiver, index: number) => {
                         return <div key={index}>{item.publicKey}</div>
                       }
                     )
@@ -155,7 +156,7 @@ export const CycleDetail: React.FC = () => {
               <div className={styles.title}>Refreshed Concensors</div>
               <div className={styles.value}>
                 {data?.cycleRecord?.refreshedConsensors?.length > 0
-                  ? data?.cycleRecord?.refreshedConsensors?.map((item: { id: string }) => {
+                  ? data?.cycleRecord?.refreshedConsensors?.map((item: P2P.NodeListTypes.Node) => {
                       return <div key={item.id}>{item.id}</div>
                     })
                   : '-'}

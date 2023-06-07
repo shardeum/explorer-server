@@ -6,7 +6,8 @@ import { useContract } from '../api'
 import { AnchorLink, ContentLayout, Dropdown, Pagination } from '../components'
 import { Table } from '../components/TableComp'
 import { IColumnProps } from '../components/TableComp/Table'
-import { Account, breadcrumbsList, contractTypes } from '../types'
+import { breadcrumbsList, contractTypes } from '../types'
+import { Account } from '../../types'
 
 import styles from './Contract.module.scss'
 
