@@ -10,8 +10,8 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "noImplicitReturns": false,
-    "noEmit": true,
-    "incremental": true,
+    "noEmit": false,
+    "incremental": false,
     "moduleResolution": "node",
     "isolatedModules": true,
     "jsx": "preserve"
