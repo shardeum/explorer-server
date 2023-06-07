@@ -44,22 +44,6 @@ export enum TransactionType {
   InternalTxReceipt = 8,
 }
 
-// export interface TokenTx {
-//   contractAddress: string
-//   contractInfo?: ContractInfo
-//   cycle: number
-//   timestamp: number
-//   tokenEvent: string
-//   tokenFrom: string
-//   tokenOperator: unknown
-//   tokenTo: string
-//   tokenType: number
-//   tokenValue: string
-//   transactionFee: string
-//   txHash: string
-//   txId: string
-// }
-
 export interface ContractInfo {
   totalSupply: number
   decimals: string

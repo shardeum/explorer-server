@@ -13,14 +13,14 @@ import styles from './Contract.module.scss'
 
 const header: IColumnProps<Account>[] = [
   {
-    key: 'accountId',
+    key: 'ethAddress',
     value: 'Contract Address',
     render: (val: Account[keyof Account], item: Account) => (
       <AnchorLink
         href={`/account/${item?.ethAddress}`}
         label={val as string}
         size="small"
-        width={300}
+        width={350}
         ellipsis
       />
     ),
@@ -46,7 +46,7 @@ export const Contract: React.FC = () => {
   return (
     <div className={styles.Contract}>
       <ContentLayout
-        title="Contract Address"
+        title="All Contracts"
         titleRight={<div className={styles.title}>Number of Contracts - {total}</div>}
         breadcrumbItems={breadcrumbs}
         showBackButton

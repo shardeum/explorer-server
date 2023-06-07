@@ -16,7 +16,7 @@ const limit = 10
 
 const tableColumns: IColumnProps<AccountT>[] = [
   {
-    key: 'accountId',
+    key: 'ethAddress',
     value: 'Account Address',
     render: (val: unknown, item: AccountT) => (
       <AnchorLink

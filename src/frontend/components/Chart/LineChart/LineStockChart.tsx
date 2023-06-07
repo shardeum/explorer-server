@@ -18,7 +18,7 @@ interface LineStockChartProps {
 
 interface SeriesData {
   name: string
-  keys: string[]
+  // keys: string[]
   data: number[][]
   type?: string
   threshold?: unknown
@@ -40,10 +40,6 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
   if (data) {
     seriesData.push({
       name: name === 'Validators' ? 'Active Validators' : 'Total Txs',
-      keys:
-        name === 'Validators'
-          ? ['x', 'y', 'activated', 'syncing', 'joined', 'removed', 'apoped', 'cycleNumber']
-          : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
       data: data,
       // type: 'line',
       threshold: null,
@@ -57,10 +53,6 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       })
       seriesData.push({
         name: 'Active & Syncing Validators',
-        keys:
-          name === 'Validators'
-            ? ['x', 'y', 'activated', 'syncing', 'joined', 'removed', 'apoped', 'cycleNumber']
-            : ['x', 'y', 'totalStakeTxs', 'totalUnstakeTxs', 'cycleNumber'],
         data: activeAndSyncing,
         // type: 'line',
         threshold: null,
@@ -110,19 +102,6 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       zoomEnabled: true,
     },
     tooltip: {
-      pointFormat:
-        name === 'Validators'
-          ? `<span>Active Validators: <b>{point.y}</b></span><br/>
-          <span>Activated Validators: <b>{point.activated}</b></span><br/>
-          <span>Syncing Validators: <b>{point.syncing}</b></span><br/>
-          <span>Joined Validators: <b>{point.joined}</b></span><br/>
-          <span>Removed Validators: <b>{point.removed}</b></span><br/>
-          <span>Apoptosized Validators: <b>{point.apoped}</b></span><br/>
-          <span>Cycle Number <b>{point.cycleNumber}</b></span>`
-          : `<span>Total Txs: <b>{point.y}</b></span><br />
-      <span>Total StakeTxs: <b>{point.totalStakeTxs}</b></span><br />
-      <span>Total UnstakeTxs: <b>{point.totalUnstakeTxs}</b></span><br />
-      <span>Cycle Number: <b>{point.cycleNumber}</b></span><br />`,
       formatter:
         name === 'Validators'
           ? function () {
@@ -152,6 +131,7 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
                   new Date(timestamp).getTime()
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />
+        <span>Total Internal Txs: <b>${item[0][2]}</b></span><br />
         <span>Total Stake Txs: <b>${item[0][3]}</b></span><br />
         <span>Total Unstake Txs: <b>${item[0][4]}</b></span><br />
         <span>Cycle Number: <b>${item[0][5]}</b></span>`

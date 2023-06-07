@@ -9,7 +9,7 @@ interface detailProps {
 }
 
 export type AccountDetails = {
-  account: Account;
+  account: Account | undefined;
   accountType: AccountType;
   transactions: Transaction[];
   totalPages: number;

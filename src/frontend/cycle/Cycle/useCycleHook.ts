@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../../api'
-import { Cycle } from '../../types'
+import { Cycle } from '../../../types'
 
 type CycleHookResult = {
   cycles: Cycle[]

@@ -69,6 +69,11 @@ export const CycleDetail: React.FC = () => {
             </div>
 
             <div className={styles.item}>
+              <div className={styles.title}>Desired Number</div>
+              <div className={styles.value}>{data?.cycleRecord?.desired}</div>
+            </div>
+
+            <div className={styles.item}>
               <div className={styles.title}>Number of Active Nodes</div>
               <div className={styles.value}>{data?.cycleRecord?.active}</div>
             </div>

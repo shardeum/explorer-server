@@ -11,10 +11,40 @@ import { useCycleHook } from './useCycleHook'
 const header = [
   {
     key: 'cycleRecord.counter',
-    value: 'Count',
+    value: 'Cycle Number',
     render: (val: unknown, item: CycleT) => (
       <AnchorLink href={`/cycle/${item?.counter}`} label={val as unknown as string} size="small" />
     ),
+  },
+  {
+    key: 'cycleRecord.active',
+    value: 'Active Validators',
+    render: (val: unknown) => (val ? val : '0'),
+  },
+  {
+    key: 'cycleRecord.activated.length',
+    value: 'Activated Validators',
+    render: (val: unknown) => (val ? val : '0'),
+  },
+  {
+    key: 'cycleRecord.joined.length',
+    value: 'Joined Validators',
+    render: (val: unknown) => (val ? val : '0'),
+  },
+  {
+    key: 'cycleRecord.syncing',
+    value: 'Syncing Validators',
+    render: (val: unknown) => (val ? val : '0'),
+  },
+  {
+    key: 'cycleRecord.removed.length',
+    value: 'Removed Validators',
+    render: (val: unknown) => (val ? val : '0'),
+  },
+  {
+    key: 'cycleRecord.apoptosized.length',
+    value: 'Apoptosized Validators',
+    render: (val: unknown) => (val ? val : '0'),
   },
   {
     key: 'cycleRecord.start',

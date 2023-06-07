@@ -161,6 +161,13 @@ export const AccountDetail: React.FC = () => {
                           >
                             Token Tracker
                           </Button>
+                          <Button
+                            apperance="outlined"
+                            className={styles.btn}
+                            onClick={() => router.push(`/log?address=${id}`)}
+                          >
+                            Filter By Logs
+                          </Button>
                         </div>
                       ) : null
                     }
