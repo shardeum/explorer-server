@@ -16,7 +16,7 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "collector.ts",
+    "collector.ts"
   ],
   "rules": {
     "no-empty": [

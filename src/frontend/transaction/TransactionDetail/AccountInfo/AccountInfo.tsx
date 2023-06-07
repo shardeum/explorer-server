@@ -1,5 +1,5 @@
 import React from 'react'
-import { AccountType } from '../../../../@type/index'
+import { AccountType } from '../../../../types'
 import { calculateValue } from '../../../utils/calculateValue'
 import Web3Utils from 'web3-utils'
 import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'

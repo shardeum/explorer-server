@@ -1,4 +1,4 @@
-import { TransactionSearchType, TransactionType } from '../../@type'
+import { TransactionSearchType, TransactionType } from '../../types'
 
 export interface TokenTxs {
   contractAddress: string

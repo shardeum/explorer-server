@@ -1,7 +1,7 @@
 import { Account } from 'ethereumjs-util'
 import { TxReceipt } from '@ethereumjs/vm/dist/types'
 import { ReadableReceipt } from './receipt'
-import { ERC20ContractDetail } from '.'
+import { ERC20ContractDetail, NetworkParameters } from '.'
 import { TokenTx } from './transaction'
 
 export enum AccountType {
@@ -134,7 +134,7 @@ export interface WrappedAccount {
 export interface NetworkAccount extends BaseAccount {
   id: string
   current: NetworkParameters
-  next: NetworkParameters | {}
+  next: NetworkParameters | object
   hash: string
   timestamp: number
 }

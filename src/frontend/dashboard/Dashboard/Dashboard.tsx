@@ -8,11 +8,10 @@ import { Spacer } from '../../components'
 import { useCycle, useTransaction, useAccount, useStats } from '../../api'
 import styles from './Dashboard.module.scss'
 import { ChartDetail } from '../ChartDetail'
-import { AccountSearchType } from '../../types'
+import { AccountSearchType, TransactionSearchType } from '../../types'
 
 import { LatestTransactions } from '../LatestTransaction'
 import { LatestCycle } from '../LatestCycle'
-import { TransactionSearchType } from '../../../@type'
 
 export const Dashboard: React.FC = () => {
   const { data: cycles } = useCycle({ count: 10 })
