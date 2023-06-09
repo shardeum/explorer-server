@@ -20,16 +20,15 @@ export const Header: React.FC<Record<string, never>> = () => {
   const navLinks = [
     { key: '/', value: 'Home' },
     {
-      key: 'https://explorer-liberty10.shardeum.org',
-      value: 'Testnets',
+      key: 'betanet',
+      value: 'About Betanet',
       render: () => {
         return (
           <TopBarDropdown
-            label="Testnets"
+            label=""
             options={[
-              { key: 'https://explorer-liberty10.shardeum.org', value: 'AlphaNet Liberty 1.6' },
-              { key: 'https://explorer-liberty20.shardeum.org', value: 'AlphaNet Liberty 2.1' },
-              { key: 'https://explorer-sphinx.shardeum.org', value: 'BetaNet Sphinx' },
+              { key: 'https://shardeum.org/betanet', value: 'Shardeum Betanet' },
+              { key: 'https://docs.shardeum.org/node/run/validator', value: 'Run a validator node' },
             ]}
           />
         )

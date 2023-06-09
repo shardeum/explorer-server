@@ -27,7 +27,7 @@ const header = [
     render: (val: unknown) => (val ? val : '0'),
   },
   {
-    key: 'cycleRecord.joined.length',
+    key: 'cycleRecord.joinedConsensors.length',
     value: 'Joined Validators',
     render: (val: unknown) => (val ? val : '0'),
   },
