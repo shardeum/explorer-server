@@ -18,6 +18,7 @@ export const Dashboard: React.FC = () => {
   const { transactions, totalRewardTxs, totalStakeTxs, totalUnstakeTxs, totalTransactions } = useTransaction({
     count: 10,
     txType: TransactionSearchType.StakeReceipt,
+    totalStakeData: true
   })
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA })

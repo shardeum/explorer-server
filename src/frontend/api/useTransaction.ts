@@ -1,7 +1,6 @@
 import useSWR from 'swr'
 import { TransactionQuery } from '../types'
 import { Transaction } from '../../types'
-
 import { fetcher } from './fetcher'
 
 import { PATHS } from './paths'
@@ -18,7 +17,7 @@ type TransactionResult = {
 }
 
 export const useTransaction = (query: TransactionQuery): TransactionResult => {
-  const { page, count, txType } = query
+  const { page, count, txType, totalStakeData = false } = query
 
   const createUrl = (): string => {
     let url = `${PATHS.TRANSACTION}?page=${page}`
@@ -34,13 +33,19 @@ export const useTransaction = (query: TransactionQuery): TransactionResult => {
 
   const transactions: Transaction[] = data?.transactions || []
 
+  const response = useSWR<PagedTransaction>(totalStakeData ? `${PATHS.TRANSACTION}?totalData=true` : null, fetcher)
+  // let response
+  // if (totalStakeData === true) {
+  //   response = useSWR(`${PATHS.TRANSACTION}?totalData=true`)
+  // }
+
   return {
     transactions,
     totalPages: data?.totalPages || 0,
     totalTransactions: data?.totalTransactions || 0,
-    totalRewardTxs: data?.totalRewardTxs || 0,
-    totalStakeTxs: data?.totalStakeTxs || 0,
-    totalUnstakeTxs: data?.totalUnstakeTxs || 0,
+    totalRewardTxs: response?.data?.totalRewardTxs || 0,
+    totalStakeTxs: response?.data?.totalStakeTxs || 0,
+    totalUnstakeTxs: response?.data?.totalUnstakeTxs || 0,
     loading: !data,
   }
 }

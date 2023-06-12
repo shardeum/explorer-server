@@ -88,6 +88,7 @@ interface RequestQuery {
   topic2: string
   topic3: string
   responseType: string
+  totalStakeData: string
 }
 
 console.log(ARCHIVER_URL)
@@ -442,6 +443,7 @@ const start = async (): Promise<void> => {
       endCycle: 's?',
       txId: 's?',
       type: 's?', // This is sent with txHash. To query from db again and update the cache!
+      totalStakeData: 's?'
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -452,6 +454,8 @@ const start = async (): Promise<void> => {
     const itemsPerPage = 10
     let totalPages = 0
     let totalTransactions = 0
+    let totalStakeTxs = 0
+    let totalUnstakeTxs = 0
     let transactions: (TransactionInterface | TokenTx<string>)[]
     let txType: TransactionSearchType
     let filterAddressTokenBalance = 0
@@ -662,6 +666,18 @@ const start = async (): Promise<void> => {
     } else if (query.txId) {
       const transaction = await Transaction.queryTransactionByTxId(query.txId)
       transactions = [transaction]
+    } else if (query.totalStakeData === 'true') {
+      txType = TransactionSearchType.StakeReceipt
+      totalStakeTxs = await Transaction.queryTransactionCount(null, txType)
+      txType = TransactionSearchType.UnstakeReceipt
+      totalUnstakeTxs = await Transaction.queryTransactionCount(null, txType)
+      const res: any = {
+        success: true,
+        totalStakeTxs,
+        totalUnstakeTxs
+      }
+      reply.send(res)
+      return
     } else {
       reply.send({
         success: false,
@@ -679,22 +695,6 @@ const start = async (): Promise<void> => {
     }
     if (query.count) {
       totalTransactions = await Transaction.queryTransactionCount(null, TransactionSearchType.All)
-      if (query.txType) {
-        if (
-          txType === TransactionSearchType.StakeReceipt ||
-          txType === TransactionSearchType.UnstakeReceipt
-        ) {
-          txType = TransactionSearchType.StakeReceipt
-          const totalStakeTxs = await Transaction.queryTransactionCount(null, txType)
-          res.totalStakeTxs = totalStakeTxs
-          txType = TransactionSearchType.UnstakeReceipt
-          const totalUnstakeTxs = await Transaction.queryTransactionCount(null, txType)
-          res.totalUnstakeTxs = totalUnstakeTxs
-        } else {
-          const totalRewardTxs = await Transaction.queryTransactionCount(null, txType)
-          res.totalRewardTxs = totalRewardTxs
-        }
-      }
       res.totalTransactions = totalTransactions
     }
     if (query.filterAddress) {
@@ -1154,7 +1154,7 @@ const start = async (): Promise<void> => {
         reply.send({ success: false, error: 'Invalid count' })
         return
       }
-      if (count > 10000) count = 10000 // set to show max 10000 cycles
+      if (count > 100000) count = 100000 // set to show max 100000 cycles for TEMP
 
       // Cache enabled only for query string => ?count=1000&responseType=array
       if (query.responseType === 'array' && count === 1000) {
@@ -1234,7 +1234,7 @@ const start = async (): Promise<void> => {
         reply.send({ success: false, error: 'Invalid count' })
         return
       }
-      if (count > 10000) count = 10000 // set to show max 10000 cycles
+      if (count > 100000) count = 100000 // set to show max 100000 cycles for TEMP
 
       // Cache enabled only for query string => ?count=1000&responseType=array
       if (query.responseType === 'array' && count === 1000) {

@@ -33,6 +33,7 @@ export interface TransactionQuery {
   page?: number
   count?: number
   txType?: TransactionSearchType
+  totalStakeData?: boolean
 }
 
 export const TransactionSearchList: {
