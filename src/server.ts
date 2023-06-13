@@ -688,7 +688,7 @@ const start = async (): Promise<void> => {
       totalStakeTxs = await Transaction.queryTransactionCount(null, txType)
       txType = TransactionSearchType.UnstakeReceipt
       totalUnstakeTxs = await Transaction.queryTransactionCount(null, txType)
-      const res: any = {
+      const res: TransactionResponse = {
         success: true,
         totalStakeTxs,
         totalUnstakeTxs,
