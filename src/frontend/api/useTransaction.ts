@@ -33,11 +33,7 @@ export const useTransaction = (query: TransactionQuery): TransactionResult => {
 
   const transactions: Transaction[] = data?.transactions || []
 
-  const response = useSWR<PagedTransaction>(totalStakeData ? `${PATHS.TRANSACTION}?totalData=true` : null, fetcher)
-  // let response
-  // if (totalStakeData === true) {
-  //   response = useSWR(`${PATHS.TRANSACTION}?totalData=true`)
-  // }
+  const response = useSWR<PagedTransaction>(totalStakeData ? `${PATHS.TRANSACTION}?totalStakeData=true` : null, fetcher)
 
   return {
     transactions,
