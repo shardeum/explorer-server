@@ -4,7 +4,7 @@ import { PATHS } from './paths'
 
 const api = axios.create({
   baseURL: PATHS.BASE_URL,
-  timeout: 5000,
+  timeout: 10000,
 })
 
 api.interceptors.request.use(
