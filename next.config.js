@@ -44,11 +44,11 @@ const nextConfig = {
             },
             {
               key: 'Content-Security-Policy',
-              value: "style-src self",
+              value: "style-src self unsafe-inline", // unsafe-inline is for NextJS style injection
             },
             {
               key: 'Content-Security-Policy',
-              value: "font-src self",
+              value: "font-src self fonts.gstatic.com",
             },
           ],
         },
