@@ -22,7 +22,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
   const renderErc20Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
-    // TODO: have to fix TransactionType enum
     if (
       items &&
       items.length > 0 &&
@@ -45,7 +44,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                     {item.tokenTo}
                   </Link>
                   <span>For</span>
-                  {/* TODO: calculate amount and token*/}
                   <div>{calculateTokenValue(item, item.tokenType, null, true)}&nbsp;</div>
                   <Link href={`/account/${item.contractAddress}`} className={styles.anchor}>
                     {item.tokenType === TransactionType.EVM_Internal
@@ -64,7 +62,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
   const renderErc721Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
-    // TODO: have to fix TransactionType enum
     if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_721) {
       return (
         <div className={styles.item}>
@@ -76,6 +73,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
               tokenId={calculateTokenValue(items[0], items[0].tokenType)}
               token={items[0]?.contractInfo?.name || items[0]?.contractAddress}
               type="ERC-721"
+              contractAddress={items[0]?.contractAddress}
             />
           </div>
         </div>
@@ -86,7 +84,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
   const renderErc1155Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
-    // TODO: have to fix TransactionType enum
     if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_1155) {
       return (
         <div className={styles.item}>
@@ -99,6 +96,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 tokenId={calculateTokenValue(items[0], items[0].tokenType)}
                 token={items[0]?.contractAddress}
                 type="ERC-1155"
+                contractAddress={items[0]?.contractAddress}
               />
             </div>
           </div>
@@ -219,9 +217,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div className={styles.item}>
                   <div className={styles.title}>Stake Amount:</div>
                   <div className={styles.value}>
-                    {calculateFullValue(
-                      transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake
-                    )}{' '}
+                    {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake)}{' '}
                     SHM
                   </div>
                 </div>
@@ -237,9 +233,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   <div className={styles.item}>
                     <div className={styles.title}>Stake Amount:</div>
                     <div className={styles.value}>
-                      {calculateFullValue(
-                        transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake
-                      )}{' '}
+                      {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake)}{' '}
                       SHM
                     </div>
                   </div>
@@ -257,7 +251,6 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             </>
           )}
 
-          {/* TODO: calculate value */}
           <div className={styles.item}>
             <div className={styles.title}>Value:</div>
             <div className={styles.value}>
@@ -265,13 +258,26 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             </div>
           </div>
 
-          {/* TODO: calculate fee */}
           <div className={styles.item}>
             <div className={styles.title}>Transaction Fee:</div>
             <div className={styles.value}>
               {calculateFullValue(transaction?.wrappedEVMAccount?.amountSpent || '0')}
             </div>
           </div>
+
+          <div className={styles.item}>
+            <div className={styles.title}>Gas Used:</div>
+            <div className={styles.value}>
+              {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.gasUsed || '0')}
+            </div>
+          </div>
+
+          {transaction?.wrappedEVMAccount?.readableReceipt?.reason && (
+            <div className={styles.item}>
+              <div className={styles.title}>Reason:</div>
+              <div className={styles.value}>{transaction?.wrappedEVMAccount?.readableReceipt?.reason}</div>
+            </div>
+          )}
 
           {renderErc20Tokens()}
           {renderErc721Tokens()}

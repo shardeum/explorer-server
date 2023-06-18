@@ -11,8 +11,9 @@ interface ItemProps {
   tokenId?: string
   token?: string
   type?: string
+  contractAddress?: string
 }
-export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type }) => {
+export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type, contractAddress }) => {
   return (
     <div className={styles.Overivew_Item}>
       <div className={styles.listItem}>
@@ -39,12 +40,13 @@ export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type }) =>
                 {type}
                 Token ID&nbsp;
               </div>
-              <Link href={`/token/${tokenId}`} className={styles.listLink}>
+              {/* TODO: Link to token detail page */}
+              <Link href={`/token/${contractAddress}`} className={styles.listLink}>
                 [{tokenId}]
               </Link>
             </div>
             <div className={styles.listItemCol}>
-              <Link href={`/account/${token}`} className={styles.listLink}>
+              <Link href={`/token/${contractAddress}`} className={styles.listLink}>
                 {token}
               </Link>
               <span>&nbsp;{type}</span>
