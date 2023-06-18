@@ -19,26 +19,30 @@ export const TransactionDetail: React.FC = () => {
 
   const { transactionData, receiptData, setShowReceipt, showReceipt } = useTransactionDetailHook(id)
 
-  const tabs = useMemo(
-    () => [
+  const tabs = useMemo(() => {
+    const tabsArray = [
       {
         key: 'overview',
         value: 'Overview',
         content: <Ovewview transaction={transactionData} />,
       },
       {
-        key: 'log',
-        value: 'Logs',
-        content: <Logs transaction={transactionData} />,
-      },
-      {
         key: 'jsonview',
         value: 'Json View',
         content: <JsonView transaction={transactionData} />,
       },
-    ],
-    [transactionData]
-  )
+    ]
+    // hides logs tab if there are no logs
+    if (transactionData?.wrappedEVMAccount?.readableReceipt?.logs?.length) {
+      tabsArray.splice(1, 0, {
+        key: 'log',
+        value: 'Logs',
+        content: <Logs transaction={transactionData} />,
+      })
+    }
+
+    return tabsArray
+  }, [transactionData])
 
   const receiptTabs = useMemo(
     () => [
