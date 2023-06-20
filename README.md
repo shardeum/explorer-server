@@ -62,3 +62,15 @@ To clean the old database.
 ```
 npm run flush
 ```
+
+
+## Usage endpoints
+
+ - Usage endpoints are used to count uses for each endpoint in the explorer server API
+ - Usage endpoints require a security key (default: *ceba96f6eafd2ea59e68a0b0d754a939*) this should be a secret key in the production servers provided by the env var **USAGE_ENDPOINTS_KEY**
+    - the security key can be used in the *x-usage-key* HTTP header in the related requests, wrong or invalid keys will result in a 403 error
+ - The usage endpoints are:
+    - POST *<host:port>/usage/enable*       **Enable the usage and start saving usage data**
+    - POST *<host:port>/usage/disable*      **Disable the usage and reset usage data**
+    - GET *<host:port>/usage/metrics*       **Provide usage data in the JSON format**
+

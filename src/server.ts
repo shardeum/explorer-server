@@ -26,6 +26,7 @@ import * as ValidatorStats from './stats/validatorStats'
 import * as TransactionStats from './stats/transactionStats'
 import * as CoinStats from './stats/coinStats'
 import fastifyRateLimit from '@fastify/rate-limit'
+import * as usage from './middleware/usage'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -128,8 +129,15 @@ const start = async (): Promise<void> => {
       server.next('/*')
     })
 
+  // await server.register(fastifyMiddie)
+  server.addHook('preHandler', usage.usageMiddleware)
+  server.addHook('onError', usage.usageErrorMiddleware)
+  server.post('/usage/enable', usage.usageEnableHandler)
+  server.post('/usage/disable', usage.usageDisableHandler)
+  server.get('/usage/metrics', usage.usageMetricsHandler)
+
   server.get('/port', (req, reply) => {
-    reply.send({ port })
+    reply.send({ port: CONFIG.port.server })
   })
 
   server.get('/api/cycleinfo', async (_request, reply) => {
