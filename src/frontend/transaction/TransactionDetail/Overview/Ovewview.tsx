@@ -196,8 +196,8 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                     className={styles.link}
                   >
                     {transaction?.wrappedEVMAccount?.readableReceipt?.contractAddress}
-                  </Link>{' '}
-                  (Contract created)
+                  </Link>
+                  {transaction?.wrappedEVMAccount?.readableReceipt?.status === 1 && ' (Contract created)'}
                 </div>
               )}
             </div>
