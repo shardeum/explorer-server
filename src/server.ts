@@ -113,7 +113,9 @@ const start = async (): Promise<void> => {
     logger: false,
   })
 
-  await server.register(fastifyCors)
+  await server.register(fastifyCors, {
+    origin: true
+  })
   await server.register(fastifyRateLimit, {
     max: CONFIG.rateLimit,
     timeWindow: '1 minute',
