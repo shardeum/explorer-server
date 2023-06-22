@@ -2,13 +2,12 @@
 import { config as CONFIG } from '../../config'
 
 const port = process.argv[2]
-if (port) {
+if (port && Number.isInteger(Number(port))) {
   CONFIG.port.server = port
 }
 let BASE_URL = `http://${CONFIG.host}:${CONFIG.port.server}`
 
-if (CONFIG.apiUrl != '')
-  BASE_URL = CONFIG.apiUrl
+if (CONFIG.apiUrl != '') BASE_URL = CONFIG.apiUrl
 
 console.log('BASE_URL', BASE_URL)
 
