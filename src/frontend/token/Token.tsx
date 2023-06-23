@@ -60,12 +60,14 @@ export const Token: React.FC = () => {
         <>
           {' '}
           {val
-            ? utils
-                .formatUnits(
-                  val as number,
-                  account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
-                )
-                .toString()
+            ? account?.contractType === ContractType.ERC_721
+              ? Web3Utils.hexToNumberString('0x' + val)
+              : utils
+                  .formatUnits(
+                    val as number,
+                    account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                  )
+                  .toString()
             : ''}
         </>
       ),
