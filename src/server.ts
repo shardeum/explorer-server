@@ -84,6 +84,7 @@ interface RequestQuery {
   marker: string
   type: string //contract accounts list query
   accountType: string
+  accountId: string
   topic0: string
   topic1: string
   topic2: string
@@ -202,6 +203,7 @@ const start = async (): Promise<void> => {
       accountType: 's?',
       startCycle: 's?',
       endCycle: 's?',
+      accountId: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -230,6 +232,13 @@ const start = async (): Promise<void> => {
         accountType = parseInt(query.accountType)
       }
       const account = await Account.queryAccountByAddress(query.address.toLowerCase(), accountType)
+      if (account) accounts = [account]
+    } else if (query.accountId) {
+      if (query.accountId.length !== 64) {
+        reply.send({ success: false, error: 'Invalid account id' })
+        return
+      }
+      const account = await Account.queryAccountByAccountId(query.accountId.toLowerCase())
       if (account) accounts = [account]
     } else if (query.type) {
       const type: number = parseInt(query.type)
@@ -451,7 +460,7 @@ const start = async (): Promise<void> => {
       endCycle: 's?',
       txId: 's?',
       type: 's?', // This is sent with txHash. To query from db again and update the cache!
-      totalStakeData: 's?'
+      totalStakeData: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -682,7 +691,7 @@ const start = async (): Promise<void> => {
       const res: any = {
         success: true,
         totalStakeTxs,
-        totalUnstakeTxs
+        totalUnstakeTxs,
       }
       reply.send(res)
       return
