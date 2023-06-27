@@ -2,7 +2,7 @@ export const config = {
   env: process.env.NODE_ENV || 'development', // development, production
   host: process.env.HOST || '127.0.0.1',
   subscription: {
-    enabled: true,
+    enabled: false,
   },
   port: {
     collector: process.env.COLLECTORPORT || '4444',

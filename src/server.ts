@@ -148,33 +148,35 @@ const start = async (): Promise<void> => {
   server.get('/port', (req, reply) => {
     reply.send({ port: CONFIG.port.server })
   })
-  server.get('/evm_log_subscription', { websocket: true },
-             (connection:SocketStream, req:FastifyRequest) => {
-
-     let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
-     socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
-     connection.socket.id = socket_id;
-     socketClient.set(socket_id, connection);
-
-    connection.socket.on('message', message => {
-      try{
-        const payload = JSON.parse(message);
-        socketHandlers.onMessage(connection, payload);
-        return
-      }catch(e){
-        connection.socket.send(JSON.stringify({error: e.message}));
-        return
-      }
+  if(CONFIG.subscription.enabled === true){
+    server.get('/evm_log_subscription', { websocket: true }, 
+               (connection:SocketStream, req:FastifyRequest) => {
+     
+       let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
+       socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
+       connection.socket.id = socket_id;
+       socketClient.set(socket_id, connection);
+    
+      connection.socket.on('message', message => {
+        try{
+          const payload = JSON.parse(message);
+          socketHandlers.onMessage(connection, payload);
+          return
+        }catch(e){
+          connection.socket.send(JSON.stringify({error: e.message}));
+          return
+        }
+      })
+      connection.socket.on('close', message => {
+        try{
+          removeLogSubscriptionBySocketId(connection.socket.id)
+          socketClient.delete(connection.socket.id);
+        }catch(e){
+          console.error(e);
+        }
+      })
     })
-    connection.socket.on('close', message => {
-      try{
-        removeLogSubscriptionBySocketId(connection.socket.id)
-        socketClient.delete(connection.socket.id);
-      }catch(e){
-        console.error(e);
-      }
-    })
-  })
+  }
 
   server.get('/api/cycleinfo', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
