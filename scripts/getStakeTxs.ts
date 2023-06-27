@@ -1,10 +1,10 @@
 import * as fs from 'fs'
 import axios from 'axios'
 import Web3 from 'web3'
-import { TransactionType } from '../src/frontend/types'
+import { TransactionSearchType } from '../src/frontend/types'
 
 const EXPLORE_URL = 'http://localhost:6001'
-const STAKE_TX_TYPE = TransactionType.StakeReceipt
+const STAKE_TX_TYPE = TransactionSearchType.StakeReceipt
 
 const getStakeTx = async (): Promise<void> => {
     let url = `${EXPLORE_URL}/api/transaction?txType=${STAKE_TX_TYPE}`

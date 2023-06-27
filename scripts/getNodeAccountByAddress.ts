@@ -1,10 +1,10 @@
 import * as fs from 'fs'
 import axios from 'axios'
 import Web3 from 'web3'
-import { TransactionType } from '../src/@type'
+import { TransactionSearchType } from '../src/frontend/types'
 
 const EXPLORE_URL = 'http://localhost:6001'
-const STAKE_TX_TYPE = TransactionType.StakeReceipt
+const STAKE_TX_TYPE = TransactionSearchType.StakeReceipt
 const NODE_ACCOUNT_TYPE = 9
 
 async function sleep(time: number): Promise<void> {
