@@ -67,14 +67,19 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
         <div className={styles.item}>
           <div className={styles.title}>ERC-721 Tokens Transferred :</div>
           <div className={styles.value}>
-            <Item
-              from={items[0]?.tokenFrom}
-              to={items[0]?.tokenTo}
-              tokenId={calculateTokenValue(items[0], items[0].tokenType)}
-              token={items[0]?.contractInfo?.name || items[0]?.contractAddress}
-              type="ERC-721"
-              contractAddress={items[0]?.contractAddress}
-            />
+            <div className={styles.card}>
+              {items.map((item, index) => (
+                <Item
+                  key={index}
+                  from={item.tokenFrom}
+                  to={item.tokenTo}
+                  tokenId={calculateTokenValue(item, item?.tokenType)}
+                  token={item?.contractInfo?.name || item?.contractAddress}
+                  type="ERC-721"
+                  contractAddress={item?.contractAddress}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )
@@ -89,15 +94,18 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
         <div className={styles.item}>
           <div className={styles.title}>ERC-1155 Tokens Transferred :</div>
           <div className={styles.value}>
-            <div className={styles.value}>
-              <Item
-                from={items[0]?.tokenFrom}
-                to={items[0]?.tokenTo}
-                tokenId={calculateTokenValue(items[0], items[0].tokenType)}
-                token={items[0]?.contractAddress}
-                type="ERC-1155"
-                contractAddress={items[0]?.contractAddress}
-              />
+            <div className={styles.card}>
+              {items.map((item, index) => (
+                <Item
+                  key={index}
+                  from={item.tokenFrom}
+                  to={item.tokenTo}
+                  tokenId={calculateTokenValue(item, item?.tokenType)}
+                  token={item?.contractInfo?.name || item?.contractAddress}
+                  type="ERC-1155"
+                  contractAddress={item?.contractAddress}
+                />
+              ))}
             </div>
           </div>
         </div>

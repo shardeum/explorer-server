@@ -62,11 +62,12 @@
 }
 
 .Overivew_Item {
-  @extend %card;
+  // @extend %card;
 
   .listItem {
     display: flex;
     flex-wrap: wrap;
+    margin-bottom: spacing(4);
   }
 
   .listItemRow {
@@ -79,6 +80,7 @@
 
   .listItemCol {
     display: flex;
+    align-items: center;
     margin-right: spacing(4);
     margin-bottom: spacing(4);
   }

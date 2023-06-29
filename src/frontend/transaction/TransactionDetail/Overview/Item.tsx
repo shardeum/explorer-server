@@ -17,10 +17,10 @@ export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type, cont
   return (
     <div className={styles.Overivew_Item}>
       <div className={styles.listItem}>
-        <Icon name="right_arrow" color="black" size="small" />
         <div>
           <div className={styles.listItemRow}>
             <div className={styles.listItemCol}>
+              <Icon name="right_arrow" color="black" size="small" />
               <div className={styles.listTitle}>From</div>
               <Link href={`/account/${from}`} className={styles.listLink}>
                 {from}
@@ -35,19 +35,15 @@ export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type, cont
           </div>
           <div className={styles.listItemRow}>
             <div className={styles.listItemCol}>
-              <div>
-                <span>For&nbsp;</span>
-                {type}
-                Token ID&nbsp;
-              </div>
-              {/* TODO: Link to token detail page */}
+              <div>&nbsp;For Token ID&nbsp;</div>
               <Link href={`/token/${contractAddress}`} className={styles.listLink}>
                 [{tokenId}]
               </Link>
+              &nbsp;of&nbsp;
             </div>
             <div className={styles.listItemCol}>
               <Link href={`/token/${contractAddress}`} className={styles.listLink}>
-                {token}
+                &nbsp;{token}
               </Link>
               <span>&nbsp;{type}</span>
             </div>
