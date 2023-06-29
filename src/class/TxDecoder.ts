@@ -55,9 +55,9 @@ const UNISWAP_WITHDRAWAL_EVENT = '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98c
 // const UNISWAP_MINT_EVENT = '0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f'
 // const UNISWAP_BURN_EVENT = '0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496'
 
-const ERC_20_BALANCE = '0x0'
-const ERC_721_BALANCE = '0x3'
-const ERC_1155_BALANCE = '0x3' // This is not correct; have to research and update it later
+const ERC_20_BALANCE_SLOT = '0x0'
+const ERC_721_BALANCE_SLOT = '0x3'
+const ERC_1155_BALANCE_SLOT = '0x3' // This is not correct; have to research and update it later
 
 export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {}): Promise<DecodeTxResult> => {
   const txs: TokenTx[] = []
@@ -279,10 +279,10 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
         ) {
           const storageKey =
             tokenTx.tokenType === TransactionType.ERC_20
-              ? ERC_20_BALANCE
+              ? ERC_20_BALANCE_SLOT
               : tokenTx.tokenType === TransactionType.ERC_721
-              ? ERC_721_BALANCE
-              : ERC_1155_BALANCE
+              ? ERC_721_BALANCE_SLOT
+              : ERC_1155_BALANCE_SLOT
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
             let calculatedKey = Web3.utils
@@ -298,19 +298,20 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                 contractStorage = await queryAccountByAccountId(shardusAddress)
                 // console.log('contractStorage', contractStorage)
               }
-              if (!contractStorage)
-                for (let i = 0; i < 20; i++) {
-                  calculatedKey = Web3.utils
-                    .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: '' + i })
-                    ?.slice(2)
-                  // console.log('calculatedKey', calculatedKey + log.address)
-                  if (Object.keys(storageKeyValueMap).length === 0) {
-                    const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
-                    contractStorage = await queryAccountByAccountId(shardusAddress)
-                    // console.log('contractStorage', contractStorage)
-                    break
-                  } else if (storageKeyValueMap[calculatedKey + log.address]) break
-                }
+              // Commented out this because it can map to wrong value
+              // if (!contractStorage)
+              //   for (let i = 0; i < 20; i++) {
+              //     calculatedKey = Web3.utils
+              //       .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: '' + i })
+              //       ?.slice(2)
+              //     console.log('calculatedKey', calculatedKey + log.address)
+              //     if (Object.keys(storageKeyValueMap).length === 0) {
+              //       const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
+              //       contractStorage = await queryAccountByAccountId(shardusAddress)
+              //       console.log('contractStorage', contractStorage)
+              //       break
+              //     } else if (storageKeyValueMap[calculatedKey + log.address]) break
+              //   }
               // console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
             }
             if (
@@ -327,6 +328,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
               //   tokenValue = Web3.utils.hexToNumberString('0x' + decode)
               // }
+              // console.log('decode', decode)
+              // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
               tokenValue = Web3.utils.hexToNumberString('0x' + decode)
               // console.log(calculatedKey, tokenValue)
             }
@@ -353,23 +356,24 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                 contractStorage = await queryAccountByAccountId(shardusAddress)
                 // console.log('contractStorage', contractStorage)
               }
-              if (!contractStorage)
-                for (let i = 0; i < 20; i++) {
-                  calculatedKey = Web3.utils
-                    .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: '' + i })
-                    ?.slice(2)
-                  // console.log('calculatedKey', calculatedKey + log.address)
-                  if (Object.keys(storageKeyValueMap).length === 0) {
-                    const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
-                    contractStorage = await queryAccountByAccountId(shardusAddress)
-                    // console.log('contractStorage', contractStorage)
-                    break
-                  } else if (
-                    storageKeyValueMap[calculatedKey + log.address] &&
-                    storageKeyValueMap[calculatedKey + log.address].ethAddress === log.address
-                  )
-                    break
-                }
+              // Commented out this because it can map to the wrong value; therefore, for now we should depands on the
+              // if (!contractStorage)
+              //   for (let i = 0; i < 20; i++) {
+              //     calculatedKey = Web3.utils
+              //       .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: '' + i })
+              //       ?.slice(2)
+              //     console.log('calculatedKey', calculatedKey + log.address)
+              //     if (Object.keys(storageKeyValueMap).length === 0) {
+              //       const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
+              //       contractStorage = await queryAccountByAccountId(shardusAddress)
+              //       console.log('contractStorage', contractStorage)
+              //       break
+              //     } else if (
+              //       storageKeyValueMap[calculatedKey + log.address] &&
+              //       storageKeyValueMap[calculatedKey + log.address].ethAddress === log.address
+              //     )
+              //       break
+              //   }
               // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             }
             if (
@@ -386,15 +390,19 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
               //   tokenValue = Web3.utils.hexToNumberString('0x' + decode)
               // }
+              // console.log('decode', decode)
+              // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
               tokenValue = Web3.utils.hexToNumberString('0x' + decode)
               // console.log(calculatedKey, tokenValue)
             }
-            tokens.push({
-              ethAddress: tokenTx.tokenTo,
-              contractAddress: log.address,
-              tokenValue,
-              tokenType: tokenTx.tokenType,
-            })
+            if (tokenValue !== '0') {
+              tokens.push({
+                ethAddress: tokenTx.tokenTo,
+                contractAddress: log.address,
+                tokenValue,
+                tokenType: tokenTx.tokenType,
+              })
+            }
           }
         }
       }
