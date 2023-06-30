@@ -61,7 +61,7 @@ export const Token: React.FC = () => {
           {' '}
           {val
             ? account?.contractType === ContractType.ERC_721
-              ? Web3Utils.hexToNumberString('0x' + val)
+              ? val
               : utils
                   .formatUnits(
                     val as number,
@@ -155,13 +155,13 @@ export const Token: React.FC = () => {
                     {
                       key: 'Max Total Supply :',
                       value: account?.contractInfo?.totalSupply
-                      ? utils
-                          .formatUnits(
-                            account?.contractInfo?.totalSupply,
-                            account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
-                          )
-                          .toString()
-                      : '',
+                        ? utils
+                            .formatUnits(
+                              account?.contractInfo?.totalSupply,
+                              account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                            )
+                            .toString()
+                        : '',
                     },
                   ]}
                 />
@@ -184,7 +184,7 @@ export const Token: React.FC = () => {
           </div>
         </div>
 
-        {filteredAddress && (
+        {filteredAddress.length === 42 && (
           <div className={styles.filter}>
             <div>
               <div className={styles.title}>FILTERED BY TOKEN HOLDER</div>
@@ -195,12 +195,14 @@ export const Token: React.FC = () => {
               <div className={styles.title}>BALANCE</div>
               <div className={styles.value}>
                 {tokenBalance
-                  ? utils
-                      .formatUnits(
-                        tokenBalance,
-                        account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
-                      )
-                      .toString()
+                  ? account?.contractType === ContractType.ERC_721
+                    ? tokenBalance
+                    : utils
+                        .formatUnits(
+                          tokenBalance,
+                          account?.contractInfo?.decimals ? parseInt(account?.contractInfo?.decimals) : 18
+                        )
+                        .toString()
                   : ''}
               </div>
             </div>

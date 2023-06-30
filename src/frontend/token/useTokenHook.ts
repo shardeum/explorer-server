@@ -24,7 +24,7 @@ type TokenHookResult = {
   onTabChange: (e: TransactionSearchType) => void
 }
 
-export const useTokenHook = ({id, address}: detailProps): TokenHookResult => {
+export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [tokens, setTokens] = useState<Token[]>([])
@@ -47,12 +47,19 @@ export const useTokenHook = ({id, address}: detailProps): TokenHookResult => {
   }, [])
 
   const getAddress = useCallback(async () => {
+    if (id.length !== 42 && id.length !== 64) return
     const data = await api.get(`${PATHS.ADDRESS}?address=${id}&accountType=${accountType}`)
-
     return data?.data?.accounts as Account[]
   }, [accountType, id])
 
   const getTransaction = useCallback(async () => {
+    if (filteredAddress.length !== 42 && filteredAddress.length !== 0) {
+      return {
+        transactions,
+        total,
+        tokenBalance,
+      }
+    }
     let url = `${PATHS.TRANSACTION}?address=${id}&page=${page}&txType=${transactionType}`
 
     if (filteredAddress) {
@@ -69,6 +76,7 @@ export const useTokenHook = ({id, address}: detailProps): TokenHookResult => {
   }, [filteredAddress, id, page, transactionType])
 
   const getToken = useCallback(async () => {
+    if (id.length !== 42 && id.length !== 64) return
     const data = await api.get(`${PATHS.TOKEN}?contractAddress=${id}&page=1`)
 
     return {
@@ -85,7 +93,7 @@ export const useTokenHook = ({id, address}: detailProps): TokenHookResult => {
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
-        const {total, transactions, tokenBalance} = await getTransaction()
+        const { total, transactions, tokenBalance } = await getTransaction()
 
         setTransactions(transactions as Transaction[])
         setTotal(total)
@@ -97,7 +105,7 @@ export const useTokenHook = ({id, address}: detailProps): TokenHookResult => {
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
-        const {tokenHolders, tokens} = await getToken()
+        const { tokenHolders, tokens } = await getToken()
         setTokenHolders(tokenHolders)
         setTokens(tokens)
       }
