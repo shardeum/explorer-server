@@ -1,14 +1,14 @@
-import { TokenTx, TransactionType, DecodeTxResult, Transaction, ContractType } from '../types'
-import { getWeb3 } from '../storage/transaction'
-import Web3 from 'web3'
-import { Account, Token, queryAccountByAccountId } from '../storage/account'
-import { Log, insertLog } from '../storage/log'
-import { config } from '../config/index'
+import {TokenTx, TransactionType, DecodeTxResult, Transaction, ContractType} from '../types'
+import {getWeb3} from '../storage/transaction'
+import Web3, {Contract, ContractAbi} from 'web3'
+import {Account, Token, queryAccountByAccountId} from '../storage/account'
+import {Log, insertLog} from '../storage/log'
+import {config} from '../config/index'
 import ERC20_ABI from '../utils/abis/ERC20.json'
 import ERC721_ABI from '../utils/abis/ERC721.json'
 import ERC1155_ABI from '../utils/abis/ERC1155.json'
-import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
-import { AbiItem } from 'web3-utils'
+import {rlp, toBuffer, bufferToHex} from 'ethereumjs-util'
+import {Erc1155Abi, Erc721Abi} from "../types/abis";
 import {padAndPrefixBlockNumber} from '../utils/index'
 
 const ERC_721_INTERFACE = '0x80ac58cd'
@@ -165,8 +165,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             const web3 = new Web3()
             const result = web3.eth.abi.decodeParameters(['uint256[]', 'uint256[]'], log.data)
             if (config.verbose) console.log('Transfer Batch Decoding', result)
-            if (result?.['0'] && result['1'] && result['0'].length === result['1'].length) {
-              for (let i = 0; i < result['0'].length; i++) {
+            if (result?.['0'] && result['1'] && (result['0'] as unknown[]).length === (result['1'] as unknown[]).length) {
+              for (let i = 0; i < (result['0'] as unknown[]).length; i++) {
                 // Created a specail technique to extract the repective tokenValue of each tokenId/value transfer
                 /* eslint-disable security/detect-object-injection */
                 const id = `${Web3.utils.padLeft(Web3.utils.numberToHex(result['0'][i]), 64)}`
@@ -285,12 +285,12 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             tokenTx.tokenType === TransactionType.ERC_20
               ? ERC_20_BALANCE_SLOT
               : tokenTx.tokenType === TransactionType.ERC_721
-              ? ERC_721_BALANCE_SLOT
-              : ERC_1155_BALANCE_SLOT
+                ? ERC_721_BALANCE_SLOT
+                : ERC_1155_BALANCE_SLOT
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
-            let calculatedKey = Web3.utils
-              .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: storageKey })
+            const calculatedKey = Web3.utils
+              .soliditySha3({type: 'uint', value: tokenTx.tokenFrom}, {type: 'uint', value: storageKey})
               ?.slice(2)
             let contractStorage: Account | null = null
             if (
@@ -345,8 +345,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
           }
           if (tokenTx.tokenTo !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
-            let calculatedKey = Web3.utils
-              .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: storageKey })
+            const calculatedKey = Web3.utils
+              .soliditySha3({type: 'uint', value: tokenTx.tokenTo}, {type: 'uint', value: storageKey})
               ?.slice(2)
             // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             let contractStorage: Account | null = null
@@ -420,8 +420,8 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
           ? tx.wrappedEVMAccount.readableReceipt?.data.slice(10) || ''
           : ''
       )
-      if (result?.['0'] && result['1'] && result['0'].length === result['1'].length) {
-        for (let i = 0; i < result['0'].length; i++) {
+      if (result?.['0'] && result['1'] && (result['0'] as unknown[]).length === (result['1'] as unknown[]).length) {
+        for (let i = 0; i < (result['0'] as unknown[]).length; i++) {
           const tokenTx = {
             tokenType: TransactionType.EVM_Internal,
             tokenFrom: tx.txTo,
@@ -463,12 +463,12 @@ export const getContractInfo = async (
   let foundCorrectContract = false
   try {
     const web3 = (await getWeb3()) as Web3
-    const Token = new web3.eth.Contract(ERC20_ABI.abi as unknown as AbiItem, contractAddress)
+    const Token = new web3.eth.Contract(ERC20_ABI.abi as ContractAbi, contractAddress)
     contractInfo.name = await Token.methods.name().call()
     if (config.verbose) console.log('Token Name', contractInfo.name)
     contractInfo.symbol = await Token.methods.symbol().call()
-    contractInfo.totalSupply = await Token.methods.totalSupply().call()
-    contractInfo.decimals = await Token.methods.decimals().call()
+    contractInfo.totalSupply = String(await Token.methods.totalSupply().call())
+    contractInfo.decimals = String(await Token.methods.decimals().call())
     foundCorrectContract = true
     contractType = ContractType.ERC_20
     // await sleep(200); // Awaiting a bit to refresh the service points of the validator
@@ -480,7 +480,7 @@ export const getContractInfo = async (
   if (!foundCorrectContract) {
     try {
       const web3 = (await getWeb3()) as Web3
-      const Token = new web3.eth.Contract(ERC721_ABI.abi as unknown as AbiItem, contractAddress)
+      const Token: Contract<Erc721Abi> = new web3.eth.Contract(ERC721_ABI.abi as ContractAbi, contractAddress)
       const result = await Token.methods.supportsInterface(ERC_721_INTERFACE).call()
       if (result) {
         if (!contractInfo.name) contractInfo.name = await Token.methods.name().call()
@@ -496,7 +496,7 @@ export const getContractInfo = async (
   if (!foundCorrectContract) {
     try {
       const web3 = (await getWeb3()) as Web3
-      const Token = new web3.eth.Contract(ERC1155_ABI.abi as unknown as AbiItem, contractAddress)
+      const Token: Contract<Erc1155Abi> = new web3.eth.Contract(ERC1155_ABI.abi as ContractAbi, contractAddress)
       const result = await Token.methods.supportsInterface(ERC_1155_INTERFACE).call()
       if (result) {
         foundCorrectContract = true
@@ -506,5 +506,5 @@ export const getContractInfo = async (
       console.log('Non ERC 1155 Contract', contractAddress) // It could be not ERC 20 Contract
     }
   }
-  return { contractInfo, contractType }
+  return {contractInfo, contractType}
 }

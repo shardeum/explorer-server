@@ -1,6 +1,6 @@
 import moment from 'moment'
 import React, { Fragment, useState } from 'react'
-import Web3Utils from 'web3-utils'
+import web3 from 'web3'
 
 import { useAccount } from '../../api'
 import { AnchorLink, ContentLayout, Pagination } from '../../components'
@@ -10,6 +10,7 @@ import { breadcrumbsList } from '../../types'
 import { Account as AccountT } from '../../../types'
 
 import styles from './Account.module.scss'
+import {fromWeiNoTrailingComma} from "../../utils/fromWeiNoTrailingComma";
 
 const siblingCount = 3
 const limit = 10
@@ -32,7 +33,7 @@ const tableColumns: IColumnProps<AccountT>[] = [
     key: 'account.balance',
     value: 'Balance',
     render: (_: unknown, item: AccountT) => (
-      <>{`${Number(Web3Utils.fromWei(item?.account?.balance, 'ether')).toFixed()} SHM`}</>
+      <>{`${Number(fromWeiNoTrailingComma(`0x${item?.account?.balance}`, 'ether')).toFixed()} SHM`}</>
     ),
   },
   {

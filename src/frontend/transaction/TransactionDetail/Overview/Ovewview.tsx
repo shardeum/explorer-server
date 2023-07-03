@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import moment from 'moment'
-import Web3Utils from 'web3-utils'
+import web3 from 'web3'
 
 import { Chip, Icon } from '../../../components'
 import { Item } from './Item'
@@ -177,7 +177,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.title}>Nonce:</div>
             <div className={styles.value}>
               {transaction?.wrappedEVMAccount?.readableReceipt?.nonce &&
-                Web3Utils.hexToNumber('0x' + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
+                web3.utils.hexToNumber('0x' + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
             </div>
           </div>
 
@@ -262,14 +262,14 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Value:</div>
             <div className={styles.value}>
-              {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.value)} SHM
+              {calculateFullValue(`0x${transaction?.wrappedEVMAccount?.readableReceipt?.value}`)} SHM
             </div>
           </div>
 
           <div className={styles.item}>
             <div className={styles.title}>Transaction Fee:</div>
             <div className={styles.value}>
-              {calculateFullValue(transaction?.wrappedEVMAccount?.amountSpent || '0')}
+              {calculateFullValue(`0x${transaction?.wrappedEVMAccount?.amountSpent}` || '0')}
             </div>
           </div>
 

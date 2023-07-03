@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import Web3Utils from 'web3-utils'
+import web3 from 'web3'
 import { utils } from 'ethers'
 
 import { AnchorLink, Button, ContentLayout, CopyButton, Spacer, Tab, Table } from '../components'
@@ -11,6 +11,7 @@ import { breadcrumbsList, ContractType, TransactionSearchType } from '../types'
 import { useTokenHook } from './useTokenHook'
 
 import styles from './Token.module.scss'
+import { fromWeiNoTrailingComma } from '../utils/fromWeiNoTrailingComma'
 
 export const Token: React.FC = () => {
   const router = useRouter()
@@ -129,7 +130,7 @@ export const Token: React.FC = () => {
                 items={[
                   {
                     key: 'Balance :',
-                    value: Web3Utils.fromWei(account?.account?.balance, 'ether'),
+                    value: fromWeiNoTrailingComma(`0x${account?.account?.balance}`, 'ether'),
                   },
                   {
                     key: 'Max Total Supply :',

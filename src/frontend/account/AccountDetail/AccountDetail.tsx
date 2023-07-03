@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-import Web3Utils from 'web3-utils'
+import web3 from 'web3'
 import { utils } from 'ethers'
 import moment from 'moment'
 import { Button, ContentLayout, CopyButton, Spacer, Pagination } from '../../components'
@@ -174,12 +174,12 @@ export const AccountDetail: React.FC = () => {
                     items={[
                       {
                         key: 'Balance :',
-                        value: calculateValue(account?.account?.balance) + '   SHM',
+                        value: calculateValue(`0x${account?.account?.balance}`) + '   SHM',
                       },
                       {
                         key: 'Nonce :',
                         value:
-                          account?.account?.nonce && Web3Utils.hexToNumber('0x' + account?.account?.nonce),
+                          account?.account?.nonce && web3.utils.hexToNumber('0x' + account?.account?.nonce),
                       },
                       {
                         key: 'Tokens :',

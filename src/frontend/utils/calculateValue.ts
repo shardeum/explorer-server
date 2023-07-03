@@ -1,11 +1,12 @@
-import Web3Utils from 'web3-utils'
+import web3 from 'web3'
 import { utils } from 'ethers'
 import { TokenTx, TransactionType } from '../types'
 import BN from 'bn.js'
+import {fromWeiNoTrailingComma} from "./fromWeiNoTrailingComma";
 
 export const calculateValue = (value: string | BN): string => {
   try {
-    return round(Web3Utils.fromWei(value, 'ether'))
+    return round(fromWeiNoTrailingComma(value, 'ether'))
   } catch (e) {
     return 'error in calculating Value'
   }
@@ -13,7 +14,7 @@ export const calculateValue = (value: string | BN): string => {
 
 export const calculateFullValue = (value: string | BN): string => {
   try {
-    return Web3Utils.fromWei(value, 'ether')
+    return fromWeiNoTrailingComma(value, 'ether')
   } catch (e) {
     return 'error in calculating Value'
   }
@@ -35,13 +36,13 @@ export const calculateTokenValue = (
         ? utils.formatUnits(tokenTx.tokenValue, decimalsValue)
         : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
 
-      // : round(Web3Utils.fromWei(tokenTx.tokenValue, "ether"));
+      // : round(web3.utils.fromWei(tokenTx.tokenValue, "ether"));
     } else if (txType === TransactionType.ERC_721) {
       return tokenTx.tokenEvent === 'Approval For All'
         ? tokenTx.tokenValue === '0x0000000000000000000000000000000000000000000000000000000000000001'
           ? 'True'
           : 'False'
-        : shortTokenValue(Web3Utils.hexToNumberString(tokenTx.tokenValue))
+        : shortTokenValue(web3.utils.hexToNumberString(tokenTx.tokenValue))
     } else if (txType === TransactionType.ERC_1155) {
       return tokenTx.tokenEvent === 'Approval For All'
         ? tokenTx.tokenValue === '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -50,8 +51,8 @@ export const calculateTokenValue = (
         : tokenTx.tokenValue.length != 130
         ? tokenTx.tokenValue
         : tokenId
-        ? shortTokenValue(Web3Utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66)))
-        : shortTokenValue(Web3Utils.hexToNumberString('0x' + tokenTx.tokenValue.substring(66, 130)))
+        ? shortTokenValue(web3.utils.hexToNumberString(tokenTx.tokenValue.substring(0, 66)))
+        : shortTokenValue(web3.utils.hexToNumberString('0x' + tokenTx.tokenValue.substring(66, 130)))
     }
   } catch (e) {
     return 'error in calculating tokenValue'
