@@ -65,7 +65,9 @@ export async function queryLogCount(
   topic0?: string,
   topic1?: string,
   topic2?: string,
-  topic3?: string
+  topic3?: string,
+  fromBlock?: string,
+  toBlock?: string
 ): Promise<number> {
   let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = { 'COUNT(txHash)': 0 }
   try {
@@ -100,12 +102,24 @@ export async function queryLogCount(
       sql += `WHERE topic0=?`
       inputs = [topic0]
     }
+    if (fromBlock && toBlock) {
+      sql += ` AND blockNumber BETWEEN ? AND ?`
+      inputs.push(parseInt(fromBlock))
+      inputs.push(parseInt(toBlock))
+    } else if (fromBlock && !toBlock) {
+      sql += ` AND blockNumber >= ?`
+      inputs.push(parseInt(fromBlock))
+    } else if (toBlock && !fromBlock) {
+      sql += ` AND blockNumber <= ?`
+      inputs.push(parseInt(toBlock))
+    }
     if (startCycle >= 0 && endCycle >= 0) {
       if (inputs.length > 0) sql += ` AND cycle BETWEEN ? AND ?`
       else sql += `WHERE cycle BETWEEN ? AND ?`
       inputs = [...inputs, ...[startCycle, endCycle]]
     }
     logs = await db.get(sql, inputs)
+    console.log(`thant: query result`, logs)
   } catch (e) {
     console.log(e)
   }
@@ -126,7 +140,9 @@ export async function queryLogs(
   topic0?: string,
   topic1?: string,
   topic2?: string,
-  topic3?: string
+  topic3?: string,
+  fromBlock?: string,
+  toBlock?: string
 ): Promise<Log[]> {
   let logs: DbLog[] = []
   try {
@@ -164,6 +180,19 @@ export async function queryLogs(
       sql += `WHERE topic0=?`
       inputs = [topic0]
     }
+
+    if (fromBlock && toBlock) {
+      sql += ` AND blockNumber BETWEEN ? AND ?`
+      inputs.push(parseInt(fromBlock))
+      inputs.push(parseInt(toBlock))
+    } else if (fromBlock && !toBlock) {
+      sql += ` AND blockNumber >= ?`
+      inputs.push(parseInt(fromBlock))
+    } else if (toBlock && !fromBlock) {
+      sql += ` AND blockNumber <= ?`
+      inputs.push(parseInt(toBlock))
+    }
+
     if (startCycle >= 0 && endCycle >= 0) {
       if (inputs.length > 0) sqlQueryExtension = ` AND cycle BETWEEN ? AND ?` + sqlQueryExtension
       else sqlQueryExtension = ` WHERE cycle BETWEEN ? AND ?` + sqlQueryExtension

@@ -85,7 +85,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
         cycle: tx.cycle,
         timestamp: tx.timestamp,
         txHash: tx.txHash,
-        blockNumber: log.blockNumber, // TODO: Currently, blockNumber is saved as hexString. Look into which way (as number or as hexString) would be better for faster lookup. Add index to blockNumber when initializing the database.
+        blockNumber: parseInt(log.blockNumber.toString()), // TODO: Currently, blockNumber is saved as hexString. Look into which way (as number or as hexString) would be better for faster lookup. Add index to blockNumber when initializing the database.
         contractAddress: log.address,
         log: log,
         topic0: '',

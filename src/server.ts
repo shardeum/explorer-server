@@ -94,6 +94,8 @@ interface RequestQuery {
   topic2: string
   topic3: string
   responseType: string
+  fromBlock: string
+  toBlock: string
   totalStakeData: string
 }
 
@@ -1069,6 +1071,8 @@ const start = async (): Promise<void> => {
       topic2: 's?',
       topic3: 's?',
       type: 's?',
+      fromBlock: 's?',
+      toBlock: 's?'
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -1126,7 +1130,9 @@ const start = async (): Promise<void> => {
         query.topic0,
         query.topic1,
         query.topic2,
-        query.topic3
+        query.topic3,
+        query.fromBlock,
+        query.toBlock
       )
 
       if (query.page) {
@@ -1153,7 +1159,9 @@ const start = async (): Promise<void> => {
           query.topic0,
           query.topic1,
           query.topic2,
-          query.topic3
+          query.topic3,
+          query.fromBlock,
+          query.toBlock
         )
         if (query.type === 'txs') {
           for (let i = 0; i < logs.length; i++) {
