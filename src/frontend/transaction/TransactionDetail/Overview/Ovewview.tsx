@@ -100,7 +100,8 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   key={index}
                   from={item.tokenFrom}
                   to={item.tokenTo}
-                  tokenId={calculateTokenValue(item, item?.tokenType)}
+                  tokenId={calculateTokenValue(item, item?.tokenType, true)}
+                  tokenValue={calculateTokenValue(item, item?.tokenType)}
                   token={item?.contractInfo?.name || item?.contractAddress}
                   type="ERC-1155"
                   contractAddress={item?.contractAddress}

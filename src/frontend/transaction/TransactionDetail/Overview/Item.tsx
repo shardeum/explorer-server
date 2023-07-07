@@ -6,14 +6,23 @@ import styles from './Ovewview.module.scss'
 import Link from 'next/link'
 
 interface ItemProps {
-  from?: string
-  to?: string
-  tokenId?: string
-  token?: string
-  type?: string
-  contractAddress?: string
+  from: string
+  to: string
+  tokenId: string
+  tokenValue?: string
+  token: string
+  type: string
+  contractAddress: string
 }
-export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type, contractAddress }) => {
+export const Item: React.FC<ItemProps> = ({
+  from,
+  to,
+  tokenId,
+  tokenValue,
+  token,
+  type,
+  contractAddress,
+}) => {
   return (
     <div className={styles.Overivew_Item}>
       <div className={styles.listItem}>
@@ -35,17 +44,24 @@ export const Item: React.FC<ItemProps> = ({ from, to, tokenId, token, type, cont
           </div>
           <div className={styles.listItemRow}>
             <div className={styles.listItemCol}>
-              <div>&nbsp;For Token ID&nbsp;</div>
+              <div>
+                &nbsp;{type}
+                <span>For</span>
+              </div>
+              {tokenValue && (
+                <div>
+                  {tokenValue} <span>of</span>
+                </div>
+              )}
+              <div>Token ID&nbsp;</div>
               <Link href={`/token/${contractAddress}`} className={styles.listLink}>
                 [{tokenId}]
               </Link>
-              &nbsp;of&nbsp;
             </div>
             <div className={styles.listItemCol}>
               <Link href={`/token/${contractAddress}`} className={styles.listLink}>
                 &nbsp;{token}
               </Link>
-              <span>&nbsp;{type}</span>
             </div>
           </div>
         </div>
