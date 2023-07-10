@@ -708,7 +708,6 @@ export async function queryTransactions(
       // txType should be non-zero as TransactionSearchType starts at 1, so
       // this conditional is pretty sane
       if (txType === TransactionSearchType.AllExceptInternalTx) {
-        const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT * FROM transactions WHERE transactionType=? OR  transactionType=? OR  transactionType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [
           TransactionType.Receipt,

@@ -73,16 +73,22 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
       total: data?.data?.totalTransactions,
       tokenBalance: data?.data?.filterAddressTokenBalance,
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredAddress, id, page, transactionType])
 
   const getToken = useCallback(async () => {
-    if (id.length !== 42 && id.length !== 64) return
+    if (id.length !== 42 && id.length !== 64)
+      return {
+        tokenHolders,
+        tokens,
+      }
     const data = await api.get(`${PATHS.TOKEN}?contractAddress=${id}&page=1`)
 
     return {
       tokenHolders: data?.data?.totalTokenHolders,
       tokens: data?.data?.tokens,
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   useEffect(() => {
