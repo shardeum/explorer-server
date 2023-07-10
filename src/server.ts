@@ -1084,6 +1084,10 @@ const start = async (): Promise<void> => {
     let totalPages = 0
     let totalLogs = 0
     let logs
+    const topic0 = query.topic0 && query.topic0.length === 66 ? query.topic0 : null
+    const topic1 = query.topic1 && query.topic1.length === 66 ? query.topic1 : null
+    const topic2 = query.topic2 && query.topic2.length === 66 ? query.topic2 : null
+    const topic3 = query.topic3 && query.topic3.length === 66 ? query.topic3 : null
     const transactions = []
     if (query.count) {
       const count: number = parseInt(query.count)
@@ -1097,7 +1101,7 @@ const start = async (): Promise<void> => {
       }
       logs = await Log.queryLogs(0, count)
       totalLogs = await Log.queryLogCount(0, 0, query.type)
-    } else if (query.address || query.topic0 || query.startCycle || query.endCycle) {
+    } else if (query.address || topic0 || query.startCycle || query.endCycle) {
       const address: string = query.address ? query.address.toLowerCase() : ''
 
       let startCycle: number
@@ -1127,10 +1131,10 @@ const start = async (): Promise<void> => {
         endCycle,
         query.type,
         address,
-        query.topic0,
-        query.topic1,
-        query.topic2,
-        query.topic3,
+        topic0,
+        topic1,
+        topic2,
+        topic3,
         query.fromBlock,
         query.toBlock
       )
@@ -1156,10 +1160,10 @@ const start = async (): Promise<void> => {
           endCycle,
           query.type,
           address,
-          query.topic0,
-          query.topic1,
-          query.topic2,
-          query.topic3,
+          topic0,
+          topic1,
+          topic2,
+          topic3,
           query.fromBlock,
           query.toBlock
         )
