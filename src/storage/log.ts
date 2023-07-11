@@ -99,14 +99,14 @@ function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type:
   }
   if (request.fromBlock && request.toBlock) {
     queryParams.push(`blockNumber BETWEEN ? AND ?`)
-    values.push(parseInt(request.fromBlock))
-    values.push(parseInt(request.toBlock))
+    values.push(request.fromBlock)
+    values.push(request.toBlock)
   } else if (request.fromBlock && !request.toBlock) {
     queryParams.push(`blockNumber >= ?`)
-    values.push(parseInt(request.fromBlock))
+    values.push(request.fromBlock)
   } else if (request.toBlock && !request.fromBlock) {
     queryParams.push(`blockNumber <= ?`)
-    values.push(parseInt(request.toBlock))
+    values.push(request.toBlock)
   }
   sql = `${sql}${queryParams.length > 0 ? ` WHERE ${queryParams.join(' AND ')}` : ''}`;
   return {sql, values}
