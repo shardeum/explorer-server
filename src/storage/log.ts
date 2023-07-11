@@ -170,7 +170,7 @@ export async function queryLogs(
   let logs: DbLog[] = []
   try {
 
-    let {sql, values: inputs} = buildLogQueryString({
+    const queryString = buildLogQueryString({
       address: contractAddress,
       topic0,
       topic1,
@@ -179,6 +179,8 @@ export async function queryLogs(
       fromBlock,
       toBlock
     }, false, type)
+    const sql = queryString.sql
+    let inputs = queryString.values
 
     let sqlQueryExtension = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     if (type === 'txs') {
