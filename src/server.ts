@@ -15,6 +15,7 @@ import * as utils from './utils'
 import fastifyCors from '@fastify/cors'
 import { Server, IncomingMessage, ServerResponse } from 'http'
 import fastifyNextjs from '@fastify/nextjs'
+import FastifyWebsocket from '@fastify/websocket';
 import axios from 'axios'
 import {
   AccountSearchType,
@@ -41,7 +42,7 @@ import {
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
-import { SocketStream } from '@fastify/websocket'
+import fastifyWebsocket, { SocketStream } from '@fastify/websocket'
 import {
   AccountResponse,
   AddressResponse,
@@ -119,7 +120,7 @@ const start = async (): Promise<void> => {
     logger: false,
   })
 
-  await server.register(require('@fastify/websocket'), {clientTracking: true});
+  await server.register(FastifyWebsocket);
   await server.register(fastifyCors)
   await server.register(fastifyRateLimit, {
     max: CONFIG.rateLimit,

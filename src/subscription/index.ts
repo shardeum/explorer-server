@@ -25,7 +25,12 @@ export const SOCKETID_BY_LOG_STRINGIFIED = new Map<string, Set<string>>();
 export const LOG_SUBSCRIPTIONS_BY_SOCKETID = new Map<string, Set<string>>();
 
 // implement this function at O(1)
-export const addLogSubscriptions = (
+export const addLogSubscriptions: (
+  addresses: string[], 
+  topics: string[], 
+  subscription_id: string, 
+  socketId: string
+) => void = (
   addresses: string[], 
   topics: string[], 
   subscription_id: string, 
@@ -76,7 +81,7 @@ export const addLogSubscriptions = (
   // console.log(LOG_SUBSCRIPTIONS_BY_ADDRESS);
 }
 
-export const removeLogSubscription = (subscription_id: string, socketId: string) => {
+export const removeLogSubscription: (subscription_id: string, socketId: string) => void = (subscription_id: string, socketId: string) => {
 
     if(!LOG_SUBSCRIPTIONS_BY_ID.has(subscription_id)){
       return 
@@ -201,7 +206,7 @@ async function getLogs(
   topic1 = undefined,
   topic2 = undefined,
   topic3 = undefined,
-) {
+): Promise<any> {
   let logs
   try {
     let sql = `SELECT log FROM logs `
