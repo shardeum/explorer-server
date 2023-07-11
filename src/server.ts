@@ -148,14 +148,14 @@ const start = async (): Promise<void> => {
   server.get('/port', (req, reply) => {
     reply.send({ port: CONFIG.port.server })
   })
-  server.get('/evm_log_subscription', { websocket: true }, 
+  server.get('/evm_log_subscription', { websocket: true },
              (connection:SocketStream, req:FastifyRequest) => {
-   
+
      let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
      socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
      connection.socket.id = socket_id;
      socketClient.set(socket_id, connection);
-  
+
     connection.socket.on('message', message => {
       try{
         const payload = JSON.parse(message);
@@ -1079,12 +1079,20 @@ const start = async (): Promise<void> => {
       reply.send({ success: false, error: err })
       return
     }
-    // console.log('Request', _request.query);
+    if (CONFIG.verbose) console.log('Request', _request.query);
     const query = _request.query as RequestQuery
+    for (const key in query) {
+      if (query[key] === 'undefined') {
+        delete query[key]
+      }
+    }
+    if (CONFIG.verbose) console.log('cleaned log query request', query)
     const itemsPerPage = 10
     let totalPages = 0
     let totalLogs = 0
     let logs
+    const supportedQueryParams = ['address', 'topic0', 'topic1', 'topic2', 'topic3', 'fromBlock', 'toBlock', 'startCycle', 'endCycle']
+    const address = query.address && query.address.length === 42 ? query.address : null
     const topic0 = query.topic0 && query.topic0.length === 66 ? query.topic0 : null
     const topic1 = query.topic1 && query.topic1.length === 66 ? query.topic1 : null
     const topic2 = query.topic2 && query.topic2.length === 66 ? query.topic2 : null
@@ -1102,7 +1110,7 @@ const start = async (): Promise<void> => {
       }
       logs = await Log.queryLogs(0, count)
       totalLogs = await Log.queryLogCount(0, 0, query.type)
-    } else if (query.address || topic0 || query.startCycle || query.endCycle) {
+    } else if (Object.keys(query).some(key => supportedQueryParams.includes(key))) {
       const address: string = query.address ? query.address.toLowerCase() : ''
 
       let startCycle: number

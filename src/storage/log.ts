@@ -1,7 +1,7 @@
 /* eslint-disable no-empty */
 import * as db from './sqlite3storage'
-import { extractValues, extractValuesFromArray } from './sqlite3storage'
-import { config } from '../config/index'
+import {extractValues, extractValuesFromArray} from './sqlite3storage'
+import {config} from '../config/index'
 
 export interface Log<L = object> {
   cycle: number
@@ -14,6 +14,16 @@ export interface Log<L = object> {
   topic1?: string
   topic2?: string
   topic3?: string
+}
+
+export interface LogQueryRequest {
+  address?: string;
+  topic0?: string;
+  topic1?: string;
+  topic2?: string;
+  topic3?: string;
+  fromBlock?: string;
+  toBlock?: string;
 }
 
 type DbLog = Log & {
@@ -57,6 +67,51 @@ export async function bulkInsertLogs(logs: Log[]): Promise<void> {
   }
 }
 
+function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type: string): { sql: string, values: any[] } {
+  let sql
+  const queryParams = []
+  const values = []
+  if (countOnly) {
+    sql = 'SELECT COUNT(txHash) FROM logs '
+    if (type === 'txs') sql = 'SELECT COUNT(DISTINCT(txHash)) FROM logs '
+  } else {
+    sql = 'SELECT * FROM logs '
+  }
+  if (request.address) {
+    queryParams.push(`contractAddress=?`);
+    values.push(request.address)
+  }
+  if (request.topic0) {
+    queryParams.push(`topic0=?`);
+    values.push(request.topic0)
+  }
+  if (request.topic1) {
+    queryParams.push(`topic1=?`);
+    values.push(request.topic1)
+  }
+  if (request.topic2) {
+    queryParams.push(`topic2=?`);
+    values.push(request.topic2)
+  }
+  if (request.topic3) {
+    queryParams.push(`topic3=?`);
+    values.push(request.topic3)
+  }
+  if (request.fromBlock && request.toBlock) {
+    queryParams.push(`blockNumber BETWEEN ? AND ?`)
+    values.push(parseInt(request.fromBlock))
+    values.push(parseInt(request.toBlock))
+  } else if (request.fromBlock && !request.toBlock) {
+    queryParams.push(`blockNumber >= ?`)
+    values.push(parseInt(request.fromBlock))
+  } else if (request.toBlock && !request.fromBlock) {
+    queryParams.push(`blockNumber <= ?`)
+    values.push(parseInt(request.toBlock))
+  }
+  sql = `${sql}${queryParams.length > 0 ? ` WHERE ${queryParams.join(' AND ')}` : ''}`;
+  return {sql, values}
+}
+
 export async function queryLogCount(
   startCycle = undefined,
   endCycle = undefined,
@@ -69,57 +124,25 @@ export async function queryLogCount(
   fromBlock?: string,
   toBlock?: string
 ): Promise<number> {
-  let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = { 'COUNT(txHash)': 0 }
+  let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = {'COUNT(txHash)': 0}
   try {
-    let sql = 'SELECT COUNT(txHash) FROM logs '
-    let inputs: (string | number)[] = []
-    if (type === 'txs') sql = 'SELECT COUNT(DISTINCT(txHash)) FROM logs '
-    if (contractAddress && topic0 && topic1 && topic2 && topic3) {
-      sql += `WHERE contractAddress=? AND topic0=? AND topic1=? AND topic2=? AND topic3=?`
-      inputs = [contractAddress, topic0, topic1, topic2, topic3]
-    } else if (contractAddress && topic0 && topic1 && topic2) {
-      sql += `WHERE contractAddress=? AND topic0=? AND topic1=? AND topic2=?`
-      inputs = [contractAddress, topic0, topic1, topic2]
-    } else if (contractAddress && topic0 && topic1) {
-      sql += `WHERE contractAddress=? AND topic0=? AND topic1=?`
-      inputs = [contractAddress, topic0, topic1]
-    } else if (contractAddress && topic0) {
-      sql += `WHERE contractAddress=? AND topic0=?`
-      inputs = [contractAddress, topic0]
-    } else if (contractAddress) {
-      sql += `WHERE contractAddress=?`
-      inputs = [contractAddress]
-    } else if (topic0 && topic1 && topic2 && topic3) {
-      sql += `WHERE topic0=? AND topic1=? AND topic2=? AND topic3=?`
-      inputs = [topic0, topic1, topic2, topic3]
-    } else if (topic0 && topic1 && topic2) {
-      sql += `WHERE topic0=? AND topic1=? AND topic2=?`
-      inputs = [topic0, topic1, topic2]
-    } else if (topic0 && topic1) {
-      sql += `WHERE topic0=? AND topic1=?`
-      inputs = [topic0, topic1]
-    } else if (topic0) {
-      sql += `WHERE topic0=?`
-      inputs = [topic0]
-    }
-    if (fromBlock && toBlock) {
-      sql += ` AND blockNumber BETWEEN ? AND ?`
-      inputs.push(parseInt(fromBlock))
-      inputs.push(parseInt(toBlock))
-    } else if (fromBlock && !toBlock) {
-      sql += ` AND blockNumber >= ?`
-      inputs.push(parseInt(fromBlock))
-    } else if (toBlock && !fromBlock) {
-      sql += ` AND blockNumber <= ?`
-      inputs.push(parseInt(toBlock))
-    }
+    let {sql, values: inputs} = buildLogQueryString({
+      address: contractAddress,
+      topic0,
+      topic1,
+      topic2,
+      topic3,
+      fromBlock,
+      toBlock
+    }, true, type)
+
     if (startCycle >= 0 && endCycle >= 0) {
       if (inputs.length > 0) sql += ` AND cycle BETWEEN ? AND ?`
       else sql += `WHERE cycle BETWEEN ? AND ?`
       inputs = [...inputs, ...[startCycle, endCycle]]
     }
+    if (config.verbose) console.log(sql, inputs)
     logs = await db.get(sql, inputs)
-    console.log(`thant: query result`, logs)
   } catch (e) {
     console.log(e)
   }
@@ -146,51 +169,20 @@ export async function queryLogs(
 ): Promise<Log[]> {
   let logs: DbLog[] = []
   try {
-    let sql = 'SELECT * FROM logs '
-    let inputs: (string | number)[] = []
+
+    let {sql, values: inputs} = buildLogQueryString({
+      address: contractAddress,
+      topic0,
+      topic1,
+      topic2,
+      topic3,
+      fromBlock,
+      toBlock
+    }, false, type)
+
     let sqlQueryExtension = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     if (type === 'txs') {
       sqlQueryExtension = ` GROUP BY txHash` + sqlQueryExtension
-    }
-    if (contractAddress && topic0 && topic1 && topic2 && topic3) {
-      sql += `WHERE contractAddress=? AND topic0=? AND topic1=? AND topic2=? AND topic3=?`
-      inputs = [contractAddress, topic0, topic1, topic2, topic3]
-    } else if (contractAddress && topic0 && topic1 && topic2) {
-      sql += `WHERE contractAddress=? AND topic0=? AND topic1=? AND topic2=?`
-      inputs = [contractAddress, topic0, topic1, topic2]
-    } else if (contractAddress && topic0 && topic1) {
-      sql += `WHERE contractAddress=? AND topic0=? AND topic1=?`
-      inputs = [contractAddress, topic0, topic1]
-    } else if (contractAddress && topic0) {
-      sql += `WHERE contractAddress=? AND topic0=?`
-      inputs = [contractAddress, topic0]
-    } else if (contractAddress) {
-      sql += `WHERE contractAddress=?`
-      inputs = [contractAddress]
-    } else if (topic0 && topic1 && topic2 && topic3) {
-      sql += `WHERE topic0=? AND topic1=? AND topic2=? AND topic3=?`
-      inputs = [topic0, topic1, topic2, topic3]
-    } else if (topic0 && topic1 && topic2) {
-      sql += `WHERE topic0=? AND topic1=? AND topic2=?`
-      inputs = [topic0, topic1, topic2]
-    } else if (topic0 && topic1) {
-      sql += `WHERE topic0=? AND topic1=?`
-      inputs = [topic0, topic1]
-    } else if (topic0) {
-      sql += `WHERE topic0=?`
-      inputs = [topic0]
-    }
-
-    if (fromBlock && toBlock) {
-      sql += ` AND blockNumber BETWEEN ? AND ?`
-      inputs.push(parseInt(fromBlock))
-      inputs.push(parseInt(toBlock))
-    } else if (fromBlock && !toBlock) {
-      sql += ` AND blockNumber >= ?`
-      inputs.push(parseInt(fromBlock))
-    } else if (toBlock && !fromBlock) {
-      sql += ` AND blockNumber <= ?`
-      inputs.push(parseInt(toBlock))
     }
 
     if (startCycle >= 0 && endCycle >= 0) {
@@ -198,10 +190,11 @@ export async function queryLogs(
       else sqlQueryExtension = ` WHERE cycle BETWEEN ? AND ?` + sqlQueryExtension
       inputs = [...inputs, ...[startCycle, endCycle]]
     }
+    if (config.verbose) console.log(sql, inputs)
     logs = await db.all(sql + sqlQueryExtension, inputs)
     if (logs.length > 0) {
-    logs.forEach((log: DbLog) => {
-      if (log.log) (log as Log).log = JSON.parse(log.log)
+      logs.forEach((log: DbLog) => {
+        if (log.log) (log as Log).log = JSON.parse(log.log)
       })
     }
   } catch (e) {
@@ -212,7 +205,7 @@ export async function queryLogs(
 }
 
 export async function queryLogCountBetweenCycles(startCycleNumber: number, endCycleNumber: number): Promise<number> {
-  let logs: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
+  let logs: { 'COUNT(*)': number } = {'COUNT(*)': 0}
   try {
     const sql = `SELECT COUNT(*) FROM logs WHERE cycle BETWEEN ? AND ?`
     logs = await db.get(sql, [startCycleNumber, endCycleNumber])
