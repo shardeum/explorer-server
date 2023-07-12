@@ -2,12 +2,13 @@
 import * as db from './sqlite3storage'
 import {extractValues, extractValuesFromArray} from './sqlite3storage'
 import {config} from '../config/index'
+import {padAndPrefixBlockNumber} from '../utils/index'
 
 export interface Log<L = object> {
   cycle: number
   timestamp: number
   txHash: string
-  blockNumber: number
+  blockNumber: string
   contractAddress: string
   log: L
   topic0: string
@@ -97,16 +98,18 @@ function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type:
     queryParams.push(`topic3=?`);
     values.push(request.topic3)
   }
-  if (request.fromBlock && request.toBlock) {
+  const fromBlock = request.fromBlock ? padAndPrefixBlockNumber(request.fromBlock) : null
+  const toBlock = request.toBlock ? padAndPrefixBlockNumber(request.toBlock) : null
+  if (fromBlock && toBlock) {
     queryParams.push(`blockNumber BETWEEN ? AND ?`)
-    values.push(request.fromBlock)
-    values.push(request.toBlock)
-  } else if (request.fromBlock && !request.toBlock) {
+    values.push(fromBlock)
+    values.push(toBlock)
+  } else if (fromBlock && !toBlock) {
     queryParams.push(`blockNumber >= ?`)
-    values.push(request.fromBlock)
-  } else if (request.toBlock && !request.fromBlock) {
+    values.push(fromBlock)
+  } else if (!fromBlock && toBlock) {
     queryParams.push(`blockNumber <= ?`)
-    values.push(request.toBlock)
+    values.push(toBlock)
   }
   sql = `${sql}${queryParams.length > 0 ? ` WHERE ${queryParams.join(' AND ')}` : ''}`;
   return {sql, values}
