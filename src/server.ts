@@ -1024,7 +1024,7 @@ const start = async (): Promise<void> => {
       }
     }
 
-    let transactions: TransactionInterface[] = []
+    const transactions: TransactionInterface[] = []
     if (query.count) {
       const count: number = parseInt(query.count)
       //max 1000 logs
