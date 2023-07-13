@@ -80,7 +80,7 @@ function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type:
     values.push(request.address)
   }
 
-  const createTopicQuery = (topicIndex: number, topicValue: any) => {
+  const createTopicQuery = (topicIndex: number, topicValue: any): void => {
     const hexPattern = /^0x[a-fA-F0-9]{64}$/;
     if (Array.isArray(topicValue)) {
       const validHexValues = topicValue.filter(value => typeof value === 'string' && hexPattern.test(value));
