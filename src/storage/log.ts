@@ -19,10 +19,7 @@ export interface Log<L = object> {
 
 export interface LogQueryRequest {
   address?: string;
-  topic0?: string;
-  topic1?: string;
-  topic2?: string;
-  topic3?: string;
+  topics?: any[];
   fromBlock?: string;
   toBlock?: string;
 }
@@ -82,21 +79,24 @@ function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type:
     queryParams.push(`contractAddress=?`);
     values.push(request.address)
   }
-  if (request.topic0) {
-    queryParams.push(`topic0=?`);
-    values.push(request.topic0)
+
+  const createTopicQuery = (topicIndex: number, topicValue: any) => {
+    const hexPattern = /^0x[a-fA-F0-9]{64}$/;
+    if (Array.isArray(topicValue)) {
+      const validHexValues = topicValue.filter(value => typeof value === 'string' && hexPattern.test(value));
+      if (validHexValues.length > 0) {
+        const query = `topic${topicIndex} IN (${validHexValues.map(() => '?').join(',')})`;
+        queryParams.push(query);
+        values.push(...validHexValues);
+      }
+    } else if (typeof topicValue === 'string' && hexPattern.test(topicValue)) {
+      queryParams.push(`topic${topicIndex}=?`);
+      values.push(topicValue);
+    }
   }
-  if (request.topic1) {
-    queryParams.push(`topic1=?`);
-    values.push(request.topic1)
-  }
-  if (request.topic2) {
-    queryParams.push(`topic2=?`);
-    values.push(request.topic2)
-  }
-  if (request.topic3) {
-    queryParams.push(`topic3=?`);
-    values.push(request.topic3)
+  // Handling topics array
+  if (Array.isArray(request.topics)) {
+    request.topics.forEach((topic, index) => createTopicQuery(index, topic));
   }
   const fromBlock = request.fromBlock ? padAndPrefixBlockNumber(request.fromBlock) : null
   const toBlock = request.toBlock ? padAndPrefixBlockNumber(request.toBlock) : null
@@ -120,10 +120,7 @@ export async function queryLogCount(
   endCycle = undefined,
   type = undefined,
   contractAddress?: string,
-  topic0?: string,
-  topic1?: string,
-  topic2?: string,
-  topic3?: string,
+  topics?: any[],
   fromBlock?: string,
   toBlock?: string
 ): Promise<number> {
@@ -131,10 +128,7 @@ export async function queryLogCount(
   try {
     let {sql, values: inputs} = buildLogQueryString({
       address: contractAddress,
-      topic0,
-      topic1,
-      topic2,
-      topic3,
+      topics,
       fromBlock,
       toBlock
     }, true, type)
@@ -163,10 +157,7 @@ export async function queryLogs(
   endCycle?: number,
   type?: string,
   contractAddress?: string,
-  topic0?: string,
-  topic1?: string,
-  topic2?: string,
-  topic3?: string,
+  topics?: any[],
   fromBlock?: string,
   toBlock?: string
 ): Promise<Log[]> {
@@ -175,10 +166,7 @@ export async function queryLogs(
 
     const queryString = buildLogQueryString({
       address: contractAddress,
-      topic0,
-      topic1,
-      topic2,
-      topic3,
+      topics,
       fromBlock,
       toBlock
     }, false, type)

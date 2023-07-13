@@ -90,10 +90,7 @@ interface RequestQuery {
   type: string //contract accounts list query
   accountType: string
   accountId: string
-  topic0: string
-  topic1: string
-  topic2: string
-  topic3: string
+  topics: string
   responseType: string
   fromBlock: string
   toBlock: string
@@ -149,14 +146,14 @@ const start = async (): Promise<void> => {
     reply.send({ port: CONFIG.port.server })
   })
   if(CONFIG.subscription.enabled === true){
-    server.get('/evm_log_subscription', { websocket: true }, 
+    server.get('/evm_log_subscription', { websocket: true },
                (connection:SocketStream, req:FastifyRequest) => {
-     
+
        let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
        socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
        connection.socket.id = socket_id;
        socketClient.set(socket_id, connection);
-    
+
       connection.socket.on('message', message => {
         try{
           const payload = JSON.parse(message);
@@ -1093,12 +1090,21 @@ const start = async (): Promise<void> => {
     let totalPages = 0
     let totalLogs = 0
     let logs
-    const supportedQueryParams = ['address', 'topic0', 'topic1', 'topic2', 'topic3', 'fromBlock', 'toBlock', 'startCycle', 'endCycle']
+    const supportedQueryParams = ['address', 'topics', 'fromBlock', 'toBlock', 'startCycle', 'endCycle']
     const address = query.address && query.address.length === 42 ? query.address : null
-    const topic0 = query.topic0 && query.topic0.length === 66 ? query.topic0 : null
-    const topic1 = query.topic1 && query.topic1.length === 66 ? query.topic1 : null
-    const topic2 = query.topic2 && query.topic2.length === 66 ? query.topic2 : null
-    const topic3 = query.topic3 && query.topic3.length === 66 ? query.topic3 : null
+    // const topic0 = query.topic0 && query.topic0.length === 66 ? query.topic0 : null
+    // const topic1 = query.topic1 && query.topic1.length === 66 ? query.topic1 : null
+    // const topic2 = query.topic2 && query.topic2.length === 66 ? query.topic2 : null
+    // const topic3 = query.topic3 && query.topic3.length === 66 ? query.topic3 : null
+    let topics = []
+    try {
+      const parsedTopics = JSON.parse(query.topics)
+      if (parsedTopics && Array.isArray(parsedTopics)) {
+        topics = parsedTopics
+      }
+    } catch (e) {
+      console.log(`Error parsing topics: ${e.message}`)
+    }
     const transactions = []
     if (query.count) {
       const count: number = parseInt(query.count)
@@ -1142,10 +1148,7 @@ const start = async (): Promise<void> => {
         endCycle,
         query.type,
         address,
-        topic0,
-        topic1,
-        topic2,
-        topic3,
+        topics,
         query.fromBlock,
         query.toBlock
       )
@@ -1171,10 +1174,7 @@ const start = async (): Promise<void> => {
           endCycle,
           query.type,
           address,
-          topic0,
-          topic1,
-          topic2,
-          topic3,
+          topics,
           query.fromBlock,
           query.toBlock
         )
