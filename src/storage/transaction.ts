@@ -431,7 +431,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
         if (config.verbose) console.log(methodCode)
         // eslint-disable-next-line security/detect-object-injection
         if (ERC20_METHOD_DIC[methodCode] === 'transfer' || ERC20_METHOD_DIC[methodCode] === 'transferFrom') {
-          const tokenTx = {} as any
+          const tokenTx = {} as TokenTx
           // eslint-disable-next-line security/detect-object-injection
           if (ERC20_METHOD_DIC[methodCode] === 'transfer') {
             // Token transfer transaction
@@ -445,7 +445,7 @@ export async function insertOrUpdateTransaction(archivedCycle: ArchivedCycle): P
             tokenTx.tokenValue = `0x${data.substring(114)}`
           }
           if (config.verbose) console.log('tokenTx', tokenTx)
-          transactionInfo['tokenTxs'] = tokenTx
+          transactionInfo.tokenTxs.push(tokenTx)
           if (tokenTx.tokenTo) {
             const accountExist = await Account.queryAccountByAddress(tokenTx.tokenTo)
             if (config.verbose) console.log('tokenTx.tokenTo', tokenTx.tokenTo, accountExist)
@@ -705,8 +705,6 @@ export async function queryTransactions(
         }
       }
     } else if (txType) {
-      // txType should be non-zero as TransactionSearchType starts at 1, so
-      // this conditional is pretty sane
       if (txType === TransactionSearchType.AllExceptInternalTx) {
         const sql = `SELECT * FROM transactions WHERE transactionType=? OR  transactionType=? OR  transactionType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [
@@ -796,27 +794,31 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
   return null
 }
 
-export async function queryTransactionByHash(txHash: string, detail = false): Promise<Transaction | null> {
+export async function queryTransactionByHash(txHash: string, detail = false): Promise<Transaction[] | null> {
   try {
     const sql = `SELECT * FROM transactions WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
-    const transaction: DbTransaction = await db.get(sql, [txHash])
-    if (transaction) {
-      if (transaction.wrappedEVMAccount)
-        transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-      if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
-      if (detail) {
-        const sql = `SELECT * FROM tokenTxs WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
-        const tokenTxs: DbTokenTx[] = await db.all(sql, [txHash])
-        if (tokenTxs.length > 0) {
-          tokenTxs.forEach((tokenTx: { contractInfo: string }) => {
-            if (tokenTx.contractInfo) tokenTx.contractInfo = JSON.parse(tokenTx.contractInfo)
-          })
-          transaction.tokenTxs = tokenTxs
+    const transactions: DbTransaction[] = await db.all(sql, [txHash])
+    if (transactions.length > 0) {
+      for (let i = 0; i < transactions.length; i++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const transaction = transactions[i]
+        if (transaction.wrappedEVMAccount)
+          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
+        if (detail) {
+          const sql = `SELECT * FROM tokenTxs WHERE txId=? ORDER BY cycle DESC, timestamp DESC`
+          const tokenTxs: DbTokenTx[] = await db.all(sql, [transaction.txId])
+          if (tokenTxs.length > 0) {
+            tokenTxs.forEach((tokenTx: { contractInfo: string }) => {
+              if (tokenTx.contractInfo) tokenTx.contractInfo = JSON.parse(tokenTx.contractInfo)
+            })
+            transaction.tokenTxs = tokenTxs
+          }
         }
       }
     }
-    if (config.verbose) console.log('transaction hash', transaction)
-    return transaction
+    if (config.verbose) console.log('transaction hash', transactions)
+    return transactions
   } catch (e) {
     console.log(e)
   }

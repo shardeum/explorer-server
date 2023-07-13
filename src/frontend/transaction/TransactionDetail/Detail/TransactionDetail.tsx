@@ -15,9 +15,10 @@ import { useTransactionDetailHook } from './useTransactionDetailHook'
 export const TransactionDetail: React.FC = () => {
   const router = useRouter()
 
-  const id = router?.query?.id as string
+  const txHash = router?.query?.id as string
+  const txId = router?.query?.txId as string
 
-  const { transactionData, receiptData, setShowReceipt, showReceipt } = useTransactionDetailHook(id)
+  const { transactionData, receiptData, setShowReceipt, showReceipt } = useTransactionDetailHook(txHash, txId)
 
   const tabs = useMemo(() => {
     const tabsArray = [

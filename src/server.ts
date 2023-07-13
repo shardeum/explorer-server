@@ -1,6 +1,12 @@
 // require("dotenv").config();
 
-import { addLogSubscriptions, evmLogDiscovery, LOG_SUBSCRIPTIONS_BY_ADDRESS, removeLogSubscription, removeLogSubscriptionBySocketId } from './subscription/'
+import {
+  addLogSubscriptions,
+  evmLogDiscovery,
+  LOG_SUBSCRIPTIONS_BY_ADDRESS,
+  removeLogSubscription,
+  removeLogSubscriptionBySocketId,
+} from './subscription/'
 import * as Storage from './storage'
 import * as ArchivedCycle from './storage/archivedCycle'
 import * as Transaction from './storage/transaction'
@@ -15,7 +21,7 @@ import * as utils from './utils'
 import fastifyCors from '@fastify/cors'
 import { Server, IncomingMessage, ServerResponse } from 'http'
 import fastifyNextjs from '@fastify/nextjs'
-import FastifyWebsocket from '@fastify/websocket';
+import FastifyWebsocket from '@fastify/websocket'
 import axios from 'axios'
 import {
   AccountSearchType,
@@ -117,7 +123,7 @@ const start = async (): Promise<void> => {
     logger: false,
   })
 
-  await server.register(FastifyWebsocket);
+  await server.register(FastifyWebsocket)
   await server.register(fastifyCors)
   await server.register(fastifyRateLimit, {
     max: CONFIG.rateLimit,
@@ -145,34 +151,36 @@ const start = async (): Promise<void> => {
   server.get('/port', (req, reply) => {
     reply.send({ port: CONFIG.port.server })
   })
-  if(CONFIG.subscription.enabled === true){
-    server.get('/evm_log_subscription', { websocket: true },
-               (connection:SocketStream, req:FastifyRequest) => {
+  if (CONFIG.subscription.enabled === true) {
+    server.get(
+      '/evm_log_subscription',
+      { websocket: true },
+      (connection: SocketStream, req: FastifyRequest) => {
+        let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
+        socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex')
+        connection.socket.id = socket_id
+        socketClient.set(socket_id, connection)
 
-       let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
-       socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
-       connection.socket.id = socket_id;
-       socketClient.set(socket_id, connection);
-
-      connection.socket.on('message', message => {
-        try{
-          const payload = JSON.parse(message);
-          socketHandlers.onMessage(connection, payload);
-          return
-        }catch(e){
-          connection.socket.send(JSON.stringify({error: e.message}));
-          return
-        }
-      })
-      connection.socket.on('close', message => {
-        try{
-          removeLogSubscriptionBySocketId(connection.socket.id)
-          socketClient.delete(connection.socket.id);
-        }catch(e){
-          console.error(e);
-        }
-      })
-    })
+        connection.socket.on('message', (message) => {
+          try {
+            const payload = JSON.parse(message)
+            socketHandlers.onMessage(connection, payload)
+            return
+          } catch (e) {
+            connection.socket.send(JSON.stringify({ error: e.message }))
+            return
+          }
+        })
+        connection.socket.on('close', (message) => {
+          try {
+            removeLogSubscriptionBySocketId(connection.socket.id)
+            socketClient.delete(connection.socket.id)
+          } catch (e) {
+            console.error(e)
+          }
+        })
+      }
+    )
   }
 
   server.get('/api/cycleinfo', async (_request, reply) => {
@@ -662,9 +670,8 @@ const start = async (): Promise<void> => {
         return
       }
       if (query.type === 'requery') {
-        const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-        if (transaction) {
-          transactions = [transaction]
+        transactions = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+        if (transactions.length > 0) {
           txHashQueryCache.set(query.txHash, { success: true, transactions })
           const res: TransactionResponse = {
             success: true,
@@ -699,14 +706,19 @@ const start = async (): Promise<void> => {
         if (found.success) return found
         if (!acceptedTx) return found
       }
-      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-      if (transaction) transactions = [transaction]
-      if (transaction) txHashQueryCache.set(query.txHash, { success: true, transactions })
-      else
+      transactions = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+      if (transactions.length > 0) txHashQueryCache.set(query.txHash, { success: true, transactions })
+      else {
         txHashQueryCache.set(query.txHash, {
           success: false,
           error: 'This transaction is not found!',
         })
+        reply.send({
+          success: false,
+          error: 'This transaction is not found!',
+        })
+        return
+      }
       if (txHashQueryCache.size > txHashQueryCacheSize + 10) {
         // Remove old data
         const extra = txHashQueryCache.size - txHashQueryCacheSize
@@ -750,98 +762,6 @@ const start = async (): Promise<void> => {
     }
     if (query.filterAddress) {
       res.filterAddressTokenBalance = filterAddressTokenBalance
-    }
-    reply.send(res)
-  })
-
-  // Seems we can remove this endpoint now.
-  server.get('/api/tx', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query as object, {
-      txHash: 's?',
-      type: 's?',
-    })
-    if (err) {
-      reply.send({ success: false, error: err })
-      return
-    }
-    const query = _request.query as RequestQuery
-    let transactions = []
-    const res: TransactionResponse = {
-      success: true,
-      transactions,
-    }
-    if (query.txHash.length !== 66) {
-      reply.send({
-        success: false,
-        error: 'The transaction hash is not correct!',
-      })
-      return
-    }
-    if (query.type === 'requery') {
-      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-      if (transaction) {
-        transactions = [transaction]
-        txHashQueryCache.set(query.txHash, { success: true, transactions })
-        res.transactions = transactions
-        reply.send(res)
-        return
-      }
-    }
-    let acceptedTx = false
-    let result
-    try {
-      // result = await axios.get(
-      //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
-      // );
-      result = await axios.get(`${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`)
-    } catch (e) {
-      console.log(`RPC Data Collector is not responding`, e)
-    }
-    if (result && result.data && result.data.txStatus) {
-      if (!result.data.txStatus.injected || !result.data.txStatus.accepted) {
-        res.success = false
-        res.transactions.push({ txStatus: result.data.txStatus })
-      }
-      acceptedTx = result.data.txStatus.accepted
-    }
-    if (res.success) {
-      const found = txHashQueryCache.get(query.txHash)
-      if (found) {
-        if (found.success) return found
-        if (!acceptedTx) return found
-      }
-      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-      // console.log('transaction result', query.txHash, transactions)
-      if (transaction) {
-        res.transactions.push(transaction)
-      } else {
-        try {
-          const queryArchiver = await axios.get(`${ARCHIVER_URL}/nodelist`)
-          const activeNode = queryArchiver.data.nodeList[0]
-          result = await axios.get(`http://${activeNode.ip}:${activeNode.port}/tx/${query.txHash}`)
-          if (result.data && result.data.account) {
-            // console.log('transaction result', result.status, result.data)
-            res.transactions.push({ wrappedEVMAccount: result.data.account })
-          }
-        } catch (e) {
-          console.log(`Archiver ${ARCHIVER_URL} is not responding`, e)
-        }
-      }
-
-      txHashQueryCache.set(query.txHash, res)
-      if (txHashQueryCache.size > txHashQueryCacheSize + 10) {
-        // Remove old data
-        const extra = txHashQueryCache.size - txHashQueryCacheSize
-        const arrayTemp = Array.from(txHashQueryCache)
-        arrayTemp.splice(0, extra)
-        txHashQueryCache = new Map(arrayTemp)
-      }
-
-      if (!transaction) {
-        delete res.transactions
-        reply.send({ result: res, success: false, error: 'This transaction is not found!' })
-        return
-      }
     }
     reply.send(res)
   })
@@ -1072,13 +992,13 @@ const start = async (): Promise<void> => {
       topic3: 's?',
       type: 's?',
       fromBlock: 's?',
-      toBlock: 's?'
+      toBlock: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
       return
     }
-    if (CONFIG.verbose) console.log('Request', _request.query);
+    if (CONFIG.verbose) console.log('Request', _request.query)
     const query = _request.query as RequestQuery
     for (const key in query) {
       if (query[key] === 'undefined') {
@@ -1104,7 +1024,7 @@ const start = async (): Promise<void> => {
       }
     }
 
-    const transactions = []
+    let transactions: TransactionInterface[] = []
     if (query.count) {
       const count: number = parseInt(query.count)
       //max 1000 logs
@@ -1117,7 +1037,7 @@ const start = async (): Promise<void> => {
       }
       logs = await Log.queryLogs(0, count)
       totalLogs = await Log.queryLogCount(0, 0, query.type)
-    } else if (Object.keys(query).some(key => supportedQueryParams.includes(key))) {
+    } else if (Object.keys(query).some((key) => supportedQueryParams.includes(key))) {
       const address: string = query.address ? query.address.toLowerCase() : ''
 
       let startCycle: number
@@ -1179,9 +1099,12 @@ const start = async (): Promise<void> => {
         )
         if (query.type === 'txs') {
           for (let i = 0; i < logs.length; i++) {
-            const transaction = await Transaction.queryTransactionByHash(logs[i].txHash) // eslint-disable-line security/detect-object-injection
-            console.log(logs[i].txHash, transaction) // eslint-disable-line security/detect-object-injection
-            transactions.push(transaction)
+            const txs = await Transaction.queryTransactionByHash(logs[i].txHash) // eslint-disable-line security/detect-object-injection
+            if (txs.length > 0) {
+              const success = txs.filter((tx: any) => tx?.wrappedEVMAccount?.readableReceipt?.status === 1)
+              transactions.push(success[0])
+            }
+            // console.log(logs[i].txHash, transactions) // eslint-disable-line security/detect-object-injection
           }
         }
       }
@@ -1417,8 +1340,8 @@ const start = async (): Promise<void> => {
         throw err
       }
       console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
-      if(CONFIG.subscription.enabled) {
-        setInterval(evmLogDiscovery, 15 * 1000);
+      if (CONFIG.subscription.enabled) {
+        setInterval(evmLogDiscovery, 15 * 1000)
       }
     }
   )

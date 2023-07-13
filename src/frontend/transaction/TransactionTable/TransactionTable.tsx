@@ -21,8 +21,14 @@ const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx>[] = [
   {
     key: 'txHash',
     value: 'Txn Hash',
-    render: (val: string | TransactionType) => (
-      <AnchorLink href={`/transaction/${val}`} label={val as string} size="small" ellipsis width={150} />
+    render: (val: string, item: Transaction | TokenTx) => (
+      <AnchorLink
+        href={`/transaction/${val}?txId=${item?.txId}`}
+        label={val as string}
+        size="small"
+        ellipsis
+        width={150}
+      />
     ),
   },
   {
@@ -76,12 +82,19 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'wrappedEVMAccount.readableReceipt',
           value: 'To',
-          render: (val: ReadableReceipt) =>  
-            val && (val?.to ? (
+          render: (val: ReadableReceipt) =>
+            val &&
+            (val?.to ? (
               <AnchorLink href={`/account/${val.to}`} label={val.to} size="small" ellipsis width={150} />
             ) : (
-              <AnchorLink href={`/account/${val.contractAddress}`} label={'Contract creation'} size="small" ellipsis width={150} />
-            ))
+              <AnchorLink
+                href={`/account/${val.contractAddress}`}
+                label={'Contract creation'}
+                size="small"
+                ellipsis
+                width={150}
+              />
+            )),
         },
         {
           key: 'wrappedEVMAccount.readableReceipt.value',
