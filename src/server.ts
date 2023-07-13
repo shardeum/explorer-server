@@ -1092,19 +1092,18 @@ const start = async (): Promise<void> => {
     let logs
     const supportedQueryParams = ['address', 'topics', 'fromBlock', 'toBlock', 'startCycle', 'endCycle']
     const address = query.address && query.address.length === 42 ? query.address : null
-    // const topic0 = query.topic0 && query.topic0.length === 66 ? query.topic0 : null
-    // const topic1 = query.topic1 && query.topic1.length === 66 ? query.topic1 : null
-    // const topic2 = query.topic2 && query.topic2.length === 66 ? query.topic2 : null
-    // const topic3 = query.topic3 && query.topic3.length === 66 ? query.topic3 : null
     let topics = []
-    try {
-      const parsedTopics = JSON.parse(query.topics)
-      if (parsedTopics && Array.isArray(parsedTopics)) {
-        topics = parsedTopics
+    if (query.topics) {
+      try {
+        const parsedTopics = JSON.parse(query.topics)
+        if (parsedTopics && Array.isArray(parsedTopics)) {
+          topics = parsedTopics
+        }
+      } catch (e) {
+        console.log(`Error parsing topics: ${e.message}`)
       }
-    } catch (e) {
-      console.log(`Error parsing topics: ${e.message}`)
     }
+
     const transactions = []
     if (query.count) {
       const count: number = parseInt(query.count)
