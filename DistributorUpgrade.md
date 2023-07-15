@@ -49,6 +49,9 @@ sequenceDiagram
     participant ArchiveServer
     participant ValidatorNode
 
+    DappClientWS->>RPCServer: Connect & subscribe with filter parameters
+    RPCServer->>ExplorerServer: Send the subscription filter parameters
+
     ValidatorNode->>ArchiveServer: Send Receipt data over HTTP
     ArchiveServer->>ExplorerCollector: Send Receipt data (socket.io RECEIPT message)
     ArchiveServer->>ExplorerCollector: Send Cycle data (socket.io ARCHIVED_CYCLE message)
@@ -58,8 +61,6 @@ sequenceDiagram
     ExplorerServer->>ExplorerServer: Run SQL query for each subscription
     ExplorerServer->>RPCServer: If data match, send "log_found" message with data
 
-    DappClientWS->>RPCServer: Connect & subscribe with filter parameters
-    RPCServer->>ExplorerServer: Send the subscription filter parameters
     RPCServer->>DappClientWS: If address filter match, forward "log_found" data to subscriber
 ```
 <br>
@@ -118,6 +119,9 @@ sequenceDiagram
     participant ArchiveServer
     participant ValidatorNode
 
+    DappClientWS->>RPCServer: Connect & subscribe with filter parameters
+    RPCServer->>Distributor: Send the subscription filter parameters
+
     ValidatorNode->>ArchiveServer: Send Receipt data over HTTP
     ArchiveServer->>ExplorerCollector: Send Receipt data (socket.io RECEIPT message)
     ArchiveServer->>ExplorerCollector: Send Cycle data (socket.io ARCHIVED_CYCLE message)
@@ -127,8 +131,6 @@ sequenceDiagram
     Note over Distributor: Checks if Receipt data matches any subscription filter
     Distributor->>RPCServer: If data match, send "log_found" message with data
 
-    DappClientWS->>RPCServer: Connect & subscribe with filter parameters
-    RPCServer->>Distributor: Send the subscription filter parameters
     RPCServer->>DappClientWS: If address filter match, forward "log_found" data to subscriber
 
 ```
