@@ -9,7 +9,7 @@ The system is composed of several software components, each of which is a NodeJS
 - ExplorerCollector
 - ExplorerServer
 - RPCServer
-- DappClientWS
+- DappClientWS (users/community that use websockets)
 
 ## DappClientWS and RPCServer Interaction
 
@@ -38,6 +38,8 @@ The ExplorerServer runs a function called `evmLogDiscovery` once every 15 second
 
 When the RPCServer gets the "log_found" data, it inspects the addresses in the data and then forwards the data to any subscribers that have a filter that matches this data.
 
+## Sequence diagram for Current design.  
+- Note the break in flow where the sql DB is queried per subscription 
 ```mermaid
 sequenceDiagram
     participant DappClientWS
@@ -60,6 +62,10 @@ sequenceDiagram
     RPCServer->>ExplorerServer: Send the subscription filter parameters
     RPCServer->>DappClientWS: If address filter match, forward "log_found" data to subscriber
 ```
+<br>
+<br>
+<br>
+
 
 # Design2: Upgraded System Overview
 
@@ -70,7 +76,7 @@ The system is composed of several software components, each of which is a NodeJS
 - ValidatorNode
 - ArchiveServer
 - ExplorerCollector
-- Distributor (new)
+- Distributor (new microservice for shardeum-explorer repo)
 - RPCServer
 - DappClientWS
 
@@ -101,6 +107,8 @@ The Distributor checks each Receipt it receives against any of the subscribed fi
 
 When the RPCServer gets the "log_found" data, it inspects the addresses in the data and then forwards the data to any subscribers that have a filter that matches this data.
 
+## Sequence diagram for new design. 
+The Distributor is added and data now flows all the way through 
 ```mermaid
 sequenceDiagram
     participant DappClientWS
@@ -124,6 +132,9 @@ sequenceDiagram
     RPCServer->>DappClientWS: If address filter match, forward "log_found" data to subscriber
 
 ```
+<br>
+<br>
+<br>
 
 # Design Update: Motivation and Overview
 
@@ -151,10 +162,24 @@ The system upgrade involves several key changes:
 
 2. **Task 2: RPCServer Modification** - Alter the RPCServer's subscription initialization code so that it sends subscription filter parameters to the Distributor instead of the ExplorerServer. The existing mechanism for sending "log_found" back to DappClient will remain unchanged, although the code that invokes this will change with the new flow. This task can be done in parallel with Task 1.
 
-3. **Task 3: ExplorerCollector Modification** - This task has two main components. First, implement new code in `src/collector.ts` of ExplorerCollector to forward the Cycle and Receipt data to the Distributor using socket.io, right after `collector.processData(data)` and `collector.processReceipt(data)` are called. Second, create new code in the Distributor to handle these incoming messages. The ExplorerCollector will listen on the `distributorPort` and should be able to send to one or more subscribed Distributors. Suggested filenames: `src/collector/DistributorSender.ts` for the code in ExplorerCollector to send data to Distributor, and `src/DistributorSocketListener.ts` in Distributor for receiving the data.  The messages used for socket communications should be documented in the task, but it is expected to be similar to when we send Receipt data from the archiver to the explorer collector. 
+3. **Task 3: ExplorerCollector Modification** - This task has two main components. First, implement new code in `src/collector.ts` of ExplorerCollector to forward the Cycle and Receipt data to the Distributor using socket.io, right after `collector.processData(data)` and `collector.processReceipt(data)` are called. Second, create new code in the Distributor to handle these incoming messages. The ExplorerCollector will listen on the `distributorPort` and should be able to send to one or more subscribed Distributors. Suggested filenames: `src/collector/DistributorSender.ts` for the code in ExplorerCollector to send data to Distributor, and `src/DistributorSocketListener.ts` in Distributor for receiving the data.  The messages used for socket communications should be documented in the task, but it is expected to be similar to when we send Receipt data from the archiver to the explorer collector.  For now it should be assumed that one ExplorerCollector service can send to multiple Distributors.  We may adjust this later and could perhaps have an intermediate distributor. 
 
 4. **Task 4: Distributor's "log_found" Messaging** - As the code for sending "log_found" back to the DappClient will remain unchanged, this task mainly involves integrating the new filtering mechanism developed in Task 1 into the Distributor's messaging system. This should be done after Task 1, but it can be performed in parallel with Task 3.
 
-5. **Task 5: Testing and Debugging** - Once all the new codes are implemented and modifications are made, rigorous testing and debugging is required to ensure the new system works as expected. This task can't start until the other four tasks are completed.
+5. **Task 5: Update tools and docs to work with new Distributor microservice** - Make sure this works with local smoke testing.  Make sure the default port selected above works with local shardus cli testing.
+
+5. **Task 6: Testing and Debugging** - Once all the new codes are implemented and modifications are made, rigorous testing and debugging is required to ensure the new system works as expected. This task can't start until the other four tasks are completed.  Test on a dev server, test with nginx.  Test with multiple distributors behind nginx.  Test with multiple RPC servers
+behind nginx.  Want to make sure nginx does not mess up subscriptions. 
 
 Note: This project should support two programmers working in parallel for some of the time. Otherwise pair programming should be invoked when schedules permit.  1 and 2 can bet started right away with communication and then the dev working on 2 can finish and start on the collector changes for task 3.  Pair programming may be helpful for wrapping up the distributor side code that receives data in task 3.  
+
+
+# Possible Problems
+We may have issues with nginx when running multiple distributors.  We know there will be issues with "filter" RPCs so there may be some shared work to solve these issues. 
+
+# Future consideration
+In the future we may adjust some connections to use a reliable queue instead of sockets.
+This will depend on how reliable this system can be in real world situations.
+If we need to optimize the collector later, we could have it send to a repeater microservice
+that could then forward the data to N other nodes.  
+ 
