@@ -1,38 +1,32 @@
 // require("dotenv").config();
 
-import {
-  evmLogDiscovery,
-  removeLogSubscriptionBySocketId,
-} from './subscription/'
-import * as Storage from './storage'
-import * as ArchivedCycle from './storage/archivedCycle'
-import * as Transaction from './storage/transaction'
-import * as Account from './storage/account'
-import * as Cycle from './storage/cycle'
-import * as Receipt from './storage/receipt'
-import * as Log from './storage/log'
-import Fastify, { FastifyRequest } from 'fastify'
-import * as vanillaCrypto from 'crypto'
-import * as crypto from '@shardus/crypto-utils'
-import * as utils from './utils'
 import fastifyCors from '@fastify/cors'
-import FastifyWebsocket from '@fastify/websocket'
 import fastifyNextjs from '@fastify/nextjs'
+import fastifyRateLimit from '@fastify/rate-limit'
+import FastifyWebsocket from '@fastify/websocket'
+import * as crypto from '@shardus/crypto-utils'
 import axios from 'axios'
+import Fastify from 'fastify'
+import * as usage from './middleware/usage'
+import * as StatsStorage from './stats'
+import * as CoinStats from './stats/coinStats'
+import * as TransactionStats from './stats/transactionStats'
+import * as ValidatorStats from './stats/validatorStats'
+import * as Storage from './storage'
+import * as Account from './storage/account'
+import * as ArchivedCycle from './storage/archivedCycle'
+import * as Cycle from './storage/cycle'
+import * as Log from './storage/log'
+import * as Receipt from './storage/receipt'
+import * as Transaction from './storage/transaction'
 import {
   AccountSearchType,
   AccountType,
   TokenTx,
+  Transaction as TransactionInterface,
   TransactionSearchType,
-  Transaction as TransactionInterface, WebSocketWithId,
 } from './types'
-import * as StatsStorage from './stats'
-import * as ValidatorStats from './stats/validatorStats'
-import * as TransactionStats from './stats/transactionStats'
-import * as CoinStats from './stats/coinStats'
-import fastifyRateLimit from '@fastify/rate-limit'
-import { socketClient, socketHandlers } from './subscription/websocket'
-import * as usage from './middleware/usage'
+import * as utils from './utils'
 import { getFromArchiver } from '@shardus/archiver-discovery'
 import './archiver'
 
@@ -46,6 +40,7 @@ import {
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
+//import { ARCHIVER_URL, config as CONFIG, RPC_DATA_SERVER_URL } from './config' //from Distributor work
 import {
   AccountResponse,
   AddressResponse,
@@ -147,37 +142,6 @@ const start = async (): Promise<void> => {
   server.get('/port', (req, reply) => {
     reply.send({ port: CONFIG.port.server })
   })
-  if (CONFIG.subscription.enabled === true) {
-    server.get(
-      '/evm_log_subscription',
-      { websocket: true },
-      (connection: SocketStream, req: FastifyRequest) => {
-        let socket_id = vanillaCrypto.randomBytes(32).toString('hex');
-        socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
-        (connection.socket as WebSocketWithId).id = socket_id
-        socketClient.set(socket_id, connection)
-
-        connection.socket.on('message', (message) => {
-          try {
-            const payload = JSON.parse(message.toString())
-            socketHandlers.onMessage(connection, payload)
-            return
-          } catch (e) {
-            connection.socket.send(JSON.stringify({ error: e.message }))
-            return
-          }
-        })
-        connection.socket.on('close', (message) => {
-          try {
-            removeLogSubscriptionBySocketId((connection.socket as WebSocketWithId).id)
-            socketClient.delete((connection.socket as WebSocketWithId).id)
-          } catch (e) {
-            console.error(e)
-          }
-        })
-      }
-    )
-  }
 
   server.get('/api/cycleinfo', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
@@ -1429,9 +1393,6 @@ const start = async (): Promise<void> => {
         throw err
       }
       console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
-      if (CONFIG.subscription.enabled) {
-        setInterval(evmLogDiscovery, 15 * 1000)
-      }
     }
   )
 }
