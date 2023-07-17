@@ -8,6 +8,7 @@ export const config = {
     collector: process.env.COLLECTORPORT || '4444',
     server: process.env.PORT || '6001',
     rpc_data_collector: process.env.RPCDCPORT || '4445',
+    distributor_port: process.env.DISTRIBUTOR_PORT || '4446',
   },
   archiverInfo: {
     ip: process.env.ARCHIVERIP || '127.0.0.1',
