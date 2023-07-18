@@ -17,15 +17,15 @@ export const setupDistributorSender = (): void => {
 
   socketServer.on(ConnectionEvent, (socket) => {
     console.log(`New distributor registered ${socket.id}`)
-    registeredDistributors[socket.id] = socket
+    registeredDistributors.set(socket.id, socket)
     socket.on(DisconnectionEvent, () => {
       console.log(`Distributor ${socket.id} disconnected`)
-      delete registeredDistributors[socket.id]
+      registeredDistributors.delete(socket.id)
     })
     socket.on(ErrorEvent, (err) => {
       console.log(`Distributor ${socket.id} error: ${err}. Disconnecting...`)
+      registeredDistributors.delete(socket.id)
       socket.disconnect()
-      delete registeredDistributors[socket.id]
     })
   })
 
