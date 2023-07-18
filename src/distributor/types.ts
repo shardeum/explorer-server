@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Data {
+export interface ArchivedCycles {
   archivedCycles: any[]
   sign: {
     owner: string
@@ -7,7 +7,7 @@ export interface Data {
   }
 }
 
-export interface NewData {
+export interface ArchivedReceipts {
   receipts: any[]
   cycles: any[]
   sign: {
