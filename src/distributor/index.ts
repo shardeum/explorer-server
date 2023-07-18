@@ -1,7 +1,7 @@
 import * as crypto from '@shardus/crypto-utils'
 import { config } from '../config';
 import * as db from '../storage/sqlite3storage'
-import { socketClient } from './websocket'
+import { socketClient } from './WebSocket'
 
 type contract_address = string;
 type strigified_subscription = string;
