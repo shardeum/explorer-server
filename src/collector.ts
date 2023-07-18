@@ -22,6 +22,7 @@ import {
   updateLastSyncedCycle,
   downloadReceiptsBetweenCycles,
 } from './class/DataSync'
+import { setupDistributorSender, forwardReceiptData, forwardCycleData } from './collector/DistributorSender'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
@@ -30,6 +31,10 @@ import axios from 'axios'
 if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
 }
+
+// constants
+const ArchiverCycleWsEvent = 'ARCHIVED_CYCLE'
+const ArchiverReceiptWsEvent = 'RECEIPT'
 
 export const checkAndSyncData = async (): Promise<void> => {
   let lastStoredReceiptCount = await receipt.queryReceiptCount()
@@ -112,6 +117,7 @@ export const checkAndSyncData = async (): Promise<void> => {
 // Setup Log Directory
 const start = async (): Promise<void> => {
   await Storage.initializeDB()
+  await setupDistributorSender()
 
   const collector = new Collector()
 
@@ -123,10 +129,11 @@ const start = async (): Promise<void> => {
         console.log('connected to archive server')
       })
 
-      socketClient.on('RECEIPT', async (data: NewData) => {
+      socketClient.on(ArchiverReceiptWsEvent, async (data: NewData) => {
         // console.log('RECEIVED RECEIPT')
         try {
           collector.processReceipt(data)
+          forwardReceiptData(data)
         } catch (e) {
           console.log('Error in processing received data!', e)
         }
@@ -190,7 +197,7 @@ const start = async (): Promise<void> => {
     console.log('connected to archive server')
   })
 
-  socketClient.on('ARCHIVED_CYCLE', async (data: Data) => {
+  socketClient.on(ArchiverCycleWsEvent, async (data: Data) => {
     console.log(
       'RECEIVED ARCHIVED_CYCLE',
       data.archivedCycles &&
@@ -200,9 +207,11 @@ const start = async (): Promise<void> => {
     )
     try {
       collector.processData(data)
+      forwardCycleData(data)
     } catch (e) {
       console.log('Error in processing received data!', e)
     }
   })
 }
+
 start()
