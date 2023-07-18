@@ -1,6 +1,6 @@
 import * as socketClient from 'socket.io-client'
 import { config } from '../config'
-import { Data, NewData } from './types'
+import { ArchivedCycles, ArchivedReceipts } from './types'
 
 export const setupCollectorListener = async (): Promise<void> => {
   const socket = socketClient.connect(`http://${config.host}:${config.port.collector_distributor_sender}`, {
@@ -18,12 +18,12 @@ export const setupCollectorListener = async (): Promise<void> => {
   socket.on('data/receipt', receiptDataHandler)
 }
 
-const cycleDataHandler = async (data: Data): Promise<void> => {
+const cycleDataHandler = async (data: ArchivedCycles): Promise<void> => {
   /*prettier-ignore*/ console.log('Received archived cycle data, valid? ', data.archivedCycles && data.archivedCycles[0] && data.archivedCycles[0].cycleRecord && data.archivedCycles[0].cycleRecord.counter)
   console.log(`Cycle data: ${JSON.stringify(data, null, 2)}`)
 }
 
-const receiptDataHandler = async (data: NewData): Promise<void> => {
+const receiptDataHandler = async (data: ArchivedReceipts): Promise<void> => {
   /*prettier-ignore*/ console.log('Received receipt data, valid?', data.receipts && data.receipts[0] && data.receipts[0].receipt && data.receipts[0].receipt.cycle)
   console.log(`Receipt data: ${JSON.stringify(data, null, 2)}`)
 }
