@@ -4,12 +4,14 @@ import * as crypto from 'crypto'
 import Fastify from 'fastify'
 import { config } from './config'
 import { evmLogDiscovery, removeLogSubscriptionBySocketId } from './distributor/'
-import { socketClient, socketHandlers } from './distributor/websocket'
+import { setupCollectorListener } from './distributor/CollectorListener'
+import { socketClient, socketHandlers } from './distributor/WebSocket'
 import * as Storage from './storage'
 
 const start = async (): Promise<void> => {
   // Init dependencies
   await Storage.initializeDB()
+  await setupCollectorListener()
 
   // Init server
   const server = Fastify({
@@ -40,15 +42,15 @@ const start = async (): Promise<void> => {
   // Start server
   server.listen(
     {
-      port: Number(config.port.distributor_port),
+      port: Number(config.port.distributor),
       host: '0.0.0.0',
     },
     async (err) => {
       if (err) {
-        server.log.error(`Error starting distributor on port ${config.port.distributor_port}. Error ${err}`)
+        server.log.error(`Error starting distributor on port ${config.port.distributor}. Error ${err}`)
         throw err
       }
-      console.log('Distributor server is listening on port:', config.port.distributor_port)
+      console.log('Distributor server is listening on port:', config.port.distributor)
       setInterval(evmLogDiscovery, 15 * 1000)
     }
   )
