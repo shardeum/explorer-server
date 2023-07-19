@@ -7,10 +7,14 @@ interface Subscription {
   filterOptions: LogFilterOptions
 }
 
-export const logSocketClient = new Map<string, SocketStream>()
+const logSocketClient = new Map<string, SocketStream>()
 
 export const addLogSocketClient = (socketId: string, socket: SocketStream): void => {
   logSocketClient.set(socketId, socket)
+}
+
+export const getLogSocketClient = (socketId: string): SocketStream | undefined => {
+  return logSocketClient.get(socketId)
 }
 
 export const removeLogSocketClient = (socketId: string): void => {
@@ -36,6 +40,7 @@ export const removeLogSubscription = (subscriptionId: string): void => {
 }
 
 export const removeLogSubscriptionBySocketId = (socketId: string): void => {
+  removeLogSocketClient(socketId)
   logSubscriptionMap.forEach((subscription) => {
     if (subscription.socketId === socketId) {
       logSubscriptionMap.delete(subscription.subscriptionId)

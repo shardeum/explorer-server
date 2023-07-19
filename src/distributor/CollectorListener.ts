@@ -1,7 +1,8 @@
+import fs from 'fs'
 import * as socketClient from 'socket.io-client'
 import { config } from '../config'
 import { IndexedLogs, extractLogsFromReceipts } from './CollectorDataParser'
-import { logSocketClient, logSubscriptionMap } from './SocketManager'
+import { getLogSocketClient, logSubscriptionMap } from './SocketManager'
 import { ArchivedCycles, ArchivedReceipts } from './types'
 
 export const setupCollectorListener = async (): Promise<void> => {
@@ -16,8 +17,8 @@ export const setupCollectorListener = async (): Promise<void> => {
   socket.on('error', (err) => console.log(`Error from distributor sender: ${err}`))
 
   // Register custom socket event handlers
-  socket.on('data/cycle', cycleDataHandler)
-  socket.on('data/receipt', receiptDataHandler)
+  socket.on('/data/cycle', cycleDataHandler)
+  socket.on('/data/receipt', receiptDataHandler)
 }
 
 const cycleDataHandler = async (data: ArchivedCycles): Promise<void> => {
@@ -26,8 +27,7 @@ const cycleDataHandler = async (data: ArchivedCycles): Promise<void> => {
 }
 
 const receiptDataHandler = async (data: ArchivedReceipts): Promise<void> => {
-  /*prettier-ignore*/ console.log('Received receipt data, valid?', data.receipts && data.receipts[0] && data.receipts[0].receipt && data.receipts[0].receipt.cycle)
-  console.log(`Receipt data: ${JSON.stringify(data, null, 2)}`)
+  /*prettier-ignore*/ console.log('Received receipt data from archiver.')
 
   const logs = extractLogsFromReceipts(data)
   console.log(`Number of logs found in receipts: ${logs.length}`)
@@ -40,10 +40,12 @@ const receiptDataHandler = async (data: ArchivedReceipts): Promise<void> => {
 
   for (const [subscriptionId, subscription] of logSubscriptionMap.entries()) {
     const filteredLogs = indexedLogs.filter(subscription.filterOptions)
+    console.log(`Number of logs found for subscription ${subscriptionId}: ${filteredLogs.length}`)
     if (filteredLogs.length > 0) {
-      const socket = logSocketClient.get(subscription.socketId)
+      const socket = getLogSocketClient(subscription.socketId)
       if (socket) {
-        socket.socket.send(
+        console.log(`Sending ${filteredLogs.length} logs to socket ${subscription.socketId}`)
+        await socket.socket.send(
           JSON.stringify({ method: 'log_found', subscription_id: subscriptionId, logs: filteredLogs })
         )
       }
