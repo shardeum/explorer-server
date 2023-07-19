@@ -2,7 +2,7 @@ import { SocketStream } from '@fastify/websocket'
 import { addLogSubscriptions, removeLogSubscription } from '.'
 
 export const socketHandlers = {
-  onMessage: async function (conn: SocketStream, message: any) {
+  onMessage: async function (conn: SocketStream, message: any, socket_id: string) {
     let method = ''
     let subscription_id = ''
 
@@ -33,18 +33,20 @@ export const socketHandlers = {
         if (address.length === 0 && topics.length > 0) {
           address = ['AllContracts']
         }
-        console.log('adding subscription', conn.socket.id)
-        addLogSubscriptions(address, topics, subscription_id, conn.socket.id)
+        console.log('adding subscription', socket_id)
+        addLogSubscriptions(address, topics, subscription_id, socket_id)
         conn.socket.send(JSON.stringify({ method: 'subscribe', success: true, subscription_id }))
         return
       } catch (e: any) {
-        conn.socket.send({ method: 'subscribe', success: false, subscription_id, error: e.message })
+        conn.socket.send(
+          JSON.stringify({ method: 'subscribe', success: false, subscription_id, error: e.message })
+        )
         return
       }
     }
     if (method === 'unsubscribe') {
       try {
-        removeLogSubscription(subscription_id, conn.socket.id)
+        removeLogSubscription(subscription_id, socket_id)
         conn.socket.send(JSON.stringify({ method: 'unsubscribe', success: true, subscription_id }))
         return
       } catch (e: any) {

@@ -57,13 +57,12 @@ const start = async (): Promise<void> => {
 const evmLogSubscriptionHandler = (connection: SocketStream): void => {
   let socket_id = crypto.randomBytes(32).toString('hex')
   socket_id = crypto.createHash('sha256').update(socket_id).digest().toString('hex')
-  connection.socket.id = socket_id
   socketClient.set(socket_id, connection)
 
   connection.socket.on('message', (message) => {
     try {
-      const payload = JSON.parse(message)
-      socketHandlers.onMessage(connection, payload)
+      const payload = JSON.parse(message.toString())
+      socketHandlers.onMessage(connection, payload, socket_id)
       return
     } catch (e) {
       connection.socket.send(JSON.stringify({ error: e.message }))
@@ -72,8 +71,8 @@ const evmLogSubscriptionHandler = (connection: SocketStream): void => {
   })
   connection.socket.on('close', () => {
     try {
-      removeLogSubscriptionBySocketId(connection.socket.id)
-      socketClient.delete(connection.socket.id)
+      removeLogSubscriptionBySocketId(socket_id)
+      socketClient.delete(socket_id)
     } catch (e) {
       console.error(e)
     }
