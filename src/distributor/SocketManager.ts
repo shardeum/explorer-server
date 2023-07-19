@@ -1,0 +1,44 @@
+import { SocketStream } from '@fastify/websocket'
+import { LogFilterOptions } from './CollectorDataParser'
+
+interface Subscription {
+  subscriptionId: string
+  socketId: string
+  filterOptions: LogFilterOptions
+}
+
+export const logSocketClient = new Map<string, SocketStream>()
+
+export const addLogSocketClient = (socketId: string, socket: SocketStream): void => {
+  logSocketClient.set(socketId, socket)
+}
+
+export const removeLogSocketClient = (socketId: string): void => {
+  logSocketClient.delete(socketId)
+}
+
+export const logSubscriptionMap = new Map<string, Subscription>()
+
+export const addLogSubscriptions = (
+  subscriptionId: string,
+  socketId: string,
+  filterOptions: LogFilterOptions
+): void => {
+  logSubscriptionMap.set(subscriptionId, {
+    subscriptionId,
+    socketId,
+    filterOptions,
+  })
+}
+
+export const removeLogSubscription = (subscriptionId: string): void => {
+  logSubscriptionMap.delete(subscriptionId)
+}
+
+export const removeLogSubscriptionBySocketId = (socketId: string): void => {
+  logSubscriptionMap.forEach((subscription) => {
+    if (subscription.socketId === socketId) {
+      logSubscriptionMap.delete(subscription.subscriptionId)
+    }
+  })
+}
