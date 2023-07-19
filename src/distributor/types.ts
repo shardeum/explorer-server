@@ -25,3 +25,16 @@ export interface ReadableReceipt {
   timestamp: number
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
+
+// Ethereum log data types
+
+export interface Log {
+  address: string
+  blockHash: string
+  blockNumber: string
+  data: string
+  logIndex: string
+  topics: string[]
+  transactionHash: string
+  transactionIndex: string
+}
