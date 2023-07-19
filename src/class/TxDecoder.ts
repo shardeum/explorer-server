@@ -333,7 +333,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               // }
               // console.log('decode', decode)
               // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
-              tokenValue = Web3.utils.hexToNumberString('0x' + decode)
+              tokenValue = decode?.length > 0 ? Web3.utils.hexToNumberString('0x' + decode) : '0'
               // console.log(calculatedKey, tokenValue)
             }
             tokens.push({
@@ -394,7 +394,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
               // }
               // console.log('decode', decode)
               // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
-              tokenValue = Web3.utils.hexToNumberString('0x' + decode)
+              tokenValue = decode?.length > 0 ? Web3.utils.hexToNumberString('0x' + decode) : '0'
               // console.log(calculatedKey, tokenValue)
             }
             if (tokenValue !== '0') {
