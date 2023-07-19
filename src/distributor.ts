@@ -3,9 +3,9 @@ import FastifyWebsocket, { SocketStream } from '@fastify/websocket'
 import * as crypto from 'crypto'
 import Fastify from 'fastify'
 import { config } from './config'
-import { evmLogDiscovery, removeLogSubscriptionBySocketId } from './distributor/'
 import { setupCollectorListener } from './distributor/CollectorListener'
-import { socketClient, socketHandlers } from './distributor/WebSocket'
+import { evmLogSubscriptionHandler } from './distributor/Handler'
+import { removeLogSubscriptionBySocketId } from './distributor/SocketManager'
 import * as Storage from './storage'
 
 const start = async (): Promise<void> => {
@@ -37,7 +37,7 @@ const start = async (): Promise<void> => {
   })
 
   // Register handler
-  server.get('/evm_log_subscription', { websocket: true }, evmLogSubscriptionHandler)
+  server.get('/evm_log_subscription', { websocket: true }, evmLogSubscriptionController)
 
   // Start server
   server.listen(
@@ -51,20 +51,18 @@ const start = async (): Promise<void> => {
         throw err
       }
       console.log('Distributor server is listening on port:', config.port.distributor)
-      setInterval(evmLogDiscovery, 15 * 1000)
     }
   )
 }
 
-const evmLogSubscriptionHandler = (connection: SocketStream): void => {
-  let socket_id = crypto.randomBytes(32).toString('hex')
-  socket_id = crypto.createHash('sha256').update(socket_id).digest().toString('hex')
-  socketClient.set(socket_id, connection)
+const evmLogSubscriptionController = (connection: SocketStream): void => {
+  let socketId = crypto.randomBytes(32).toString('hex')
+  socketId = crypto.createHash('sha256').update(socketId).digest().toString('hex')
 
   connection.socket.on('message', (message) => {
     try {
       const payload = JSON.parse(message.toString())
-      socketHandlers.onMessage(connection, payload, socket_id)
+      evmLogSubscriptionHandler.onMessage(connection, payload, socketId)
       return
     } catch (e) {
       connection.socket.send(JSON.stringify({ error: e.message }))
@@ -73,8 +71,7 @@ const evmLogSubscriptionHandler = (connection: SocketStream): void => {
   })
   connection.socket.on('close', () => {
     try {
-      removeLogSubscriptionBySocketId(socket_id)
-      socketClient.delete(socket_id)
+      removeLogSubscriptionBySocketId(socketId)
     } catch (e) {
       console.error(e)
     }

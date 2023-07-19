@@ -1,3 +1,5 @@
+import { WrappedEVMAccount } from '../types'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ArchivedCycles {
   archivedCycles: any[]
@@ -14,4 +16,9 @@ export interface ArchivedReceipts {
     owner: string
     sig: string
   }
+}
+
+export interface ReadableReceipt {
+  data: WrappedEVMAccount
+  timestamp: number
 }
