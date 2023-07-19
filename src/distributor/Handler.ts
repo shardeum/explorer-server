@@ -1,9 +1,8 @@
 import { SocketStream } from '@fastify/websocket'
-import { addLogSubscriptions, removeLogSubscription } from './SocketManager'
+import { addLogSocketClient, addLogSubscriptions, removeLogSubscription } from './SocketManager'
 
 interface BaseRequest {
   method: string
-  subscription_id: string
 }
 
 const validateBaseRequest = (request: unknown): [idValid: boolean, errorMsg: string] => {
@@ -14,15 +13,15 @@ const validateBaseRequest = (request: unknown): [idValid: boolean, errorMsg: str
   if (typeof req.method !== 'string') {
     return [false, 'method must be a string.']
   }
-  if (typeof req.subscription_id !== 'string') {
-    return [false, 'subscription_id must be a string.']
-  }
   return [true, '']
 }
 
-export interface SubscribeRequest extends BaseRequest {
-  address: string
-  topics: string[]
+interface SubscribeRequest extends BaseRequest {
+  params: {
+    subscription_id: string
+    address: string
+    topics: string[]
+  }
 }
 
 const validateSubscribeRequest = (request: unknown): [idValid: boolean, errorMsg: string] => {
@@ -30,17 +29,42 @@ const validateSubscribeRequest = (request: unknown): [idValid: boolean, errorMsg
     return [false, 'Request must be an object.']
   }
   const req = request as Partial<SubscribeRequest>
-  if (typeof req.method !== 'string') {
-    return [false, 'method must be a string.']
+  if (typeof req.params !== 'object' || req.params === null) {
+    return [false, 'params must be an object.']
   }
-  if (typeof req.subscription_id !== 'string') {
-    return [false, 'subscription_id must be a string.']
+  const params = req.params as Partial<SubscribeRequest['params']>
+  if (typeof params.subscription_id !== 'string') {
+    return [false, 'params.subscription_id must be a string.']
   }
-  if (typeof req.address !== 'string') {
-    return [false, 'address must be a string.']
+  if (typeof params.address !== 'string') {
+    return [false, 'params.address must be a string.']
   }
-  if (!Array.isArray(req.topics) || !req.topics.every((topic) => typeof topic === 'string')) {
-    return [false, 'topics must be an array of strings.']
+  if (!Array.isArray(params.topics)) {
+    return [false, 'params.topics must be an array.']
+  }
+  if (params.topics.some((topic) => typeof topic !== 'string')) {
+    return [false, 'params.topics must be an array of strings.']
+  }
+  return [true, '']
+}
+
+interface UnsubscribeRequest extends BaseRequest {
+  params: {
+    subscription_id: string
+  }
+}
+
+const validateUnsubscribeRequest = (request: unknown): [idValid: boolean, errorMsg: string] => {
+  if (typeof request !== 'object' || request === null) {
+    return [false, 'Request must be an object.']
+  }
+  const req = request as Partial<UnsubscribeRequest>
+  if (typeof req.params !== 'object' || req.params === null) {
+    return [false, 'params must be an object.']
+  }
+  const params = req.params as Partial<UnsubscribeRequest['params']>
+  if (typeof params.subscription_id !== 'string') {
+    return [false, 'params.subscription_id must be a string.']
   }
   return [true, '']
 }
@@ -63,26 +87,33 @@ export const evmLogSubscriptionHandler = {
           return
         }
         const subscribeRequest = request as SubscribeRequest
-        addLogSubscriptions(subscribeRequest.subscription_id, socketId, {
-          address: subscribeRequest.address,
-          topics: subscribeRequest.topics,
+        addLogSubscriptions(subscribeRequest.params.subscription_id, socketId, {
+          address: subscribeRequest.params.address,
+          topics: subscribeRequest.params.topics,
         })
         conn.socket.send(
           JSON.stringify({
             method: 'subscribe',
             success: true,
-            subscription_id: subscribeRequest.subscription_id,
+            subscription_id: subscribeRequest.params.subscription_id,
           })
         )
+        addLogSocketClient(socketId, conn)
         return
       }
       case 'unsubscribe': {
-        removeLogSubscription(request.subscription_id)
+        const [idValid, errorMsg] = validateUnsubscribeRequest(request)
+        if (!idValid) {
+          conn.socket.send(JSON.stringify({ method: 'unsubscribe', success: false, error: errorMsg }))
+          return
+        }
+        const unsubscribeRequest = request as UnsubscribeRequest
+        removeLogSubscription(unsubscribeRequest.params.subscription_id)
         conn.socket.send(
           JSON.stringify({
             method: 'unsubscribe',
             success: true,
-            subscription_id: request.subscription_id,
+            subscription_id: unsubscribeRequest.params.subscription_id,
           })
         )
         return
