@@ -5,7 +5,8 @@ import * as Account from '../storage/account'
 import * as Transaction from '../storage/transaction'
 import * as Cycle from '../storage/cycle'
 import * as Receipt from '../storage/receipt'
-import { config, ARCHIVER_URL } from '../config'
+import { config } from '../config'
+import { getDefaultArchiverUrl } from '../archiver'
 
 export let needSyncing = false
 
@@ -31,8 +32,9 @@ export const compareWithOldArchivedCyclesData = async (
   lastCycleCounter: number
 ): Promise<{ success: boolean; cycle: number }> => {
   let downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
+  const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
-    `${ARCHIVER_URL}/full-archive?start=${lastCycleCounter - 20}&end=${lastCycleCounter}`
+    `${archiverUrl}/full-archive?start=${lastCycleCounter - 20}&end=${lastCycleCounter}`
   )
   if (response && response.data && response.data.archivedCycles) {
     downloadedArchivedCycles = response.data.archivedCycles
@@ -78,14 +80,15 @@ export async function compareWithOldReceiptsData(
   const endCycle = lastStoredReceiptCycle
   const startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
   let downloadedReceiptCountByCycles: { cycle: number; receipts: number }[]
+  const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
-    `${ARCHIVER_URL}/receipt?start=${lastStoredReceiptCycle - 10}&end=${lastStoredReceiptCycle}`
+    `${archiverUrl}/receipt?start=${lastStoredReceiptCycle - 10}&end=${lastStoredReceiptCycle}`
   )
   if (response && response.data && response.data.receipts) {
     downloadedReceiptCountByCycles = response.data.receipts
   } else {
     throw Error(
-      `Can't fetch receipts data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${ARCHIVER_URL}`
+      `Can't fetch receipts data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${archiverUrl}`
     )
   }
   const oldReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
@@ -114,8 +117,9 @@ export const compareWithOldCyclesData = async (
   lastCycleCounter: number
 ): Promise<{ success: boolean; cycle: number }> => {
   let downloadedCycles: Cycle.Cycle[]
+  const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
-    `${ARCHIVER_URL}/cycleinfo?start=${lastCycleCounter - 10}&end=${lastCycleCounter - 1}`
+    `${archiverUrl}/cycleinfo?start=${lastCycleCounter - 10}&end=${lastCycleCounter - 1}`
   )
   if (response && response.data && response.data.cycleInfo) {
     downloadedCycles = response.data.cycleInfo
@@ -234,16 +238,17 @@ export const downloadAndInsertArchivedCycles = async (
   let complete = false
   let start = startCycle
   let end = start + 100
+  const archiverUrl = await getDefaultArchiverUrl()
   while (!complete) {
     if (end >= cycleToSyncTo) {
-      const res = await axios.get(`${ARCHIVER_URL}/full-archive/1`)
+      const res = await axios.get(`${archiverUrl}/full-archive/1`)
       if (res.data && res.data.archivedCycles && res.data.archivedCycles.length > 0) {
         cycleToSyncTo = res.data.archivedCycles[0].cycleRecord.counter
         console.log('cycleToSyncTo', cycleToSyncTo)
       }
     }
     console.log(`Downloading archive from cycle ${start} to cycle ${end}`)
-    const response = await axios.get(`${ARCHIVER_URL}/full-archive?start=${start}&end=${end}`)
+    const response = await axios.get(`${archiverUrl}/full-archive?start=${start}&end=${end}`)
     if (response && response.data && response.data.archivedCycles) {
       // collector = collector.concat(response.data.archivedCycles);
       if (response.data.archivedCycles.length < 100) {
@@ -332,9 +337,10 @@ export const downloadAndInsertReceiptsAndCycles = async (
   let patchData = config.patchData
   if (startReceipt === 0) patchData = true
   if (!patchData) completeForReceipt = true
+  const archiverUrl = await getDefaultArchiverUrl()
   while (!completeForReceipt || !completeForCycle) {
     if (endReceipt >= totalReceiptsToSync || endCycle >= totalCyclesToSync) {
-      const res = await axios.get(`${ARCHIVER_URL}/totalData`)
+      const res = await axios.get(`${archiverUrl}/totalData`)
       if (res.data && res.data.totalCycles && res.data.totalReceipts) {
         if (totalReceiptsToSync < res.data.totalReceipts) {
           completeForReceipt = false
@@ -350,7 +356,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
     }
     if (!completeForReceipt) {
       console.log(`Downloading receipts from ${startReceipt} to ${endReceipt}`)
-      const response = await axios.get(`${ARCHIVER_URL}/receipt?start=${startReceipt}&end=${endReceipt}`)
+      const response = await axios.get(`${archiverUrl}/receipt?start=${startReceipt}&end=${endReceipt}`)
       if (response && response.data && response.data.receipts) {
         // collector = collector.concat(response.data.archivedCycles);
         console.log(`Downloaded receipts`, response.data.receipts.length)
@@ -371,7 +377,7 @@ export const downloadAndInsertReceiptsAndCycles = async (
     }
     if (!completeForCycle) {
       console.log(`Downloading cycles from ${startCycle} to ${endCycle}`)
-      const response = await axios.get(`${ARCHIVER_URL}/cycleinfo?start=${startCycle}&end=${endCycle}`)
+      const response = await axios.get(`${archiverUrl}/cycleinfo?start=${startCycle}&end=${endCycle}`)
       if (response && response.data && response.data.cycleInfo) {
         console.log(`Downloaded cycles`, response.data.cycleInfo.length)
         const cycles = response.data.cycleInfo
@@ -431,8 +437,10 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     // Let's assume it has synced data for now, update to sync account count between them
     return
   }
+
+  const archiverUrl = await getDefaultArchiverUrl()
   if (totalExistingGenesisAccounts === 0) {
-    const res = await axios.get(`${ARCHIVER_URL}/account?startCycle=0&endCycle=5`)
+    const res = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5`)
     if (res && res.data && res.data.totalAccounts) {
       totalGenesisAccounts = res.data.totalAccounts
     } else {
@@ -443,7 +451,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     let page = 0
     while (!completeSyncingAccounts) {
       console.log(`Downloading accounts from ${startAccount} to ${endAccount}`)
-      const response = await axios.get(`${ARCHIVER_URL}/account?startCycle=0&endCycle=5&page=${page}`)
+      const response = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5&page=${page}`)
       if (response && response.data && response.data.accounts) {
         // collector = collector.concat(response.data.archivedCycles);
         if (response.data.accounts.length < 10000) {
@@ -464,7 +472,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     await Transaction.processTransactionData(combineTransactions)
   }
   if (totalExistingGenesisTransactionReceipts === 0) {
-    const res = await axios.get(`${ARCHIVER_URL}/transaction?startCycle=0&endCycle=5`)
+    const res = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5`)
     if (res && res.data && res.data.totalTransactions) {
       totalGenesisTransactionReceipts = res.data.totalTransactions
     } else {
@@ -475,7 +483,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     let page = 0
     while (!completeSyncTransactions) {
       console.log(`Downloading transactions from ${startTransaction} to ${endTransaction}`)
-      const response = await axios.get(`${ARCHIVER_URL}/transaction?startCycle=0&endCycle=5&page=${page}`)
+      const response = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5&page=${page}`)
       if (response && response.data && response.data.transactions) {
         // collector = collector.concat(response.data.archivedCycles);
         if (response.data.transactions.length < 10000) {
@@ -521,14 +529,15 @@ export async function compareReceiptsCountByCycles(
 ): Promise<{ cycle: number; receipts: number }[]> {
   const unMatchedCycle = []
   let downloadedReceiptCountByCycle: { cycle: number; receipts: number }[]
+  const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
-    `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
+    `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
   )
   if (response && response.data && response.data.receipts) {
     downloadedReceiptCountByCycle = response.data.receipts
   } else {
     console.log(
-      `Can't fetch receipts count between cycle ${startCycle} and cycle ${endCycle} from archiver ${ARCHIVER_URL}`
+      `Can't fetch receipts count between cycle ${startCycle} and cycle ${endCycle} from archiver ${archiverUrl}`
     )
     return
   }
@@ -555,11 +564,12 @@ export async function downloadReceiptsByCycle(
   for (const { cycle, receipts } of data) {
     let page = 1
     let totalDownloadedReceipts = 0
+    const archiverUrl = await getDefaultArchiverUrl()
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const response = await axios.get(
-        `${ARCHIVER_URL}/receipt?startCycle=${cycle}&endCycle=${cycle}&page=${page}`
+        `${archiverUrl}/receipt?startCycle=${cycle}&endCycle=${cycle}&page=${page}`
       )
       if (response && response.data && response.data.receipts) {
         const downloadedReceipts = response.data.receipts
@@ -568,7 +578,7 @@ export async function downloadReceiptsByCycle(
           await Receipt.processReceiptData(downloadedReceipts)
         } else {
           console.log(
-            `Got 0 receipts when querying for page ${page} of cycle ${cycle} from archiver ${ARCHIVER_URL}`
+            `Got 0 receipts when querying for page ${page} of cycle ${cycle} from archiver ${archiverUrl}`
           )
           break
         }
@@ -579,7 +589,7 @@ export async function downloadReceiptsByCycle(
           break
         }
       } else {
-        console.log(`Can't fetch receipts for  page ${page} of cycle ${cycle} from archiver ${ARCHIVER_URL}`)
+        console.log(`Can't fetch receipts for  page ${page} of cycle ${cycle} from archiver ${archiverUrl}`)
         break
       }
     }
@@ -591,18 +601,19 @@ export const downloadReceiptsBetweenCycles = async (
   totalCyclesToSync: number
 ): Promise<void> => {
   let endCycle = startCycle + 100
+  const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle < totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
     console.log(`Downloading receipts from cycle ${startCycle} to cycle ${endCycle}`)
     let response = await axios.get(
-      `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=count`
+      `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=count`
     )
     if (response && response.data && response.data.receipts) {
       console.log(`Download receipts Count`, response.data.receipts)
       const receiptsCount = response.data.receipts
       for (let i = 1; i <= Math.ceil(receiptsCount / 100); i++) {
         response = await axios.get(
-          `${ARCHIVER_URL}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
+          `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
         )
         if (response && response.data && response.data.receipts) {
           console.log(`Downloaded receipts`, response.data.receipts.length)

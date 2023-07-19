@@ -30,6 +30,6 @@ export const config = {
   USAGE_ENDPOINTS_KEY: process.env.USAGE_ENDPOINTS_KEY || 'ceba96f6eafd2ea59e68a0b0d754a939',
 }
 
-export const ARCHIVER_URL = `http://${config.archiverInfo.ip}:${config.archiverInfo.port}`
+export const ARCHIVER_INFO = `${config.archiverInfo.ip}:${config.archiverInfo.port}:${config.archiverInfo.publicKey}`
 
 export const RPC_DATA_SERVER_URL = `http://${config.host}:${config.port.rpc_data_collector}`

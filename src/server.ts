@@ -33,11 +33,13 @@ import * as CoinStats from './stats/coinStats'
 import fastifyRateLimit from '@fastify/rate-limit'
 import { socketClient, socketHandlers } from './subscription/websocket'
 import * as usage from './middleware/usage'
+import { getFromArchiver } from '@shardus/archiver-discovery'
+import './archiver'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL, RPC_DATA_SERVER_URL } from './config'
+import { config as CONFIG, RPC_DATA_SERVER_URL, ARCHIVER_INFO } from './config'
 import {
   coinStatsCacheRecord,
   isCacheRecordValid,
@@ -98,8 +100,6 @@ interface RequestQuery {
   toBlock: string
   totalStakeData: string
 }
-
-console.log(ARCHIVER_URL)
 
 let txHashQueryCache = new Map()
 const txHashQueryCacheSize = 1000
@@ -393,8 +393,8 @@ const start = async (): Promise<void> => {
     if (account) accounts.push(account)
     if (accounts.length === 0) {
       try {
-        const queryArchiver = await axios.get(`${ARCHIVER_URL}/nodelist`)
-        const activeNode = queryArchiver.data.nodeList[0]
+        const queryArchiver = await getFromArchiver('nodelist')
+        const activeNode = queryArchiver.nodeList[0]
         const result = await axios.get(`http://${activeNode.ip}:${activeNode.port}/account/${query.address}`)
         if (result.data.error || !result.data.account) {
           reply.send({
@@ -758,6 +758,98 @@ const start = async (): Promise<void> => {
     }
     if (query.filterAddress) {
       res.filterAddressTokenBalance = filterAddressTokenBalance
+    }
+    reply.send(res)
+  })
+
+  // Seems we can remove this endpoint now.
+  server.get('/api/tx', async (_request, reply) => {
+    const err = utils.validateTypes(_request.query as object, {
+      txHash: 's?',
+      type: 's?',
+    })
+    if (err) {
+      reply.send({ success: false, error: err })
+      return
+    }
+    const query = _request.query as RequestQuery
+    let transactions = []
+    const res: TransactionResponse = {
+      success: true,
+      transactions,
+    }
+    if (query.txHash.length !== 66) {
+      reply.send({
+        success: false,
+        error: 'The transaction hash is not correct!',
+      })
+      return
+    }
+    if (query.type === 'requery') {
+      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+      if (transaction) {
+        transactions = [transaction]
+        txHashQueryCache.set(query.txHash, { success: true, transactions })
+        res.transactions = transactions
+        reply.send(res)
+        return
+      }
+    }
+    let acceptedTx = false
+    let result
+    try {
+      // result = await axios.get(
+      //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
+      // );
+      result = await axios.get(`${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`)
+    } catch (e) {
+      console.log(`RPC Data Collector is not responding`, e)
+    }
+    if (result && result.data && result.data.txStatus) {
+      if (!result.data.txStatus.injected || !result.data.txStatus.accepted) {
+        res.success = false
+        res.transactions.push({ txStatus: result.data.txStatus })
+      }
+      acceptedTx = result.data.txStatus.accepted
+    }
+    if (res.success) {
+      const found = txHashQueryCache.get(query.txHash)
+      if (found) {
+        if (found.success) return found
+        if (!acceptedTx) return found
+      }
+      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+      // console.log('transaction result', query.txHash, transactions)
+      if (transaction) {
+        res.transactions.push(transaction)
+      } else {
+        try {
+          const queryArchiver = await getFromArchiver(`nodelist`)
+          const activeNode = queryArchiver.nodeList[0]
+          result = await axios.get(`http://${activeNode.ip}:${activeNode.port}/tx/${query.txHash}`)
+          if (result.data && result.data.account) {
+            // console.log('transaction result', result.status, result.data)
+            res.transactions.push({ wrappedEVMAccount: result.data.account })
+          }
+        } catch (e) {
+          console.log(`Archiver is not responding`, e)
+        }
+      }
+
+      txHashQueryCache.set(query.txHash, res)
+      if (txHashQueryCache.size > txHashQueryCacheSize + 10) {
+        // Remove old data
+        const extra = txHashQueryCache.size - txHashQueryCacheSize
+        const arrayTemp = Array.from(txHashQueryCache)
+        arrayTemp.splice(0, extra)
+        txHashQueryCache = new Map(arrayTemp)
+      }
+
+      if (!transaction) {
+        delete res.transactions
+        reply.send({ result: res, success: false, error: 'This transaction is not found!' })
+        return
+      }
     }
     reply.send(res)
   })

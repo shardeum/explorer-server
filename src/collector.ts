@@ -25,8 +25,9 @@ import {
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
-import { config as CONFIG, ARCHIVER_URL } from './config'
+import { config as CONFIG } from './config'
 import axios from 'axios'
+import { getDefaultArchiverUrl } from './archiver'
 if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
 }
@@ -37,7 +38,8 @@ export const checkAndSyncData = async (): Promise<void> => {
   let totalReceiptsToSync = 0
   let totalCyclesToSync = 0
   let lastStoredReceiptCycle = 0
-  const response = await axios.get(`${ARCHIVER_URL}/totalData`)
+  const archiverUrl = await getDefaultArchiverUrl()
+  const response = await axios.get(`${archiverUrl}/totalData`)
   if (response.data && response.data.totalReceipts >= 0 && response.data.totalCycles >= 0) {
     totalReceiptsToSync = response.data.totalReceipts
     totalCyclesToSync = response.data.totalCycles
@@ -115,10 +117,12 @@ const start = async (): Promise<void> => {
 
   const collector = new Collector()
 
+  const archiverUrl = await getDefaultArchiverUrl()
+
   if (CONFIG.experimentalSnapshot) {
     await checkAndSyncData()
     try {
-      const socketClient = ioclient.connect(ARCHIVER_URL)
+      const socketClient = ioclient.connect(archiverUrl)
       socketClient.on('connect', () => {
         console.log('connected to archive server')
       })
@@ -140,7 +144,7 @@ const start = async (): Promise<void> => {
   const lastStoredCycles = await archivedCycle.queryAllArchivedCycles(1)
   let lastStoredCycleCounter = 0
   let lastestCycleToSync = 0
-  const response = await axios.get(`${ARCHIVER_URL}/full-archive/1`)
+  const response = await axios.get(`${archiverUrl}/full-archive/1`)
   if (response.data && response.data.archivedCycles && response.data.archivedCycles.length > 0) {
     lastestCycleToSync = response.data.archivedCycles[0].cycleRecord.counter
     console.log('lastestCycleToSync', lastestCycleToSync)
@@ -184,7 +188,7 @@ const start = async (): Promise<void> => {
   //   console.log('lastSyncedCycle', lastSyncedCycle);
   // }
 
-  const socketClient = ioclient.connect(ARCHIVER_URL)
+  const socketClient = ioclient.connect(archiverUrl)
 
   socketClient.on('connect', () => {
     console.log('connected to archive server')
