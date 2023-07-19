@@ -9,6 +9,7 @@ import { bufferToHex } from 'ethereumjs-util'
 
 type DbReceipt = Receipt & {
   tx: string
+  beforeStateAccounts: string
   accounts: string
   result: string
   sign: string
@@ -352,6 +353,7 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
     const receipt: DbReceipt = await db.get(sql, [receiptId])
     if (receipt) {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.beforeStateAccounts) (receipt as Receipt).beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) (receipt as Receipt).accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) (receipt as Receipt).sign = JSON.parse(receipt.sign)
@@ -372,6 +374,7 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
 
     receipts.forEach((receipt: DbReceipt) => {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
@@ -394,6 +397,7 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
 
     receipts.forEach((receipt: DbReceipt) => {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
@@ -449,6 +453,7 @@ export async function queryReceiptsBetweenCycles(
     receipts = await db.all(sql, [start, end])
     receipts.forEach((receipt: DbReceipt) => {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
+      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
