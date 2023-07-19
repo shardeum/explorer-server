@@ -1,5 +1,4 @@
-import { Log } from 'web3-core'
-import { ArchivedReceipts, ReadableReceipt } from './types'
+import { Log, ArchivedReceipts, ReadableReceipt } from './types'
 
 export const extractLogsFromReceipts = (archivedReceipts: ArchivedReceipts): Log[] => {
   // extract readableReceipt from archivedReceipts
