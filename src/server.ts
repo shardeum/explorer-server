@@ -1,10 +1,7 @@
 // require("dotenv").config();
 
 import {
-  addLogSubscriptions,
   evmLogDiscovery,
-  LOG_SUBSCRIPTIONS_BY_ADDRESS,
-  removeLogSubscription,
   removeLogSubscriptionBySocketId,
 } from './subscription/'
 import * as Storage from './storage'
@@ -19,16 +16,15 @@ import * as vanillaCrypto from 'crypto'
 import * as crypto from '@shardus/crypto-utils'
 import * as utils from './utils'
 import fastifyCors from '@fastify/cors'
-import { Server, IncomingMessage, ServerResponse } from 'http'
-import fastifyNextjs from '@fastify/nextjs'
 import FastifyWebsocket from '@fastify/websocket'
+import fastifyNextjs from '@fastify/nextjs'
 import axios from 'axios'
 import {
   AccountSearchType,
   AccountType,
   TokenTx,
   TransactionSearchType,
-  Transaction as TransactionInterface,
+  Transaction as TransactionInterface, WebSocketWithId,
 } from './types'
 import * as StatsStorage from './stats'
 import * as ValidatorStats from './stats/validatorStats'
@@ -48,7 +44,6 @@ import {
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
-import fastifyWebsocket, { SocketStream } from '@fastify/websocket'
 import {
   AccountResponse,
   AddressResponse,
@@ -59,6 +54,7 @@ import {
   TokenResponse,
   TransactionResponse,
 } from './types'
+import { SocketStream } from "@fastify/websocket";
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -156,14 +152,14 @@ const start = async (): Promise<void> => {
       '/evm_log_subscription',
       { websocket: true },
       (connection: SocketStream, req: FastifyRequest) => {
-        let socket_id = vanillaCrypto.randomBytes(32).toString('hex')
-        socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex')
-        connection.socket.id = socket_id
+        let socket_id = vanillaCrypto.randomBytes(32).toString('hex');
+        socket_id = vanillaCrypto.createHash('sha256').update(socket_id).digest().toString('hex');
+        (connection.socket as WebSocketWithId).id = socket_id
         socketClient.set(socket_id, connection)
 
         connection.socket.on('message', (message) => {
           try {
-            const payload = JSON.parse(message)
+            const payload = JSON.parse(message.toString())
             socketHandlers.onMessage(connection, payload)
             return
           } catch (e) {
@@ -173,8 +169,8 @@ const start = async (): Promise<void> => {
         })
         connection.socket.on('close', (message) => {
           try {
-            removeLogSubscriptionBySocketId(connection.socket.id)
-            socketClient.delete(connection.socket.id)
+            removeLogSubscriptionBySocketId((connection.socket as WebSocketWithId).id)
+            socketClient.delete((connection.socket as WebSocketWithId).id)
           } catch (e) {
             console.error(e)
           }

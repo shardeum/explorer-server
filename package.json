@@ -28,8 +28,8 @@
     "@ethereumjs/vm": "6.2.0",
     "@fastify/cors": "8.3.0",
     "@fastify/nextjs": "10.0.0",
-    "@fastify/rate-limit": "8.0.1",
-    "@fastify/websocket": "^8.0.0",
+    "@fastify/rate-limit": "8.0.3",
+    "@fastify/websocket": "8.2.0",
     "@shardus/crypto-utils": "4.0.4",
     "@shardus/types": "1.0.11",
     "@svgr/webpack": "8.0.1",
@@ -50,7 +50,7 @@
     "ethereumjs-util": "7.1.5",
     "ethers": "5.7.2",
     "fast-stable-stringify": "1.0.0",
-    "fastify": "^4.10.2",
+    "fastify": "4.20.0",
     "helmet": "3.21.1",
     "highcharts": "10.3.2",
     "highcharts-react-official": "3.1.0",
@@ -77,12 +77,15 @@
     "web3": "4.0.2"
   },
   "devDependencies": {
+    "@types/fastify-cors": "2.1.0",
     "@types/lodash": "4.14.191",
-    "@types/node-cron": "3.0.7",
     "@types/node": "18.16.1",
+    "@types/node-cron": "3.0.7",
     "@types/qs": "6.9.7",
+    "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "5.60.1",
     "@typescript-eslint/parser": "5.60.1",
+    "@typescript-eslint/typescript-estree": "5.61.0",
     "eslint": "8.44.0",
     "eslint-config-next": "13.4.8",
     "eslint-config-prettier": "8.8.0",
@@ -97,8 +100,7 @@
     "gts": "3.1.1",
     "nodemon": "^2.0.22",
     "prettier": "2.8.1",
-    "typescript": "4.9.4",
-    "@typescript-eslint/typescript-estree": "5.61.0"
+    "typescript": "4.9.4"
   },
   "overrides": {
     "semver": "7.5.3",

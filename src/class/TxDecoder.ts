@@ -289,7 +289,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                 : ERC_1155_BALANCE_SLOT
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
-            const calculatedKey = Web3.utils
+            let calculatedKey = Web3.utils
               .soliditySha3({type: 'uint', value: tokenTx.tokenFrom}, {type: 'uint', value: storageKey})
               ?.slice(2)
             let contractStorage: Account | null = null
@@ -345,7 +345,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
           }
           if (tokenTx.tokenTo !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
-            const calculatedKey = Web3.utils
+            let calculatedKey = Web3.utils
               .soliditySha3({type: 'uint', value: tokenTx.tokenTo}, {type: 'uint', value: storageKey})
               ?.slice(2)
             // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
