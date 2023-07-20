@@ -15,6 +15,7 @@ export const extractLogsFromReceipts = (archivedReceipts: ArchivedReceipts): Log
     })
     .flat()
     .filter((log) => {
+      if (log === undefined) return false
       if ('address' in log && 'topics' in log && 'data' in log) return true
     })
 
