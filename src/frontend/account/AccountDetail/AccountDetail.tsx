@@ -204,7 +204,8 @@ export const AccountDetail: React.FC = () => {
                       },
                       {
                         key: 'StakeLock',
-                        value: account?.account?.stakeLock && calculateValue(account?.account?.stakeLock),
+                        value:
+                          account?.account?.stakeLock && calculateValue(`0x${account?.account?.stakeLock}`),
                       },
                     ]}
                   />
@@ -227,7 +228,7 @@ export const AccountDetail: React.FC = () => {
                       },
                       {
                         key: 'Reward',
-                        value: account?.account?.reward && calculateValue(account?.account?.reward),
+                        value: account?.account?.reward && calculateValue(`0x${account?.account?.reward}`),
                       },
                     ]}
                   />

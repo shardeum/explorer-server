@@ -4,7 +4,7 @@ import { calculateValue } from '../../../utils/calculateValue'
 import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
 
 import styles from './AccountInfo.module.scss'
-import web3 from "web3";
+import web3 from 'web3'
 
 interface AccountInfoProps {
   receipt: {
@@ -42,7 +42,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
         accountId: account?.accountId,
         ethAddress: account?.data?.ethAddress,
         accountType: 'EOA or CA',
-        balance: calculateValue(account?.data?.account?.balance) + ' SHM',
+        balance: calculateValue(`0x${account?.data?.account?.balance}`) + ' SHM',
         nonce: web3.utils.hexToNumber('0x' + account?.data?.account?.nonce),
       }
     else if (account?.data?.accountType === AccountType.ContractStorage)

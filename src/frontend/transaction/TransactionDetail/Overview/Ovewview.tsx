@@ -226,7 +226,9 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div className={styles.item}>
                   <div className={styles.title}>Stake Amount:</div>
                   <div className={styles.value}>
-                    {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake)}{' '}
+                    {calculateFullValue(
+                      `0x${transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake}`
+                    )}{' '}
                     SHM
                   </div>
                 </div>
@@ -235,14 +237,18 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   <div className={styles.item}>
                     <div className={styles.title}>Reward:</div>
                     <div className={styles.value}>
-                      {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward)}{' '}
+                      {calculateFullValue(
+                        `0x${transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.reward}`
+                      )}{' '}
                       SHM
                     </div>
                   </div>
                   <div className={styles.item}>
                     <div className={styles.title}>Stake Amount:</div>
                     <div className={styles.value}>
-                      {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake)}{' '}
+                      {calculateFullValue(
+                        `0x${transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.stake}`
+                      )}{' '}
                       SHM
                     </div>
                   </div>
@@ -250,7 +256,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                     <div className={styles.title}>Unstake Amount:</div>
                     <div className={styles.value}>
                       {calculateFullValue(
-                        transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.totalUnstakeAmount
+                        `0x${transaction?.wrappedEVMAccount?.readableReceipt?.stakeInfo?.totalUnstakeAmount}`
                       )}{' '}
                       SHM
                     </div>
