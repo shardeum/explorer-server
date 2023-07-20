@@ -19,7 +19,7 @@ const validateBaseRequest = (request: unknown): [idValid: boolean, errorMsg: str
 interface SubscribeRequest extends BaseRequest {
   params: {
     subscription_id: string
-    address: string
+    address: string[]
     topics: string[]
   }
 }
@@ -39,13 +39,16 @@ const validateSubscribeRequest = (request: unknown): [idValid: boolean, errorMsg
   if (params.address === undefined && params.topics === undefined) {
     return [false, 'params.address or params.topics must be provided.']
   }
-  if (params.address !== undefined && typeof params.address !== 'string') {
-    return [false, 'params.address must be a string.']
+  if (params.address !== undefined && !Array.isArray(params.address)) {
+    return [false, 'params.address must be an array of strings.']
+  }
+  if (params.address !== undefined && params.address.some((addr) => typeof addr !== 'string')) {
+    return [false, 'params.address must be an array of strings.']
   }
   if (params.topics !== undefined && !Array.isArray(params.topics)) {
     return [false, 'params.topics must be an array.']
   }
-  if (params.topics.some((topic) => typeof topic !== 'string')) {
+  if (params.topics !== undefined && params.topics.some((topic) => typeof topic !== 'string')) {
     return [false, 'params.topics must be an array of strings.']
   }
   return [true, '']

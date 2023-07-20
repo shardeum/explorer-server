@@ -1,4 +1,4 @@
-import { Log, ArchivedReceipts, ReadableReceipt } from './types'
+import { ArchivedReceipts, Log, ReadableReceipt } from './types'
 
 export const extractLogsFromReceipts = (archivedReceipts: ArchivedReceipts): Log[] => {
   // extract readableReceipt from archivedReceipts
@@ -23,7 +23,7 @@ export const extractLogsFromReceipts = (archivedReceipts: ArchivedReceipts): Log
 }
 
 export interface LogFilterOptions {
-  address?: string
+  address?: string[]
   topics?: string[]
 }
 
@@ -57,28 +57,33 @@ export class IndexedLogs {
   }
 
   filter(options: LogFilterOptions): Log[] {
-    let logIds: string[] = []
+    let topicFilterMatch: string[] = []
+    const addressFilterMatch: string[] = []
+
     if (options.address) {
-      logIds = [...(this.AddressMap.get(options.address) || [])]
+      for (const address of options.address) {
+        addressFilterMatch.push(...(this.AddressMap.get(address) || []))
+      }
     }
+
     if (options.topics) {
       if (options.topics.length == 1) {
-        logIds = [...(this.Topic0Map.get(options.topics[0]) || [])]
+        topicFilterMatch = [...(this.Topic0Map.get(options.topics[0]) || [])]
       } else if (options.topics.length == 2) {
         const topic0FilterMatch = new Set(this.Topic0Map.get(options.topics[0]) || [])
         const topic1FilterMatch = new Set(this.Topic1Map.get(options.topics[1]) || [])
-        logIds = intersectionOfSets([topic0FilterMatch, topic1FilterMatch])
+        topicFilterMatch = intersectionOfSets([topic0FilterMatch, topic1FilterMatch])
       } else if (options.topics.length == 3) {
         const topic0FilterMatch = new Set(this.Topic0Map.get(options.topics[0]) || [])
         const topic1FilterMatch = new Set(this.Topic1Map.get(options.topics[1]) || [])
         const topic2FilterMatch = new Set(this.Topic2Map.get(options.topics[2]) || [])
-        logIds = intersectionOfSets([topic0FilterMatch, topic1FilterMatch, topic2FilterMatch])
+        topicFilterMatch = intersectionOfSets([topic0FilterMatch, topic1FilterMatch, topic2FilterMatch])
       } else if (options.topics.length == 4) {
         const topic0FilterMatch = new Set(this.Topic0Map.get(options.topics[0]) || [])
         const topic1FilterMatch = new Set(this.Topic1Map.get(options.topics[1]) || [])
         const topic2FilterMatch = new Set(this.Topic2Map.get(options.topics[2]) || [])
         const topic3FilterMatch = new Set(this.Topic2Map.get(options.topics[3]) || [])
-        logIds = intersectionOfSets([
+        topicFilterMatch = intersectionOfSets([
           topic0FilterMatch,
           topic1FilterMatch,
           topic2FilterMatch,
@@ -87,12 +92,22 @@ export class IndexedLogs {
       }
     }
 
-    // remove duplicate logIds
-    logIds = [...new Set(logIds)]
-    // sort the logIds
-    logIds.sort((a, b) => parseInt(a) - parseInt(b))
+    console.log(`addressFilterMatch: ${addressFilterMatch}`)
+    console.log(`topicFilterMatch: ${topicFilterMatch}`)
 
-    return logIds.map((logId) => this.LogMap.get(logId) as Log)
+    // remove duplicate logIds
+    let result = []
+    if (!options.address) {
+      result = [...new Set(topicFilterMatch)]
+    } else if (!options.topics) {
+      result = [...new Set(addressFilterMatch)]
+    } else {
+      result = [...new Set(intersectionOfSets([new Set(addressFilterMatch), new Set(topicFilterMatch)]))]
+    }
+    // sort the logIds
+    result.sort((a, b) => parseInt(a) - parseInt(b))
+
+    return result.map((logId) => this.LogMap.get(logId) as Log)
   }
 }
 
