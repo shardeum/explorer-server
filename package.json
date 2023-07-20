@@ -30,7 +30,7 @@
     "@fastify/nextjs": "10.0.0",
     "@fastify/rate-limit": "8.0.3",
     "@fastify/websocket": "8.2.0",
-    "@shardus/archiver-discovery": "^1.0.3",
+    "@shardus/archiver-discovery": "1.1.0",
     "@shardus/crypto-utils": "4.0.4",
     "@shardus/types": "1.0.11",
     "@svgr/webpack": "8.0.1",
