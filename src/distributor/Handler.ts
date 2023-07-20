@@ -36,10 +36,10 @@ const validateSubscribeRequest = (request: unknown): [idValid: boolean, errorMsg
   if (typeof params.subscription_id !== 'string') {
     return [false, 'params.subscription_id must be a string.']
   }
-  if (typeof params.address !== 'string') {
+  if (params.address !== undefined && typeof params.address !== 'string') {
     return [false, 'params.address must be a string.']
   }
-  if (!Array.isArray(params.topics)) {
+  if (params.topics !== undefined && !Array.isArray(params.topics)) {
     return [false, 'params.topics must be an array.']
   }
   if (params.topics.some((topic) => typeof topic !== 'string')) {
@@ -83,6 +83,7 @@ export const evmLogSubscriptionHandler = {
       case 'subscribe': {
         const [idValid, errorMsg] = validateSubscribeRequest(request)
         if (!idValid) {
+          console.log(`Invalid subscribe request: ${errorMsg}, message: ${JSON.stringify(message)}`)
           conn.socket.send(JSON.stringify({ method: 'subscribe', success: false, error: errorMsg }))
           return
         }
@@ -104,6 +105,7 @@ export const evmLogSubscriptionHandler = {
       case 'unsubscribe': {
         const [idValid, errorMsg] = validateUnsubscribeRequest(request)
         if (!idValid) {
+          console.log(`Invalid unsubscribe request: ${errorMsg}, message: ${JSON.stringify(message)}`)
           conn.socket.send(JSON.stringify({ method: 'unsubscribe', success: false, error: errorMsg }))
           return
         }
