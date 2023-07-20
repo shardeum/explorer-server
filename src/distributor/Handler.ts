@@ -36,6 +36,9 @@ const validateSubscribeRequest = (request: unknown): [idValid: boolean, errorMsg
   if (typeof params.subscription_id !== 'string') {
     return [false, 'params.subscription_id must be a string.']
   }
+  if (params.address === undefined && params.topics === undefined) {
+    return [false, 'params.address or params.topics must be provided.']
+  }
   if (params.address !== undefined && typeof params.address !== 'string') {
     return [false, 'params.address must be a string.']
   }
