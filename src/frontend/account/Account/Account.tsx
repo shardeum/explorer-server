@@ -1,6 +1,5 @@
 import moment from 'moment'
 import React, { Fragment, useState } from 'react'
-import web3 from 'web3'
 
 import { useAccount } from '../../api'
 import { AnchorLink, ContentLayout, Pagination } from '../../components'

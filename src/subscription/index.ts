@@ -1,16 +1,10 @@
-import { queryLatestCycleRecords } from "../storage/cycle";
-import { queryLogs, queryLogsBetweenCycles } from "../storage/log";
 import * as crypto from '@shardus/crypto-utils'
-import { stringify } from "qs";
 import { config } from '../config';
-import axios from "axios";
 import * as db from '../storage/sqlite3storage'
 import { socketClient } from "./websocket";
 
 type contract_address = string;
 type strigified_subscription = string;
-type LogSubscriptionsAddress = Map<contract_address, Map<strigified_subscription, Set<string>>>
-type LogSubscriptionsID = Map<string, {address: string[], topics: string[]}>
 
 
 // export const LOG_SUBSCRIPTIONS_IPPORT_ADDRESS: LOG_SUBSCRIPTIONS_IPPORT_ADDRESS = new Map();

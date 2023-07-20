@@ -39,7 +39,7 @@ import './archiver'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
-import { config as CONFIG, RPC_DATA_SERVER_URL, ARCHIVER_INFO } from './config'
+import { config as CONFIG, RPC_DATA_SERVER_URL } from './config'
 import {
   coinStatsCacheRecord,
   isCacheRecordValid,
@@ -1089,7 +1089,9 @@ const start = async (): Promise<void> => {
     if (CONFIG.verbose) console.log('Request', _request.query)
     const query = _request.query as RequestQuery
     for (const key in query) {
+      // eslint-disable-next-line security/detect-object-injection
       if (query[key] === 'undefined') {
+        // eslint-disable-next-line security/detect-object-injection
         delete query[key]
       }
     }
@@ -1099,7 +1101,6 @@ const start = async (): Promise<void> => {
     let totalLogs = 0
     let logs
     const supportedQueryParams = ['address', 'topics', 'fromBlock', 'toBlock', 'startCycle', 'endCycle']
-    const address = query.address && query.address.length === 42 ? query.address : null
     let topics = []
     if (query.topics) {
       try {

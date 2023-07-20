@@ -1,6 +1,5 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import web3 from 'web3'
 import { utils } from 'ethers'
 
 import { AnchorLink, Button, ContentLayout, CopyButton, Spacer, Tab, Table } from '../components'

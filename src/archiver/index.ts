@@ -1,6 +1,5 @@
-import { setupArchiverDiscovery, getArchiverList, getFinalArchiverList } from '@shardus/archiver-discovery'
+import { setupArchiverDiscovery, getFinalArchiverList } from '@shardus/archiver-discovery'
 import { ARCHIVER_INFO, config } from '../config'
-
 
 //archiver discovery will remove possible duplication of archiver info
 process.env['ARCHIVER_INFO'] = process.env['ARCHIVER_INFO']
@@ -16,7 +15,7 @@ setupArchiverDiscovery({
 //used to perform requests using the same archiver
 let defaultArchiverUrl = null
 
-export async function getDefaultArchiverUrl() {
+export async function getDefaultArchiverUrl(): Promise<string> {
   if (defaultArchiverUrl) {
     return defaultArchiverUrl
   }
