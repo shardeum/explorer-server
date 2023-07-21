@@ -95,8 +95,8 @@ export const evmLogSubscriptionHandler = {
         }
         const subscribeRequest = request as SubscribeRequest
         addLogSubscriptions(subscribeRequest.params.subscription_id, socketId, {
-          address: subscribeRequest.params.address,
-          topics: subscribeRequest.params.topics,
+          address: subscribeRequest.params.address.map((addr) => addr.toLowerCase()),
+          topics: subscribeRequest.params.topics.map((topic) => topic.toLowerCase()),
         })
         conn.socket.send(
           JSON.stringify({

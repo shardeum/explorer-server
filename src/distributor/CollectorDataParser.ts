@@ -48,11 +48,30 @@ export class IndexedLogs {
       const log = logs[i]
       const logId = i.toString()
       this.LogMap.set(logId, log)
-      this.AddressMap.set(log.address, [...(this.AddressMap.get(log.address) || []), logId])
-      this.Topic0Map.set(log.topics[0], [...(this.Topic0Map.get(log.topics[0]) || []), logId])
-      this.Topic1Map.set(log.topics[1], [...(this.Topic1Map.get(log.topics[1]) || []), logId])
-      this.Topic2Map.set(log.topics[2], [...(this.Topic2Map.get(log.topics[2]) || []), logId])
-      this.Topic3Map.set(log.topics[3], [...(this.Topic3Map.get(log.topics[3]) || []), logId])
+
+      const address = log.address.toLowerCase()
+      const topics = log.topics.map((topic) => topic.toLowerCase())
+
+      if (!this.AddressMap.has(address)) {
+        this.AddressMap.set(address, [])
+      }
+      this.AddressMap.get(address).push(logId)
+      if (!this.Topic0Map.has(topics[0])) {
+        this.Topic0Map.set(topics[0], [])
+      }
+      this.Topic0Map.get(topics[0]).push(logId)
+      if (!this.Topic1Map.has(topics[1])) {
+        this.Topic1Map.set(topics[1], [])
+      }
+      this.Topic1Map.get(topics[1]).push(logId)
+      if (!this.Topic2Map.has(topics[2])) {
+        this.Topic2Map.set(topics[2], [])
+      }
+      this.Topic2Map.get(topics[2]).push(logId)
+      if (!this.Topic3Map.has(topics[3])) {
+        this.Topic3Map.set(topics[3], [])
+      }
+      this.Topic3Map.get(topics[3]).push(logId)
     }
   }
 
@@ -91,9 +110,6 @@ export class IndexedLogs {
         ])
       }
     }
-
-    console.log(`addressFilterMatch: ${addressFilterMatch}`)
-    console.log(`topicFilterMatch: ${topicFilterMatch}`)
 
     // remove duplicate logIds
     let result = []
