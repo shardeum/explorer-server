@@ -202,14 +202,14 @@ export async function processReceiptData(
         txReceipt.data.accountType === AccountType.Receipt
           ? TransactionType.Receipt
           : txReceipt.data.accountType === AccountType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txReceipt.data.accountType === AccountType.StakeReceipt
-              ? TransactionType.StakeReceipt
-              : txReceipt.data.accountType === AccountType.UnstakeReceipt
-                ? TransactionType.UnstakeReceipt
-                : txReceipt.data.accountType === AccountType.InternalTxReceipt
-                  ? TransactionType.InternalTxReceipt
-                  : (-1 as TransactionType)
+          ? TransactionType.NodeRewardReceipt
+          : txReceipt.data.accountType === AccountType.StakeReceipt
+          ? TransactionType.StakeReceipt
+          : txReceipt.data.accountType === AccountType.UnstakeReceipt
+          ? TransactionType.UnstakeReceipt
+          : txReceipt.data.accountType === AccountType.InternalTxReceipt
+          ? TransactionType.InternalTxReceipt
+          : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
         const txObj = {
@@ -353,7 +353,6 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
     const receipt: DbReceipt = await db.get(sql, [receiptId])
     if (receipt) {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-      if (receipt.beforeStateAccounts) (receipt as Receipt).beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) (receipt as Receipt).accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) (receipt as Receipt).sign = JSON.parse(receipt.sign)
@@ -374,7 +373,6 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
 
     receipts.forEach((receipt: DbReceipt) => {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
@@ -397,7 +395,6 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
 
     receipts.forEach((receipt: DbReceipt) => {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
@@ -423,7 +420,10 @@ export async function queryReceiptCount(): Promise<number> {
   return receipts['COUNT(*)'] || 0
 }
 
-export async function queryReceiptCountByCycles(start: number, end: number): Promise<{ receipts: number, cycle: number }[]> {
+export async function queryReceiptCountByCycles(
+  start: number,
+  end: number
+): Promise<{ receipts: number; cycle: number }[]> {
   let receipts: { cycle: number; 'COUNT(*)': number }[] = []
   try {
     const sql = `SELECT cycle, COUNT(*) FROM receipts GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
@@ -436,7 +436,7 @@ export async function queryReceiptCountByCycles(start: number, end: number): Pro
   return receipts.map((receipt) => {
     return {
       receipts: receipt['COUNT(*)'],
-      cycle: receipt.cycle
+      cycle: receipt.cycle,
     }
   })
 }
@@ -453,7 +453,6 @@ export async function queryReceiptsBetweenCycles(
     receipts = await db.all(sql, [start, end])
     receipts.forEach((receipt: DbReceipt) => {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)

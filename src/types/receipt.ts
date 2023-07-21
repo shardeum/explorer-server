@@ -6,7 +6,6 @@ export interface Receipt {
   cycle: number
   timestamp: number
   result: object
-  beforeStateAccounts: Account[]
   accounts: Account[]
   sign: {
     owner: string
