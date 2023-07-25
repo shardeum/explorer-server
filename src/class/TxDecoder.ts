@@ -307,15 +307,15 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                   calculatedKey = Web3.utils
                     .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: '' + i })
                     ?.slice(2)
-                  console.log('calculatedKey', calculatedKey + log.address)
+                  // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
-                    console.log('contractStorage', contractStorage)
+                    // console.log('contractStorage', contractStorage)
                     break
                   } else if (storageKeyValueMap[calculatedKey + log.address]) break
                 }
-              console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
+              // console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
             }
             if (
               storageKeyValueMap[calculatedKey + log.address] ||
@@ -364,11 +364,11 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                   calculatedKey = Web3.utils
                     .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: '' + i })
                     ?.slice(2)
-                  console.log('calculatedKey', calculatedKey + log.address)
+                  // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
-                    console.log('contractStorage', contractStorage)
+                    // console.log('contractStorage', contractStorage)
                     break
                   } else if (
                     storageKeyValueMap[calculatedKey + log.address] &&
@@ -376,7 +376,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                   )
                     break
                 }
-              console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
+              // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             }
             if (
               storageKeyValueMap[calculatedKey + log.address] ||
