@@ -230,6 +230,10 @@ export const AccountDetail: React.FC = () => {
                         key: 'Reward',
                         value: account?.account?.reward && calculateValue(`0x${account?.account?.reward}`),
                       },
+                      {
+                        key: 'Penalty',
+                        value: account?.account?.penalty && calculateValue(`0x${account?.account?.penalty}`),
+                      },
                     ]}
                   />
                 ) : (
