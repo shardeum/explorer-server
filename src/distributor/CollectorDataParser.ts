@@ -23,8 +23,8 @@ export const extractLogsFromReceipts = (archivedReceipts: ArchivedReceipts): Log
 }
 
 export interface LogFilterOptions {
-  address?: string[]
-  topics?: string[]
+  address: string[]
+  topics: string[]
 }
 
 export class IndexedLogs {
@@ -113,9 +113,9 @@ export class IndexedLogs {
 
     // remove duplicate logIds
     let result = []
-    if (!options.address) {
+    if (options.address.length === 0) {
       result = [...new Set(topicFilterMatch)]
-    } else if (!options.topics) {
+    } else if (options.topics.length === 0) {
       result = [...new Set(addressFilterMatch)]
     } else {
       result = [...new Set(intersectionOfSets([new Set(addressFilterMatch), new Set(topicFilterMatch)]))]
