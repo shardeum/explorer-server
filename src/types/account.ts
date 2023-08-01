@@ -14,6 +14,7 @@ export interface Account {
   accountType: AccountType
   contractType?: ContractType
   contractInfo?: any
+  operatorAccountInfo?: OperatorAccountInfo
 }
 
 export interface Token {

@@ -9,6 +9,7 @@ import { ArchivedCycle } from './archivedCycle'
 type DbAccount = Account & {
   account: string
   contractInfo: string
+  operatorAccountInfo: string
 }
 
 export { type Account, type Token } from '../types'
@@ -285,6 +286,7 @@ export async function queryAccountByAddress(
     if (account) account.account = JSON.parse(account.account)
     if (account && account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
     if (config.verbose) console.log('Account Address', account)
+    if (account && account.operatorAccountInfo) account.operatorAccountInfo = JSON.parse(account.operatorAccountInfo)
     return account as Account
   } catch (e) {
     console.log(e)
