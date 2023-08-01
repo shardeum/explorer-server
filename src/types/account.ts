@@ -66,6 +66,22 @@ export enum AccountSearchType {
   InternalTxReceipt,
 }
 
+interface OperatorAccountInfo {
+  certExp: number;
+  nominee: string;
+  operatorStats: {
+    history: { b: number; e: number }[];
+    isShardeumRun: boolean;
+    lastStakedNodeKey: string;
+    totalNodePenalty: string;
+    totalNodeReward: string;
+    totalNodeTime: number;
+    totalUnstakeReward: string;
+    unstakeCount: number;
+  };
+  stake: string;
+}
+
 export interface BaseAccount {
   accountType: AccountType
 }
@@ -79,6 +95,10 @@ interface BaseWrappedEVMAccount extends BaseAccount {
 
   /** account timestamp. last time a TX changed it */
   timestamp: number
+
+  /** operator account info */
+  operatorAccountInfo: OperatorAccountInfo
+
 }
 
 /**
