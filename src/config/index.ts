@@ -12,11 +12,11 @@ export const config = {
     collector_distributor_sender: process.env.COLLECTOR_DISTRIBUTOR_SENDER_PORT || '4447',
   },
   archiverInfo: {
-    ip: process.env.ARCHIVERIP || '69.164.192.243',
+    ip: process.env.ARCHIVERIP || '127.0.0.1',
     port: process.env.ARCHIVERPORT || '4000',
     publicKey: process.env.ARCHIVERPK || '758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
   },
-  rpcUrl: 'https://explorer-dapps.shardeum.org/',
+  rpcUrl: 'http://localhost:8080',
   apiUrl: '',
   EXPLORER_DB: 'explorer-db',
   TRANSACTION_DB: 'transaction-db',
