@@ -93,7 +93,7 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
                   new Date(timestamp).getTime()
                 )}</b></span><br /><br />
         <span>Total Txs: <b>${item[0][1]}</b></span><br />
-        <span>Total Internal Txs: <b>${item[0][1]}</b></span><br />
+        <span>Total Internal Txs: <b>${item[0][2]}</b></span><br />
         <span>Total Stake Txs: <b>${item[0][3]}</b></span><br />
         <span>Total Unstake Txs: <b>${item[0][4]}</b></span><br />
         <span>Cycle Number: <b>${item[0][5]}</b></span>`
