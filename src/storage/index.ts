@@ -22,13 +22,32 @@ export const initializeDB = async (): Promise<void> => {
   )
   // await db.runCreate('Drop INDEX if exists `transactions_hash_id`');
   await db.runCreate('CREATE INDEX if not exists `transactions_hash_id` ON `transactions` (`txHash`, `txId`)')
+
+  // Old index
   // await db.runCreate('Drop INDEX if exists `transactions_idx1`');
-  await db.runCreate(
-    'CREATE INDEX if not exists `transactions_idx1` ON `transactions` (`transactionType` DESC)'
-  )
+  // await db.runCreate(
+  //   'CREATE INDEX if not exists `transactions_idx1` ON `transactions` (`transactionType` DESC)'
+  // )
   // await db.runCreate('Drop INDEX if exists `transactions_idx2`');
+  // await db.runCreate(
+  //   'CREATE INDEX if not exists `transactions_idx2` ON `transactions` (`cycle` DESC, `timestamp` DESC, `txFrom`, `txTo`, `nominee`)'
+  // )
+
+  // New index
   await db.runCreate(
-    'CREATE INDEX if not exists `transactions_idx2` ON `transactions` (`cycle` DESC, `timestamp` DESC, `txFrom`, `txTo`, `nominee`)'
+    'CREATE INDEX if not exists `transactions_txType` ON `transactions` (`transactionType`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `transactions_txFrom` ON `transactions` (`txFrom`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `transactions_txTo` ON `transactions` (`txTo`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `transactions_nominee` ON `transactions` (`nominee`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `transactions_cycle_timestamp` ON `transactions` (`cycle` DESC, `timestamp` DESC)'
   )
   await db.runCreate(
     'CREATE TABLE if not exists `tokenTxs` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `txId` TEXT, `txHash` TEXT NOT NULL, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `contractAddress` TEXT NOT NULL, `contractInfo` JSON, `tokenFrom` TEXT NOT NULL, `tokenTo` TEXT NOT NULL, `tokenValue` TEXT NOT NULL, `tokenType` INTEGER NOT NULL, `tokenEvent` TEXT NOT NULL, `tokenOperator` TEXT, `transactionFee` TEXT NOT NULL, FOREIGN KEY (`txId`, `txHash`) REFERENCES transactions(`txId`, `txHash`))'
@@ -54,7 +73,7 @@ export const initializeDB = async (): Promise<void> => {
     'CREATE INDEX if not exists `logs_idx` ON `logs` (`cycle` DESC, `timestamp` DESC, `txHash`, `blockNumber` DESC, `contractAddress`, `topic0`, `topic1`, `topic2`, `topic3`)'
   )
   await db.runCreate(
-    'CREATE TABLE if not exists `receipts` (`receiptId` TEXT NOT NULL UNIQUE PRIMARY KEY, `tx` JSON NOT NULL, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `result` JSON NOT NULL, `beforeStateAccounts` JSON, `accounts` JSON NOT NULL, `receipt` JSON, `sign` JSON NOT NULL)'
+    'CREATE TABLE if not exists `receipts` (`receiptId` TEXT NOT NULL UNIQUE PRIMARY KEY, `tx` JSON NOT NULL, `cycle` NUMBER NOT NULL, `timestamp` BIGINT NOT NULL, `result` JSON NOT NULL, `accounts` JSON NOT NULL, `receipt` JSON, `sign` JSON NOT NULL)'
   )
   // await db.runCreate('Drop INDEX if exists `receipts_idx`');
   await db.runCreate('CREATE INDEX if not exists `receipts_idx` ON `receipts` (`cycle` ASC, `timestamp` ASC)')
