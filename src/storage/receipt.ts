@@ -85,9 +85,9 @@ export async function processReceiptData(
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
       continue
     }
-
+    const receiptExist = await queryReceiptByReceiptId(tx.txId)
     let txReceipt: WrappedAccount = receipt
-    combineReceipts.push(receiptObj as unknown as Receipt)
+    if (!receiptExist) combineReceipts.push(receiptObj as unknown as Receipt)
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
     const storageKeyValueMap = {}
@@ -202,14 +202,14 @@ export async function processReceiptData(
         txReceipt.data.accountType === AccountType.Receipt
           ? TransactionType.Receipt
           : txReceipt.data.accountType === AccountType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txReceipt.data.accountType === AccountType.StakeReceipt
-              ? TransactionType.StakeReceipt
-              : txReceipt.data.accountType === AccountType.UnstakeReceipt
-                ? TransactionType.UnstakeReceipt
-                : txReceipt.data.accountType === AccountType.InternalTxReceipt
-                  ? TransactionType.InternalTxReceipt
-                  : (-1 as TransactionType)
+          ? TransactionType.NodeRewardReceipt
+          : txReceipt.data.accountType === AccountType.StakeReceipt
+          ? TransactionType.StakeReceipt
+          : txReceipt.data.accountType === AccountType.UnstakeReceipt
+          ? TransactionType.UnstakeReceipt
+          : txReceipt.data.accountType === AccountType.InternalTxReceipt
+          ? TransactionType.InternalTxReceipt
+          : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
         const txObj = {
@@ -231,23 +231,19 @@ export async function processReceiptData(
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
         }
+        let newTx = true
         const transactionExist = await Transaction.queryTransactionByTxId(tx.txId)
         if (config.verbose) console.log('transactionExist', transactionExist)
         if (!transactionExist) {
           if (txObj.nominee) await Transaction.insertTransaction(txObj)
           else combineTransactions.push(txObj)
         } else {
-          if (
-            transactionExist.cycle <= txObj.cycle &&
-            transactionExist.wrappedEVMAccount.timestamp &&
-            txObj.wrappedEVMAccount.timestamp &&
-            transactionExist.wrappedEVMAccount.timestamp < txObj.wrappedEVMAccount.timestamp
-          ) {
-            await Transaction.updateTransaction(tx.txId, txObj)
-            continue
+          if (transactionExist.cycle <= txObj.cycle && transactionExist.timestamp < txObj.timestamp) {
+            await Transaction.insertTransaction(tx)
           }
+          newTx = false
         }
-        const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap)
+        const { txs, accs, tokens } = await decodeTx(txObj, storageKeyValueMap, newTx)
         for (const acc of accs) {
           if (acc === ZERO_ETH_ADDRESS) continue
           if (!combineAccounts1.some((a) => a.ethAddress === acc)) {
@@ -353,7 +349,8 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
     const receipt: DbReceipt = await db.get(sql, [receiptId])
     if (receipt) {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-      if (receipt.beforeStateAccounts) (receipt as Receipt).beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
+      if (receipt.beforeStateAccounts)
+        (receipt as Receipt).beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) (receipt as Receipt).accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
       if (receipt.sign) (receipt as Receipt).sign = JSON.parse(receipt.sign)
@@ -423,7 +420,10 @@ export async function queryReceiptCount(): Promise<number> {
   return receipts['COUNT(*)'] || 0
 }
 
-export async function queryReceiptCountByCycles(start: number, end: number): Promise<{ receipts: number, cycle: number }[]> {
+export async function queryReceiptCountByCycles(
+  start: number,
+  end: number
+): Promise<{ receipts: number; cycle: number }[]> {
   let receipts: { cycle: number; 'COUNT(*)': number }[] = []
   try {
     const sql = `SELECT cycle, COUNT(*) FROM receipts GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
@@ -436,7 +436,7 @@ export async function queryReceiptCountByCycles(start: number, end: number): Pro
   return receipts.map((receipt) => {
     return {
       receipts: receipt['COUNT(*)'],
-      cycle: receipt.cycle
+      cycle: receipt.cycle,
     }
   })
 }

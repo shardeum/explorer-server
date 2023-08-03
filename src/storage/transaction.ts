@@ -1437,3 +1437,15 @@ export async function queryTransactionsByTimestamp(
   if (config.verbose) console.log('transactions by timestamp', transactions)
   return transactions
 }
+
+export async function queryTokenTxByTxId(txId: string): Promise<DbTokenTx[] | null> {
+  try {
+    const sql = `SELECT * FROM tokenTxs WHERE txId=?`
+    const tokenTxs: DbTokenTx[] = await db.all(sql, [txId])
+    if (config.verbose) console.log('tokenTxs txId', tokenTxs)
+    return tokenTxs
+  } catch (e) {
+    console.log(e)
+  }
+  return null
+}

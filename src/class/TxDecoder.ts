@@ -1,15 +1,15 @@
-import {TokenTx, TransactionType, DecodeTxResult, Transaction, ContractType} from '../types'
-import {getWeb3} from '../storage/transaction'
-import Web3, {Contract, ContractAbi} from 'web3'
-import {Account, Token, queryAccountByAccountId} from '../storage/account'
-import {Log, insertLog} from '../storage/log'
-import {config} from '../config/index'
+import { TokenTx, TransactionType, DecodeTxResult, Transaction, ContractType } from '../types'
+import { getWeb3, queryTokenTxByTxId } from '../storage/transaction'
+import Web3, { Contract, ContractAbi } from 'web3'
+import { Account, Token, queryAccountByAccountId } from '../storage/account'
+import { Log, insertLog } from '../storage/log'
+import { config } from '../config/index'
 import ERC20_ABI from '../utils/abis/ERC20.json'
 import ERC721_ABI from '../utils/abis/ERC721.json'
 import ERC1155_ABI from '../utils/abis/ERC1155.json'
-import {rlp, toBuffer, bufferToHex} from 'ethereumjs-util'
-import {Erc1155Abi, Erc721Abi} from "../types/abis";
-import {padAndPrefixBlockNumber} from '../utils/index'
+import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
+import { Erc1155Abi, Erc721Abi } from '../types/abis'
+import { padAndPrefixBlockNumber } from '../utils/index'
 
 const ERC_721_INTERFACE = '0x80ac58cd'
 const ERC_1155_INTERFACE = '0xd9b67a26'
@@ -60,7 +60,11 @@ const ERC_20_BALANCE_SLOT = '0x0'
 const ERC_721_BALANCE_SLOT = '0x3'
 const ERC_1155_BALANCE_SLOT = '0x3' // This is not correct; have to research and update it later
 
-export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {}): Promise<DecodeTxResult> => {
+export const decodeTx = async (
+  tx: Transaction,
+  storageKeyValueMap: object = {},
+  newTx: boolean = true
+): Promise<DecodeTxResult> => {
   const txs: TokenTx[] = []
   const accs: string[] = []
   const tokens: Token[] = []
@@ -79,6 +83,17 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
 
   const logs = 'readableReceipt' in tx.wrappedEVMAccount && tx.wrappedEVMAccount.readableReceipt?.logs
 
+  if (!newTx) {
+    // Check if there is any tokenTx for this txId; if found, return empty result to skip decoding
+    const tokenTxs = await queryTokenTxByTxId(tx.txId)
+    if (!tokenTxs || tokenTxs.length > 0) {
+      return {
+        txs,
+        accs,
+        tokens,
+      }
+    }
+  }
   if (logs && logs.length > 0) {
     let TransferTX = false
     for (const log of logs) {
@@ -165,7 +180,11 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             const web3 = new Web3()
             const result = web3.eth.abi.decodeParameters(['uint256[]', 'uint256[]'], log.data)
             if (config.verbose) console.log('Transfer Batch Decoding', result)
-            if (result?.['0'] && result['1'] && (result['0'] as unknown[]).length === (result['1'] as unknown[]).length) {
+            if (
+              result?.['0'] &&
+              result['1'] &&
+              (result['0'] as unknown[]).length === (result['1'] as unknown[]).length
+            ) {
               for (let i = 0; i < (result['0'] as unknown[]).length; i++) {
                 // Created a specail technique to extract the repective tokenValue of each tokenId/value transfer
                 /* eslint-disable security/detect-object-injection */
@@ -285,12 +304,12 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
             tokenTx.tokenType === TransactionType.ERC_20
               ? ERC_20_BALANCE_SLOT
               : tokenTx.tokenType === TransactionType.ERC_721
-                ? ERC_721_BALANCE_SLOT
-                : ERC_1155_BALANCE_SLOT
+              ? ERC_721_BALANCE_SLOT
+              : ERC_1155_BALANCE_SLOT
           if (tokenTx.tokenFrom !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
             let calculatedKey = Web3.utils
-              .soliditySha3({type: 'uint', value: tokenTx.tokenFrom}, {type: 'uint', value: storageKey})
+              .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: storageKey })
               ?.slice(2)
             let contractStorage: Account | null = null
             if (
@@ -307,15 +326,15 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                   calculatedKey = Web3.utils
                     .soliditySha3({ type: 'uint', value: tokenTx.tokenFrom }, { type: 'uint', value: '' + i })
                     ?.slice(2)
-                  console.log('calculatedKey', calculatedKey + log.address)
+                  // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
-                    console.log('contractStorage', contractStorage)
+                    // console.log('contractStorage', contractStorage)
                     break
                   } else if (storageKeyValueMap[calculatedKey + log.address]) break
                 }
-              console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
+              // console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
             }
             if (
               storageKeyValueMap[calculatedKey + log.address] ||
@@ -346,7 +365,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
           if (tokenTx.tokenTo !== ZERO_ETH_ADDRESS) {
             let tokenValue = '0'
             let calculatedKey = Web3.utils
-              .soliditySha3({type: 'uint', value: tokenTx.tokenTo}, {type: 'uint', value: storageKey})
+              .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: storageKey })
               ?.slice(2)
             // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             let contractStorage: Account | null = null
@@ -364,11 +383,11 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                   calculatedKey = Web3.utils
                     .soliditySha3({ type: 'uint', value: tokenTx.tokenTo }, { type: 'uint', value: '' + i })
                     ?.slice(2)
-                  console.log('calculatedKey', calculatedKey + log.address)
+                  // console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
-                    console.log('contractStorage', contractStorage)
+                    // console.log('contractStorage', contractStorage)
                     break
                   } else if (
                     storageKeyValueMap[calculatedKey + log.address] &&
@@ -376,7 +395,7 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
                   )
                     break
                 }
-              console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
+              // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             }
             if (
               storageKeyValueMap[calculatedKey + log.address] ||
@@ -420,7 +439,11 @@ export const decodeTx = async (tx: Transaction, storageKeyValueMap: object = {})
           ? tx.wrappedEVMAccount.readableReceipt?.data.slice(10) || ''
           : ''
       )
-      if (result?.['0'] && result['1'] && (result['0'] as unknown[]).length === (result['1'] as unknown[]).length) {
+      if (
+        result?.['0'] &&
+        result['1'] &&
+        (result['0'] as unknown[]).length === (result['1'] as unknown[]).length
+      ) {
         for (let i = 0; i < (result['0'] as unknown[]).length; i++) {
           const tokenTx = {
             tokenType: TransactionType.EVM_Internal,
@@ -496,7 +519,10 @@ export const getContractInfo = async (
   if (!foundCorrectContract) {
     try {
       const web3 = (await getWeb3()) as Web3
-      const Token: Contract<Erc1155Abi> = new web3.eth.Contract(ERC1155_ABI.abi as ContractAbi, contractAddress)
+      const Token: Contract<Erc1155Abi> = new web3.eth.Contract(
+        ERC1155_ABI.abi as ContractAbi,
+        contractAddress
+      )
       const result = await Token.methods.supportsInterface(ERC_1155_INTERFACE).call()
       if (result) {
         foundCorrectContract = true
@@ -506,5 +532,5 @@ export const getContractInfo = async (
       console.log('Non ERC 1155 Contract', contractAddress) // It could be not ERC 20 Contract
     }
   }
-  return {contractInfo, contractType}
+  return { contractInfo, contractType }
 }
