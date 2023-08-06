@@ -51,7 +51,6 @@ import {
   TokenResponse,
   TransactionResponse,
 } from './types'
-import { SocketStream } from "@fastify/websocket";
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -94,6 +93,8 @@ interface RequestQuery {
   fromBlock: string
   toBlock: string
   totalStakeData: string
+  beforeTimestamp: string
+  afterTimestamp: string
 }
 
 let txHashQueryCache = new Map()
@@ -463,6 +464,8 @@ const start = async (): Promise<void> => {
       txId: 's?',
       type: 's?', // This is sent with txHash. To query from db again and update the cache!
       totalStakeData: 's?',
+      beforeTimestamp: 's?',
+      afterTimestamp: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -548,8 +551,72 @@ const start = async (): Promise<void> => {
       }
       reply.send(res)
       return
+    } else if (query.beforeTimestamp || query.afterTimestamp) {
+      let beforeTimestamp: number = 0
+      let afterTimestamp: number = 0
+      if (query.beforeTimestamp) beforeTimestamp = parseInt(query.beforeTimestamp)
+      if (beforeTimestamp < 0 || Number.isNaN(beforeTimestamp)) {
+        reply.send({ success: false, error: 'Invalid before timestamp' })
+        return
+      }
+      if (query.afterTimestamp) afterTimestamp = parseInt(query.afterTimestamp)
+      if (afterTimestamp < 0 || Number.isNaN(afterTimestamp)) {
+        reply.send({ success: false, error: 'Invalid after timestamp' })
+        return
+      }
+      // TODO: maybe set the limit in the queryable timestamp range
+      const address: string = query.address ? query.address.toLowerCase() : ''
+      if (address && address.length !== 42 && address.length !== 64) {
+        reply.send({
+          success: false,
+          error: 'The address is not correct!',
+        })
+        return
+      }
+      totalTransactions = await Transaction.queryTransactionCountByTimestamp(
+        beforeTimestamp,
+        afterTimestamp,
+        address
+      )
+      const res: TransactionResponse = {
+        success: true,
+        totalTransactions,
+      }
+      if (query.page) {
+        const page: number = parseInt(query.page)
+        if (page <= 0 || Number.isNaN(page)) {
+          reply.send({ success: false, error: 'Invalid page number' })
+          return
+        }
+        // checking totalPages first
+        totalPages = Math.ceil(totalTransactions / itemsPerPage)
+        if (page > totalPages) {
+          reply.send({
+            success: false,
+            error: 'Page no is greater than the totalPage',
+          })
+        }
+        transactions = await Transaction.queryTransactionsByTimestamp(
+          (page - 1) * itemsPerPage,
+          itemsPerPage,
+          beforeTimestamp,
+          afterTimestamp,
+          query.address && query.address.toLowerCase()
+        )
+        res.transactions = transactions
+        res.totalPages = totalPages
+      }
+      reply.send(res)
+      return
     } else if (query.address || query.token) {
       const address: string = query.address ? query.address.toLowerCase() : query.token.toLowerCase()
+      if (address.length !== 42 && address.length !== 64) {
+        reply.send({
+          success: false,
+          error: 'The address is not correct!',
+        })
+        return
+      }
       let page: number
       if (query.page) {
         page = parseInt(query.page)
@@ -565,6 +632,13 @@ const start = async (): Promise<void> => {
       let filterAddress
       if (query.filterAddress) {
         filterAddress = query.filterAddress.toLowerCase()
+        if (filterAddress.length !== 42) {
+          reply.send({
+            success: false,
+            error: 'The filter address is not correct!',
+          })
+          return
+        }
       }
       totalTransactions = await Transaction.queryTransactionCount(address, txType, filterAddress)
       if (totalTransactions <= 0) {

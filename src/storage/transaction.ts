@@ -1152,3 +1152,284 @@ export async function queryTransactionCountByCycles(
     }
   })
 }
+
+export async function queryTransactionCountByTimestamp(
+  beforeTimestamp: number,
+  afterTimestamp: number,
+  address?: string,
+  txType?: TransactionSearchType,
+  filterAddress?: string
+): Promise<number> {
+  let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
+  let sql = `SELECT COUNT(*) FROM transactions WHERE `
+  if (txType) {
+    if (
+      txType === TransactionSearchType.EVM_Internal ||
+      txType === TransactionSearchType.ERC_20 ||
+      txType === TransactionSearchType.ERC_721 ||
+      txType === TransactionSearchType.ERC_1155 ||
+      txType === TransactionSearchType.TokenTransfer
+    )
+      sql = `SELECT COUNT(*) FROM tokenTxs WHERE `
+  }
+  let values: any = []
+  if (afterTimestamp > 0) {
+    sql += `timestamp>? `
+    values.push(afterTimestamp)
+  }
+  if (beforeTimestamp > 0) {
+    if (afterTimestamp > 0) sql += `AND timestamp<? `
+    else sql += `timestamp<? `
+    values.push(beforeTimestamp)
+  }
+  try {
+    if (address) {
+      if (!txType) {
+        sql += `AND (txFrom=? OR txTo=? OR nominee=?)`
+        values.push(address, address, address)
+      } else if (txType === TransactionSearchType.AllExceptInternalTx) {
+        const ty = TransactionType.InternalTxReceipt
+        sql = `AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=?`
+        values.push(address, address, address, ty)
+      } else if (
+        txType === TransactionSearchType.Receipt ||
+        txType === TransactionSearchType.NodeRewardReceipt ||
+        txType === TransactionSearchType.StakeReceipt ||
+        txType === TransactionSearchType.UnstakeReceipt ||
+        txType === TransactionSearchType.InternalTxReceipt
+      ) {
+        const ty =
+          txType === TransactionSearchType.Receipt
+            ? TransactionType.Receipt
+            : txType === TransactionSearchType.NodeRewardReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
+        sql += `AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType=?`
+        values.push(address, address, address, ty)
+      } else if (
+        txType === TransactionSearchType.EVM_Internal ||
+        txType === TransactionSearchType.ERC_20 ||
+        txType === TransactionSearchType.ERC_721 ||
+        txType === TransactionSearchType.ERC_1155
+      ) {
+        const ty =
+          txType === TransactionSearchType.EVM_Internal
+            ? TransactionType.EVM_Internal
+            : txType === TransactionSearchType.ERC_20
+            ? TransactionType.ERC_20
+            : txType === TransactionSearchType.ERC_721
+            ? TransactionType.ERC_721
+            : TransactionType.ERC_1155
+        sql += `AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=?`
+        values.push(address, address, address, ty)
+      } else if (txType === TransactionSearchType.TokenTransfer) {
+        if (filterAddress) {
+          sql += `AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT tokenType=?`
+          values.push(address, filterAddress, filterAddress, filterAddress, TransactionType.EVM_Internal)
+        } else {
+          sql += `AND contractAddress=? AND NOT tokenType=?`
+          values.push(address, TransactionType.EVM_Internal)
+        }
+      }
+    } else if (txType) {
+      if (txType === TransactionSearchType.AllExceptInternalTx) {
+        const ty = TransactionType.InternalTxReceipt
+        sql += `AND transactionType!=?`
+        values.push(ty)
+      } else if (
+        txType === TransactionSearchType.Receipt ||
+        txType === TransactionSearchType.NodeRewardReceipt ||
+        txType === TransactionSearchType.StakeReceipt ||
+        txType === TransactionSearchType.UnstakeReceipt ||
+        txType === TransactionSearchType.InternalTxReceipt
+      ) {
+        const ty =
+          txType === TransactionSearchType.Receipt
+            ? TransactionType.Receipt
+            : txType === TransactionSearchType.NodeRewardReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
+        sql += `AND transactionType=?`
+        values.push(ty)
+      } else if (
+        txType === TransactionSearchType.EVM_Internal ||
+        txType === TransactionSearchType.ERC_20 ||
+        txType === TransactionSearchType.ERC_721 ||
+        txType === TransactionSearchType.ERC_1155
+      ) {
+        const ty =
+          txType === TransactionSearchType.EVM_Internal
+            ? TransactionType.EVM_Internal
+            : txType === TransactionSearchType.ERC_20
+            ? TransactionType.ERC_20
+            : txType === TransactionSearchType.ERC_721
+            ? TransactionType.ERC_721
+            : TransactionType.ERC_1155
+        sql += `AND tokenType=?`
+        values.push(ty)
+      }
+    }
+    transactions = await db.get(sql, values)
+  } catch (e) {
+    console.log(e)
+  }
+
+  if (config.verbose) console.log('transactions count by timestamp', transactions)
+
+  return transactions['COUNT(*)'] || 0
+}
+
+export async function queryTransactionsByTimestamp(
+  skip = 0,
+  limit = 10,
+  beforeTimestamp: number,
+  afterTimestamp: number,
+  address?: string,
+  txType?: TransactionSearchType,
+  filterAddress?: string
+): Promise<(DbTransaction | DbTokenTx)[]> {
+  let transactions: (DbTransaction | DbTokenTx)[] = []
+  let sql = `SELECT * FROM transactions WHERE `
+  if (txType) {
+    if (
+      txType === TransactionSearchType.EVM_Internal ||
+      txType === TransactionSearchType.ERC_20 ||
+      txType === TransactionSearchType.ERC_721 ||
+      txType === TransactionSearchType.ERC_1155 ||
+      txType === TransactionSearchType.TokenTransfer
+    )
+      sql = `SELECT * FROM tokenTxs WHERE `
+  }
+  let values: any = []
+  if (afterTimestamp > 0) {
+    sql += `timestamp>? `
+    values.push(afterTimestamp)
+  }
+  if (beforeTimestamp > 0) {
+    if (afterTimestamp > 0) sql += `AND timestamp<? `
+    else sql += `timestamp<? `
+    values.push(beforeTimestamp)
+  }
+  const sqlSuffix = ` ORDER BY timestamp ASC LIMIT ${limit} OFFSET ${skip}`
+  try {
+    if (address) {
+      if (!txType || TransactionSearchType.All) {
+        sql += `AND (txFrom=? OR txTo=? OR nominee=?)`
+        values.push(address, address, address)
+      } else if (txType === TransactionSearchType.AllExceptInternalTx) {
+        const ty = TransactionType.InternalTxReceipt
+        sql += `AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType!=?`
+        values.push(address, address, address, ty)
+      } else if (
+        txType === TransactionSearchType.Receipt ||
+        txType === TransactionSearchType.NodeRewardReceipt ||
+        txType === TransactionSearchType.StakeReceipt ||
+        txType === TransactionSearchType.UnstakeReceipt ||
+        txType === TransactionSearchType.InternalTxReceipt
+      ) {
+        const ty =
+          txType === TransactionSearchType.Receipt
+            ? TransactionType.Receipt
+            : txType === TransactionSearchType.NodeRewardReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
+        sql += `AND (txFrom=? OR txTo=? OR nominee=?) AND transactionType=?`
+        values.push(address, address, address, ty)
+      } else if (
+        txType === TransactionSearchType.EVM_Internal ||
+        txType === TransactionSearchType.ERC_20 ||
+        txType === TransactionSearchType.ERC_721 ||
+        txType === TransactionSearchType.ERC_1155
+      ) {
+        const ty =
+          txType === TransactionSearchType.EVM_Internal
+            ? TransactionType.EVM_Internal
+            : txType === TransactionSearchType.ERC_20
+            ? TransactionType.ERC_20
+            : txType === TransactionSearchType.ERC_721
+            ? TransactionType.ERC_721
+            : TransactionType.ERC_1155
+        sql += `AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND tokenType=?`
+        values.push(address, address, address, ty)
+      } else if (txType === TransactionSearchType.TokenTransfer) {
+        if (filterAddress) {
+          sql += `AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?)`
+          values.push(address, filterAddress, filterAddress, filterAddress, TransactionType.EVM_Internal)
+        } else {
+          const sql = `AND contractAddress=? AND NOT (tokenType=?)`
+          values.push(address, TransactionType.EVM_Internal)
+        }
+      }
+    } else if (txType) {
+      if (txType === TransactionSearchType.AllExceptInternalTx) {
+        const ty = TransactionType.InternalTxReceipt
+        sql += `AND transactionType!=?`
+        values.push(ty)
+      } else if (
+        txType === TransactionSearchType.Receipt ||
+        txType === TransactionSearchType.NodeRewardReceipt ||
+        txType === TransactionSearchType.StakeReceipt ||
+        txType === TransactionSearchType.UnstakeReceipt ||
+        txType === TransactionSearchType.InternalTxReceipt
+      ) {
+        const ty =
+          txType === TransactionSearchType.Receipt
+            ? TransactionType.Receipt
+            : txType === TransactionSearchType.NodeRewardReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
+        sql += `AND transactionType=?`
+        values.push(ty)
+      } else if (
+        txType === TransactionSearchType.EVM_Internal ||
+        txType === TransactionSearchType.ERC_20 ||
+        txType === TransactionSearchType.ERC_721 ||
+        txType === TransactionSearchType.ERC_1155
+      ) {
+        const ty =
+          txType === TransactionSearchType.EVM_Internal
+            ? TransactionType.EVM_Internal
+            : txType === TransactionSearchType.ERC_20
+            ? TransactionType.ERC_20
+            : txType === TransactionSearchType.ERC_721
+            ? TransactionType.ERC_721
+            : TransactionType.ERC_1155
+        sql += `AND tokenType=?`
+        values.push(ty)
+      }
+    }
+    sql += sqlSuffix
+    transactions = await db.all(sql, values)
+    if (transactions.length > 0) {
+      transactions.forEach((transaction) => {
+        if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
+          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if ('result' in transaction && transaction.result)
+          (transaction as Transaction).result = JSON.parse(transaction.result)
+        if ('contractInfo' in transaction && transaction.contractInfo)
+          transaction.contractInfo = JSON.parse(transaction.contractInfo)
+      })
+    }
+  } catch (e) {
+    console.log(e)
+  }
+
+  if (config.verbose) console.log('transactions by timestamp', transactions)
+  return transactions
+}
