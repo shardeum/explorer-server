@@ -192,7 +192,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
           txTo: txReceipt.data.readableReceipt.to
             ? txReceipt.data.readableReceipt.to
             : txReceipt.data.readableReceipt.contractAddress,
-          originTxData: tx.originTxData || {},
+          originalTxData: tx.originalTxData || {},
         } as Transaction.Transaction
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee

@@ -13,8 +13,7 @@ export interface Transaction {
   txFrom: string
   txTo: string
   nominee?: string
-  originTxData: unknown // This has to be originalTxData; there is also a fix MR for it. // The lower one has to be removed when the fix is merged.
-  originalTxData?: any
+  originalTxData: unknown
   tokenTxs?: TokenTx[]
   contractInfo?: ContractInfo
   txStatus?: TxStatus

@@ -119,7 +119,7 @@ interface RawTransaction {
   accountId: string
   cycleNumber: number
   data: WrappedEVMAccount
-  originTxData: {
+  originalTxData: {
     duration: number
     internalTXType: InternalTXType
     isInternalTx: boolean
@@ -186,7 +186,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
         txTo: transaction.data.readableReceipt.to
           ? transaction.data.readableReceipt.to
           : transaction.data.readableReceipt.contractAddress,
-        originTxData: {},
+        originalTxData: {},
       }
 
       const { txs, accs, tokens } = await decodeTx(txObj)
