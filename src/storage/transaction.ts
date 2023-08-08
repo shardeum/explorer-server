@@ -1309,16 +1309,20 @@ export async function queryTransactionsByTimestamp(
       sql = `SELECT * FROM tokenTxs WHERE `
   }
   const values: any = []
+  let sqlSuffix = ''
   if (afterTimestamp > 0) {
     sql += `timestamp>? `
+    sqlSuffix = ` ORDER BY timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     values.push(afterTimestamp)
   }
   if (beforeTimestamp > 0) {
     if (afterTimestamp > 0) sql += `AND timestamp<? `
-    else sql += `timestamp<? `
+    else {
+      sql += `timestamp<? `
+      sqlSuffix = ` ORDER BY timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+    }
     values.push(beforeTimestamp)
   }
-  const sqlSuffix = ` ORDER BY timestamp ASC LIMIT ${limit} OFFSET ${skip}`
   try {
     if (address) {
       if (!txType || TransactionSearchType.All) {
