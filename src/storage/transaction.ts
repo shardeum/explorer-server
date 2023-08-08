@@ -1172,7 +1172,7 @@ export async function queryTransactionCountByTimestamp(
     )
       sql = `SELECT COUNT(*) FROM tokenTxs WHERE `
   }
-  let values: any = []
+  const values: any = []
   if (afterTimestamp > 0) {
     sql += `timestamp>? `
     values.push(afterTimestamp)
@@ -1308,7 +1308,7 @@ export async function queryTransactionsByTimestamp(
     )
       sql = `SELECT * FROM tokenTxs WHERE `
   }
-  let values: any = []
+  const values: any = []
   if (afterTimestamp > 0) {
     sql += `timestamp>? `
     values.push(afterTimestamp)

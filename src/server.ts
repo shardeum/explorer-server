@@ -552,8 +552,8 @@ const start = async (): Promise<void> => {
       reply.send(res)
       return
     } else if (query.beforeTimestamp || query.afterTimestamp) {
-      let beforeTimestamp: number = 0
-      let afterTimestamp: number = 0
+      let beforeTimestamp = 0
+      let afterTimestamp = 0
       if (query.beforeTimestamp) beforeTimestamp = parseInt(query.beforeTimestamp)
       if (beforeTimestamp < 0 || Number.isNaN(beforeTimestamp)) {
         reply.send({ success: false, error: 'Invalid before timestamp' })
