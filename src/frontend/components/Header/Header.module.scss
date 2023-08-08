@@ -37,6 +37,7 @@
 
   .list_item {
     @include fontStyle(small);
+    margin-top: spacing(3.8);
     margin-left: spacing(12);
   }
 

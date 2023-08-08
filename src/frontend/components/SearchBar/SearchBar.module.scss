@@ -1,0 +1,40 @@
+@import '../../../styles/index.scss';
+
+.SearchBar {
+  width: 495px;
+  border: border(gray);
+  border-radius: borderRadius(8);
+  height: 30px;
+  display: flex;
+  align-items: center;
+
+  @include tabletPro {
+    width: 100%;
+  }
+
+  .box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: border(gray);
+    border-radius: borderRadius(8);
+    box-shadow: shadow(shadow1);
+    overflow: hidden;
+    height: 50px;
+  }
+
+  .input {
+    @include fontStyle(small);
+    width: 90%;
+    padding: 0 spacing(0) 0 spacing(10);
+  }
+
+  .iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 8%;
+    margin-left: spacing(10);
+    
+  }
+}

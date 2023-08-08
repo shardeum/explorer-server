@@ -1,5 +1,6 @@
 import { api } from '../api/axios'
 import { PATHS } from '../api/paths'
+import { AccountType } from '../types'
 
 export const isTransactionHash = async (searchText: string): Promise<boolean> => {
   const {
@@ -11,6 +12,6 @@ export const isTransactionHash = async (searchText: string): Promise<boolean> =>
 export const isNodeAccount = async (searchText: string): Promise<boolean> => {
   const {
     data: { success, accounts },
-  } = await api.get(`${PATHS.ADDRESS}?address=${searchText}&accountType=9`)
+  } = await api.get(`${PATHS.ADDRESS}?address=${searchText}&accountType=${AccountType.NodeAccount2}`)
   return success && accounts[0].accountId === searchText
 }

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Icon } from '../../components'
 
-import { useSearchHook } from './useSearchHook'
+import { useSearchHook } from '../../components/SearchBar/useSearchHook'
 
 import styles from './SearchBox.module.scss'
 
