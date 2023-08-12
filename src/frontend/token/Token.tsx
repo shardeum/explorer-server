@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { utils } from 'ethers'
 
-import { AnchorLink, Button, ContentLayout, CopyButton, Spacer, Tab, Table } from '../components'
+import { AnchorLink, Button, ContentLayout, CopyButton, Spacer, Tab, Table, Pagination } from '../components'
 import { DetailCard } from '../account/DetailCard'
 import { TransactionTable } from '../transaction'
 import { breadcrumbsList, ContractType, TransactionSearchType } from '../types'
@@ -23,13 +23,17 @@ export const Token: React.FC = () => {
     total,
     transactionType,
     transactions,
-    tokenHolders,
+    totalTokenHolders,
     tokens,
     filteredAddress,
     onAddressChange,
     activeTab,
     onTabChange,
     tokenBalance,
+    page,
+    setPage,
+    tokenHolderPage,
+    setTokenHolderPage,
   } = useTokenHook({
     id: String(id),
     address: address?.toString(),
@@ -37,6 +41,9 @@ export const Token: React.FC = () => {
 
 
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
+
+  const siblingCount = 3
+  const pageSize = 10
 
   const header = [
     {
@@ -71,12 +78,38 @@ export const Token: React.FC = () => {
     {
       key: TransactionSearchType.AllExceptInternalTx as number,
       value: 'Transfer',
-      content: <TransactionTable data={transactions} txType={transactionType} />,
+      content: (
+        <>
+          <TransactionTable data={transactions} txType={transactionType} />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setPage(p)}
+              totalCount={total}
+              siblingCount={siblingCount}
+              currentPage={page}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
+      ),
     },
     {
       key: 'holder',
       value: 'Holder',
-      content: <Table columns={header} data={tokens} />,
+      content: (
+        <>
+          <Table columns={header} data={tokens} />
+          <div className={styles.paginationWrapper}>
+            <Pagination
+              onPageChange={(p) => setTokenHolderPage(p)}
+              totalCount={totalTokenHolders}
+              siblingCount={siblingCount}
+              currentPage={tokenHolderPage}
+              pageSize={pageSize}
+            />
+          </div>
+        </>
+      ),
     },
   ]
 
@@ -135,7 +168,7 @@ export const Token: React.FC = () => {
                           .toString()
                       : '',
                   },
-                  { key: 'Holders :', value: tokenHolders },
+                  { key: 'Holders :', value: totalTokenHolders },
                   { key: 'Transfers :', value: total },
                 ]}
               />

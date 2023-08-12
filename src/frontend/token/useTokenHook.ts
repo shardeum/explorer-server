@@ -20,15 +20,17 @@ type TokenHookResult = {
   account?: Account
   transactions: TokenTx[]
   tokens: Token[]
-  tokenHolders: number
-  total?: number
+  totalTokenHolders: number
+  total: number
   page: number
   transactionType: TransactionSearchType
+  tokenHolderPage: number
   filteredAddress: string
   activeTab: number | string
   tokenBalance: string
   setPage: (page: number) => void
-  setTransactionType: (transactionType: number) => void
+  setTransactionType: (transactionType: TransactionSearchType) => void
+  setTokenHolderPage: (page: number) => void
   onAddressChange: (e: ChangeEvent<HTMLInputElement>) => void
   onTabChange: (e: TransactionSearchType) => void
 }
@@ -37,10 +39,11 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<TokenTx[]>([])
   const [tokens, setTokens] = useState<Token[]>([])
-  const [tokenHolders, setTokenHolders] = useState<number>(0)
-  const [total, setTotal] = useState<number>()
+  const [totalTokenHolders, setTokenHolders] = useState<number>(0)
+  const [total, setTotal] = useState<number>(0)
   const [page, setPage] = useState<number>(1)
   const [transactionType, setTransactionType] = useState<number>(TransactionSearchType.AllExceptInternalTx)
+  const [tokenHolderPage, setTokenHolderPage] = useState<number>(1)
   const [filteredAddress, setFilteredAddress] = useState<string>('')
   const [activeTab, setActiveTab] = useState(TransactionSearchType.AllExceptInternalTx)
   const [tokenBalance, setTokenBalance] = useState<string>('')
@@ -88,17 +91,17 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
   const getToken = useCallback(async () => {
     if (id.length !== 42 && id.length !== 64)
       return {
-        tokenHolders,
+        totalTokenHolders,
         tokens,
       }
-    const data = await api.get(`${PATHS.TOKEN}?contractAddress=${id}&page=1`)
+    const data = await api.get(`${PATHS.TOKEN}?contractAddress=${id}&page=${tokenHolderPage}`)
 
     return {
-      tokenHolders: data?.data?.totalTokenHolders,
+      totalTokenHolders: data?.data?.totalTokenHolders,
       tokens: data?.data?.tokens,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [id, tokenHolderPage])
 
   useEffect(() => {
     async function fetchData(): Promise<void> {
@@ -133,8 +136,8 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
-        const { tokenHolders, tokens } = await getToken()
-        setTokenHolders(tokenHolders)
+        const { totalTokenHolders, tokens } = await getToken()
+        setTokenHolders(totalTokenHolders)
         setTokens(tokens)
       }
     }
@@ -151,11 +154,13 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
   return {
     account,
     transactions,
-    tokenHolders,
+    totalTokenHolders,
     tokens,
     total,
     page,
     setPage,
+    tokenHolderPage,
+    setTokenHolderPage,
     transactionType,
     setTransactionType,
     filteredAddress,
