@@ -3,6 +3,7 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 import { InternalTXType, TransactionType } from '../types'
 import { getTransactionObj, isStakingEVMTx, getStakeTxBlobFromEVMTx } from '../utils/decodeEVMRawTx'
+import { bufferToHex } from 'ethereumjs-util'
 
 export interface OriginalTxData {
   txId: string
@@ -21,6 +22,8 @@ type DbOriginalTxData = OriginalTxData & {
   originalTxData: string
   sign: string
 }
+
+export let originalTxsMap: Map<string, number> = new Map()
 
 export async function insertOriginalTxData(originalTxData: OriginalTxData): Promise<void> {
   try {
@@ -60,6 +63,9 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
   const combineOriginalTxsData: OriginalTxData[] = []
 
   for (const originalTxData of originalTxsData) {
+    const txId = originalTxData.txId
+    if (originalTxsMap.has(txId)) continue
+    originalTxsMap.set(txId, originalTxData.cycleNumber)
     // console.log('originalTxData', originalTxData)
     try {
       if (originalTxData.originalTxData.tx.raw) {
@@ -81,7 +87,7 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
           }
           combineOriginalTxsData.push({
             ...originalTxData,
-            txHash: txObj.hash().toString('hex'),
+            txHash: bufferToHex(txObj.hash()),
             transactionType,
           })
         } else {
@@ -199,4 +205,14 @@ export async function queryOriginalTxDataByTxHash(txHash: string): Promise<Origi
     console.log(e)
   }
   return null
+}
+
+export function cleanOldOriginalTxsMap(currentCycleCounter: number) {
+  for (let [key, value] of originalTxsMap) {
+    // Clean originalTxs that are older than current cycle
+    if (value < currentCycleCounter) {
+      originalTxsMap.delete(key)
+    }
+  }
+  if (config.verbose) console.log('Clean old originalTxs map!', currentCycleCounter)
 }

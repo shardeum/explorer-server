@@ -25,6 +25,13 @@ export type ReceiptResponse = {
   totalReceipts?: number
 }
 
+export type OriginalTxResponse = {
+  success: boolean
+  originalTxs?: unknown
+  totalPages?: number
+  totalOriginalTxs?: number
+}
+
 export type TransactionResponse = {
   success: boolean
   transactions?: Array<unknown>

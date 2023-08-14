@@ -19,9 +19,11 @@ import * as Cycle from './storage/cycle'
 import * as Log from './storage/log'
 import * as Receipt from './storage/receipt'
 import * as Transaction from './storage/transaction'
+import * as OriginalTxData from './storage/originalTxData'
 import {
   AccountSearchType,
   AccountType,
+  OriginalTxResponse,
   TokenTx,
   Transaction as TransactionInterface,
   TransactionSearchType,
@@ -1103,6 +1105,131 @@ const start = async (): Promise<void> => {
     if (query.count) {
       totalReceipts = await Receipt.queryReceiptCount()
       res.totalReceipts = totalReceipts
+    }
+    reply.send(res)
+  })
+
+  server.get('/api/originalTx', async (_request, reply) => {
+    const err = utils.validateTypes(_request.query as object, {
+      count: 's?',
+      page: 's?',
+      txId: 's?',
+      txHash: 's?',
+      startCycle: 's?',
+      endCycle: 's?',
+    })
+    if (err) {
+      reply.send({ success: false, error: err })
+      return
+    }
+    // console.log('Request', _request.query);
+    const query = _request.query as RequestQuery
+    const itemsPerPage = 10
+    let totalPages = 0
+    let totalOriginalTxs = 0
+    let originalTxs
+    if (query.count) {
+      const count: number = parseInt(query.count)
+      //max 1000 originalTxs
+      if (count > 1000) {
+        reply.send({ success: false, error: 'The count number is too big.' })
+        return
+      } else if (count <= 0 || Number.isNaN(count)) {
+        reply.send({ success: false, error: 'Invalid count' })
+        return
+      }
+      originalTxs = await OriginalTxData.queryOriginalTxDataCount(0, count)
+    } else if (query.startCycle) {
+      const startCycle: number = parseInt(query.startCycle)
+      if (startCycle < 0 || Number.isNaN(startCycle)) {
+        reply.send({ success: false, error: 'Invalid start cycle number' })
+        return
+      }
+      let endCycle = startCycle + 100
+      if (query.endCycle) {
+        endCycle = parseInt(query.endCycle)
+        if (endCycle < 0 || Number.isNaN(endCycle)) {
+          reply.send({ success: false, error: 'Invalid end cycle number' })
+          return
+        }
+        if (endCycle - startCycle > 100) {
+          reply.send({ success: false, error: 'The cycle range is too big. Max cycle range is 100 cycles.' })
+          return
+        }
+      }
+      totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount(null, startCycle, endCycle)
+      if (query.page) {
+        const page: number = parseInt(query.page)
+        if (page <= 0 || Number.isNaN(page)) {
+          reply.send({ success: false, error: 'Invalid page number' })
+          return
+        }
+        // checking totalPages first
+        totalPages = Math.ceil(totalOriginalTxs / itemsPerPage)
+        if (page > totalPages) {
+          reply.send({
+            success: false,
+            error: 'Page no is greater than the totalPage',
+          })
+        }
+        originalTxs = await OriginalTxData.queryOriginalTxsData(
+          (page - 1) * itemsPerPage,
+          itemsPerPage,
+          null,
+          startCycle,
+          endCycle
+        )
+      }
+    } else if (query.txId) {
+      const txId: string = query.txId.toLowerCase()
+      if (txId.length !== 64)
+        reply.send({
+          success: false,
+          error: 'The transaction id is not correct!',
+        })
+      originalTxs = await OriginalTxData.queryOriginalTxDataByTxId(txId)
+    } else if (query.txHash) {
+      const txHash: string = query.txHash.toLowerCase()
+      if (txHash.length !== 66)
+        reply.send({
+          success: false,
+          error: 'The transaction hash is not correct!',
+        })
+      originalTxs = await OriginalTxData.queryOriginalTxDataByTxHash(txHash)
+    } else if (query.page) {
+      const page: number = parseInt(query.page)
+      if (page <= 0 || Number.isNaN(page)) {
+        reply.send({ success: false, error: 'Invalid page number' })
+        return
+      }
+      // checking totalPages first
+      totalOriginalTxs = await Receipt.queryReceiptCount()
+      totalPages = Math.ceil(totalOriginalTxs / itemsPerPage)
+      if (page > totalPages) {
+        reply.send({
+          success: false,
+          error: 'Page no is greater than the totalPage',
+        })
+      }
+      originalTxs = await OriginalTxData.queryOriginalTxsData((page - 1) * itemsPerPage, itemsPerPage)
+    } else {
+      reply.send({
+        success: false,
+        error: 'not specified which receipt to show',
+      })
+      return
+    }
+    const res: OriginalTxResponse = {
+      success: true,
+      originalTxs,
+    }
+    if (query.page || query.startCycle) {
+      res.totalOriginalTxs = totalOriginalTxs
+      res.totalPages = totalPages
+    }
+    if (query.count) {
+      totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
+      res.totalOriginalTxs = totalOriginalTxs
     }
     reply.send(res)
   })
