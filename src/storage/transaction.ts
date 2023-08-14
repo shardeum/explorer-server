@@ -10,6 +10,7 @@ import {
   WrappedEVMAccount,
   WrappedDataReceipt,
   WrappedAccount,
+  InternalTXType,
 } from '../types'
 import ERC20ABI from 'human-standard-token-abi'
 import Web3 from 'web3'
@@ -123,7 +124,7 @@ interface RawTransaction {
   data: WrappedEVMAccount
   originTxData: {
     duration: number
-    internalTXType: TransactionType
+    internalTXType: InternalTXType
     isInternalTx: boolean
     nominator: string
     nominee: string

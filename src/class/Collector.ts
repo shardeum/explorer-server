@@ -6,6 +6,7 @@ import { insertOrUpdateTransaction } from '../storage/transaction'
 import { insertOrUpdateAccount } from '../storage/account'
 import { insertOrUpdateCycle } from '../storage/cycle'
 import { processReceiptData } from '../storage/receipt'
+import { processOriginalTxData } from '../storage/originalTxData'
 export interface Data {
   archivedCycles: any[]
   sign: {
@@ -17,6 +18,7 @@ export interface Data {
 export interface NewData {
   receipts: any[]
   cycles: any[]
+  originalTxsData: any[]
   sign: {
     owner: string
     sig: string
@@ -167,8 +169,9 @@ export class Collector {
   async processReceipt(data: NewData) {
     let err = utils.validateTypes(data, {
       sign: 'o',
-      receipt: 'a?',
-      cycle: 'a?',
+      receipts: 'a?',
+      cycles: 'a?',
+      originalTxsData: 'a?',
     })
     if (err) {
       return
@@ -186,13 +189,11 @@ export class Collector {
       console.log('Data received from archive-server has invalid signature')
       return
     }
-    if (!data.receipts) {
-      if (!data.cycles) {
-        console.log('Data received from archive-server is invalid')
-        return
-      }
+    if (!data.receipts && !data.cycles && !data.originalTxsData) {
+      console.log('Data received from archive-server is invalid')
+      return
     }
-    const { receipts, cycles } = data
+    const { receipts, cycles, originalTxsData } = data
     if (cycles)
       for (const cycle of cycles) {
         if (!cycle.cycleRecord || !cycle.cycleMarker || cycle.counter < 0) {
@@ -202,5 +203,6 @@ export class Collector {
         await insertOrUpdateCycle(cycle)
       }
     if (receipts) await processReceiptData(receipts)
+    if (originalTxsData) await processOriginalTxData(originalTxsData)
   }
 }
