@@ -49,10 +49,10 @@ export async function bulkInsertOriginalTxsData(originalTxsData: OriginalTxData[
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully bulk inserted OriginalTxData', originalTxsData.length)
+    console.log('Successfully bulk inserted OriginalTxsData', originalTxsData.length)
   } catch (e) {
     console.log(e)
-    console.log('Unable to bulk insert OriginalTxData', originalTxsData.length)
+    console.log('Unable to bulk insert OriginalTxsData', originalTxsData.length)
   }
 }
 
@@ -60,7 +60,7 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
   console.log('originalTxsData size', originalTxsData.length)
   if (originalTxsData && originalTxsData.length <= 0) return
   const bucketSize = 1000
-  const combineOriginalTxsData: OriginalTxData[] = []
+  let combineOriginalTxsData: OriginalTxData[] = []
 
   for (const originalTxData of originalTxsData) {
     const txId = originalTxData.txId
@@ -103,7 +103,10 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
     } catch (e) {
       console.log('Error in processing original Tx data', originalTxData.txId, e)
     }
-    if (combineOriginalTxsData.length > bucketSize) await bulkInsertOriginalTxsData(combineOriginalTxsData)
+    if (combineOriginalTxsData.length >= bucketSize) {
+      await bulkInsertOriginalTxsData(combineOriginalTxsData)
+      combineOriginalTxsData = []
+    }
   }
   if (combineOriginalTxsData.length > 0) await bulkInsertOriginalTxsData(combineOriginalTxsData)
 }
