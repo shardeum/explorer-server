@@ -127,13 +127,54 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.value}>{transaction?.txStatus}</div>
           </div>
           <div className={styles.item}>
-            <div className={styles.title}>Original Tx Data:</div>
-            <div className={styles.value}>{transaction?.originTxData}</div>
+            <div className={styles.title}>Type:</div>
+            <div className={styles.value}>
+              <Chip title={showTxMethod(transaction)} color="info" className={styles.chip} />
+            </div>
           </div>
           <div className={styles.item}>
-            <div className={styles.title}>Injected Timestamp:</div>
+            <div className={styles.title}>Cycle:</div>
+            <div className={styles.value}>{transaction?.['cycleNumber']}</div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.title}>Timestamp:</div>
             <div className={styles.value}>{transaction?.timestamp}</div>
           </div>
+          {transaction.readableReceipt && (
+            <>
+              <div className={styles.item}>
+                <div className={styles.title}>Nonce:</div>
+                <div className={styles.value}>
+                  {/* {web3.utils.hexToNumber('0x' + transaction.readableReceipt.nonce)} */}
+                </div>
+              </div>
+
+              <div className={styles.item}>
+                <div className={styles.title}>From:</div>
+                <div className={styles.value}>
+                  <Link href={`/account/${transaction?.readableReceipt?.from}`} className={styles.link}>
+                    {transaction?.readableReceipt.from}
+                  </Link>
+                </div>
+              </div>
+
+              <div className={styles.item}>
+                <div className={styles.title}>To:</div>
+                <div className={styles.value}>
+                  <Link href={`/account/${transaction?.readableReceipt?.to}`} className={styles.link}>
+                    {transaction?.readableReceipt.to}
+                  </Link>
+                </div>
+              </div>
+
+              <div className={styles.item}>
+                <div className={styles.title}>Value:</div>
+                <div className={styles.value}>
+                  {calculateFullValue(`0x${transaction?.readableReceipt?.value}`)} SHM
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )
     } else {

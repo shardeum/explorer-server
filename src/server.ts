@@ -28,6 +28,7 @@ import {
   Transaction as TransactionInterface,
   OriginalTxData as OriginalTxDataInterface,
   TransactionSearchType,
+  TransactionType,
 } from './types'
 import * as utils from './utils'
 import { getFromArchiver } from '@shardus/archiver-discovery'
@@ -54,6 +55,8 @@ import {
   TokenResponse,
   TransactionResponse,
 } from './types'
+import { getStakeTxBlobFromEVMTx, getTransactionObj, isStakingEVMTx } from './utils/decodeEVMRawTx'
+import { bufferToHex } from 'ethereumjs-util'
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -98,6 +101,7 @@ interface RequestQuery {
   totalStakeData: string
   beforeTimestamp: string
   afterTimestamp: string
+  decode: string // For originalTxsData, reply the query result by decoding the data
 }
 
 let txHashQueryCache = new Map()
@@ -1022,6 +1026,7 @@ const start = async (): Promise<void> => {
       txHash: 's?',
       startCycle: 's?',
       endCycle: 's?',
+      decode: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -1094,6 +1099,13 @@ const start = async (): Promise<void> => {
         })
       const originalTx: OriginalTxDataInterface = await OriginalTxData.queryOriginalTxDataByTxId(txId)
       if (originalTx) originalTxs = [originalTx]
+      else {
+        reply.send({
+          success: false,
+          error: 'This transaction is not found!',
+        })
+        return
+      }
     } else if (query.txHash) {
       const txHash: string = query.txHash.toLowerCase()
       if (txHash.length !== 66)
@@ -1103,6 +1115,13 @@ const start = async (): Promise<void> => {
         })
       const originalTx: OriginalTxDataInterface = await OriginalTxData.queryOriginalTxDataByTxHash(txHash)
       if (originalTx) originalTxs = [originalTx]
+      else {
+        reply.send({
+          success: false,
+          error: 'This transaction is not found!',
+        })
+        return
+      }
     } else if (query.page) {
       const page: number = parseInt(query.page)
       if (page <= 0 || Number.isNaN(page)) {
@@ -1110,7 +1129,7 @@ const start = async (): Promise<void> => {
         return
       }
       // checking totalPages first
-      totalOriginalTxs = await Receipt.queryReceiptCount()
+      totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
       totalPages = Math.ceil(totalOriginalTxs / itemsPerPage)
       if (page > totalPages) {
         reply.send({
@@ -1122,7 +1141,7 @@ const start = async (): Promise<void> => {
     } else {
       reply.send({
         success: false,
-        error: 'not specified which receipt to show',
+        error: 'not specified which originalTxData to show',
       })
       return
     }
@@ -1137,6 +1156,33 @@ const start = async (): Promise<void> => {
     if (query.count) {
       totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
       res.totalOriginalTxs = totalOriginalTxs
+    }
+    if (query.decode === 'true') {
+      for (const originalTx of originalTxs as OriginalTxDataInterface[]) {
+        if (originalTx.originalTxData.tx.raw) {
+          // EVM Tx
+          const txObj = getTransactionObj(originalTx.originalTxData.tx)
+          console.log('txObj', txObj)
+          // Custom readableReceipt
+          if (txObj) {
+            const readableReceipt = {
+              from: txObj.getSenderAddress().toString(),
+              to: txObj.to ? txObj.to.toString() : null,
+              value: txObj.value.toString(),
+              data: '0x' + txObj.data.toString('hex'),
+              // contractAddress // TODO: add contract address
+            }
+            if (
+              originalTx.transactionType === TransactionType.StakeReceipt ||
+              originalTx.transactionType === TransactionType.UnstakeReceipt
+            ) {
+              const internalTxData: any = getStakeTxBlobFromEVMTx(txObj)
+              readableReceipt['internalTxData'] = internalTxData
+            }
+            originalTx.originalTxData = { ...originalTx.originalTxData, readableReceipt }
+          }
+        }
+      }
     }
     reply.send(res)
   })

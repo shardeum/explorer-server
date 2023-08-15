@@ -108,7 +108,7 @@ export async function queryOriginalTxDataCount(
     let sql = `SELECT COUNT(*) FROM originalTxsData`
     const values: any[] = []
     if (startCycle && endCycle) {
-      sql += ` WHERE cycle BETWEEN ? AND ?`
+      sql += ` WHERE cycleNumber BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
       if (type) {
         sql += ` AND transactionType=?`
@@ -118,7 +118,7 @@ export async function queryOriginalTxDataCount(
       sql += ` WHERE transactionType=?`
       values.push(type)
     }
-    originalTxsData = await db.get(sql, [])
+    originalTxsData = await db.get(sql, values)
   } catch (e) {
     console.log(e)
   }
@@ -136,7 +136,7 @@ export async function queryOriginalTxsData(
   let originalTxsData: DbOriginalTxData[] = []
   try {
     let sql = `SELECT * FROM originalTxsData`
-    const sqlSuffix = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+    const sqlSuffix = ` ORDER BY cycleNumber DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     const values: any[] = []
     if (startCycle && endCycle) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
@@ -150,7 +150,7 @@ export async function queryOriginalTxsData(
       values.push(type)
     }
     sql += sqlSuffix
-    originalTxsData = await db.all(sql, [values])
+    originalTxsData = await db.all(sql, values)
     originalTxsData.forEach((originalTxData: DbOriginalTxData) => {
       if (originalTxData.originalTxData)
         originalTxData.originalTxData = JSON.parse(originalTxData.originalTxData)

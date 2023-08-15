@@ -1,4 +1,5 @@
 import { WrappedEVMAccount, Token } from './account'
+import { ReadableReceipt } from './receipt'
 
 export interface Transaction {
   txId: string
@@ -18,6 +19,7 @@ export interface Transaction {
   contractInfo?: ContractInfo
   txStatus?: TxStatus
   data?: unknown
+  readableReceipt?: Partial<ReadableReceipt>
 }
 
 export interface Result {
