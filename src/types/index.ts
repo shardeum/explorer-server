@@ -19,6 +19,7 @@ export interface NetworkParameters {
 
 export * from './account'
 export * from './cycle'
+export * from './originalTxData'
 export * from './receipt'
 export * from './serverResponseTypes'
 export * from './transaction'

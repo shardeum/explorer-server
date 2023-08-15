@@ -120,19 +120,19 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
         <div className={styles.Ovewview}>
           <div className={styles.item}>
             <div className={styles.title}>Transaction Hash:</div>
-            <div className={styles.value}>{transaction?.txStatus?.txHash}</div>
+            <div className={styles.value}>{transaction?.txHash}</div>
           </div>
           <div className={styles.item}>
-            <div className={styles.title}>Injected to the network:</div>
-            <div className={styles.value}>{transaction?.txStatus?.injected ? 'True' : 'False'}</div>
+            <div className={styles.title}>Transaction Status:</div>
+            <div className={styles.value}>{transaction?.txStatus}</div>
           </div>
           <div className={styles.item}>
-            <div className={styles.title}>Accepted by the network:</div>
-            <div className={styles.value}>{transaction?.txStatus?.accepted ? 'True' : 'False'}</div>
+            <div className={styles.title}>Original Tx Data:</div>
+            <div className={styles.value}>{transaction?.originTxData}</div>
           </div>
           <div className={styles.item}>
-            <div className={styles.title}>Reason:</div>
-            <div className={styles.value}>{transaction?.txStatus?.reason}</div>
+            <div className={styles.title}>Injected Timestamp:</div>
+            <div className={styles.value}>{transaction?.timestamp}</div>
           </div>
         </div>
       )

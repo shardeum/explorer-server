@@ -26,6 +26,7 @@ import {
   OriginalTxResponse,
   TokenTx,
   Transaction as TransactionInterface,
+  OriginalTxData as OriginalTxDataInterface,
   TransactionSearchType,
 } from './types'
 import * as utils from './utils'
@@ -480,7 +481,7 @@ const start = async (): Promise<void> => {
     let totalTransactions = 0
     let totalStakeTxs = 0
     let totalUnstakeTxs = 0
-    let transactions: (TransactionInterface | TokenTx<string>)[]
+    let transactions: (TransactionInterface | TokenTx<string> | OriginalTxDataInterface)[]
     let txType: TransactionSearchType
     let filterAddressTokenBalance = 0
     if (query.txType) {
@@ -509,15 +510,18 @@ const start = async (): Promise<void> => {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      let endCycle
+      let endCycle = startCycle + 100
       if (query.endCycle) {
         endCycle = parseInt(query.endCycle)
         if (endCycle < 0 || Number.isNaN(endCycle)) {
           reply.send({ success: false, error: 'Invalid end cycle number' })
           return
         }
-      } else endCycle = await Cycle.queryCycleCount()
-      console.log('endCycle', endCycle, 'startCycle', startCycle)
+        if (endCycle - startCycle > 100) {
+          reply.send({ success: false, error: 'The cycle range is too big. Max cycle range is 100 cycles.' })
+          return
+        }
+      }
       totalTransactions = await Transaction.queryTransactionCountBetweenCycles(
         startCycle,
         endCycle,
@@ -698,7 +702,8 @@ const start = async (): Promise<void> => {
       totalTransactions = await Transaction.queryTransactionCount(null, txType)
       totalPages = Math.ceil(totalTransactions / itemsPerPage)
     } else if (query.txHash) {
-      if (query.txHash.length !== 66) {
+      const txHash = query.txHash.toLowerCase()
+      if (txHash.length !== 66) {
         reply.send({
           success: false,
           error: 'The transaction hash is not correct!',
@@ -706,9 +711,9 @@ const start = async (): Promise<void> => {
         return
       }
       if (query.type === 'requery') {
-        transactions = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
+        transactions = await Transaction.queryTransactionByHash(txHash, true)
         if (transactions.length > 0) {
-          txHashQueryCache.set(query.txHash, { success: true, transactions })
+          txHashQueryCache.set(txHash, { success: true, transactions })
           const res: TransactionResponse = {
             success: true,
             transactions,
@@ -717,35 +722,27 @@ const start = async (): Promise<void> => {
           return
         }
       }
-      let acceptedTx = false
-      let result
-      try {
-        // result = await axios.get(
-        //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
-        // );
-        result = await axios.get(`${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`)
-      } catch (e) {
-        console.log(`RPC Data Collector is not responding`, e)
-      }
-      if (result && result.data && result.data.txStatus) {
-        if (!result.data.txStatus.injected || !result.data.txStatus.accepted) {
-          reply.send({
-            success: false,
-            transactions: [{ txStatus: result.data.txStatus }],
-          })
-          return
-        }
-        acceptedTx = result.data.txStatus.accepted
-      }
-      const found = txHashQueryCache.get(query.txHash)
+      const found = txHashQueryCache.get(txHash)
       if (found) {
-        if (found.success) return found
-        if (!acceptedTx) return found
+        if (found.success) {
+          if (!found.transactions[0].TxStatus) return found
+        }
       }
-      transactions = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-      if (transactions.length > 0) txHashQueryCache.set(query.txHash, { success: true, transactions })
+      transactions = await Transaction.queryTransactionByHash(txHash, true)
+      if (transactions.length > 0) txHashQueryCache.set(txHash, { success: true, transactions })
       else {
-        txHashQueryCache.set(query.txHash, {
+        const originalTx = await OriginalTxData.queryOriginalTxDataByTxHash(txHash)
+        if (originalTx) {
+          // Assume the tx is expired if the original tx is more than 15 seconds old
+          const ExpiredTimestamp_MS = 15000
+          console.log(originalTx.timestamp, Date.now(), originalTx.timestamp - Date.now())
+          const txStatus = originalTx.timestamp - Date.now() > ExpiredTimestamp_MS ? 'Pending' : 'Expired'
+          transactions = [{ ...originalTx, txStatus }]
+          txHashQueryCache.set(txHash, { success: true, transactions })
+        }
+      }
+      if (!(transactions.length > 0)) {
+        txHashQueryCache.set(txHash, {
           success: false,
           error: 'This transaction is not found!',
         })
@@ -798,98 +795,6 @@ const start = async (): Promise<void> => {
     }
     if (query.filterAddress) {
       res.filterAddressTokenBalance = filterAddressTokenBalance
-    }
-    reply.send(res)
-  })
-
-  // Seems we can remove this endpoint now.
-  server.get('/api/tx', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query as object, {
-      txHash: 's?',
-      type: 's?',
-    })
-    if (err) {
-      reply.send({ success: false, error: err })
-      return
-    }
-    const query = _request.query as RequestQuery
-    let transactions = []
-    const res: TransactionResponse = {
-      success: true,
-      transactions,
-    }
-    if (query.txHash.length !== 66) {
-      reply.send({
-        success: false,
-        error: 'The transaction hash is not correct!',
-      })
-      return
-    }
-    if (query.type === 'requery') {
-      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-      if (transaction) {
-        transactions = [transaction]
-        txHashQueryCache.set(query.txHash, { success: true, transactions })
-        res.transactions = transactions
-        reply.send(res)
-        return
-      }
-    }
-    let acceptedTx = false
-    let result
-    try {
-      // result = await axios.get(
-      //   `http://localhost:${CONFIG.port.rpc_data_collector}/api/tx/${query.txHash}`
-      // );
-      result = await axios.get(`${RPC_DATA_SERVER_URL}/api/tx/${query.txHash}`)
-    } catch (e) {
-      console.log(`RPC Data Collector is not responding`, e)
-    }
-    if (result && result.data && result.data.txStatus) {
-      if (!result.data.txStatus.injected || !result.data.txStatus.accepted) {
-        res.success = false
-        res.transactions.push({ txStatus: result.data.txStatus })
-      }
-      acceptedTx = result.data.txStatus.accepted
-    }
-    if (res.success) {
-      const found = txHashQueryCache.get(query.txHash)
-      if (found) {
-        if (found.success) return found
-        if (!acceptedTx) return found
-      }
-      const transaction = await Transaction.queryTransactionByHash(query.txHash.toLowerCase(), true)
-      // console.log('transaction result', query.txHash, transactions)
-      if (transaction) {
-        res.transactions.push(transaction)
-      } else {
-        try {
-          const queryArchiver = await getFromArchiver(`nodelist`)
-          const activeNode = queryArchiver.nodeList[0]
-          result = await axios.get(`http://${activeNode.ip}:${activeNode.port}/tx/${query.txHash}`)
-          if (result.data && result.data.account) {
-            // console.log('transaction result', result.status, result.data)
-            res.transactions.push({ wrappedEVMAccount: result.data.account })
-          }
-        } catch (e) {
-          console.log(`Archiver is not responding`, e)
-        }
-      }
-
-      txHashQueryCache.set(query.txHash, res)
-      if (txHashQueryCache.size > txHashQueryCacheSize + 10) {
-        // Remove old data
-        const extra = txHashQueryCache.size - txHashQueryCacheSize
-        const arrayTemp = Array.from(txHashQueryCache)
-        arrayTemp.splice(0, extra)
-        txHashQueryCache = new Map(arrayTemp)
-      }
-
-      if (!transaction) {
-        delete res.transactions
-        reply.send({ result: res, success: false, error: 'This transaction is not found!' })
-        return
-      }
     }
     reply.send(res)
   })
@@ -1127,7 +1032,7 @@ const start = async (): Promise<void> => {
     const itemsPerPage = 10
     let totalPages = 0
     let totalOriginalTxs = 0
-    let originalTxs
+    let originalTxs: OriginalTxDataInterface[] | number
     if (query.count) {
       const count: number = parseInt(query.count)
       //max 1000 originalTxs
@@ -1138,7 +1043,7 @@ const start = async (): Promise<void> => {
         reply.send({ success: false, error: 'Invalid count' })
         return
       }
-      originalTxs = await OriginalTxData.queryOriginalTxDataCount(0, count)
+      originalTxs = await OriginalTxData.queryOriginalTxsData(0, count)
     } else if (query.startCycle) {
       const startCycle: number = parseInt(query.startCycle)
       if (startCycle < 0 || Number.isNaN(startCycle)) {
@@ -1187,7 +1092,8 @@ const start = async (): Promise<void> => {
           success: false,
           error: 'The transaction id is not correct!',
         })
-      originalTxs = await OriginalTxData.queryOriginalTxDataByTxId(txId)
+      const originalTx: OriginalTxDataInterface = await OriginalTxData.queryOriginalTxDataByTxId(txId)
+      if (originalTx) originalTxs = [originalTx]
     } else if (query.txHash) {
       const txHash: string = query.txHash.toLowerCase()
       if (txHash.length !== 66)
@@ -1195,7 +1101,8 @@ const start = async (): Promise<void> => {
           success: false,
           error: 'The transaction hash is not correct!',
         })
-      originalTxs = await OriginalTxData.queryOriginalTxDataByTxHash(txHash)
+      const originalTx: OriginalTxDataInterface = await OriginalTxData.queryOriginalTxDataByTxHash(txHash)
+      if (originalTx) originalTxs = [originalTx]
     } else if (query.page) {
       const page: number = parseInt(query.page)
       if (page <= 0 || Number.isNaN(page)) {

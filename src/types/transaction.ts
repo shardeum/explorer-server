@@ -16,7 +16,7 @@ export interface Transaction {
   originTxData: unknown
   tokenTxs?: TokenTx[]
   contractInfo?: ContractInfo
-  txStatus?: TransactionStatus
+  txStatus?: TxStatus
   data?: unknown
 }
 
@@ -25,12 +25,7 @@ export interface Result {
   txResult: string
 }
 
-export interface TransactionStatus {
-  txHash: string
-  accepted: boolean
-  injected: boolean
-  reason: string
-}
+export type TxStatus = 'Pending' | 'Expired'
 
 export enum TransactionType {
   Receipt = 0, // EVM Receipt

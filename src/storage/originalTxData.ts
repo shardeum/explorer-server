@@ -1,29 +1,16 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { InternalTXType, TransactionType } from '../types'
+import { InternalTXType, TransactionType, OriginalTxData } from '../types'
 import { getTransactionObj, isStakingEVMTx, getStakeTxBlobFromEVMTx } from '../utils/decodeEVMRawTx'
 import { bufferToHex } from 'ethereumjs-util'
-
-export interface OriginalTxData {
-  txId: string
-  txHash: string
-  timestamp: number
-  cycleNumber: number
-  originalTxData: any
-  transactionType: TransactionType
-  sign: {
-    owner: string
-    sig: string
-  }
-}
 
 type DbOriginalTxData = OriginalTxData & {
   originalTxData: string
   sign: string
 }
 
-export let originalTxsMap: Map<string, number> = new Map()
+export const originalTxsMap: Map<string, number> = new Map()
 
 export async function insertOriginalTxData(originalTxData: OriginalTxData): Promise<void> {
   try {
@@ -119,7 +106,7 @@ export async function queryOriginalTxDataCount(
   let originalTxsData: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     let sql = `SELECT COUNT(*) FROM originalTxsData`
-    let values: any[] = []
+    const values: any[] = []
     if (startCycle && endCycle) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
@@ -149,8 +136,8 @@ export async function queryOriginalTxsData(
   let originalTxsData: DbOriginalTxData[] = []
   try {
     let sql = `SELECT * FROM originalTxsData`
-    let sqlSuffix = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
-    let values: any[] = []
+    const sqlSuffix = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+    const values: any[] = []
     if (startCycle && endCycle) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
@@ -210,8 +197,8 @@ export async function queryOriginalTxDataByTxHash(txHash: string): Promise<Origi
   return null
 }
 
-export function cleanOldOriginalTxsMap(currentCycleCounter: number) {
-  for (let [key, value] of originalTxsMap) {
+export function cleanOldOriginalTxsMap(currentCycleCounter: number): void {
+  for (const [key, value] of originalTxsMap) {
     // Clean originalTxs that are older than current cycle
     if (value < currentCycleCounter) {
       originalTxsMap.delete(key)
