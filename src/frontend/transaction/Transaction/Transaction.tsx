@@ -31,8 +31,7 @@ export const Transaction: React.FC = () => {
   })
 
   const onNext = (): void => {
-    const totalPage = Math.ceil(totalTransactions / 10)
-
+    const totalPage = Math.ceil((totalTransactions || totalOriginalTxs) / pageSize)
     setCurrentPage(currentPage < totalPage ? currentPage + 1 : totalPage)
   }
 
@@ -60,7 +59,7 @@ export const Transaction: React.FC = () => {
         </div>
         {loading ? (
           <div>Loading...</div>
-        ) : transactions && transactions.length > 0 ? (
+        ) : (transactions && transactions.length > 0) || (originalTxs && originalTxs.length > 0) ? (
           <Fragment>
             <TransactionTable
               data={transactionType.key === TransactionSearchType.Pending ? originalTxs : transactions}

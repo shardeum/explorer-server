@@ -16,7 +16,7 @@ export const useTransaction = (query: TransactionQuery): PagedTransaction => {
     if (txType) {
       url += `&txType=${txType}`
       if (txType === TransactionSearchType.Pending)
-        url = `${PATHS.ORIGINAL_TX}?pending=true&decode=true?page=${page}`
+        url = `${PATHS.ORIGINAL_TX}?pending=true&decode=true&page=${page}`
     }
     return url
   }

@@ -4,7 +4,7 @@ export interface OriginalTxData {
   txId: string
   txHash: string
   timestamp: number
-  cycleNumber: number
+  cycle: number
   originalTxData: any
   transactionType: TransactionType
   sign: {

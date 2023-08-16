@@ -33,18 +33,14 @@ import {
 import * as utils from './utils'
 import { getFromArchiver } from '@shardus/archiver-discovery'
 import './archiver'
-
-crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
-
 // config variables
-import { config as CONFIG, RPC_DATA_SERVER_URL } from './config'
+import { config as CONFIG } from './config'
 import {
   coinStatsCacheRecord,
   isCacheRecordValid,
   transactionStatsCacheRecord,
   validatorStatsCacheRecord,
 } from './class/cache_per_cycle'
-//import { ARCHIVER_URL, config as CONFIG, RPC_DATA_SERVER_URL } from './config' //from Distributor work
 import {
   AccountResponse,
   AddressResponse,
@@ -55,8 +51,10 @@ import {
   TokenResponse,
   TransactionResponse,
 } from './types'
-import { getStakeTxBlobFromEVMTx, getTransactionObj, isStakingEVMTx } from './utils/decodeEVMRawTx'
-import { bufferToHex } from 'ethereumjs-util'
+import { getStakeTxBlobFromEVMTx, getTransactionObj } from './utils/decodeEVMRawTx'
+
+crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
+
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
 }
@@ -1147,8 +1145,8 @@ const start = async (): Promise<void> => {
         return
       }
     } else if (query.pending === 'true') {
-      let page: number = 1
-      page = parseInt(query.page)
+      let page = 1
+      if (query.page) page = parseInt(query.page)
       if (page <= 0 || Number.isNaN(page)) {
         reply.send({ success: false, error: 'Invalid page number' })
         return
@@ -1216,13 +1214,13 @@ const start = async (): Promise<void> => {
         if (originalTx.originalTxData.tx.raw) {
           // EVM Tx
           const txObj = getTransactionObj(originalTx.originalTxData.tx)
-          console.log('txObj', txObj)
           // Custom readableReceipt
           if (txObj) {
             const readableReceipt = {
               from: txObj.getSenderAddress().toString(),
               to: txObj.to ? txObj.to.toString() : null,
-              value: txObj.value.toString(),
+              nonce: txObj.nonce.toString(16),
+              value: txObj.value.toString(16),
               data: '0x' + txObj.data.toString('hex'),
               // contractAddress // TODO: add contract address
             }

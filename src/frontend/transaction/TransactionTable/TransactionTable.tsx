@@ -6,10 +6,16 @@ import { AnchorLink, Chip } from '../../components'
 import { calculateTokenValue, calculateValue } from '../../utils/calculateValue'
 import { showTxMethod } from '../../utils/showMethod'
 
-import { OriginalTxData, TokenTx, Transaction, TransactionSearchType, TransactionType } from '../../../types'
+import {
+  OriginalTxData,
+  TokenTx,
+  Transaction,
+  TransactionSearchType,
+  TransactionType,
+  ReadableReceipt,
+} from '../../../types'
 import { Table } from '../../components/TableComp'
 import { IColumnProps } from '../../components/TableComp/Table'
-import { ReadableReceipt } from '../../../@type'
 
 interface ITransactionTable {
   data: (Transaction | TokenTx | OriginalTxData)[]
@@ -17,11 +23,11 @@ interface ITransactionTable {
   txType?: TransactionSearchType
 }
 
-const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx>[] = [
+const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx | OriginalTxData>[] = [
   {
     key: 'txHash',
     value: 'Txn Hash',
-    render: (val: string, item: Transaction | TokenTx) => (
+    render: (val: string, item: Transaction | TokenTx | OriginalTxData) => (
       <AnchorLink
         href={`/transaction/${val}?txId=${item?.txId}`}
         label={val as string}
@@ -34,13 +40,15 @@ const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx>[] = [
   {
     key: 'method',
     value: 'Method',
-    render: (_: unknown, item: Transaction | TokenTx) => (
+    render: (_: unknown, item: Transaction | TokenTx | OriginalTxData) => (
       <Chip
         title={showTxMethod(item)}
         color={
-          'wrappedEVMAccount' in item && item?.wrappedEVMAccount?.readableReceipt?.status === 0
-            ? 'error'
-            : 'success'
+          'wrappedEVMAccount' in item
+            ? item?.wrappedEVMAccount?.readableReceipt?.status === 0
+              ? 'error'
+              : 'success'
+            : 'gray'
         }
         size="medium"
       />
@@ -60,10 +68,12 @@ const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx>[] = [
 export const TransactionTable: React.FC<ITransactionTable> = (props) => {
   const { data, txType = TransactionSearchType.All } = props
 
-  const [header, setHeader] = useState<IColumnProps<ReadableReceipt | Transaction | TokenTx>[]>([])
+  const [header, setHeader] = useState<
+    IColumnProps<ReadableReceipt | Transaction | TokenTx | OriginalTxData>[]
+  >([])
 
   useEffect(() => {
-    let tHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx>[] = []
+    let tHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx | OriginalTxData>[] = []
 
     if (
       txType === TransactionSearchType.AllExceptInternalTx ||
@@ -253,6 +263,34 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'transactionFee',
           value: 'Txn Fee',
+          render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
+        },
+      ]
+    }
+
+    if (txType === TransactionSearchType.Pending) {
+      tHeader = [
+        {
+          key: 'originalTxData.readableReceipt.from',
+          value: 'From',
+          render: (val: string | TransactionType) => (
+            <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          ),
+        },
+        {
+          key: 'originalTxData.readableReceipt.to',
+          value: 'To',
+          render: (val: ReadableReceipt) =>
+            val &&
+            (val?.to ? (
+              <AnchorLink href={`/account/${val.to}`} label={val.to} size="small" ellipsis width={150} />
+            ) : (
+              'Contract Creation'
+            )),
+        },
+        {
+          key: 'originalTxData.readableReceipt.value',
+          value: 'Value',
           render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
         },
       ]

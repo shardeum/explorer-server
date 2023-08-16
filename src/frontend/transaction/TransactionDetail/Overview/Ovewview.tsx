@@ -145,7 +145,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           </div>
           <div className={styles.item}>
             <div className={styles.title}>Cycle:</div>
-            <div className={styles.value}>{transaction?.['cycleNumber']}</div>
+            <div className={styles.value}>{transaction?.cycle}</div>
           </div>
           <div className={styles.item}>
             <div className={styles.title}>Timestamp:</div>

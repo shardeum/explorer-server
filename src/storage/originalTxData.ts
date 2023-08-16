@@ -52,7 +52,7 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
   for (const originalTxData of originalTxsData) {
     const txId = originalTxData.txId
     if (originalTxsMap.has(txId)) continue
-    originalTxsMap.set(txId, originalTxData.cycleNumber)
+    originalTxsMap.set(txId, originalTxData.cycle)
     // console.log('originalTxData', originalTxData)
     try {
       if (originalTxData.originalTxData.tx.raw) {
@@ -109,7 +109,7 @@ export async function queryOriginalTxDataCount(
     let sql = `SELECT COUNT(*) FROM originalTxsData`
     const values: any[] = []
     if (startCycle && endCycle) {
-      sql += ` WHERE cycleNumber BETWEEN ? AND ?`
+      sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
     }
     if (afterTimestamp) {
@@ -163,7 +163,7 @@ export async function queryOriginalTxsData(
   let originalTxsData: DbOriginalTxData[] = []
   try {
     let sql = `SELECT * FROM originalTxsData`
-    const sqlSuffix = ` ORDER BY cycleNumber DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+    const sqlSuffix = ` ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     const values: any[] = []
     if (startCycle && endCycle) {
       sql += ` WHERE cycle BETWEEN ? AND ?`

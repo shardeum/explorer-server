@@ -1,5 +1,4 @@
 import { WrappedEVMAccount, Token } from './account'
-import { ReadableReceipt } from './receipt'
 
 export interface Transaction {
   txId: string
