@@ -6,7 +6,7 @@ import styles from './Chip.module.scss'
 
 interface ChipProps {
   className?: string
-  color?: 'primary' | 'warn' | 'success' | 'error' | 'info'
+  color?: 'primary' | 'warn' | 'success' | 'error' | 'info' | 'gray'
   size?: 'large' | 'medium' | 'small'
   title: string
 }

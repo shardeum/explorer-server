@@ -10,7 +10,11 @@ interface JsonViewProps {
 export const JsonView: React.FC<JsonViewProps> = ({ transaction }) => {
   return (
     <div className={styles.JsonView}>
-      <pre>{JSON.stringify(transaction?.wrappedEVMAccount?.readableReceipt, null, 2)}</pre>
+      {transaction?.wrappedEVMAccount?.readableReceipt ? (
+        <pre>{JSON.stringify(transaction?.wrappedEVMAccount?.readableReceipt, null, 2)}</pre>
+      ) : (
+        <pre>{JSON.stringify(transaction, null, 2)}</pre>
+      )}
     </div>
   )
 }

@@ -36,6 +36,11 @@
     color: color(info);
   }
 
+  &.gray {
+    background-color: color(gray-400);
+    color: color(gray-700);
+  }
+
   &.large {
     padding: spacing(8) spacing(16);
     @include fontStyle(small);

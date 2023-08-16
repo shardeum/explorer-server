@@ -25,7 +25,7 @@ export const Transaction: React.FC = () => {
   const siblingCount = 3
   const pageSize = 10
 
-  const { transactions, totalTransactions, loading } = useTransaction({
+  const { transactions, totalTransactions, originalTxs, totalOriginalTxs, loading } = useTransaction({
     page: currentPage,
     txType: transactionType.key,
   })
@@ -62,11 +62,14 @@ export const Transaction: React.FC = () => {
           <div>Loading...</div>
         ) : transactions && transactions.length > 0 ? (
           <Fragment>
-            <TransactionTable data={transactions} txType={transactionType.key} />
+            <TransactionTable
+              data={transactionType.key === TransactionSearchType.Pending ? originalTxs : transactions}
+              txType={transactionType.key}
+            />
             <div className={styles.paginationWrapper}>
               <Pagination
                 onPageChange={(p) => setCurrentPage(p)}
-                totalCount={totalTransactions}
+                totalCount={totalTransactions || totalOriginalTxs}
                 siblingCount={siblingCount}
                 currentPage={currentPage}
                 pageSize={pageSize}

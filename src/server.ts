@@ -102,6 +102,7 @@ interface RequestQuery {
   beforeTimestamp: string
   afterTimestamp: string
   decode: string // For originalTxsData, reply the query result by decoding the data
+  pending: string // For pending txs (AllExceptInternalTx) for pending txs page
 }
 
 let txHashQueryCache = new Map()
@@ -737,10 +738,32 @@ const start = async (): Promise<void> => {
       else {
         const originalTx = await OriginalTxData.queryOriginalTxDataByTxHash(txHash)
         if (originalTx) {
+          if (originalTx.originalTxData.tx.raw) {
+            // EVM Tx
+            const txObj = getTransactionObj(originalTx.originalTxData.tx)
+            // Custom readableReceipt for originalTxsData
+            if (txObj) {
+              const readableReceipt = {
+                from: txObj.getSenderAddress().toString(),
+                to: txObj.to ? txObj.to.toString() : null,
+                nonce: txObj.nonce.toString(16),
+                value: txObj.value.toString(16),
+                data: '0x' + txObj.data.toString('hex'),
+                // contractAddress // TODO: add contract address
+              }
+              if (
+                originalTx.transactionType === TransactionType.StakeReceipt ||
+                originalTx.transactionType === TransactionType.UnstakeReceipt
+              ) {
+                const internalTxData: any = getStakeTxBlobFromEVMTx(txObj)
+                readableReceipt['internalTxData'] = internalTxData
+              }
+              originalTx.originalTxData = { ...originalTx.originalTxData, readableReceipt }
+            }
+          }
           // Assume the tx is expired if the original tx is more than 15 seconds old
-          const ExpiredTimestamp_MS = 15000
-          console.log(originalTx.timestamp, Date.now(), originalTx.timestamp - Date.now())
-          const txStatus = originalTx.timestamp - Date.now() > ExpiredTimestamp_MS ? 'Pending' : 'Expired'
+          const ExpiredTxTimestamp_MS = 15000
+          const txStatus = originalTx.timestamp - Date.now() > ExpiredTxTimestamp_MS ? 'Pending' : 'Expired'
           transactions = [{ ...originalTx, txStatus }]
           txHashQueryCache.set(txHash, { success: true, transactions })
         }
@@ -1027,6 +1050,7 @@ const start = async (): Promise<void> => {
       startCycle: 's?',
       endCycle: 's?',
       decode: 's?',
+      pending: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -1122,6 +1146,36 @@ const start = async (): Promise<void> => {
         })
         return
       }
+    } else if (query.pending === 'true') {
+      let page: number = 1
+      page = parseInt(query.page)
+      if (page <= 0 || Number.isNaN(page)) {
+        reply.send({ success: false, error: 'Invalid page number' })
+        return
+      }
+      let txType = TransactionSearchType.AllExceptInternalTx
+      if (query.txType) {
+        txType = parseInt(query.txType)
+      }
+      // Generally assuming txs before 10 seconds ago are still pending ( Some of them could be processed already)
+      const PendingTxTimestamp_MS = 10000
+      const afterTimestamp = Date.now() - PendingTxTimestamp_MS
+
+      // checking totalPages first
+      totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount(txType, afterTimestamp)
+      totalPages = Math.ceil(totalOriginalTxs / itemsPerPage)
+      if (page > totalPages) {
+        reply.send({
+          success: false,
+          error: 'Page no is greater than the totalPage',
+        })
+      }
+      originalTxs = await OriginalTxData.queryOriginalTxsData(
+        (page - 1) * itemsPerPage,
+        itemsPerPage,
+        txType,
+        afterTimestamp
+      )
     } else if (query.page) {
       const page: number = parseInt(query.page)
       if (page <= 0 || Number.isNaN(page)) {

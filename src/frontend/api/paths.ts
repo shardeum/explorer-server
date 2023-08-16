@@ -22,6 +22,7 @@ export const PATHS = {
   ADDRESS: BASE_URL + '/api/address',
   TOKEN: BASE_URL + '/api/token',
   LOG: BASE_URL + '/api/log',
+  ORIGINAL_TX: BASE_URL + '/api/originalTx',
   STATS_VALIDATOR: BASE_URL + '/api/stats/validator',
   STATS_TRANSACTION: BASE_URL + '/api/stats/transaction',
   STATS_COIN: BASE_URL + '/api/stats/coin',

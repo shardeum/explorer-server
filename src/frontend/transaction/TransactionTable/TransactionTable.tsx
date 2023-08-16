@@ -6,13 +6,13 @@ import { AnchorLink, Chip } from '../../components'
 import { calculateTokenValue, calculateValue } from '../../utils/calculateValue'
 import { showTxMethod } from '../../utils/showMethod'
 
-import { TokenTx, Transaction, TransactionSearchType, TransactionType } from '../../../types'
+import { OriginalTxData, TokenTx, Transaction, TransactionSearchType, TransactionType } from '../../../types'
 import { Table } from '../../components/TableComp'
 import { IColumnProps } from '../../components/TableComp/Table'
 import { ReadableReceipt } from '../../../@type'
 
 interface ITransactionTable {
-  data: (Transaction | TokenTx)[]
+  data: (Transaction | TokenTx | OriginalTxData)[]
   loading?: boolean
   txType?: TransactionSearchType
 }

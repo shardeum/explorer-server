@@ -124,7 +124,18 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           </div>
           <div className={styles.item}>
             <div className={styles.title}>Transaction Status:</div>
-            <div className={styles.value}>{transaction?.txStatus}</div>
+            <div className={styles.value}>
+              <Chip
+                title={
+                  transaction?.txStatus === 'Pending'
+                    ? 'Pending ............. ( Please wait for a bit.)'
+                    : 'Expired ............. ( Please submit the transaction again.)'
+                }
+                size="medium"
+                color={transaction?.txStatus === 'Pending' ? 'gray' : 'error'}
+                className={styles.chip}
+              />
+            </div>
           </div>
           <div className={styles.item}>
             <div className={styles.title}>Type:</div>
@@ -140,20 +151,24 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.title}>Timestamp:</div>
             <div className={styles.value}>{transaction?.timestamp}</div>
           </div>
-          {transaction.readableReceipt && (
+          {transaction.originalTxData?.readableReceipt && (
             <>
               <div className={styles.item}>
                 <div className={styles.title}>Nonce:</div>
                 <div className={styles.value}>
-                  {/* {web3.utils.hexToNumber('0x' + transaction.readableReceipt.nonce)} */}
+                  {transaction?.originalTxData?.readableReceipt?.nonce &&
+                    web3.utils.hexToNumber('0x' + transaction?.originalTxData?.readableReceipt?.nonce)}
                 </div>
               </div>
 
               <div className={styles.item}>
                 <div className={styles.title}>From:</div>
                 <div className={styles.value}>
-                  <Link href={`/account/${transaction?.readableReceipt?.from}`} className={styles.link}>
-                    {transaction?.readableReceipt.from}
+                  <Link
+                    href={`/account/${transaction?.originalTxData?.readableReceipt?.from}`}
+                    className={styles.link}
+                  >
+                    {transaction?.originalTxData?.readableReceipt?.from}
                   </Link>
                 </div>
               </div>
@@ -161,18 +176,53 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
               <div className={styles.item}>
                 <div className={styles.title}>To:</div>
                 <div className={styles.value}>
-                  <Link href={`/account/${transaction?.readableReceipt?.to}`} className={styles.link}>
-                    {transaction?.readableReceipt.to}
-                  </Link>
+                  {transaction?.originalTxData?.readableReceipt?.to ? (
+                    <Link
+                      href={`/account/${transaction?.originalTxData?.readableReceipt?.to}`}
+                      className={styles.link}
+                    >
+                      {transaction?.originalTxData?.readableReceipt?.to}
+                    </Link>
+                  ) : (
+                    'Contract Creation'
+                  )}
                 </div>
               </div>
 
               <div className={styles.item}>
                 <div className={styles.title}>Value:</div>
                 <div className={styles.value}>
-                  {calculateFullValue(`0x${transaction?.readableReceipt?.value}`)} SHM
+                  {calculateFullValue(`0x${transaction?.originalTxData?.readableReceipt?.value}`)} SHM
                 </div>
               </div>
+              {transaction?.originalTxData?.readableReceipt?.internalTxData && (
+                <>
+                  <div className={styles.item}>
+                    <div className={styles.title}>Node Address:</div>
+                    <div className={styles.value}>
+                      <Link
+                        href={`/account/${transaction?.originalTxData?.readableReceipt?.internalTxData?.nominee}`}
+                        className={styles.link}
+                      >
+                        {transaction?.originalTxData?.readableReceipt?.internalTxData?.nominee}
+                      </Link>
+                    </div>
+                  </div>
+                  {transaction?.transactionType === TransactionType.StakeReceipt && (
+                    <div className={styles.item}>
+                      <div className={styles.title}>Stake Amount:</div>
+                      <div className={styles.value}>
+                        {calculateFullValue(
+                          `0x${Number(
+                            transaction?.originalTxData?.readableReceipt?.internalTxData?.stake
+                          ).toString(16)}`
+                        )}{' '}
+                        SHM
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </>
           )}
         </div>

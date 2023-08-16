@@ -14,12 +14,12 @@ export interface Transaction {
   txFrom: string
   txTo: string
   nominee?: string
-  originTxData: unknown
+  originTxData: unknown // This has to be originalTxData; there is also a fix MR for it. // The lower one has to be removed when the fix is merged.
+  originalTxData?: any
   tokenTxs?: TokenTx[]
   contractInfo?: ContractInfo
   txStatus?: TxStatus
   data?: unknown
-  readableReceipt?: Partial<ReadableReceipt>
 }
 
 export interface Result {
@@ -119,4 +119,5 @@ export enum TransactionSearchType {
   TokenTransfer = 9, // token txs of a contract
   InternalTxReceipt = 10,
   AllExceptInternalTx = 11, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt (exclude InternalTxReceipt)
+  Pending = 12, // Pending Txs (AllExceptInternalTx) from originTxsData
 }

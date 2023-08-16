@@ -20,6 +20,8 @@ export const showTxMethod = (tx: Transaction | TokenTx): string => {
     ? methodCode !== null && ERC_TOKEN_METHOD_DIC[methodCode]
       ? ERC_TOKEN_METHOD_DIC[methodCode]
       : 'Transfer'
+    : 'originalTxData' in tx && tx?.originalTxData?.readableReceipt?.to
+    ? 'Transfer'
     : 'Contract'
   /* eslint-enable security/detect-object-injection */
 }

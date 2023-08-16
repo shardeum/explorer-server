@@ -1,7 +1,7 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { InternalTXType, TransactionType, OriginalTxData } from '../types'
+import { InternalTXType, TransactionType, OriginalTxData, TransactionSearchType } from '../types'
 import { getTransactionObj, isStakingEVMTx, getStakeTxBlobFromEVMTx } from '../utils/decodeEVMRawTx'
 import { bufferToHex } from 'ethereumjs-util'
 
@@ -99,7 +99,8 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
 }
 
 export async function queryOriginalTxDataCount(
-  type?: TransactionType,
+  txType?: TransactionSearchType,
+  afterTimestamp?: number,
   startCycle?: number,
   endCycle?: number
 ): Promise<number> {
@@ -110,13 +111,38 @@ export async function queryOriginalTxDataCount(
     if (startCycle && endCycle) {
       sql += ` WHERE cycleNumber BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
-      if (type) {
-        sql += ` AND transactionType=?`
-        values.push(type)
+    }
+    if (afterTimestamp) {
+      if (startCycle && endCycle) sql += ` AND timestamp>?`
+      else sql += ` WHERE timestamp>?`
+      values.push(afterTimestamp)
+    }
+    if (txType) {
+      if ((startCycle && endCycle) || afterTimestamp) sql += ` AND`
+      else sql += ` WHERE`
+      if (txType === TransactionSearchType.AllExceptInternalTx) {
+        sql += ` transactionType!=?`
+        values.push(TransactionType.InternalTxReceipt)
+      } else if (
+        txType === TransactionSearchType.Receipt ||
+        txType === TransactionSearchType.NodeRewardReceipt ||
+        txType === TransactionSearchType.StakeReceipt ||
+        txType === TransactionSearchType.UnstakeReceipt ||
+        txType === TransactionSearchType.InternalTxReceipt
+      ) {
+        const ty =
+          txType === TransactionSearchType.Receipt
+            ? TransactionType.Receipt
+            : txType === TransactionSearchType.NodeRewardReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
+        sql += ` transactionType=?`
+        values.push(ty)
       }
-    } else if (type) {
-      sql += ` WHERE transactionType=?`
-      values.push(type)
     }
     originalTxsData = await db.get(sql, values)
   } catch (e) {
@@ -129,7 +155,8 @@ export async function queryOriginalTxDataCount(
 export async function queryOriginalTxsData(
   skip = 0,
   limit = 10,
-  type?: TransactionType,
+  txType?: TransactionSearchType,
+  afterTimestamp?: number,
   startCycle?: number,
   endCycle?: number
 ): Promise<OriginalTxData[]> {
@@ -141,13 +168,38 @@ export async function queryOriginalTxsData(
     if (startCycle && endCycle) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
-      if (type) {
-        sql += ` AND transactionType=?`
-        values.push(type)
+    }
+    if (afterTimestamp) {
+      if (startCycle && endCycle) sql += ` AND timestamp>?`
+      else sql += ` WHERE timestamp>?`
+      values.push(afterTimestamp)
+    }
+    if (txType) {
+      if ((startCycle && endCycle) || afterTimestamp) sql += ` AND`
+      else sql += ` WHERE`
+      if (txType === TransactionSearchType.AllExceptInternalTx) {
+        sql += ` transactionType!=?`
+        values.push(TransactionType.InternalTxReceipt)
+      } else if (
+        txType === TransactionSearchType.Receipt ||
+        txType === TransactionSearchType.NodeRewardReceipt ||
+        txType === TransactionSearchType.StakeReceipt ||
+        txType === TransactionSearchType.UnstakeReceipt ||
+        txType === TransactionSearchType.InternalTxReceipt
+      ) {
+        const ty =
+          txType === TransactionSearchType.Receipt
+            ? TransactionType.Receipt
+            : txType === TransactionSearchType.NodeRewardReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
+        sql += ` transactionType=?`
+        values.push(ty)
       }
-    } else if (type) {
-      sql += ` WHERE transactionType=?`
-      values.push(type)
     }
     sql += sqlSuffix
     originalTxsData = await db.all(sql, values)
