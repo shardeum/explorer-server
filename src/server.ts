@@ -761,7 +761,7 @@ const start = async (): Promise<void> => {
           }
           // Assume the tx is expired if the original tx is more than 15 seconds old
           const ExpiredTxTimestamp_MS = 15000
-          const txStatus = originalTx.timestamp - Date.now() > ExpiredTxTimestamp_MS ? 'Pending' : 'Expired'
+          const txStatus = Date.now() - originalTx.timestamp > ExpiredTxTimestamp_MS ? 'Expired' : 'Pending'
           transactions = [{ ...originalTx, txStatus }]
           txHashQueryCache.set(txHash, { success: true, transactions })
         }

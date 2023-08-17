@@ -273,25 +273,24 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'originalTxData.readableReceipt.from',
           value: 'From',
-          render: (val: string | TransactionType) => (
+          render: (val: string) => (
             <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
           ),
         },
         {
           key: 'originalTxData.readableReceipt.to',
           value: 'To',
-          render: (val: ReadableReceipt) =>
-            val &&
-            (val?.to ? (
-              <AnchorLink href={`/account/${val.to}`} label={val.to} size="small" ellipsis width={150} />
+          render: (val: string) =>
+            val ? (
+              <AnchorLink href={`/account/${val}`} label={val} size="small" ellipsis width={150} />
             ) : (
               'Contract Creation'
-            )),
+            ),
         },
         {
           key: 'originalTxData.readableReceipt.value',
           value: 'Value',
-          render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
+          render: (val: string) => calculateValue(`0x${val}` as string),
         },
       ]
     }
