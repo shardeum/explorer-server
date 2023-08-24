@@ -39,6 +39,8 @@ const start = async (): Promise<void> => {
   console.log('startCycle', startCycle, 'totalCyclesToSync', totalCyclesToSync)
   await DataSync.downloadReceiptsBetweenCycles(startCycle, totalCyclesToSync)
   console.log('Receipts Patched!')
+  await DataSync.downloadOriginalTxsDataBetweenCycles(startCycle, totalCyclesToSync)
+  console.log('OriginalTxs Patched!')
 
   await StatsFunctions.patchStatsBetweenCycles(startCycle, totalCyclesToSync)
   console.log('Stats Patched!')

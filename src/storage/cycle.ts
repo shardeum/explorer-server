@@ -2,8 +2,7 @@ import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { Cycle } from '../types'
 import { config } from '../config/index'
-import { checkIfAnyReceiptsMissing } from '../class/DataSync'
-import { cleanOldOriginalTxsMap } from './originalTxData'
+import { checkIfAnyTxsDataMissing } from '../class/DataSync'
 
 export let Collection: unknown
 
@@ -82,8 +81,7 @@ export async function insertOrUpdateCycle(cycle: Cycle): Promise<void> {
         await updateCycle(cycleInfo.cycleMarker, cycleInfo)
     } else {
       await insertCycle(cycleInfo)
-      await checkIfAnyReceiptsMissing(cycleInfo.counter)
-      cleanOldOriginalTxsMap(cycleInfo.counter)
+      await checkIfAnyTxsDataMissing(cycleInfo.counter)
     }
   } else {
     console.log('No cycleRecord or cycleMarker in cycle,', cycle)

@@ -5,6 +5,7 @@ import * as Account from '../storage/account'
 import * as Transaction from '../storage/transaction'
 import * as Cycle from '../storage/cycle'
 import * as Receipt from '../storage/receipt'
+import * as OriginalTxData from '../storage/originalTxData'
 import { config } from '../config'
 import { getDefaultArchiverUrl } from '../archiver'
 
@@ -108,6 +109,53 @@ export async function compareWithOldReceiptsData(
     }
     success = true
     matchedCycle = downloadedReceipt.cycle
+  }
+  success = true
+  return { success, matchedCycle }
+}
+
+export async function compareWithOldOriginalTxsData(
+  lastStoredOriginalTxDataCycle = 0
+): Promise<{ success: boolean; matchedCycle: number }> {
+  const endCycle = lastStoredOriginalTxDataCycle
+  const startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
+  let downloadedOriginalTxDataCountByCycles: { cycle: number; originalTxsData: number }[]
+  const archiverUrl = await getDefaultArchiverUrl()
+  const response = await axios.get(
+    `${archiverUrl}/originalTx?start=${
+      lastStoredOriginalTxDataCycle - 10
+    }&end=${lastStoredOriginalTxDataCycle}`
+  )
+  if (response && response.data && response.data.originalTxs) {
+    downloadedOriginalTxDataCountByCycles = response.data.originalTxs
+  } else {
+    throw Error(
+      `Can't fetch originalTxsData data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${archiverUrl}`
+    )
+  }
+  const oldOriginalTxDataCountByCycle = await OriginalTxData.queryOriginalTxDataCountByCycles(
+    startCycle,
+    endCycle
+  )
+  let success = false
+  let matchedCycle = 0
+  for (let i = 0; i < downloadedOriginalTxDataCountByCycles.length; i++) {
+    /* eslint-disable security/detect-object-injection */
+    const downloadedOriginalTxData = downloadedOriginalTxDataCountByCycles[i]
+    const oldOriginalTxData = oldOriginalTxDataCountByCycle[i]
+    /* eslint-enable security/detect-object-injection */
+    console.log(downloadedOriginalTxData, oldOriginalTxData)
+    if (
+      downloadedOriginalTxData.cycle !== oldOriginalTxData.cycle ||
+      downloadedOriginalTxData.originalTxsData !== oldOriginalTxData.originalTxsData
+    ) {
+      return {
+        success,
+        matchedCycle,
+      }
+    }
+    success = true
+    matchedCycle = downloadedOriginalTxData.cycle
   }
   success = true
   return { success, matchedCycle }
@@ -322,57 +370,105 @@ export const checkStateMetaData = (
   return { isDataSynced, isReceiptSynced, isSummarySynced }
 }
 
-export const downloadAndInsertReceiptsAndCycles = async (
+export const downloadTxsDataAndCycles = async (
   totalReceiptsToSync: number,
   fromReceipt = 0,
+  totalOriginalTxsToSync: number,
+  fromOriginalTxData = 0,
   totalCyclesToSync: number,
   fromCycle = 0
 ): Promise<void> => {
+  const bucketSize = 1000
   let completeForReceipt = false
   let completeForCycle = false
+  let completeForOriginalTxData = false
   let startReceipt = fromReceipt
   let startCycle = fromCycle
-  let endReceipt = startReceipt + 1000
-  let endCycle = startCycle + 1000
+  let startOriginalTxData = fromOriginalTxData
+  let endReceipt = startReceipt + bucketSize
+  let endCycle = startCycle + bucketSize
+  let endOriginalTxData = startOriginalTxData + bucketSize
   let patchData = config.patchData
-  if (startReceipt === 0) patchData = true
-  if (!patchData) completeForReceipt = true
+  if (startReceipt === 0 || startOriginalTxData === 0) patchData = true // This means we don't have any data yet, so sync txs data as well
+  if (!patchData) {
+    completeForReceipt = true
+    completeForOriginalTxData = true
+  }
   const archiverUrl = await getDefaultArchiverUrl()
-  while (!completeForReceipt || !completeForCycle) {
-    if (endReceipt >= totalReceiptsToSync || endCycle >= totalCyclesToSync) {
+  while (!completeForReceipt || !completeForCycle || !completeForOriginalTxData) {
+    if (
+      endReceipt >= totalReceiptsToSync ||
+      endCycle >= totalCyclesToSync ||
+      endOriginalTxData >= totalOriginalTxsToSync
+    ) {
       const res = await axios.get(`${archiverUrl}/totalData`)
       if (res.data && res.data.totalCycles && res.data.totalReceipts) {
         if (totalReceiptsToSync < res.data.totalReceipts) {
           completeForReceipt = false
           totalReceiptsToSync = res.data.totalReceipts
         }
+        if (totalOriginalTxsToSync < res.data.totalOriginalTxs) {
+          completeForOriginalTxData = false
+          totalOriginalTxsToSync = res.data.totalOriginalTxs
+        }
         if (totalCyclesToSync < res.data.totalCycles) {
           completeForCycle = false
           totalCyclesToSync = res.data.totalCycles
         }
-        if (!patchData) completeForReceipt = true
-        console.log('totalReceiptsToSync', totalReceiptsToSync, 'totalCyclesToSync', totalCyclesToSync)
+        if (!patchData) {
+          completeForReceipt = true
+          completeForOriginalTxData = true
+        }
+        console.log(
+          'totalReceiptsToSync',
+          totalReceiptsToSync,
+          'totalCyclesToSync',
+          totalCyclesToSync,
+          'totalOriginalTxsToSync',
+          totalOriginalTxsToSync
+        )
       }
     }
     if (!completeForReceipt) {
       console.log(`Downloading receipts from ${startReceipt} to ${endReceipt}`)
       const response = await axios.get(`${archiverUrl}/receipt?start=${startReceipt}&end=${endReceipt}`)
       if (response && response.data && response.data.receipts) {
-        // collector = collector.concat(response.data.archivedCycles);
         console.log(`Downloaded receipts`, response.data.receipts.length)
         await Receipt.processReceiptData(response.data.receipts)
-        if (response.data.receipts.length < 1000) {
+        if (response.data.receipts.length < bucketSize) {
           completeForReceipt = true
           endReceipt += response.data.receipts.length
           startReceipt = endReceipt
-          endReceipt += 1000
+          endReceipt += bucketSize
           console.log('Download completed for receipts')
         } else {
           startReceipt = endReceipt
-          endReceipt += 1000
+          endReceipt += bucketSize
         }
       } else {
-        console.log('Receipt', 'Invalid download response')
+        console.log('Receipt', 'Invalid download response', startReceipt, endReceipt)
+      }
+    }
+    if (!completeForOriginalTxData) {
+      console.log(`Downloading originalTxsData from ${startOriginalTxData} to ${endOriginalTxData}`)
+      const response = await axios.get(
+        `${archiverUrl}/originalTx?start=${startOriginalTxData}&end=${endOriginalTxData}`
+      )
+      if (response && response.data && response.data.originalTxs) {
+        console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
+        await OriginalTxData.processOriginalTxData(response.data.originalTxs)
+        if (response.data.originalTxs.length < bucketSize) {
+          completeForReceipt = true
+          endOriginalTxData += response.data.originalTxsData.length
+          startOriginalTxData = endOriginalTxData
+          endOriginalTxData += bucketSize
+          console.log('Download completed for originalTxsData')
+        } else {
+          startOriginalTxData = endOriginalTxData
+          endOriginalTxData += bucketSize
+        }
+      } else {
+        console.log('OriginalTxData', 'Invalid download response', startOriginalTxData, endOriginalTxData)
       }
     }
     if (!completeForCycle) {
@@ -381,7 +477,6 @@ export const downloadAndInsertReceiptsAndCycles = async (
       if (response && response.data && response.data.cycleInfo) {
         console.log(`Downloaded cycles`, response.data.cycleInfo.length)
         const cycles = response.data.cycleInfo
-        const bucketSize = 1000
         let combineCycles = []
         for (let i = 0; i < cycles.length; i++) {
           // eslint-disable-next-line security/detect-object-injection
@@ -402,22 +497,22 @@ export const downloadAndInsertReceiptsAndCycles = async (
             combineCycles = []
           }
         }
-        if (response.data.cycleInfo.length < 1000) {
+        if (response.data.cycleInfo.length < bucketSize) {
           completeForCycle = true
           endCycle += response.data.cycleInfo.length
           startCycle = endCycle
-          endCycle += 1000
+          endCycle += bucketSize
           console.log('Download completed for cycles')
         } else {
           startCycle = endCycle
-          endCycle += 1000
+          endCycle += bucketSize
         }
       } else {
-        console.log('Cycle', 'Invalid download response')
+        console.log('Cycle', 'Invalid download response', startCycle, endCycle)
       }
     }
   }
-  console.log('Sync Cycle and Receipt data completed!')
+  console.log('Sync Cycle and Txs data completed!')
 }
 
 export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
@@ -503,26 +598,39 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
   console.log('Sync Genesis accounts and transaction receipts completed!')
 }
 
-export const checkIfAnyReceiptsMissing = async (cycle: number): Promise<void> => {
+export const checkIfAnyTxsDataMissing = async (cycle: number): Promise<void> => {
   if (config.verbose) console.log(!needSyncing, !dataSyncing, cycle - lastSyncedCycle, syncCycleInterval)
   if (!needSyncing && !dataSyncing && cycle - lastSyncedCycle >= syncCycleInterval) {
     const cycleToSyncTo = lastSyncedCycle + syncCycleInterval - 5
     toggleDataSyncing()
     // await (cycleToSyncTo, lastSyncedCycle)
-    const unMatchedCycle = await compareReceiptsCountByCycles(lastSyncedCycle + 1, cycleToSyncTo)
+    const unMatchedCycleForReceipts = await compareReceiptsCountByCycles(lastSyncedCycle + 1, cycleToSyncTo)
     console.log(
       `Check receipts data between ${lastSyncedCycle + 1} and ${cycleToSyncTo}`,
-      'unMatchedCycle',
-      unMatchedCycle
+      'unMatchedCycleForReceipts',
+      unMatchedCycleForReceipts
     )
-    if (unMatchedCycle.length > 0) await downloadReceiptsByCycle(unMatchedCycle)
+    if (unMatchedCycleForReceipts.length > 0) await downloadReceiptsByCycle(unMatchedCycleForReceipts)
+    const unMatchedCycleForOriginalTxsData = await compareOriginalTxsCountByCycles(
+      lastSyncedCycle + 1,
+      cycleToSyncTo
+    )
+    console.log(
+      `Check receipts data between ${lastSyncedCycle + 1} and ${cycleToSyncTo}`,
+      'unMatchedCycleForOriginalTxsData',
+      unMatchedCycleForOriginalTxsData
+    )
+    if (unMatchedCycleForOriginalTxsData.length > 0)
+      await downloadOriginalTxsDataByCycle(unMatchedCycleForOriginalTxsData)
     toggleDataSyncing()
     updateLastSyncedCycle(cycleToSyncTo)
     Receipt.cleanReceiptsMap(cycleToSyncTo)
+    OriginalTxData.cleanOldOriginalTxsMap(cycleToSyncTo)
     if (config.verbose) console.log('lastSyncedCycle', lastSyncedCycle)
   }
 }
 
+// TODO: We can have compareWithOldReceiptsData and compareReceiptsCountByCycles to be the same function, needs a bit of refactor
 export async function compareReceiptsCountByCycles(
   startCycle: number,
   endCycle: number
@@ -554,6 +662,46 @@ export async function compareReceiptsCountByCycles(
         unMatchedCycle.push(downloadedReceipt)
       }
     } else unMatchedCycle.push(downloadedReceipt)
+  }
+  return unMatchedCycle
+}
+
+// TODO: We can have compareWithOriginalTxsData and compareOriginalTxsCountByCycles to be the same function, needs a bit of refactor
+export async function compareOriginalTxsCountByCycles(
+  startCycle: number,
+  endCycle: number
+): Promise<{ cycle: number; originalTxsData: number }[]> {
+  const unMatchedCycle = []
+  let downloadedOriginalTxDataCountByCycle: { cycle: number; originalTxsData: number }[]
+  const archiverUrl = await getDefaultArchiverUrl()
+  const response = await axios.get(
+    `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
+  )
+  if (response && response.data && response.data.originalTxs) {
+    downloadedOriginalTxDataCountByCycle = response.data.originalTxs
+  } else {
+    console.log(
+      `Can't fetch originalTxs count between cycle ${startCycle} and cycle ${endCycle} from archiver ${archiverUrl}`
+    )
+    return
+  }
+  const existingOriginalTxDataCountByCycle = await OriginalTxData.queryOriginalTxDataCountByCycles(
+    startCycle,
+    endCycle
+  )
+  if (config.verbose)
+    console.log('downloadedOriginalTxDataCountByCycle', downloadedOriginalTxDataCountByCycle)
+  if (config.verbose) console.log('existingOriginalTxDataCountByCycle', existingOriginalTxDataCountByCycle)
+  for (const downloadedOriginalTxData of downloadedOriginalTxDataCountByCycle) {
+    const existingOriginalTxData = existingOriginalTxDataCountByCycle.find(
+      (rc: { cycle: number }) => rc.cycle === downloadedOriginalTxData.cycle
+    )
+    if (config.verbose) console.log(downloadedOriginalTxData, existingOriginalTxData)
+    if (existingOriginalTxData) {
+      if (downloadedOriginalTxData.originalTxsData !== existingOriginalTxData.originalTxsData) {
+        unMatchedCycle.push(downloadedOriginalTxData)
+      }
+    } else unMatchedCycle.push(downloadedOriginalTxData)
   }
   return unMatchedCycle
 }
@@ -596,6 +744,47 @@ export async function downloadReceiptsByCycle(
   }
 }
 
+export async function downloadOriginalTxsDataByCycle(
+  data: { cycle: number; originalTxsData: number }[] = []
+): Promise<void> {
+  for (const { cycle, originalTxsData } of data) {
+    let page = 1
+    let totalDownloadOriginalTxsData = 0
+    const archiverUrl = await getDefaultArchiverUrl()
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const response = await axios.get(
+        `${archiverUrl}/originalTx?startCycle=${cycle}&endCycle=${cycle}&page=${page}`
+      )
+      if (response && response.data && response.data.originalTxs) {
+        const downloadedOriginalTxsData = response.data.originalTxs
+        if (downloadedOriginalTxsData.length > 0) {
+          totalDownloadOriginalTxsData += downloadedOriginalTxsData.length
+          await OriginalTxData.processOriginalTxData(downloadedOriginalTxsData)
+        } else {
+          console.log(
+            `Got 0 originalTxData when querying for page ${page} of cycle ${cycle} from archiver ${archiverUrl}`
+          )
+          break
+        }
+        page++
+        if (config.verbose)
+          console.log('totalDownloadOriginalTxsData', totalDownloadOriginalTxsData, downloadedOriginalTxsData)
+        if (totalDownloadOriginalTxsData === downloadedOriginalTxsData) {
+          console.log('totalDownloadOriginalTxsData for cycle', cycle, totalDownloadOriginalTxsData)
+          break
+        }
+      } else {
+        console.log(
+          `Can't fetch originalTxsData for  page ${page} of cycle ${cycle} from archiver ${archiverUrl}`
+        )
+        break
+      }
+    }
+  }
+}
+
 export const downloadReceiptsBetweenCycles = async (
   startCycle: number,
   totalCyclesToSync: number
@@ -624,6 +813,40 @@ export const downloadReceiptsBetweenCycles = async (
     } else {
       if (response && response.data && response.data.receipts !== 0)
         console.log('Receipt', 'Invalid download response')
+    }
+    startCycle = endCycle + 1
+    endCycle += 100
+  }
+}
+
+export const downloadOriginalTxsDataBetweenCycles = async (
+  startCycle: number,
+  totalCyclesToSync: number
+): Promise<void> => {
+  let endCycle = startCycle + 100
+  const archiverUrl = await getDefaultArchiverUrl()
+  for (; startCycle < totalCyclesToSync; ) {
+    if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
+    console.log(`Downloading originalTxsData from cycle ${startCycle} to cycle ${endCycle}`)
+    let response = await axios.get(
+      `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&type=count`
+    )
+    if (response && response.data && response.data.originalTxs) {
+      console.log(`Download originalTxsData Count`, response.data.originalTxs)
+      const originalTxsDataCount = response.data.originalTxs
+      for (let i = 1; i <= Math.ceil(originalTxsDataCount / 100); i++) {
+        response = await axios.get(
+          `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
+        )
+        if (response && response.data && response.data.originalTxs) {
+          console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
+          const originalTxsData = response.data.originalTxs
+          await OriginalTxData.processOriginalTxData(originalTxsData)
+        }
+      }
+    } else {
+      if (response && response.data && response.data.originalTxsData !== 0)
+        console.log('OriginalTxData', 'Invalid download response')
     }
     startCycle = endCycle + 1
     endCycle += 100

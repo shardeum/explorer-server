@@ -249,6 +249,27 @@ export async function queryOriginalTxDataByTxHash(txHash: string): Promise<Origi
   return null
 }
 
+export async function queryOriginalTxDataCountByCycles(
+  start: number,
+  end: number
+): Promise<{ originalTxsData: number; cycle: number }[]> {
+  let originalTxsData: { cycle: number; 'COUNT(*)': number }[] = []
+  try {
+    const sql = `SELECT cycle, COUNT(*) FROM originalTxsData GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
+    originalTxsData = await db.all(sql, [start, end])
+  } catch (e) {
+    console.log(e)
+  }
+  if (config.verbose) console.log('OriginalTxData count by cycles', originalTxsData)
+
+  return originalTxsData.map((originalTxData) => {
+    return {
+      originalTxsData: originalTxData['COUNT(*)'],
+      cycle: originalTxData.cycle,
+    }
+  })
+}
+
 export function cleanOldOriginalTxsMap(currentCycleCounter: number): void {
   for (const [key, value] of originalTxsMap) {
     // Clean originalTxs that are older than current cycle

@@ -17,6 +17,11 @@ export interface NetworkParameters {
   maintenanceFee: number
 }
 
+export enum TxDataType {
+  RECEIPT = 'RECEIPT',
+  ORIGINAL_TX_DATA = 'ORIGINAL_TX_DATA',
+}
+
 export * from './account'
 export * from './cycle'
 export * from './originalTxData'
