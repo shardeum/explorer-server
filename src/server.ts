@@ -1579,11 +1579,13 @@ const start = async (): Promise<void> => {
     const totalAccounts = await Account.queryAccountCount(AccountSearchType.All)
     const totalTransactions = await Transaction.queryTransactionCount()
     const totalReceipts = await Receipt.queryReceiptCount()
+    const totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
     reply.send({
       totalCycles,
       totalAccounts,
       totalTransactions,
       totalReceipts,
+      totalOriginalTxs,
     })
   })
 
