@@ -438,7 +438,7 @@ export const downloadTxsDataAndCycles = async (
         if (response.data.receipts.length < bucketSize) {
           completeForReceipt = true
           endReceipt += response.data.receipts.length
-          startReceipt = endReceipt
+          startReceipt = endReceipt + 1
           endReceipt += bucketSize
           console.log('Download completed for receipts')
         } else {
@@ -459,8 +459,8 @@ export const downloadTxsDataAndCycles = async (
         await OriginalTxData.processOriginalTxData(response.data.originalTxs)
         if (response.data.originalTxs.length < bucketSize) {
           completeForReceipt = true
-          endOriginalTxData += response.data.originalTxsData.length
-          startOriginalTxData = endOriginalTxData
+          endOriginalTxData += response.data.originalTxs.length
+          startOriginalTxData = endOriginalTxData + 1
           endOriginalTxData += bucketSize
           console.log('Download completed for originalTxsData')
         } else {
@@ -500,7 +500,7 @@ export const downloadTxsDataAndCycles = async (
         if (response.data.cycleInfo.length < bucketSize) {
           completeForCycle = true
           endCycle += response.data.cycleInfo.length
-          startCycle = endCycle
+          startCycle = endCycle + 1
           endCycle += bucketSize
           console.log('Download completed for cycles')
         } else {
@@ -845,7 +845,7 @@ export const downloadOriginalTxsDataBetweenCycles = async (
         }
       }
     } else {
-      if (response && response.data && response.data.originalTxsData !== 0)
+      if (response && response.data && response.data.originalTxs !== 0)
         console.log('OriginalTxData', 'Invalid download response')
     }
     startCycle = endCycle + 1
