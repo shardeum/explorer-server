@@ -515,6 +515,38 @@ export const downloadTxsDataAndCycles = async (
   console.log('Sync Cycle and Txs data completed!')
 }
 
+export const downloadCyclces = async (startCycle, endCycle): Promise<void> => {
+  console.log(`Downloading cycles from ${startCycle} to ${endCycle}`)
+  const archiverUrl = await getDefaultArchiverUrl()
+  const response = await axios.get(`${archiverUrl}/cycleinfo?start=${startCycle}&end=${endCycle}`)
+  if (response && response.data && response.data.cycleInfo) {
+    console.log(`Downloaded cycles`, response.data.cycleInfo.length)
+    const cycles = response.data.cycleInfo
+    const bucketSize = 1000
+    let combineCycles = []
+    for (let i = 0; i < cycles.length; i++) {
+      // eslint-disable-next-line security/detect-object-injection
+      const cycle = cycles[i]
+      if (!cycle.marker || cycle.counter < 0) {
+        console.log('Invalid Cycle Received', cycle)
+        continue
+      }
+      const cycleObj = {
+        counter: cycle.counter,
+        cycleRecord: cycle,
+        cycleMarker: cycle.marker,
+      }
+      combineCycles.push(cycleObj)
+      // await Cycle.insertOrUpdateCycle(cycleObj);
+      if (combineCycles.length >= bucketSize || i === cycles.length - 1) {
+        await Cycle.bulkInsertCycles(combineCycles)
+        combineCycles = []
+      }
+    }
+  }
+  console.log('Download completed for cycles')
+}
+
 export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
   let completeSyncingAccounts = false
   let completeSyncTransactions = false
