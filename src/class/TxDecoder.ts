@@ -63,7 +63,7 @@ const ERC_1155_BALANCE_SLOT = '0x3' // This is not correct; have to research and
 export const decodeTx = async (
   tx: Transaction,
   storageKeyValueMap: object = {},
-  newTx: boolean = true
+  newTx = true
 ): Promise<DecodeTxResult> => {
   const txs: TokenTx[] = []
   const accs: string[] = []
