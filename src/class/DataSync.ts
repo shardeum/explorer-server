@@ -437,12 +437,11 @@ export const downloadTxsDataAndCycles = async (
         await Receipt.processReceiptData(response.data.receipts)
         if (response.data.receipts.length < bucketSize) {
           completeForReceipt = true
-          endReceipt += response.data.receipts.length
-          startReceipt = endReceipt + 1
-          endReceipt += bucketSize
+          startReceipt += response.data.receipts.length
+          endReceipt = startReceipt + bucketSize
           console.log('Download completed for receipts')
         } else {
-          startReceipt = endReceipt
+          startReceipt = endReceipt + 1
           endReceipt += bucketSize
         }
       } else {
@@ -459,12 +458,11 @@ export const downloadTxsDataAndCycles = async (
         await OriginalTxData.processOriginalTxData(response.data.originalTxs)
         if (response.data.originalTxs.length < bucketSize) {
           completeForReceipt = true
-          endOriginalTxData += response.data.originalTxs.length
-          startOriginalTxData = endOriginalTxData + 1
-          endOriginalTxData += bucketSize
+          startOriginalTxData += response.data.originalTxs.length
+          endOriginalTxData = startOriginalTxData + bucketSize
           console.log('Download completed for originalTxsData')
         } else {
-          startOriginalTxData = endOriginalTxData
+          startOriginalTxData = endOriginalTxData + 1
           endOriginalTxData += bucketSize
         }
       } else {
@@ -499,12 +497,11 @@ export const downloadTxsDataAndCycles = async (
         }
         if (response.data.cycleInfo.length < bucketSize) {
           completeForCycle = true
-          endCycle += response.data.cycleInfo.length
-          startCycle = endCycle + 1
-          endCycle += bucketSize
+          startCycle += response.data.cycleInfo.length
+          endCycle = startCycle + bucketSize
           console.log('Download completed for cycles')
         } else {
-          startCycle = endCycle
+          startCycle = endCycle + 1
           endCycle += bucketSize
         }
       } else {
@@ -513,38 +510,6 @@ export const downloadTxsDataAndCycles = async (
     }
   }
   console.log('Sync Cycle and Txs data completed!')
-}
-
-export const downloadCyclces = async (startCycle, endCycle): Promise<void> => {
-  console.log(`Downloading cycles from ${startCycle} to ${endCycle}`)
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(`${archiverUrl}/cycleinfo?start=${startCycle}&end=${endCycle}`)
-  if (response && response.data && response.data.cycleInfo) {
-    console.log(`Downloaded cycles`, response.data.cycleInfo.length)
-    const cycles = response.data.cycleInfo
-    const bucketSize = 1000
-    let combineCycles = []
-    for (let i = 0; i < cycles.length; i++) {
-      // eslint-disable-next-line security/detect-object-injection
-      const cycle = cycles[i]
-      if (!cycle.marker || cycle.counter < 0) {
-        console.log('Invalid Cycle Received', cycle)
-        continue
-      }
-      const cycleObj = {
-        counter: cycle.counter,
-        cycleRecord: cycle,
-        cycleMarker: cycle.marker,
-      }
-      combineCycles.push(cycleObj)
-      // await Cycle.insertOrUpdateCycle(cycleObj);
-      if (combineCycles.length >= bucketSize || i === cycles.length - 1) {
-        await Cycle.bulkInsertCycles(combineCycles)
-        combineCycles = []
-      }
-    }
-  }
-  console.log('Download completed for cycles')
 }
 
 export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
@@ -591,7 +556,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       } else {
         console.log('Genesis Account', 'Invalid download response')
       }
-      startAccount = endAccount
+      startAccount = endAccount + 1
       endAccount += 10000
       page++
       // await sleep(1000);
@@ -622,7 +587,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       } else {
         console.log('Genesis Transaction Receipt', 'Invalid download response')
       }
-      startTransaction = endTransaction
+      startTransaction = endTransaction + 1
       endTransaction += 10000
       page++
     }
@@ -817,13 +782,53 @@ export async function downloadOriginalTxsDataByCycle(
   }
 }
 
+export const downloadCyclcesBetweenCycles = async (
+  startCycle: number,
+  totalCyclesToSync: number
+): Promise<void> => {
+  const bucketSize = 1000
+  let endCycle = startCycle + bucketSize
+  const archiverUrl = await getDefaultArchiverUrl()
+  for (; startCycle <= totalCyclesToSync; ) {
+    if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
+    const response = await axios.get(`${archiverUrl}/cycleinfo?start=${startCycle}&end=${endCycle}`)
+    if (response && response.data && response.data.cycleInfo) {
+      console.log(`Downloaded cycles`, response.data.cycleInfo.length)
+      const cycles = response.data.cycleInfo
+      let combineCycles = []
+      for (let i = 0; i < cycles.length; i++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const cycle = cycles[i]
+        if (!cycle.marker || cycle.counter < 0) {
+          console.log('Invalid Cycle Received', cycle)
+          continue
+        }
+        const cycleObj = {
+          counter: cycle.counter,
+          cycleRecord: cycle,
+          cycleMarker: cycle.marker,
+        }
+        combineCycles.push(cycleObj)
+        // await Cycle.insertOrUpdateCycle(cycleObj);
+        if (combineCycles.length >= bucketSize || i === cycles.length - 1) {
+          await Cycle.bulkInsertCycles(combineCycles)
+          combineCycles = []
+        }
+      }
+    }
+    startCycle = endCycle + 1
+    endCycle += bucketSize
+  }
+  console.log('Download completed for cycles between counter', startCycle, 'and', endCycle)
+}
+
 export const downloadReceiptsBetweenCycles = async (
   startCycle: number,
   totalCyclesToSync: number
 ): Promise<void> => {
   let endCycle = startCycle + 100
   const archiverUrl = await getDefaultArchiverUrl()
-  for (; startCycle < totalCyclesToSync; ) {
+  for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
     console.log(`Downloading receipts from cycle ${startCycle} to cycle ${endCycle}`)
     let response = await axios.get(
@@ -857,7 +862,7 @@ export const downloadOriginalTxsDataBetweenCycles = async (
 ): Promise<void> => {
   let endCycle = startCycle + 100
   const archiverUrl = await getDefaultArchiverUrl()
-  for (; startCycle < totalCyclesToSync; ) {
+  for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
     console.log(`Downloading originalTxsData from cycle ${startCycle} to cycle ${endCycle}`)
     let response = await axios.get(
