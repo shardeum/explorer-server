@@ -83,7 +83,7 @@ export async function compareWithOldReceiptsData(
   let downloadedReceiptCountByCycles: { cycle: number; receipts: number }[]
   const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
-    `${archiverUrl}/receipt?start=${lastStoredReceiptCycle - 10}&end=${lastStoredReceiptCycle}`
+    `${archiverUrl}/receipt?startCycle=${lastStoredReceiptCycle - 10}&endCycle=${lastStoredReceiptCycle}`
   )
   if (response && response.data && response.data.receipts) {
     downloadedReceiptCountByCycles = response.data.receipts
@@ -457,7 +457,7 @@ export const downloadTxsDataAndCycles = async (
         console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
         await OriginalTxData.processOriginalTxData(response.data.originalTxs)
         if (response.data.originalTxs.length < bucketSize) {
-          completeForReceipt = true
+          completeForOriginalTxData = true
           startOriginalTxData += response.data.originalTxs.length
           endOriginalTxData = startOriginalTxData + bucketSize
           console.log('Download completed for originalTxsData')
