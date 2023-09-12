@@ -182,6 +182,8 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
           txId: tx.txId,
           result,
           cycle: cycle,
+          blockNumber: parseInt(txReceipt.data.readableReceipt.blockNumber),
+          blockHash: tx.blockHash,
           // partition: Number(partition), // We don't know the partition now
           timestamp: tx.timestamp,
           wrappedEVMAccount: txReceipt.data,

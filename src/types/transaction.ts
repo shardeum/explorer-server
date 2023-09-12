@@ -4,6 +4,8 @@ export interface Transaction {
   txId: string
   result: Result
   cycle: number
+  blockNumber: number
+  blockHash: string
   partition: number
   timestamp: number
   wrappedEVMAccount: WrappedEVMAccount

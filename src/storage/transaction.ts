@@ -166,6 +166,8 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
         txId: transaction.data?.txId,
         result: { txIdShort: '', txResult: '' }, // temp placeholder
         cycle: transaction.cycleNumber,
+        blockNumber: parseInt(transaction.data.readableReceipt.blockNumber),
+        blockHash: transaction.data.readableReceipt.blockHash,
         partition: 0, // Setting to 0
         timestamp: transaction.timestamp,
         wrappedEVMAccount: transaction.data,
@@ -1347,6 +1349,61 @@ export async function queryTransactionsByTimestamp(
   }
 
   if (config.verbose) console.log('transactions by timestamp', transactions)
+  return transactions
+}
+
+// transactionCount with txType = Receipt, StakeReceipt, UnstakeReceipt
+export async function queryTransactionCountByBlock(blockNumber: number, blockHash: string): Promise<number> {
+  let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
+  let sql = `SELECT COUNT(*) FROM transactions WHERE transactionType IN (?,?,?) AND `
+  const values: any = [TransactionType.Receipt, TransactionType.StakeReceipt, TransactionType.UnstakeReceipt]
+  if (blockNumber > 0) {
+    sql += `blockNumber=? `
+    values.push(blockNumber)
+  } else if (blockHash) {
+    sql += `blockHash=? `
+    values.push(blockHash)
+  }
+  try {
+    transactions = await db.get(sql, values)
+  } catch (e) {
+    console.log(e)
+  }
+  if (config.verbose) console.log('transactions count by block', transactions)
+  return transactions['COUNT(*)'] || 0
+}
+
+// transactions with txType = Receipt, StakeReceipt, UnstakeReceipt
+export async function queryTransactionsByBlock(
+  blockNumber: number,
+  blockHash: string
+): Promise<DbTransaction[]> {
+  let transactions: DbTransaction[] = []
+  let sql = `SELECT * FROM transactions WHERE transactionType IN (?,?,?) AND `
+  const values: any = [TransactionType.Receipt, TransactionType.StakeReceipt, TransactionType.UnstakeReceipt]
+  if (blockNumber > 0) {
+    sql += `blockNumber=? `
+    values.push(blockNumber)
+  } else if (blockHash) {
+    sql += `blockHash=? `
+    values.push(blockHash)
+  }
+  try {
+    transactions = await db.all(sql, values)
+    if (transactions.length > 0) {
+      transactions.forEach((transaction) => {
+        if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
+          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if ('result' in transaction && transaction.result)
+          (transaction as Transaction).result = JSON.parse(transaction.result)
+        if ('contractInfo' in transaction && transaction.contractInfo)
+          transaction.contractInfo = JSON.parse(transaction.contractInfo)
+      })
+    }
+  } catch (e) {
+    console.log(e)
+  }
+  if (config.verbose) console.log('transactions by block', transactions)
   return transactions
 }
 
