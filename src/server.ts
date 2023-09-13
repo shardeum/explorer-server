@@ -805,6 +805,13 @@ const start = async (): Promise<void> => {
     } else if (query.blockNumber || query.blockHash) {
       const blockNumber = query.blockNumber ? parseInt(query.blockNumber) : null
       const blockHash = query.blockHash ? query.blockHash.toLowerCase() : null
+
+      if (blockNumber && (blockNumber < 0 || Number.isNaN(blockNumber))) {
+        return reply.send({ success: false, error: 'invalid block Number' })
+      }
+      if (blockHash && blockHash.length !== 66) {
+        return reply.send({ success: false, error: 'invalid block hash' })
+      }
       // totalTransactions = await Transaction.queryTransactionCountByBlock(blockNumber, blockHash)
       transactions = await Transaction.queryTransactionsByBlock(blockNumber, blockHash)
       const res: TransactionResponse = {
