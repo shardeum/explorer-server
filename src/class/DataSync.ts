@@ -1,6 +1,5 @@
 import axios from 'axios'
 import * as crypto from '@shardus/crypto-utils'
-import * as ArchivedCycle from '../storage/archivedCycle'
 import * as Account from '../storage/account'
 import * as Transaction from '../storage/transaction'
 import * as Cycle from '../storage/cycle'
@@ -27,52 +26,6 @@ export const toggleDataSyncing = (): void => {
 
 export const updateLastSyncedCycle = (cycle: number): void => {
   lastSyncedCycle = cycle
-}
-
-export const compareWithOldArchivedCyclesData = async (
-  lastCycleCounter: number
-): Promise<{ success: boolean; cycle: number }> => {
-  let downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/full-archive?start=${lastCycleCounter - 20}&end=${lastCycleCounter}`
-  )
-  if (response && response.data && response.data.archivedCycles) {
-    downloadedArchivedCycles = response.data.archivedCycles
-  } else {
-    throw Error(
-      `Can't fetch data from cycle ${
-        lastCycleCounter - 20
-      } to cycle ${lastCycleCounter}  from archiver server`
-    )
-  }
-  const oldArchivedCycles = await ArchivedCycle.queryAllArchivedCyclesBetween(
-    lastCycleCounter - 19,
-    lastCycleCounter
-  )
-  downloadedArchivedCycles.sort((a, b) => (a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1))
-  oldArchivedCycles.sort((a: { cycleRecord: { counter: number } }, b: { cycleRecord: { counter: number } }) =>
-    a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
-  )
-  let success = false
-  let cycle = 0
-  for (let i = 0; i < downloadedArchivedCycles.length; i++) {
-    /* eslint-disable security/detect-object-injection */
-    const downloadedArchivedCycle = downloadedArchivedCycles[i]
-    const oldArchivedCycle = oldArchivedCycles[i]
-    /* eslint-enable security/detect-object-injection */
-    if (oldArchivedCycle.counter) delete oldArchivedCycle.counter
-    console.log(downloadedArchivedCycle.cycleRecord.counter, oldArchivedCycle.cycleRecord.counter)
-    if (JSON.stringify(downloadedArchivedCycle) !== JSON.stringify(oldArchivedCycle)) {
-      return {
-        success,
-        cycle,
-      }
-    }
-    success = true
-    cycle = downloadedArchivedCycle.cycleRecord.counter
-  }
-  return { success, cycle }
 }
 
 export async function compareWithOldReceiptsData(
@@ -201,173 +154,6 @@ export const compareWithOldCyclesData = async (
     cycle = downloadedCycle.counter
   }
   return { success, cycle }
-}
-
-export const insertArchivedCycleData = async (
-  downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[]
-): Promise<void> => {
-  for (let i = 0; i < downloadedArchivedCycles.length; i++) {
-    /* eslint-disable security/detect-object-injection */
-    const counter = downloadedArchivedCycles[i].cycleRecord.counter
-    const downloadedArchivedCycle = downloadedArchivedCycles[i]
-    /* eslint-enable security/detect-object-injection */
-
-    if (!downloadedArchivedCycle) {
-      console.log('Unable to download archivedCycle for counter', counter)
-      continue
-    }
-
-    const { isDataSynced, isReceiptSynced, isSummarySynced } = checkStateMetaData(
-      downloadedArchivedCycle,
-      counter
-    )
-
-    if (isDataSynced && isReceiptSynced && isSummarySynced) {
-      const existingArchivedCycle = await ArchivedCycle.queryArchivedCycleByMarker(
-        downloadedArchivedCycle.cycleMarker
-      )
-      if (existingArchivedCycle) {
-        await ArchivedCycle.updateArchivedCycle(downloadedArchivedCycle.cycleMarker, downloadedArchivedCycle)
-      } else {
-        await ArchivedCycle.insertArchivedCycle(downloadedArchivedCycle)
-      }
-      await Cycle.insertOrUpdateCycle({
-        counter: downloadedArchivedCycle.counter,
-        cycleMarker: downloadedArchivedCycle.cycleMarker,
-        cycleRecord: downloadedArchivedCycle.cycleRecord,
-      })
-      await Transaction.insertOrUpdateTransaction(downloadedArchivedCycle)
-      await Account.insertOrUpdateAccount(downloadedArchivedCycle)
-      console.log(`Successfully synced ArchivedCycle for counter ${counter}`)
-    } else {
-      if (
-        !downloadedArchivedCycle.data &&
-        !downloadedArchivedCycle.receipt &&
-        !downloadedArchivedCycle.summary &&
-        downloadedArchivedCycle.cycleRecord.counter < 5
-      ) {
-        // exception for cycle 1, 2, 3, 4
-        const existingArchivedCycle = await ArchivedCycle.queryArchivedCycleByMarker(
-          downloadedArchivedCycle.cycleMarker
-        )
-        if (existingArchivedCycle) {
-          await ArchivedCycle.updateArchivedCycle(
-            downloadedArchivedCycle.cycleMarker,
-            downloadedArchivedCycle
-          )
-        } else {
-          await ArchivedCycle.insertArchivedCycle(downloadedArchivedCycle)
-        }
-        await Cycle.insertOrUpdateCycle(downloadedArchivedCycle)
-        await Transaction.insertOrUpdateTransaction(downloadedArchivedCycle)
-        await Account.insertOrUpdateAccount(downloadedArchivedCycle)
-        console.log(`Successfully synced ArchivedCycle for counter ${counter}`)
-      }
-    }
-  }
-}
-
-export const calculateNetworkHash = (data: object): string => {
-  let hashArray = []
-  if (data) {
-    for (const hash of Object.values(data)) {
-      hashArray.push(hash)
-    }
-  }
-  hashArray = hashArray.sort()
-  const calculatedHash = crypto.hashObj(hashArray)
-  return calculatedHash
-}
-
-export const downloadAndInsertArchivedCycles = async (
-  cycleToSyncTo: number,
-  startCycle = 0
-): Promise<void> => {
-  let complete = false
-  let start = startCycle
-  let end = start + 100
-  const archiverUrl = await getDefaultArchiverUrl()
-  while (!complete) {
-    if (end >= cycleToSyncTo) {
-      const res = await axios.get(`${archiverUrl}/full-archive/1`)
-      if (res.data && res.data.archivedCycles && res.data.archivedCycles.length > 0) {
-        cycleToSyncTo = res.data.archivedCycles[0].cycleRecord.counter
-        console.log('cycleToSyncTo', cycleToSyncTo)
-      }
-    }
-    console.log(`Downloading archive from cycle ${start} to cycle ${end}`)
-    const response = await axios.get(`${archiverUrl}/full-archive?start=${start}&end=${end}`)
-    if (response && response.data && response.data.archivedCycles) {
-      // collector = collector.concat(response.data.archivedCycles);
-      if (response.data.archivedCycles.length < 100) {
-        complete = true
-        console.log('Download completed')
-      }
-      const downloadedArchivedCycles: ArchivedCycle.ArchivedCycle[] = response.data.archivedCycles
-      console.log(`Downloaded archived cycles`, downloadedArchivedCycles.length)
-      downloadedArchivedCycles.sort((a, b) => (a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1))
-      await insertArchivedCycleData(downloadedArchivedCycles)
-    } else {
-      console.log('Invalid download response')
-    }
-    start = end
-    end += 100
-  }
-}
-
-export const checkStateMetaData = (
-  downloadedArchivedCycle: ArchivedCycle.ArchivedCycle,
-  counter: number
-): { isDataSynced: boolean; isReceiptSynced: boolean; isSummarySynced: boolean } => {
-  let isDataSynced = false
-  let isReceiptSynced = false
-  let isSummarySynced = false
-
-  // Check data hashes
-  if (downloadedArchivedCycle.data) {
-    const downloadedNetworkDataHash = downloadedArchivedCycle.data.networkHash
-    const calculatedDataHash = calculateNetworkHash(downloadedArchivedCycle.data.partitionHashes)
-    if (downloadedNetworkDataHash === calculatedDataHash) {
-      isDataSynced = true
-    } else {
-      console.log('Different network data hash for cycle', counter)
-    }
-  } else {
-    console.log(
-      `ArchivedCycle ${downloadedArchivedCycle.cycleRecord.counter}, ${downloadedArchivedCycle.cycleMarker} does not have data field`
-    )
-  }
-
-  // Check receipt hashes
-  if (downloadedArchivedCycle.receipt) {
-    const downloadedNetworkReceiptHash = downloadedArchivedCycle.receipt.networkHash
-    const calculatedReceiptHash = calculateNetworkHash(downloadedArchivedCycle.receipt.partitionHashes)
-    if (downloadedNetworkReceiptHash === calculatedReceiptHash) {
-      isReceiptSynced = true
-    } else {
-      console.log('Different network receipt hash for cycle', counter)
-    }
-  } else {
-    console.log(
-      `ArchivedCycle ${downloadedArchivedCycle.cycleRecord.counter}, ${downloadedArchivedCycle.cycleMarker} does not have receipt field`
-    )
-  }
-
-  // Check summary hashes
-  if (downloadedArchivedCycle.summary) {
-    const downloadedNetworkSummaryHash = downloadedArchivedCycle.summary.networkHash
-    const calculatedSummaryHash = calculateNetworkHash(downloadedArchivedCycle.summary.partitionHashes)
-    if (downloadedNetworkSummaryHash === calculatedSummaryHash) {
-      isSummarySynced = true
-    } else {
-      console.log('Different network summary hash for cycle', counter)
-    }
-  } else {
-    console.log(
-      `ArchivedCycle ${downloadedArchivedCycle.cycleRecord.counter}, ${downloadedArchivedCycle.cycleMarker} does not have summary field`
-    )
-  }
-  return { isDataSynced, isReceiptSynced, isSummarySynced }
 }
 
 export const downloadTxsDataAndCycles = async (
@@ -545,7 +331,6 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       console.log(`Downloading accounts from ${startAccount} to ${endAccount}`)
       const response = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5&page=${page}`)
       if (response && response.data && response.data.accounts) {
-        // collector = collector.concat(response.data.archivedCycles);
         if (response.data.accounts.length < 10000) {
           completeSyncingAccounts = true
           console.log('Download completed for accounts')
@@ -577,7 +362,6 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       console.log(`Downloading transactions from ${startTransaction} to ${endTransaction}`)
       const response = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5&page=${page}`)
       if (response && response.data && response.data.transactions) {
-        // collector = collector.concat(response.data.archivedCycles);
         if (response.data.transactions.length < 10000) {
           completeSyncTransactions = true
           console.log('Download completed for transactions')

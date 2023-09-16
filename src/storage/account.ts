@@ -4,7 +4,6 @@ import { config } from '../config/index'
 import { AccountType, AccountSearchType, WrappedEVMAccount, Account, Token, ContractType } from '../types'
 import { bufferToHex } from 'ethereumjs-util'
 import { getContractInfo } from '../class/TxDecoder'
-import { ArchivedCycle } from './archivedCycle'
 
 type DbAccount = Account & {
   account: string
@@ -91,89 +90,6 @@ export async function bulkInsertTokens(tokens: Token[]): Promise<void> {
   } catch (e) {
     console.log(e)
     console.log('Unable to bulk insert Tokens', tokens.length)
-  }
-}
-
-export async function insertOrUpdateAccount(archivedCycle: ArchivedCycle): Promise<void> {
-  const skipTxs: string[] = []
-  if (!archivedCycle.receipt) {
-    if (config.verbose) console.log('No Receipt')
-    return
-  }
-  if (!archivedCycle.receipt.partitionMaps) {
-    if (config.verbose) console.log('No partitionMaps')
-    return
-  }
-  for (const [partitionStr, receiptsInPartition] of Object.entries(archivedCycle.receipt.partitionMaps)) {
-    const partition = Number(partitionStr)
-    for (const txId in receiptsInPartition) {
-      if (skipTxs.includes(txId)) continue
-      // eslint-disable-next-line security/detect-object-injection
-      if (!archivedCycle.receipt.partitionTxs?.[partition][txId]) {
-        console.log(
-          `txId ${txId} is not found in partitionTxs`,
-          // eslint-disable-next-line security/detect-object-injection
-          archivedCycle.receipt.partitionMaps[partition][txId]
-        )
-        continue
-      }
-      // eslint-disable-next-line security/detect-object-injection
-      const accountData = archivedCycle.receipt.partitionTxs[partition][txId].filter(
-        (acc?: { data?: { accountType: AccountType } }) => {
-          return (
-            acc?.data?.accountType === AccountType.Account ||
-            acc?.data?.accountType === AccountType.NetworkAccount ||
-            acc?.data?.accountType === AccountType.NodeAccount ||
-            acc?.data?.accountType === AccountType.NodeAccount2
-          )
-        }
-      )
-      let account: Account
-      if (accountData.length > 0) {
-        if (config.verbose) console.log('accountData', txId, accountData)
-      } else {
-        continue // skip other types of tx for now // will open it back after changes are made in client to display it
-      }
-
-      for (const accountDatum of accountData) {
-        account = accountDatum.data
-        let accObj: Account
-        if (account.accountType === AccountType.Account) {
-          accObj = {
-            accountId: accountDatum.accountId,
-            cycle: archivedCycle.cycleRecord.counter,
-            timestamp: account.timestamp,
-            ethAddress: account.ethAddress,
-            account: account.account,
-            hash: account.hash,
-            accountType: account.accountType,
-          }
-        } else {
-          accObj = {
-            accountId: accountDatum.accountId,
-            cycle: archivedCycle.cycleRecord.counter,
-            timestamp: account.timestamp,
-            account: account as unknown as WrappedEVMAccount,
-            hash: account.hash,
-            accountType: account.accountType,
-            ethAddress: '',
-          }
-        }
-        const accountExist = await queryAccountByAddress(accObj.accountId)
-        if (config.verbose) console.log('accountExist', accountExist)
-        if (!accountExist) {
-          await insertAccount(accObj)
-        } else {
-          if (accountExist.cycle < accObj.cycle && accountExist.timestamp < accObj.timestamp) {
-            // console.log('update', accountExist.cycle, accObj.cycle);
-            await updateAccount(accObj.accountId, accObj)
-          }
-        }
-        if (!skipTxs.includes(txId)) {
-          skipTxs.push(txId)
-        }
-      }
-    }
   }
 }
 

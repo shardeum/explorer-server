@@ -14,7 +14,6 @@ import * as TransactionStats from './stats/transactionStats'
 import * as ValidatorStats from './stats/validatorStats'
 import * as Storage from './storage'
 import * as Account from './storage/account'
-import * as ArchivedCycle from './storage/archivedCycle'
 import * as Cycle from './storage/cycle'
 import * as Log from './storage/log'
 import * as Receipt from './storage/receipt'
@@ -841,84 +840,6 @@ const start = async (): Promise<void> => {
     const res = {
       success: true,
       cycle,
-    }
-    reply.send(res)
-  })
-
-  server.get('/api/archive/:counter', async (_request, reply) => {
-    const err = utils.validateTypes(_request.params as object, { counter: 's' })
-    if (err) {
-      reply.send({ success: false, error: err })
-      return
-    }
-    const params = _request.params as RequestParams
-    const counter: number = parseInt(params.counter)
-    //cycle counter starts from 0
-    if (counter < 0 || Number.isNaN(counter)) {
-      reply.send({ success: false, error: 'Invalid counter' })
-      return
-    }
-    const archivedCycle = await ArchivedCycle.queryArchivedCycleByCounter(counter)
-    const res = {
-      success: true,
-      archivedCycle,
-    }
-    reply.send(res)
-  })
-
-  server.get('/api/archive', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query as object, {
-      start: 's?',
-      end: 's?',
-      count: 's?',
-      marker: 's?',
-    })
-    if (err) {
-      reply.send({ success: false, error: err })
-      return
-    }
-    const query = _request.query as RequestQuery
-    let archivedCycles = []
-    if (query.start && query.end) {
-      const from = parseInt(query.start)
-      const to = parseInt(query.end)
-      if (!(from >= 0 && to >= from) || Number.isNaN(from) || Number.isNaN(to)) {
-        reply.send({
-          success: false,
-          error: `Invalid start and end counters`,
-        })
-        return
-      }
-      const count = to - from
-      if (count > 100) {
-        reply.send({
-          success: false,
-          error: `Exceed maximum limit of 100 cycles`,
-        })
-        return
-      }
-      archivedCycles = await ArchivedCycle.queryAllArchivedCyclesBetween(from, to)
-    }
-    if (query.count) {
-      const count = parseInt(query.count)
-      if (count > 100) {
-        reply.send({
-          success: false,
-          error: `Exceed maximum limit of 100 cycles`,
-        })
-        return
-      }
-      archivedCycles = await ArchivedCycle.queryAllArchivedCycles(count)
-    }
-    if (query.marker) {
-      const archivedCycle = await ArchivedCycle.queryArchivedCycleByMarker(query.marker)
-      if (archivedCycle) {
-        archivedCycles.push(archivedCycle)
-      }
-    }
-    const res = {
-      success: true,
-      archivedCycles,
     }
     reply.send(res)
   })

@@ -3,9 +3,6 @@ import * as db from './sqlite3storage'
 export const initializeDB = async (): Promise<void> => {
   await db.init()
   await db.runCreate(
-    'CREATE TABLE if not exists `archivedCycles` (`cycleMarker` TEXT NOT NULL UNIQUE PRIMARY KEY, `counter` NUMBER NOT NULL, `cycleRecord` JSON NOT NULL, `data` JSON, `receipt` JSON, `summary` JSON)'
-  )
-  await db.runCreate(
     'CREATE TABLE if not exists `cycles` (`cycleMarker` TEXT NOT NULL UNIQUE PRIMARY KEY, `counter` NUMBER NOT NULL, `cycleRecord` JSON NOT NULL)'
   )
   // await db.runCreate('Drop INDEX if exists `cycles_idx`');
@@ -34,18 +31,10 @@ export const initializeDB = async (): Promise<void> => {
   // )
 
   // New index
-  await db.runCreate(
-    'CREATE INDEX if not exists `transactions_txType` ON `transactions` (`transactionType`)'
-  )
-  await db.runCreate(
-    'CREATE INDEX if not exists `transactions_txFrom` ON `transactions` (`txFrom`)'
-  )
-  await db.runCreate(
-    'CREATE INDEX if not exists `transactions_txTo` ON `transactions` (`txTo`)'
-  )
-  await db.runCreate(
-    'CREATE INDEX if not exists `transactions_nominee` ON `transactions` (`nominee`)'
-  )
+  await db.runCreate('CREATE INDEX if not exists `transactions_txType` ON `transactions` (`transactionType`)')
+  await db.runCreate('CREATE INDEX if not exists `transactions_txFrom` ON `transactions` (`txFrom`)')
+  await db.runCreate('CREATE INDEX if not exists `transactions_txTo` ON `transactions` (`txTo`)')
+  await db.runCreate('CREATE INDEX if not exists `transactions_nominee` ON `transactions` (`nominee`)')
   await db.runCreate(
     'CREATE INDEX if not exists `transactions_cycle_timestamp` ON `transactions` (`cycle` DESC, `timestamp` DESC)'
   )
@@ -64,9 +53,9 @@ export const initializeDB = async (): Promise<void> => {
     'CREATE INDEX if not exists `tokens_idx` ON `tokens` (`ethAddress`, `contractAddress`, `tokenType`, `tokenValue` DESC)'
   )
   await db.runCreate(
-    "CREATE TABLE if not exists `logs` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cycle` NUMBER NOT NULL," +
-    " `timestamp` BIGINT NOT NULL, `txHash` TEXT NOT NULL,  `blockNumber` TEXT NOT NULL, `contractAddress` TEXT NOT" +
-    " NULL, `log` JSON NOT NULL, `topic0` TEXT NOT NULL, `topic1` TEXT, `topic2` TEXT, `topic3` TEXT, `inserted_at` BIGINT NOT NULL DEFAULT (CAST(strftime('%s','now') AS INTEGER)*1000))"
+    'CREATE TABLE if not exists `logs` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cycle` NUMBER NOT NULL,' +
+      ' `timestamp` BIGINT NOT NULL, `txHash` TEXT NOT NULL,  `blockNumber` TEXT NOT NULL, `contractAddress` TEXT NOT' +
+      " NULL, `log` JSON NOT NULL, `topic0` TEXT NOT NULL, `topic1` TEXT, `topic2` TEXT, `topic3` TEXT, `inserted_at` BIGINT NOT NULL DEFAULT (CAST(strftime('%s','now') AS INTEGER)*1000))"
   )
   // await db.runCreate('Drop INDEX if exists `logs_idx`');
   await db.runCreate(

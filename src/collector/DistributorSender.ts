@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io'
-import { Data, NewData } from '../class/Collector'
+import { Data } from '../class/validateData'
 import { config as CONFIG } from '../config'
 
 // constants
@@ -40,7 +40,7 @@ export const forwardCycleData = async (data: Data): Promise<void> => {
   console.log(`Forwarded cycle data to ${registeredDistributors.size} distributors`)
 }
 
-export const forwardReceiptData = async (data: NewData): Promise<void> => {
+export const forwardReceiptData = async (data: Data): Promise<void> => {
   for (const socket of registeredDistributors.values()) {
     socket.emit(ReceiptDataWsEvent, data)
   }

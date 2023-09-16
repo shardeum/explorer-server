@@ -24,7 +24,6 @@ export const config = {
   CONTRACT_DB: 'contract-db',
   CYCLE_DB: 'cycle-db',
   verbose: false,
-  experimentalSnapshot: true,
   genesisSHMSupply: 100000000,
   rateLimit: 100,
   patchData: false,

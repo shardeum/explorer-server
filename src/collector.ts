@@ -1,18 +1,14 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-import { Collector, Data, NewData } from './class/Collector'
+import { Data, validateData } from './class/validateData'
 import * as ioclient from 'socket.io-client'
 import * as crypto from '@shardus/crypto-utils'
 import * as Storage from './storage'
-import * as archivedCycle from './storage/archivedCycle'
 import * as cycle from './storage/cycle'
 import * as receipt from './storage/receipt'
 import * as originalTxData from './storage/originalTxData'
 import {
-  downloadAndInsertArchivedCycles,
-  compareWithOldArchivedCyclesData,
-  // validateOldArchivedCycleData,
   downloadTxsDataAndCycles,
   compareWithOldReceiptsData,
   compareWithOldCyclesData,
@@ -173,101 +169,28 @@ const start = async (): Promise<void> => {
   await Storage.initializeDB()
   await setupDistributorSender()
 
-  const collector = new Collector()
-
   const archiverUrl = await getDefaultArchiverUrl()
 
-  if (CONFIG.experimentalSnapshot) {
-    await checkAndSyncData()
-    try {
-      const socketClient = ioclient.connect(archiverUrl)
-      socketClient.on('connect', () => {
-        console.log('connected to archive server')
-      })
+  await checkAndSyncData()
+  try {
+    const socketClient = ioclient.connect(archiverUrl)
+    socketClient.on('connect', () => {
+      console.log('connected to archive server')
+    })
 
-      socketClient.on(ArchiverReceiptWsEvent, async (data: NewData) => {
-        // console.log('RECEIVED RECEIPT')
-        try {
-          collector.processReceipt(data)
-          forwardReceiptData(data)
-        } catch (e) {
-          console.log('Error in processing received data!', e)
-        }
-      })
-    } catch (e) {
-      console.log(e)
-    }
-    return
+    socketClient.on(ArchiverReceiptWsEvent, async (data: Data) => {
+      // console.log('RECEIVED RECEIPT')
+      try {
+        validateData(data)
+        forwardReceiptData(data)
+      } catch (e) {
+        console.log('Error in processing received data!', e)
+      }
+    })
+  } catch (e) {
+    console.log(e)
   }
-
-  const lastStoredCycles = await archivedCycle.queryAllArchivedCycles(1)
-  let lastStoredCycleCounter = 0
-  let lastestCycleToSync = 0
-  const response = await axios.get(`${archiverUrl}/full-archive/1`)
-  if (response.data && response.data.archivedCycles && response.data.archivedCycles.length > 0) {
-    lastestCycleToSync = response.data.archivedCycles[0].cycleRecord.counter
-    console.log('lastestCycleToSync', lastestCycleToSync)
-  }
-  if (lastStoredCycles.length > 0 && lastStoredCycles[0].counter > 20 && lastestCycleToSync > 20) {
-    lastStoredCycleCounter = lastStoredCycles[0].counter
-    console.log('lastStoredCycleNumber', lastStoredCycleCounter)
-    // Make sure the data that are store are authentic by comparing 20 last cycles
-    const result = await compareWithOldArchivedCyclesData(lastStoredCycleCounter)
-    if (!result.success) {
-      throw Error(
-        'The last saved 20 cycles data does not match with the archiver data! Clear the DB and start the server again!'
-      )
-    }
-
-    lastStoredCycleCounter = result.cycle
-  } else if (lastStoredCycles.length > 0) {
-    lastStoredCycleCounter = lastStoredCycles[0].counter
-    if (lastStoredCycleCounter > lastSyncedCycle) {
-      throw Error(
-        'The existing db has more data than the network data! Clear the DB and start the server again!'
-      )
-    }
-  }
-  if (lastestCycleToSync > lastStoredCycleCounter) toggleNeedSyncing()
-
-  // await validateOldArchivedCycleData(lastStoredCycleCounter);
-
-  if (needSyncing) {
-    console.log(lastestCycleToSync, lastStoredCycleCounter)
-    await downloadAndInsertArchivedCycles(lastestCycleToSync, lastStoredCycleCounter)
-    toggleNeedSyncing() // data is synced now
-  }
-
-  // lastStoredCycles = await archivedCycle.queryAllArchivedCycles(1);
-  // if (lastStoredCycles.length > 0) {
-  //   lastSyncedCycle = lastStoredCycles[0].counter - 20;
-  //   if (lastSyncedCycle < 0) {
-  //     lastSyncedCycle = 0;
-  //   }
-  //   console.log('lastSyncedCycle', lastSyncedCycle);
-  // }
-
-  const socketClient = ioclient.connect(archiverUrl)
-
-  socketClient.on('connect', () => {
-    console.log('connected to archive server')
-  })
-
-  socketClient.on(ArchiverCycleWsEvent, async (data: Data) => {
-    console.log(
-      'RECEIVED ARCHIVED_CYCLE',
-      data.archivedCycles &&
-        data.archivedCycles[0] &&
-        data.archivedCycles[0].cycleRecord &&
-        data.archivedCycles[0].cycleRecord.counter
-    )
-    try {
-      collector.processData(data)
-      forwardCycleData(data)
-    } catch (e) {
-      console.log('Error in processing received data!', e)
-    }
-  })
+  return
 }
 
 start()
