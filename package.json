@@ -9,7 +9,7 @@
     "collector": "node dist/collector.js",
     "rpc_data_server": "node dist/rpc_data_server.js",
     "aggregator": "node dist/aggregator.js",
-    "distributor": "node dist/distributor.js",
+    "log_server": "node dist/log_server.js",
     "data_patcher": "node dist/data_patcher.js",
     "dev": "next dev",
     "build": "next build",

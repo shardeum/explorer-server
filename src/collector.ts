@@ -21,7 +21,7 @@ import {
   compareWithOldOriginalTxsData,
   downloadOriginalTxsDataBetweenCycles,
 } from './class/DataSync'
-import { setupDistributorSender, forwardReceiptData, forwardCycleData } from './collector/DistributorSender'
+import { setupLogServerSender, forwardReceiptData } from './logSubscription/LogServerSender'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
@@ -167,7 +167,7 @@ export const checkAndSyncData = async (): Promise<void> => {
 // Setup Log Directory
 const start = async (): Promise<void> => {
   await Storage.initializeDB()
-  await setupDistributorSender()
+  await setupLogServerSender()
 
   const archiverUrl = await getDefaultArchiverUrl()
 
@@ -182,7 +182,6 @@ const start = async (): Promise<void> => {
       // console.log('RECEIVED RECEIPT')
       try {
         validateData(data)
-        forwardReceiptData(data)
       } catch (e) {
         console.log('Error in processing received data!', e)
       }

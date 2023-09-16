@@ -1,11 +1,7 @@
-import { ArchivedReceipts, Log, ReadableReceipt } from './types'
+import { Receipt, WrappedAccount, Log } from '../types'
 
-export const extractLogsFromReceipts = (archivedReceipts: ArchivedReceipts): Log[] => {
-  // extract readableReceipt from archivedReceipts
-  if (!archivedReceipts.receipts) return []
-  const readableReceipts: ReadableReceipt[] = archivedReceipts.receipts
-    .map((receipt) => receipt.receipt)
-    .flat()
+export const extractLogsFromReceipts = (receipts: Receipt[]): Log[] => {
+  const readableReceipts: WrappedAccount[] = receipts.map((receipt) => receipt.receipt).flat()
 
   // extract logs from readableReceipts
   const logs = readableReceipts

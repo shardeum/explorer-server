@@ -6,6 +6,7 @@ import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
 import { bufferToHex } from 'ethereumjs-util'
+import { forwardReceiptData } from '../logSubscription/LogServerSender'
 
 type DbReceipt = Receipt & {
   tx: string
@@ -54,15 +55,7 @@ export async function bulkInsertReceipts(receipts: Receipt[]): Promise<void> {
   }
 }
 
-export async function processReceiptData(
-  receipts: {
-    accounts: WrappedAccount[]
-    cycle: number
-    result: unknown
-    tx: Transaction.Transaction
-    receipt: WrappedAccount
-  }[]
-): Promise<void> {
+export async function processReceiptData(receipts: Receipt[]): Promise<void> {
   if (receipts && receipts.length <= 0) return
   if (!cleanReceiptsMapByCycle) {
     const currentTime = Date.now()
@@ -90,6 +83,9 @@ export async function processReceiptData(
     if (!receiptExist) combineReceipts.push(receiptObj as unknown as Receipt)
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
+
+    // Forward receipt data to LogServer
+    await forwardReceiptData([receiptObj])
     const storageKeyValueMap = {}
     for (const account of accounts) {
       const accountType = account.data.accountType
@@ -104,7 +100,7 @@ export async function processReceiptData(
           cycle: cycle,
           timestamp: account.timestamp,
           ethAddress: account.data.ethAddress.toLowerCase(),
-          account: accountType === AccountType.Account ? account.data.account : account.data,
+          account: account.data,
           hash: account.stateId,
           accountType: account.data.accountType,
         }
@@ -164,7 +160,7 @@ export async function processReceiptData(
           ethAddress: account.accountId, // Adding accountId as ethAddess for these account types for now; since we need ethAddress for mysql index
           account: account.data,
           hash: account.stateId,
-          accountType: account.data.accountType,
+          accountType,
         }
         const index = combineAccounts2.findIndex((a) => a.accountId === accObj.accountId)
         if (index > -1) {

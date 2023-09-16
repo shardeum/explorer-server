@@ -120,3 +120,14 @@ export enum TransactionSearchType {
   AllExceptInternalTx = 11, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt (exclude InternalTxReceipt)
   Pending = 12, // Pending Txs (AllExceptInternalTx) from originTxsData
 }
+
+export interface Log {
+  address: string
+  blockHash: string
+  blockNumber: string
+  data: string
+  logIndex: string
+  topics: string[]
+  transactionHash: string
+  transactionIndex: string
+}

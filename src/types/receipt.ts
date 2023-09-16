@@ -1,13 +1,14 @@
 import { Transaction } from './transaction'
-import { Account } from './account'
+import { WrappedAccount, WrappedDataReceipt, WrappedEVMAccount } from './account'
 export interface Receipt {
   receiptId: string
-  tx: Transaction
+  tx: Transaction // TODO: Correct type
+  receipt: WrappedAccount
   cycle: number
   timestamp: number
   result: object
-  beforeStateAccounts: Account[]
-  accounts: Account[]
+  beforeStateAccounts: WrappedAccount[]
+  accounts: WrappedAccount[]
   sign: {
     owner: string
     sig: string

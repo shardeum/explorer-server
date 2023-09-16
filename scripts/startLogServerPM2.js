@@ -4,7 +4,7 @@ const pm2 = require('pm2')
 const count = parseInt(process.argv[2]) || 1
 const startingPort = +process.argv[3] || 7440
 
-console.log(`Distributor PM2: Starting ${count} from port:${startingPort}`)
+console.log(`LogServer PM2: Starting ${count} from port:${startingPort}`)
 
 pm2.connect(function (err) {
   if (err) {
@@ -13,7 +13,7 @@ pm2.connect(function (err) {
   }
 
   for (let i = 0; i < count; i++) {
-    startDistributor(startingPort + i)
+    startLogServer(startingPort + i)
   }
   setTimeout(() => {
     console.log(`Run "pm2 list" to see started processes.`)
@@ -23,14 +23,14 @@ pm2.connect(function (err) {
 })
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function startDistributor(port) {
-  const processName = 'distributor_' + port
+function startLogServer(port) {
+  const processName = 'log_server_' + port
   pm2.start(
     {
-      script: './dist/distributor.js',
+      script: './dist/log_server.js',
       name: processName,
       env: {
-        DISTRIBUTOR_PORT: port.toString(),
+        LOG_SERVER_PORT: port.toString(),
       },
     },
     function (err) {
@@ -41,7 +41,7 @@ function startDistributor(port) {
         })
         return
       } else {
-        console.log(`Started distributor server at port ${port}`)
+        console.log(`Started Log Server at port ${port}`)
       }
     }
   )

@@ -3,9 +3,9 @@ import FastifyWebsocket, { SocketStream } from '@fastify/websocket'
 import * as crypto from 'crypto'
 import Fastify from 'fastify'
 import { config } from './config'
-import { setupCollectorListener } from './distributor/CollectorListener'
-import { evmLogSubscriptionHandler } from './distributor/Handler'
-import { removeLogSubscriptionBySocketId } from './distributor/SocketManager'
+import { setupCollectorListener } from './logSubscription/CollectorListener'
+import { evmLogSubscriptionHandler } from './logSubscription/Handler'
+import { removeLogSubscriptionBySocketId } from './logSubscription/SocketManager'
 import * as Storage from './storage'
 
 const start = async (): Promise<void> => {
@@ -42,15 +42,15 @@ const start = async (): Promise<void> => {
   // Start server
   server.listen(
     {
-      port: Number(config.port.distributor),
+      port: Number(config.port.log_server),
       host: '0.0.0.0',
     },
     async (err) => {
       if (err) {
-        server.log.error(`Error starting distributor on port ${config.port.distributor}. Error ${err}`)
+        server.log.error(`Error starting Log server on port ${config.port.log_server}. Error ${err}`)
         throw err
       }
-      console.log('Distributor server is listening on port:', config.port.distributor)
+      console.log('Log server is listening on port:', config.port.log_server)
     }
   )
 }

@@ -3,30 +3,31 @@ import * as socketClient from 'socket.io-client'
 import { config } from '../config'
 import { IndexedLogs, extractLogsFromReceipts } from './CollectorDataParser'
 import { getLogSocketClient, logSubscriptionMap } from './SocketManager'
-import { ArchivedCycles, ArchivedReceipts } from './types'
+import { Cycle, Receipt } from '../types'
+import { CycleDataWsEvent, ReceiptDataWsEvent } from './LogServerSender'
 
 export const setupCollectorListener = async (): Promise<void> => {
-  const socket = socketClient.connect(`http://${config.host}:${config.port.collector_distributor_sender}`, {
+  const socket = socketClient.connect(`http://${config.host}:${config.port.collector}`, {
     reconnection: true,
     reconnectionAttempts: 10,
   })
 
   // Register default socket event handlers
-  socket.on('connect', () => console.log('Connected to distributor sender'))
-  socket.on('disconnect', () => console.log('Disconnected from distributor sender'))
-  socket.on('error', (err) => console.log(`Error from distributor sender: ${err}`))
+  socket.on('connect', () => console.log('Connected to collector'))
+  socket.on('disconnect', () => console.log('Disconnected from collector'))
+  socket.on('error', (err) => console.log(`Error from collector: ${err}`))
 
   // Register custom socket event handlers
-  socket.on('/data/cycle', cycleDataHandler)
-  socket.on('/data/receipt', receiptDataHandler)
+  socket.on(CycleDataWsEvent, cycleDataHandler)
+  socket.on(ReceiptDataWsEvent, receiptDataHandler)
 }
 
-const cycleDataHandler = async (data: ArchivedCycles): Promise<void> => {
-  /*prettier-ignore*/ console.log('Received archived cycle data, valid? ', data.archivedCycles && data.archivedCycles[0] && data.archivedCycles[0].cycleRecord && data.archivedCycles[0].cycleRecord.counter)
+const cycleDataHandler = async (data: Cycle[]): Promise<void> => {
+  /*prettier-ignore*/ console.log('Received archived cycle data, valid? ', data && data[0] && data[0].cycleRecord && data[0].cycleRecord.counter)
   console.log(`Cycle data: ${JSON.stringify(data, null, 2)}`)
 }
 
-const receiptDataHandler = async (data: ArchivedReceipts): Promise<void> => {
+const receiptDataHandler = async (data: Receipt[]): Promise<void> => {
   /*prettier-ignore*/ console.log('Received receipt data from archiver.')
 
   const logs = extractLogsFromReceipts(data)

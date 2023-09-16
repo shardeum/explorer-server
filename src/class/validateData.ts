@@ -50,6 +50,8 @@ export async function validateData(data: Data) {
       }
       await insertOrUpdateCycle(cycle)
     }
-  if (receipts) await processReceiptData(receipts)
+  if (receipts) {
+    await processReceiptData(receipts)
+  }
   if (originalTxsData) await processOriginalTxData(originalTxsData)
 }

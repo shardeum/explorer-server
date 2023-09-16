@@ -152,7 +152,7 @@ export interface NodeAccount extends BaseAccount {
 export interface WrappedAccount {
   accountId: string
   stateId: string
-  data: any
+  data: WrappedEVMAccount & WrappedDataReceipt
   timestamp: number
   accountCreated?: boolean
 }
