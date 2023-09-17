@@ -1276,7 +1276,7 @@ export async function queryTransactionsByTimestamp(
           sql += `AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?)`
           values.push(address, filterAddress, filterAddress, filterAddress, TransactionType.EVM_Internal)
         } else {
-          sql = `AND contractAddress=? AND NOT (tokenType=?)`
+          sql += `AND contractAddress=? AND NOT (tokenType=?)`
           values.push(address, TransactionType.EVM_Internal)
         }
       }
