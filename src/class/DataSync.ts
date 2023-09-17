@@ -1,5 +1,4 @@
 import axios from 'axios'
-import * as crypto from '@shardus/crypto-utils'
 import * as Account from '../storage/account'
 import * as Transaction from '../storage/transaction'
 import * as Cycle from '../storage/cycle'
@@ -552,7 +551,7 @@ export async function downloadOriginalTxsDataByCycle(
         page++
         if (config.verbose)
           console.log('totalDownloadOriginalTxsData', totalDownloadOriginalTxsData, downloadedOriginalTxsData)
-        if (totalDownloadOriginalTxsData === downloadedOriginalTxsData) {
+        if (totalDownloadOriginalTxsData === originalTxsData) {
           console.log('totalDownloadOriginalTxsData for cycle', cycle, totalDownloadOriginalTxsData)
           break
         }

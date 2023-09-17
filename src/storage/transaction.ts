@@ -9,10 +9,8 @@ import {
   TransactionSearchType,
   WrappedEVMAccount,
   WrappedDataReceipt,
-  WrappedAccount,
   InternalTXType,
 } from '../types'
-import ERC20ABI from 'human-standard-token-abi'
 import Web3 from 'web3'
 import * as Account from './account'
 import { decodeTx, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
@@ -762,7 +760,7 @@ export async function queryTransactionsBetweenCycles(
       }
     } else if (txType) {
       if (txType === TransactionSearchType.AllExceptInternalTx) {
-        const ty = TransactionType.InternalTxReceipt
+        // const ty = TransactionType.InternalTxReceipt
         // const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? and ? AND transactionType!=? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
         // transactions = await db.all(sql, [start, end, ty])
 
@@ -930,7 +928,7 @@ export async function queryTransactionCountBetweenCycles(
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ?`
         transactions = await db.get(sql, [start, end])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
-        const ty = TransactionType.InternalTxReceipt
+        // const ty = TransactionType.InternalTxReceipt
         const sql = `SELECT COUNT(*) FROM transactions WHERE cycle BETWEEN ? and ? AND (transactionType=? OR transactionType=? OR transactionType=?)`
         transactions = await db.get(sql, [
           start,
@@ -1278,7 +1276,7 @@ export async function queryTransactionsByTimestamp(
           sql += `AND contractAddress=? AND (tokenFrom=? OR tokenTo=? OR tokenOperator=?) AND NOT (tokenType=?)`
           values.push(address, filterAddress, filterAddress, filterAddress, TransactionType.EVM_Internal)
         } else {
-          const sql = `AND contractAddress=? AND NOT (tokenType=?)`
+          sql = `AND contractAddress=? AND NOT (tokenType=?)`
           values.push(address, TransactionType.EVM_Internal)
         }
       }

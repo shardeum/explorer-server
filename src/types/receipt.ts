@@ -1,5 +1,5 @@
-import { Transaction } from './transaction'
-import { WrappedAccount, WrappedDataReceipt, WrappedEVMAccount } from './account'
+import { Log, Transaction } from './transaction'
+import { WrappedAccount } from './account'
 export interface Receipt {
   receiptId: string
   tx: Transaction // TODO: Correct type
@@ -23,7 +23,7 @@ export interface ReadableReceipt {
   blockHash: string
   cumulativeGasUsed: string
   gasUsed: string
-  logs: any[]
+  logs: Log[]
   logBloom: string
   contractAddress: string | null
   from: string

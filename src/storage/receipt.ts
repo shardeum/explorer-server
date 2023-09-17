@@ -89,7 +89,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
     const storageKeyValueMap = {}
     for (const account of accounts) {
       const accountType = account.data.accountType as AccountType
-      let accObj = {
+      const accObj = {
         accountId: account.accountId,
         cycle: cycle,
         timestamp: account.timestamp,

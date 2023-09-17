@@ -15,7 +15,7 @@ export interface Data {
   }
 }
 
-export async function validateData(data: Data) {
+export async function validateData(data: Data): Promise<void> {
   let err = utils.validateTypes(data, {
     sign: 'o',
     receipts: 'a?',
