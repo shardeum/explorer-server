@@ -15,13 +15,12 @@ import {
   downloadAndSyncGenesisAccounts,
   needSyncing,
   toggleNeedSyncing,
-  lastSyncedCycle,
   updateLastSyncedCycle,
   downloadReceiptsBetweenCycles,
   compareWithOldOriginalTxsData,
   downloadOriginalTxsDataBetweenCycles,
 } from './class/DataSync'
-import { setupLogServerSender, forwardReceiptData } from './logSubscription/LogServerSender'
+import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
@@ -32,8 +31,6 @@ if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
 }
 
-// constants
-const ArchiverCycleWsEvent = 'ARCHIVED_CYCLE'
 const ArchiverReceiptWsEvent = 'RECEIPT'
 
 export const checkAndSyncData = async (): Promise<void> => {
@@ -167,7 +164,7 @@ export const checkAndSyncData = async (): Promise<void> => {
 // Setup Log Directory
 const start = async (): Promise<void> => {
   await Storage.initializeDB()
-  await setupLogServerSender()
+  await setupCollectorSocketServer()
 
   const archiverUrl = await getDefaultArchiverUrl()
 

@@ -4,7 +4,7 @@ import { config } from '../config'
 import { IndexedLogs, extractLogsFromReceipts } from './CollectorDataParser'
 import { getLogSocketClient, logSubscriptionMap } from './SocketManager'
 import { Cycle, Receipt } from '../types'
-import { CycleDataWsEvent, ReceiptDataWsEvent } from './LogServerSender'
+import { CycleDataWsEvent, ReceiptDataWsEvent } from './CollectorSocketconnection'
 
 export const setupCollectorListener = async (): Promise<void> => {
   const socket = socketClient.connect(`http://${config.host}:${config.port.collector}`, {

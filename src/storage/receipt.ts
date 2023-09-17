@@ -6,12 +6,13 @@ import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
 import { bufferToHex } from 'ethereumjs-util'
-import { forwardReceiptData } from '../logSubscription/LogServerSender'
+import { forwardReceiptData } from '../logSubscription/CollectorSocketconnection'
 
 type DbReceipt = Receipt & {
   tx: string
   beforeStateAccounts: string
   accounts: string
+  receipt: string
   result: string
   sign: string
 }
@@ -67,8 +68,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
   }
   const bucketSize = 1000
   let combineReceipts: Receipt[] = []
-  let combineAccounts1: Account.Account[] = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
-  let combineAccounts2: Account.Account[] = [] // For AccountType (NetworkAccount, NodeAccount)
+  let combineAccounts1: Account.Account[] = []
   let combineTransactions: Transaction.Transaction[] = []
   let combineTokenTransactions: TokenTx<object>[] = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2: TokenTx<object>[] = [] // For TransactionType (ERC1155)
@@ -88,22 +88,21 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
     await forwardReceiptData([receiptObj])
     const storageKeyValueMap = {}
     for (const account of accounts) {
-      const accountType = account.data.accountType
-      let accObj: Account.Account
+      const accountType = account.data.accountType as AccountType
+      let accObj = {
+        accountId: account.accountId,
+        cycle: cycle,
+        timestamp: account.timestamp,
+        account: account.data,
+        hash: account.stateId,
+        accountType,
+      } as Account.Account
       if (
         accountType === AccountType.Account ||
         accountType === AccountType.ContractStorage ||
         accountType === AccountType.ContractCode
       ) {
-        accObj = {
-          accountId: account.accountId,
-          cycle: cycle,
-          timestamp: account.timestamp,
-          ethAddress: account.data.ethAddress.toLowerCase(),
-          account: account.data,
-          hash: account.stateId,
-          accountType: account.data.accountType,
-        }
+        accObj.ethAddress = account.data.ethAddress.toLowerCase()
         if (
           accountType === AccountType.Account &&
           'codeHash' in accObj.account &&
@@ -117,33 +116,11 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
             accObj.contractType = contractType
             await Account.insertAccount(accObj)
           } else {
-            if (accountExist.cycle <= accObj.cycle && accountExist.timestamp < accObj.timestamp) {
+            if (accountExist.timestamp < accObj.timestamp) {
               await Account.updateAccount(accObj.accountId, accObj)
             }
           }
           continue
-        }
-        const index = combineAccounts1.findIndex((a) => {
-          return a.accountId === accObj.accountId
-        })
-        if (index > -1) {
-          // index comes from an index found in the array
-          // eslint-disable-next-line security/detect-object-injection
-          const accountExist = combineAccounts1[index]
-          if (accountExist.cycle < accObj.cycle && accountExist.timestamp < accObj.timestamp) {
-            combineAccounts1.splice(index, 1)
-            combineAccounts1.push(accObj)
-          }
-        } else {
-          const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
-          if (config.verbose) console.log('accountExist', accountExist)
-          if (!accountExist) {
-            combineAccounts1.push(accObj)
-          } else {
-            if (accountExist.cycle <= accObj.cycle && accountExist.timestamp < accObj.timestamp) {
-              await Account.updateAccount(accObj.accountId, accObj)
-            }
-          }
         }
         if (accountType === AccountType.ContractStorage && 'key' in accObj.account) {
           storageKeyValueMap[accObj.account.key + accObj.ethAddress] = accObj.account
@@ -153,33 +130,26 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
         accountType === AccountType.NodeAccount ||
         accountType === AccountType.NodeAccount2
       ) {
-        accObj = {
-          accountId: account.accountId,
-          cycle: cycle,
-          timestamp: account.timestamp,
-          ethAddress: account.accountId, // Adding accountId as ethAddess for these account types for now; since we need ethAddress for mysql index
-          account: account.data,
-          hash: account.stateId,
-          accountType,
+        accObj.ethAddress = account.accountId // Adding accountId as ethAddess for these account types for now; since we need ethAddress for mysql index
+      }
+      const index = combineAccounts1.findIndex((a) => {
+        return a.accountId === accObj.accountId
+      })
+      if (index > -1) {
+        // eslint-disable-next-line security/detect-object-injection
+        const accountExist = combineAccounts1[index]
+        if (accountExist.cycle < accObj.cycle && accountExist.timestamp < accObj.timestamp) {
+          combineAccounts1.splice(index, 1)
+          combineAccounts1.push(accObj)
         }
-        const index = combineAccounts2.findIndex((a) => a.accountId === accObj.accountId)
-        if (index > -1) {
-          // index comes from an index found in the array
-          // eslint-disable-next-line security/detect-object-injection
-          const accountExist = combineAccounts2[index]
-          if (accountExist.cycle <= accObj.cycle && accountExist.timestamp < accObj.timestamp) {
-            combineAccounts2.splice(index, 1)
-            combineAccounts2.push(accObj)
-          }
+      } else {
+        const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
+        if (config.verbose) console.log('accountExist', accountExist)
+        if (!accountExist) {
+          combineAccounts1.push(accObj)
         } else {
-          const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
-          if (config.verbose) console.log('accountExist', accountExist)
-          if (!accountExist) {
-            combineAccounts2.push(accObj)
-          } else {
-            if (accountExist.cycle <= accObj.cycle && accountExist.timestamp < accObj.timestamp) {
-              await Account.updateAccount(accObj.accountId, accObj)
-            }
+          if (accountExist.timestamp < accObj.timestamp) {
+            await Account.updateAccount(accObj.accountId, accObj)
           }
         }
       }
@@ -306,10 +276,6 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
       await Account.bulkInsertAccounts(combineAccounts1)
       combineAccounts1 = []
     }
-    if (combineAccounts2.length >= bucketSize) {
-      await Account.bulkInsertAccounts(combineAccounts2)
-      combineAccounts2 = []
-    }
     if (combineTransactions.length >= bucketSize) {
       await Transaction.bulkInsertTransactions(combineTransactions)
       combineTransactions = []
@@ -329,7 +295,6 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
   }
   if (combineReceipts.length > 0) await bulkInsertReceipts(combineReceipts)
   if (combineAccounts1.length > 0) await Account.bulkInsertAccounts(combineAccounts1)
-  if (combineAccounts2.length > 0) await Account.bulkInsertAccounts(combineAccounts2)
   if (combineTransactions.length > 0) await Transaction.bulkInsertTransactions(combineTransactions)
   if (combineTokenTransactions.length > 0)
     await Transaction.bulkInsertTokenTransactions(combineTokenTransactions)
@@ -349,6 +314,7 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
         (receipt as Receipt).beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) (receipt as Receipt).accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
+      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
       if (receipt.sign) (receipt as Receipt).sign = JSON.parse(receipt.sign)
     }
     if (config.verbose) console.log('Receipt receiptId', receipt)
@@ -370,6 +336,7 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
       if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
+      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
     })
 
@@ -393,6 +360,7 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
       if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
+      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
     })
   } catch (e) {
@@ -452,6 +420,7 @@ export async function queryReceiptsBetweenCycles(
       if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
       if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
+      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
       if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
     })
   } catch (e) {

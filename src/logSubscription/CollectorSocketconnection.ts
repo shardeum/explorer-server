@@ -13,7 +13,7 @@ export const ReceiptDataWsEvent = '/data/receipt'
 
 const registeredLogServers = new Map<string, Socket>()
 
-export const setupLogServerSender = (): void => {
+export const setupCollectorSocketServer = (): void => {
   const socketServer = new Server()
 
   socketServer.on(ConnectionEvent, (socket) => {
