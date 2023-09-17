@@ -22,10 +22,9 @@ export const ERC20_METHOD_DIC = {
   '0xa978501e': 'transferFrom',
 }
 
-export let Collection: unknown
-
 type DbTransaction = Transaction & {
   wrappedEVMAccount: string
+  originalTxData: string
   contractInfo: string
   result: string
 }
@@ -584,6 +583,8 @@ export async function queryTransactions(
     transactions.forEach((transaction: DbTokenTx | DbTransaction) => {
       if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
         (transaction as Transaction).wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+      if ('originalTxData' in transaction && transaction.originalTxData)
+        (transaction as Transaction).originalTxData = JSON.parse(transaction.originalTxData)
       if ('result' in transaction && transaction.result)
         (transaction as Transaction).result = JSON.parse(transaction.result)
       if ('contractInfo' in transaction && transaction.contractInfo)
@@ -605,6 +606,7 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
     if (transaction) {
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+      if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
       if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
     }
     if (detail) {
@@ -632,6 +634,7 @@ export async function queryTransactionByHash(txHash: string, detail = false): Pr
         const transaction = transactions[i]
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
         if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
         if (detail) {
           const sql = `SELECT * FROM tokenTxs WHERE txId=? ORDER BY cycle DESC, timestamp DESC`
@@ -662,6 +665,7 @@ export async function queryTransactionsForCycle(cycleNumber: number): Promise<Tr
       transactions.forEach((transaction: DbTransaction) => {
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
         if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
         if (transaction.contractInfo)
           (transaction as Transaction).contractInfo = JSON.parse(transaction.contractInfo)
@@ -828,6 +832,8 @@ export async function queryTransactionsBetweenCycles(
       transactions.forEach((transaction) => {
         if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if ('originalTxData' in transaction && transaction.originalTxData)
+          transaction.originalTxData = JSON.parse(transaction.originalTxData)
         if ('result' in transaction && transaction.result)
           (transaction as Transaction).result = JSON.parse(transaction.result)
         if ('contractInfo' in transaction && transaction.contractInfo)
@@ -1328,6 +1334,8 @@ export async function queryTransactionsByTimestamp(
       transactions.forEach((transaction) => {
         if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+        if ('originalTxData' in transaction && transaction.originalTxData)
+          transaction.originalTxData = JSON.parse(transaction.originalTxData)
         if ('result' in transaction && transaction.result)
           (transaction as Transaction).result = JSON.parse(transaction.result)
         if ('contractInfo' in transaction && transaction.contractInfo)
