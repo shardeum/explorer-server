@@ -3,7 +3,7 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 import { InternalTXType, TransactionType, OriginalTxData, TransactionSearchType } from '../types'
 import { getTransactionObj, isStakingEVMTx, getStakeTxBlobFromEVMTx } from '../utils/decodeEVMRawTx'
-import { bufferToHex } from 'ethereumjs-util'
+import { bytesToHex } from '@ethereumjs/util'
 
 type DbOriginalTxData = OriginalTxData & {
   originalTxData: string
@@ -74,7 +74,7 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
           }
           combineOriginalTxsData.push({
             ...originalTxData,
-            txHash: bufferToHex(txObj.hash()),
+            txHash: bytesToHex(txObj.hash()),
             transactionType,
           })
         } else {
@@ -134,12 +134,12 @@ export async function queryOriginalTxDataCount(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txType === TransactionSearchType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : txType === TransactionSearchType.UnstakeReceipt
-            ? TransactionType.UnstakeReceipt
-            : TransactionType.InternalTxReceipt
+              ? TransactionType.NodeRewardReceipt
+              : txType === TransactionSearchType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : txType === TransactionSearchType.UnstakeReceipt
+                  ? TransactionType.UnstakeReceipt
+                  : TransactionType.InternalTxReceipt
         sql += ` transactionType=?`
         values.push(ty)
       }
@@ -191,12 +191,12 @@ export async function queryOriginalTxsData(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-            ? TransactionType.NodeRewardReceipt
-            : txType === TransactionSearchType.StakeReceipt
-            ? TransactionType.StakeReceipt
-            : txType === TransactionSearchType.UnstakeReceipt
-            ? TransactionType.UnstakeReceipt
-            : TransactionType.InternalTxReceipt
+              ? TransactionType.NodeRewardReceipt
+              : txType === TransactionSearchType.StakeReceipt
+                ? TransactionType.StakeReceipt
+                : txType === TransactionSearchType.UnstakeReceipt
+                  ? TransactionType.UnstakeReceipt
+                  : TransactionType.InternalTxReceipt
         sql += ` transactionType=?`
         values.push(ty)
       }

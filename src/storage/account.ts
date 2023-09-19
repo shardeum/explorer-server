@@ -2,7 +2,7 @@ import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 import { AccountType, AccountSearchType, WrappedEVMAccount, Account, Token, ContractType } from '../types'
-import { bufferToHex } from 'ethereumjs-util'
+import { bytesToHex } from '@ethereumjs/util'
 import { getContractInfo } from '../class/TxDecoder'
 
 type DbAccount = Account & {
@@ -332,8 +332,7 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
   console.log('accounts size', accounts.length)
   if (accounts && accounts.length <= 0) return []
   const bucketSize = 1000
-  let combineAccounts1: Account[] = [] // For AccountType (Account(EOA), ContractStorage, ContractCode)
-  let combineAccounts2: Account[] = [] // For AccountType (NetworkAccount, NodeAccount)
+  let combineAccounts: Account[] = []
 
   const transactions: Account[] = []
 
@@ -345,54 +344,40 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
       continue
     }
     const accountType = account.data.accountType
-    let accObj: Account
+    const accObj = {
+      accountId: account.accountId,
+      cycle: account.cycleNumber,
+      timestamp: account.timestamp,
+      account: account.data,
+      hash: account.hash,
+      accountType,
+    } as unknown as Account
     if (
       accountType === AccountType.Account ||
       accountType === AccountType.ContractStorage ||
       accountType === AccountType.ContractCode
     ) {
-      accObj = {
-        accountId: account.accountId,
-        cycle: account.cycleNumber,
-        timestamp: account.timestamp,
-        ethAddress: account.data.ethAddress.toLowerCase(),
-        account:
-          accountType === AccountType.Account
-            ? account.data.account
-            : (account.data as unknown as WrappedEVMAccount),
-        hash: account.hash,
-        accountType: account.data.accountType,
-      }
+      accObj.ethAddress = account.data.ethAddress.toLowerCase()
       if (
         accountType === AccountType.Account &&
-        'codeHash' in accObj.account &&
-        accObj.account.codeHash.data &&
-        bufferToHex(accObj.account.codeHash.data) !== EOA_CodeHash
+        'account' in accObj.account &&
+        bytesToHex(Uint8Array.from(Object.values(accObj.account.account.codeHash))) !== EOA_CodeHash
       ) {
         const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
         accObj.contractInfo = contractInfo
         accObj.contractType = contractType
         await insertAccount(accObj)
         continue
-      } else {
-        combineAccounts1.push(accObj)
       }
     } else if (
       accountType === AccountType.NetworkAccount ||
+      accountType === AccountType.DevAccount ||
       accountType === AccountType.NodeAccount ||
       accountType === AccountType.NodeAccount2
     ) {
-      accObj = {
-        accountId: account.accountId,
-        cycle: account.cycleNumber,
-        timestamp: account.timestamp,
-        ethAddress: account.accountId, // Adding accountId as ethAddess for these account types for now; since we need ethAddress for mysql index
-        account: account.data as unknown as WrappedEVMAccount,
-        hash: account.hash,
-        accountType: account.data.accountType,
-      }
-      combineAccounts2.push(accObj)
+      accObj.ethAddress = account.accountId // Adding accountId as ethAddess for these account types for now; since we need ethAddress for mysql index
     }
+    combineAccounts.push(accObj)
     if (
       accountType === AccountType.Receipt ||
       accountType === AccountType.NodeRewardReceipt ||
@@ -401,16 +386,11 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
     ) {
       transactions.push(account as unknown as Account)
     }
-    if (combineAccounts1.length >= bucketSize) {
-      await bulkInsertAccounts(combineAccounts1)
-      combineAccounts1 = []
-    }
-    if (combineAccounts2.length >= bucketSize) {
-      await bulkInsertAccounts(combineAccounts2)
-      combineAccounts2 = []
+    if (combineAccounts.length >= bucketSize) {
+      await bulkInsertAccounts(combineAccounts)
+      combineAccounts = []
     }
   }
-  if (combineAccounts1.length > 0) await bulkInsertAccounts(combineAccounts1)
-  if (combineAccounts2.length > 0) await bulkInsertAccounts(combineAccounts2)
+  if (combineAccounts.length > 0) await bulkInsertAccounts(combineAccounts)
   return transactions
 }

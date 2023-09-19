@@ -45,5 +45,5 @@ export const forwardReceiptData = async (data: Receipt[]): Promise<void> => {
   for (const socket of registeredLogServers.values()) {
     socket.emit(ReceiptDataWsEvent, data)
   }
-  console.log(`Forwarded receipt data to ${registeredLogServers.size} LogServers`)
+  // console.log(`Forwarded receipt data to ${registeredLogServers.size} LogServers`)
 }

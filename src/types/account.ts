@@ -1,4 +1,4 @@
-import { Account as EVMAccount } from 'ethereumjs-util'
+import { Account as EVMAccount } from '@ethereumjs/util'
 import { TxReceipt } from '@ethereumjs/vm/dist/types'
 import { ReadableReceipt } from './receipt'
 import { ERC20ContractDetail, NetworkParameters } from '.'
@@ -107,15 +107,15 @@ export interface WrappedDataContractStorage {
   key: string
 
   /** EVM buffer value if this is of type CA_KVP */
-  value: Buffer
+  value: Uint8Array
 }
 
 /** Variant data: contract code related and addresses */
 export interface WrappedDataContractCode {
   accountType: AccountType.ContractCode
 
-  codeByte: Buffer
-  codeHash: { data: Buffer }
+  codeByte: Uint8Array
+  codeHash: Uint8Array
   contractAddress: string
 }
 

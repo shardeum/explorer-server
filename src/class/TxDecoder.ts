@@ -7,7 +7,8 @@ import { config } from '../config/index'
 import ERC20_ABI from '../utils/abis/ERC20.json'
 import ERC721_ABI from '../utils/abis/ERC721.json'
 import ERC1155_ABI from '../utils/abis/ERC1155.json'
-import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
+import { toBytes } from '@ethereumjs/util'
+import { RLP } from '@ethereumjs/rlp'
 import { Erc1155Abi, Erc721Abi } from '../types/abis'
 import { padAndPrefixBlockNumber } from '../utils/index'
 
@@ -344,7 +345,8 @@ export const decodeTx = async (
               const value = contractStorage
                 ? contractStorage.account['value']
                 : storageKeyValueMap[calculatedKey + log.address].value
-              const decode = rlp.decode(toBuffer(bufferToHex(value.data))).toString('hex')
+              const decode = RLP.decode(toBytes(value.data))
+              console.log('decode', decode)
               // if (tokenTx.tokenType === TransactionType.ERC_20) {
               //   tokenValue = Web3.utils.fromWei(decode, 'ether')
               // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
@@ -353,7 +355,7 @@ export const decodeTx = async (
               // console.log('decode', decode)
               // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
               tokenValue = decode?.length > 0 ? Web3.utils.hexToNumberString('0x' + decode) : '0'
-              // console.log(calculatedKey, tokenValue)
+              console.log(calculatedKey, tokenValue)
             }
             tokens.push({
               ethAddress: tokenTx.tokenFrom,
@@ -405,7 +407,9 @@ export const decodeTx = async (
                 ? contractStorage.account['value']
                 : storageKeyValueMap[calculatedKey + log.address].value
               // console.log(storageKeyValueMap[calculatedKey + log.address].value)
-              const decode = rlp.decode(toBuffer(bufferToHex(value.data))).toString('hex')
+              const decode = RLP.decode(value)
+
+              console.log()
               // if (tokenTx.tokenType === TransactionType.ERC_20) {
               //   tokenValue = Web3.utils.fromWei(decode, 'ether')
               // } else if (tokenTx.tokenType === TransactionType.ERC_721) {

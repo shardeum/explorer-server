@@ -749,7 +749,7 @@ const start = async (): Promise<void> => {
                 to: txObj.to ? txObj.to.toString() : null,
                 nonce: txObj.nonce.toString(16),
                 value: txObj.value.toString(16),
-                data: '0x' + txObj.data.toString('hex'),
+                data: '0x' + txObj.data.toString(),
                 // contractAddress // TODO: add contract address
               }
               if (
@@ -1165,7 +1165,7 @@ const start = async (): Promise<void> => {
               to: txObj.to ? txObj.to.toString() : null,
               nonce: txObj.nonce.toString(16),
               value: txObj.value.toString(16),
-              data: '0x' + txObj.data.toString('hex'),
+              data: '0x' + txObj.data.toString(),
               // contractAddress // TODO: add contract address
             }
             if (

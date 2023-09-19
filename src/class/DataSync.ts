@@ -396,7 +396,7 @@ export const checkIfAnyTxsDataMissing = async (cycle: number): Promise<void> => 
       cycleToSyncTo
     )
     console.log(
-      `Check receipts data between ${lastSyncedCycle + 1} and ${cycleToSyncTo}`,
+      `Check originalTxsData data between ${lastSyncedCycle + 1} and ${cycleToSyncTo}`,
       'unMatchedCycleForOriginalTxsData',
       unMatchedCycleForOriginalTxsData
     )

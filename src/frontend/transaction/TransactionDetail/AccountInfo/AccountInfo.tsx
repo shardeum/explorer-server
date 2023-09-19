@@ -1,7 +1,8 @@
 import React from 'react'
 import { AccountType } from '../../../../types'
 import { calculateValue } from '../../../utils/calculateValue'
-import { rlp, toBuffer, bufferToHex } from 'ethereumjs-util'
+import { toBytes, bytesToHex } from '@ethereumjs/util'
+import { RLP } from '@ethereumjs/rlp'
 
 import styles from './AccountInfo.module.scss'
 import web3 from 'web3'
@@ -51,9 +52,9 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
         ethAddress: account?.data?.ethAddress,
         accountType: 'Contract Storage',
         storageKey: account?.data?.key,
-        valueRaw: rlp.decode(toBuffer(bufferToHex(account?.data?.value?.data))).toString('hex'),
+        valueDec: RLP.decode(toBytes(account?.data?.value?.data)).toString(),
         decodedValueDec: web3.utils.hexToNumberString(
-          '0x' + rlp.decode(toBuffer(bufferToHex(account?.data?.value?.data))).toString('hex')
+          '0x' + RLP.decode(toBytes(account?.data?.value?.data)).toString()
         ),
       }
     else if (account?.data?.accountType === AccountType.ContractCode)
@@ -62,8 +63,8 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ receipt }) => {
         ethAddress: account?.data?.ethAddress,
         contractAddress: account?.data?.contractAddress,
         accountType: 'Contract Code',
-        codeHash: bufferToHex(account?.data?.codeHash?.data),
-        codeByte: bufferToHex(account?.data?.codeByte?.data),
+        codeHash: bytesToHex(toBytes(account?.data?.codeHash?.data)),
+        codeByte: bytesToHex(toBytes(account?.data?.codeByte?.data)),
       }
   })
   return (

@@ -164,11 +164,10 @@ export const checkAndSyncData = async (): Promise<void> => {
 // Setup Log Directory
 const start = async (): Promise<void> => {
   await Storage.initializeDB()
-  await setupCollectorSocketServer()
-
   const archiverUrl = await getDefaultArchiverUrl()
 
   await checkAndSyncData()
+  setupCollectorSocketServer()
   try {
     const socketClient = ioclient.connect(archiverUrl)
     socketClient.on('connect', () => {

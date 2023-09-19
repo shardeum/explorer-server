@@ -5,7 +5,7 @@ import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccoun
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
-import { bufferToHex } from 'ethereumjs-util'
+import { bytesToHex } from '@ethereumjs/util'
 import { forwardReceiptData } from '../logSubscription/CollectorSocketconnection'
 
 type DbReceipt = Receipt & {
@@ -105,8 +105,8 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
         accObj.ethAddress = account.data.ethAddress.toLowerCase()
         if (
           accountType === AccountType.Account &&
-          'codeHash' in accObj.account &&
-          bufferToHex(accObj.account.codeHash.data) !== EOA_CodeHash
+          'account' in accObj.account &&
+          bytesToHex(Uint8Array.from(Object.values(accObj.account.account.codeHash))) !== EOA_CodeHash
         ) {
           const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
@@ -127,6 +127,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
         }
       } else if (
         accountType === AccountType.NetworkAccount ||
+        accountType === AccountType.DevAccount ||
         accountType === AccountType.NodeAccount ||
         accountType === AccountType.NodeAccount2
       ) {
