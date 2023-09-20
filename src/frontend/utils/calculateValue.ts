@@ -5,6 +5,7 @@ import BN from 'bn.js'
 import {fromWeiNoTrailingComma} from "./fromWeiNoTrailingComma";
 
 export const calculateValue = (value: string | BN): string => {
+  console.log(value)
   try {
     return round(fromWeiNoTrailingComma(value, 'ether'))
   } catch (e) {

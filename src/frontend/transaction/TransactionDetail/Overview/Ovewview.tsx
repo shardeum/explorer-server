@@ -157,7 +157,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                 <div className={styles.title}>Nonce:</div>
                 <div className={styles.value}>
                   {transaction?.originalTxData?.readableReceipt?.nonce &&
-                    web3.utils.hexToNumber('0x' + transaction?.originalTxData?.readableReceipt?.nonce)}
+                    web3.utils.hexToNumber(transaction?.originalTxData?.readableReceipt?.nonce)}
                 </div>
               </div>
 
@@ -192,7 +192,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
               <div className={styles.item}>
                 <div className={styles.title}>Value:</div>
                 <div className={styles.value}>
-                  {calculateFullValue(`0x${transaction?.originalTxData?.readableReceipt?.value}`)} SHM
+                  {calculateFullValue(`${transaction?.originalTxData?.readableReceipt?.value}`)} SHM
                 </div>
               </div>
               {transaction?.originalTxData?.readableReceipt?.internalTxData && (
@@ -269,7 +269,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             <div className={styles.title}>Nonce:</div>
             <div className={styles.value}>
               {transaction?.wrappedEVMAccount?.readableReceipt?.nonce &&
-                web3.utils.hexToNumber('0x' + transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
+                web3.utils.hexToNumber(transaction?.wrappedEVMAccount?.readableReceipt?.nonce)}
             </div>
           </div>
 
@@ -360,14 +360,14 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Value:</div>
             <div className={styles.value}>
-              {calculateFullValue(`0x${transaction?.wrappedEVMAccount?.readableReceipt?.value}`)} SHM
+              {calculateFullValue(`${transaction?.wrappedEVMAccount?.readableReceipt?.value}`)} SHM
             </div>
           </div>
 
           <div className={styles.item}>
             <div className={styles.title}>Transaction Fee:</div>
             <div className={styles.value}>
-              {calculateFullValue(`0x${transaction?.wrappedEVMAccount?.amountSpent}` || '0')}
+              {calculateFullValue(`${transaction?.wrappedEVMAccount?.amountSpent}` || '0')}
             </div>
           </div>
 

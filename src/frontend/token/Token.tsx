@@ -129,7 +129,7 @@ export const Token: React.FC = () => {
                 items={[
                   {
                     key: 'Balance :',
-                    value: fromWeiNoTrailingComma(`0x${account?.account?.balance}`, 'ether'),
+                    value: fromWeiNoTrailingComma(`0x${account?.account?.account?.balance}`, 'ether'),
                   },
                   {
                     key: 'Max Total Supply :',

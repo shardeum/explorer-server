@@ -174,12 +174,13 @@ export const AccountDetail: React.FC = () => {
                     items={[
                       {
                         key: 'Balance :',
-                        value: calculateValue(`0x${account?.account?.balance}`) + '   SHM',
+                        value: calculateValue(`0x${account?.account?.account?.balance}`) + '   SHM',
                       },
                       {
                         key: 'Nonce :',
                         value:
-                          account?.account?.nonce && web3.utils.hexToNumber('0x' + account?.account?.nonce),
+                          account?.account?.account?.nonce &&
+                          web3.utils.hexToNumber(`0x${account?.account?.account?.nonce}`),
                       },
                       {
                         key: 'Tokens :',

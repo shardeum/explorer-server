@@ -109,12 +109,12 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'wrappedEVMAccount.readableReceipt.value',
           value: 'Value',
-          render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
+          render: (val: string | TransactionType) => calculateValue(`${val}` as string),
         },
         {
           key: 'wrappedEVMAccount.amountSpent',
           value: 'Txn Fee',
-          render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
+          render: (val: string | TransactionType) => calculateValue(`${val}` as string),
         },
       ]
     }
@@ -179,7 +179,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'transactionFee',
           value: 'Txn Fee',
-          render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
+          render: (val: string | TransactionType) => calculateValue(`${val}` as string),
         },
       ]
     }
@@ -216,7 +216,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'transactionFee',
           value: 'Txn Fee',
-          render: (val: TransactionType | string) => calculateValue(`0x${val}` as string),
+          render: (val: TransactionType | string) => calculateValue(`${val}` as string),
         },
       ]
     }
@@ -263,7 +263,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'transactionFee',
           value: 'Txn Fee',
-          render: (val: string | TransactionType) => calculateValue(`0x${val}` as string),
+          render: (val: string | TransactionType) => calculateValue(`${val}` as string),
         },
       ]
     }
@@ -290,7 +290,7 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
         {
           key: 'originalTxData.readableReceipt.value',
           value: 'Value',
-          render: (val: string) => calculateValue(`0x${val}` as string),
+          render: (val: string) => calculateValue(`${val}` as string),
         },
       ]
     }

@@ -186,7 +186,8 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
           // Calculate total gas burnt in cycle
           const gasBurnt = transactions.reduce((sum, current) => {
             if ('amountSpent' in current.wrappedEVMAccount && current.wrappedEVMAccount.amountSpent) {
-              const amountSpentBN = new BN(current.wrappedEVMAccount.amountSpent, 16)
+              // remove prefix 0x from amountSpent hex string
+              const amountSpentBN = new BN(current.wrappedEVMAccount.amountSpent.substring(2), 16)
               return sum.add(amountSpentBN)
             } else {
               return sum
