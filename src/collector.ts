@@ -28,7 +28,7 @@ import { config as CONFIG } from './config'
 import axios from 'axios'
 import { getDefaultArchiverUrl } from './archiver'
 if (process.env.PORT) {
-  CONFIG.port.collector = process.env.PORT
+  CONFIG.collector.port = Number(process.env.PORT)
 }
 
 const ArchiverReceiptWsEvent = 'RECEIPT'

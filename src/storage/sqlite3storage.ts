@@ -1,9 +1,10 @@
 import sqlite3Lib from 'sqlite3'
+import { config } from '../config/index'
 const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 
 export async function init(): Promise<void> {
-  db = new sqlite3.Database('db.sqlite3')
+  db = new sqlite3.Database(`${config.dbPath}/db.sqlite3`)
   await run('PRAGMA journal_mode=WAL')
   console.log('Database initialized.')
 }

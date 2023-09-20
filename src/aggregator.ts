@@ -15,7 +15,7 @@ crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 // config variables
 import { config as CONFIG } from './config'
 if (process.env.PORT) {
-  CONFIG.port.server = process.env.PORT
+  CONFIG.server.port = Number(process.env.PORT)
 }
 
 const measure_time = false

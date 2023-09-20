@@ -1,0 +1,47 @@
+---
+version: '3'
+services:
+  collector:
+    image: shardeum/explorer:dev
+    build:
+      context: .
+    restart: unless-stopped
+    network_mode: container:shardeum-test-container
+    command: ['run', 'collector']
+    volumes:
+      - ./data/:/app/data/
+    env_file: .env
+    configs:
+      - source: archiverconfig
+        target: /home/node/app/archiverConfig.json
+
+  explorer:
+    image: shardeum/explorer:dev
+    extends:
+      service: collector
+    depends_on: [collector]
+    command: ['run', 'server', '6001']
+    healthcheck:
+      test: ['CMD', 'curl', '-L', '--fail', 'localhost:6001']
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rpc-data-server:
+    image: shardeum/explorer:dev
+    extends:
+      service: collector
+    depends_on: [collector]
+    command: ['run', 'rpc_data_server', '4445']
+
+  aggregator:
+    image: shardeum/explorer:dev
+    extends:
+      service: collector
+    depends_on: [collector]
+    command: ['run', 'aggregator']
+
+configs:
+  archiverconfig:
+    file: ./archiverConfig.json

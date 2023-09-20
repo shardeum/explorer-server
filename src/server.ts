@@ -52,15 +52,15 @@ import { bytesToHex, bigIntToHex } from '@ethereumjs/util'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 if (process.env.PORT) {
-  CONFIG.port.server = process.env.PORT
+  CONFIG.server.port = Number(process.env.PORT)
 }
 
 console.log(process.argv)
 const port = process.argv[2]
 if (port) {
-  CONFIG.port.server = port
+  CONFIG.server.port = Number(port)
 }
-console.log('Port', CONFIG.port.server)
+console.log('Port', CONFIG.server.port)
 
 interface RequestQuery {
   page: string
@@ -141,7 +141,7 @@ const start = async (): Promise<void> => {
   server.get('/usage/metrics', usage.usageMetricsHandler)
 
   server.get('/port', (req, reply) => {
-    reply.send({ port: CONFIG.port.server })
+    reply.send({ port: CONFIG.server.port })
   })
 
   server.get('/api/cycleinfo', async (_request, reply) => {
@@ -1470,8 +1470,8 @@ const start = async (): Promise<void> => {
 
   server.listen(
     {
-      port: Number(CONFIG.port.server),
-      host: '0.0.0.0',
+      port: CONFIG.server.port,
+      host: CONFIG.server.host,
     },
     async (err) => {
       if (err) {
@@ -1479,7 +1479,7 @@ const start = async (): Promise<void> => {
         console.log(err)
         throw err
       }
-      console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
+      console.log(`Shardeum explorer server is listening on: ${CONFIG.server.host}:${CONFIG.server.port}`)
     }
   )
 }

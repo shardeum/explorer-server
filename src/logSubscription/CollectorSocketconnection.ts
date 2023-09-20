@@ -30,8 +30,8 @@ export const setupCollectorSocketServer = (): void => {
     })
   })
 
-  socketServer.listen(Number(CONFIG.port.collector))
-  console.log(`LogServer sender listening on port ${CONFIG.port.collector}`)
+  socketServer.listen(Number(CONFIG.collector.port))
+  console.log(`LogServer sender listening on port ${CONFIG.collector.port}`)
 }
 
 export const forwardCycleData = async (data: Data): Promise<void> => {

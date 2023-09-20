@@ -11,9 +11,9 @@ import * as Storage from './storage'
 console.log(process.argv)
 const port = process.argv[2]
 if (port) {
-  config.port.log_server = port
+  config.log_server.port = Number(port)
 }
-console.log('Port', config.port.log_server)
+console.log('Port', config.log_server.port)
 
 const start = async (): Promise<void> => {
   // Init dependencies
@@ -49,15 +49,15 @@ const start = async (): Promise<void> => {
   // Start server
   server.listen(
     {
-      port: Number(config.port.log_server),
-      host: '0.0.0.0',
+      port: config.distributor.port,
+      host: config.distributor.host,
     },
     async (err) => {
       if (err) {
-        server.log.error(`Error starting Log server on port ${config.port.log_server}. Error ${err}`)
+        server.log.error(`Error starting distributor on: ${config.distributor.host}:${config.distributor.port}. Error ${err}`)
         throw err
       }
-      console.log('Log server is listening on port:', config.port.log_server)
+      console.log(`Distributor server is listening on: ${config.distributor.host}:${config.distributor.port}`)
     }
   )
 }

@@ -1,6 +1,7 @@
 import { CoinStats } from './coinStats'
 import { TransactionStats } from './transactionStats'
 import { ValidatorStats } from './validatorStats'
+import { config } from '../config/index'
 
 /***
 This is the copied code from 'storage/sqlite3storage.ts'
@@ -11,7 +12,7 @@ const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 
 export async function init(): Promise<void> {
-  db = new sqlite3.Database('statsDB.sqlite3')
+  db = new sqlite3.Database(`${config.dbPath}/statsDB.sqlite3`)
   await run('PRAGMA journal_mode=WAL')
   console.log('Stats Database initialized.')
 }
