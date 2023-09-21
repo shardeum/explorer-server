@@ -30,8 +30,6 @@ import {
   TransactionType,
 } from './types'
 import * as utils from './utils'
-import { getFromArchiver } from '@shardus/archiver-discovery'
-import './archiver'
 // config variables
 import { config as CONFIG } from './config'
 import {
@@ -363,30 +361,6 @@ const start = async (): Promise<void> => {
       account = await Account.queryAccountByAddress(query.address.toLowerCase(), parseInt(query.accountType))
     else account = await Account.queryAccountByAddress(query.address.toLowerCase())
     if (account) accounts.push(account)
-    if (accounts.length === 0) {
-      try {
-        const queryArchiver = await getFromArchiver('nodelist')
-        const activeNode = queryArchiver.nodeList[0]
-        const result = await axios.get(`http://${activeNode.ip}:${activeNode.port}/account/${query.address}`)
-        if (result.data.error || !result.data.account) {
-          reply.send({
-            success: false,
-            error: 'This account is not found!',
-          })
-          return
-        }
-        accounts.push({
-          account: result.data.account,
-          ethAddress: query.address,
-        })
-      } catch (e) {
-        reply.send({
-          success: false,
-          error: 'This account is not found!',
-        })
-        return
-      }
-    }
     const res: AddressResponse = {
       success: true,
       accounts,

@@ -31,5 +31,3 @@ export const config = {
 }
 
 export const ARCHIVER_INFO = `${config.archiverInfo.ip}:${config.archiverInfo.port}:${config.archiverInfo.publicKey}`
-
-export const RPC_DATA_SERVER_URL = `http://${config.host}:${config.port.rpc_data_collector}`

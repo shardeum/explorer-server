@@ -8,7 +8,8 @@ export interface Log<L = object> {
   cycle: number
   timestamp: number
   txHash: string
-  blockNumber: string
+  blockNumber: number
+  blockHash: string
   contractAddress: string
   log: L
   topic0: string
