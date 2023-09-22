@@ -345,7 +345,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       } else {
         console.log('Genesis Account', 'Invalid download response')
       }
-      startAccount = endAccount + 1
+      startAccount = endAccount
       endAccount += 10000
       page++
       // await sleep(1000);
@@ -375,7 +375,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       } else {
         console.log('Genesis Transaction Receipt', 'Invalid download response')
       }
-      startTransaction = endTransaction + 1
+      startTransaction = endTransaction
       endTransaction += 10000
       page++
     }
