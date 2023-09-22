@@ -30,13 +30,12 @@ export const updateLastSyncedCycle = (cycle: number): void => {
 export async function compareWithOldReceiptsData(
   lastStoredReceiptCycle = 0
 ): Promise<{ success: boolean; matchedCycle: number }> {
+  const numberOfCyclesTocompare = 10
   const endCycle = lastStoredReceiptCycle
-  const startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
+  const startCycle = endCycle - numberOfCyclesTocompare > 0 ? endCycle - numberOfCyclesTocompare : 0
   let downloadedReceiptCountByCycles: { cycle: number; receipts: number }[]
   const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/receipt?startCycle=${lastStoredReceiptCycle - 10}&endCycle=${lastStoredReceiptCycle}`
-  )
+  const response = await axios.get(`${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}`)
   if (response && response.data && response.data.receipts) {
     downloadedReceiptCountByCycles = response.data.receipts
   } else {
@@ -69,8 +68,9 @@ export async function compareWithOldReceiptsData(
 export async function compareWithOldOriginalTxsData(
   lastStoredOriginalTxDataCycle = 0
 ): Promise<{ success: boolean; matchedCycle: number }> {
+  const numberOfCyclesTocompare = 10
   const endCycle = lastStoredOriginalTxDataCycle
-  const startCycle = endCycle - 10 > 0 ? endCycle - 10 : 0
+  const startCycle = endCycle - numberOfCyclesTocompare > 0 ? endCycle - numberOfCyclesTocompare : 0
   let downloadedOriginalTxDataCountByCycles: { cycle: number; originalTxsData: number }[]
   const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
@@ -117,20 +117,25 @@ export const compareWithOldCyclesData = async (
   lastCycleCounter: number
 ): Promise<{ success: boolean; cycle: number }> => {
   let downloadedCycles: Cycle.Cycle[]
+
+  const numberOfCyclesTocompare = 10
   const archiverUrl = await getDefaultArchiverUrl()
   const response = await axios.get(
-    `${archiverUrl}/cycleinfo?start=${lastCycleCounter - 10}&end=${lastCycleCounter - 1}`
+    `${archiverUrl}/cycleinfo?start=${lastCycleCounter - numberOfCyclesTocompare}&end=${lastCycleCounter - 1}`
   )
   if (response && response.data && response.data.cycleInfo) {
     downloadedCycles = response.data.cycleInfo
   } else {
     throw Error(
-      `Can't fetch data from cycle ${lastCycleCounter - 10} to cycle ${
-        lastCycleCounter - 1
-      }  from archiver server`
+      `Can't fetch data from cycle ${
+        lastCycleCounter - numberOfCyclesTocompare
+      } to cycle ${lastCycleCounter}  from archiver server`
     )
   }
-  const oldCycles = await Cycle.queryCycleRecordsBetween(lastCycleCounter - 10, lastCycleCounter + 1)
+  const oldCycles = await Cycle.queryCycleRecordsBetween(
+    lastCycleCounter - numberOfCyclesTocompare,
+    lastCycleCounter + 1
+  )
   downloadedCycles.sort((a, b) => (a.counter > b.counter ? 1 : -1))
   oldCycles.sort((a: { cycleRecord: { counter: number } }, b: { cycleRecord: { counter: number } }) =>
     a.cycleRecord.counter > b.cycleRecord.counter ? 1 : -1
@@ -163,7 +168,7 @@ export const downloadTxsDataAndCycles = async (
   totalCyclesToSync: number,
   fromCycle = 0
 ): Promise<void> => {
-  const bucketSize = 1000
+  const bucketSize = 100
   let completeForReceipt = false
   let completeForCycle = false
   let completeForOriginalTxData = false
@@ -325,7 +330,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       return
     }
     if (totalGenesisAccounts <= 0) return
-    let page = 0
+    let page = 1
     while (!completeSyncingAccounts) {
       console.log(`Downloading accounts from ${startAccount} to ${endAccount}`)
       const response = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5&page=${page}`)
@@ -356,7 +361,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       return
     }
     if (totalGenesisTransactionReceipts <= 0) return
-    let page = 0
+    let page = 1
     while (!completeSyncTransactions) {
       console.log(`Downloading transactions from ${startTransaction} to ${endTransaction}`)
       const response = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5&page=${page}`)

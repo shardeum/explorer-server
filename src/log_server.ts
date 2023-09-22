@@ -15,7 +15,7 @@ const start = async (): Promise<void> => {
 
   // Init server
   const server = Fastify({
-    logger: true,
+    logger: false,
   })
 
   // Register plugins and middleware
@@ -50,7 +50,7 @@ const start = async (): Promise<void> => {
         server.log.error(`Error starting Log server on port ${config.port.log_server}. Error ${err}`)
         throw err
       }
-      console.log('Log server is listening on port:', config.port.log_server)
+      console.log('Log Server is listening on port:', config.port.log_server)
     }
   )
 }

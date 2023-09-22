@@ -1,8 +1,8 @@
 /* eslint-disable no-empty */
 import * as db from './sqlite3storage'
-import {extractValues, extractValuesFromArray} from './sqlite3storage'
-import {config} from '../config/index'
-import {padAndPrefixBlockNumber} from '../utils/index'
+import { extractValues, extractValuesFromArray } from './sqlite3storage'
+import { config } from '../config/index'
+import { padAndPrefixBlockNumber } from '../utils/index'
 
 export interface Log<L = object> {
   cycle: number
@@ -19,10 +19,10 @@ export interface Log<L = object> {
 }
 
 export interface LogQueryRequest {
-  address?: string;
-  topics?: any[];
-  fromBlock?: string;
-  toBlock?: string;
+  address?: string
+  topics?: any[]
+  fromBlock?: string
+  toBlock?: string
 }
 
 type DbLog = Log & {
@@ -66,7 +66,11 @@ export async function bulkInsertLogs(logs: Log[]): Promise<void> {
   }
 }
 
-function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type: string): { sql: string, values: any[] } {
+function buildLogQueryString(
+  request: LogQueryRequest,
+  countOnly: boolean,
+  type: string
+): { sql: string; values: any[] } {
   let sql
   const queryParams = []
   const values = []
@@ -77,27 +81,27 @@ function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type:
     sql = 'SELECT * FROM logs '
   }
   if (request.address) {
-    queryParams.push(`contractAddress=?`);
+    queryParams.push(`contractAddress=?`)
     values.push(request.address)
   }
 
   const createTopicQuery = (topicIndex: number, topicValue: any): void => {
-    const hexPattern = /^0x[a-fA-F0-9]{64}$/;
+    const hexPattern = /^0x[a-fA-F0-9]{64}$/
     if (Array.isArray(topicValue)) {
-      const validHexValues = topicValue.filter(value => typeof value === 'string' && hexPattern.test(value));
+      const validHexValues = topicValue.filter((value) => typeof value === 'string' && hexPattern.test(value))
       if (validHexValues.length > 0) {
-        const query = `topic${topicIndex} IN (${validHexValues.map(() => '?').join(',')})`;
-        queryParams.push(query);
-        values.push(...validHexValues);
+        const query = `topic${topicIndex} IN (${validHexValues.map(() => '?').join(',')})`
+        queryParams.push(query)
+        values.push(...validHexValues)
       }
     } else if (typeof topicValue === 'string' && hexPattern.test(topicValue)) {
-      queryParams.push(`topic${topicIndex}=?`);
-      values.push(topicValue);
+      queryParams.push(`topic${topicIndex}=?`)
+      values.push(topicValue)
     }
   }
   // Handling topics array
   if (Array.isArray(request.topics)) {
-    request.topics.forEach((topic, index) => createTopicQuery(index, topic));
+    request.topics.forEach((topic, index) => createTopicQuery(index, topic))
   }
   const fromBlock = request.fromBlock ? padAndPrefixBlockNumber(request.fromBlock) : null
   const toBlock = request.toBlock ? padAndPrefixBlockNumber(request.toBlock) : null
@@ -112,8 +116,8 @@ function buildLogQueryString(request: LogQueryRequest, countOnly: boolean, type:
     queryParams.push(`blockNumber <= ?`)
     values.push(toBlock)
   }
-  sql = `${sql}${queryParams.length > 0 ? ` WHERE ${queryParams.join(' AND ')}` : ''}`;
-  return {sql, values}
+  sql = `${sql}${queryParams.length > 0 ? ` WHERE ${queryParams.join(' AND ')}` : ''}`
+  return { sql, values }
 }
 
 export async function queryLogCount(
@@ -125,14 +129,18 @@ export async function queryLogCount(
   fromBlock?: string,
   toBlock?: string
 ): Promise<number> {
-  let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = {'COUNT(txHash)': 0}
+  let logs: { 'COUNT(txHash)': number } | { 'COUNT(DISTINCT(txHash))': number } = { 'COUNT(txHash)': 0 }
   try {
-    let {sql, values: inputs} = buildLogQueryString({
-      address: contractAddress,
-      topics,
-      fromBlock,
-      toBlock
-    }, true, type)
+    let { sql, values: inputs } = buildLogQueryString(
+      {
+        address: contractAddress,
+        topics,
+        fromBlock,
+        toBlock,
+      },
+      true,
+      type
+    )
 
     if (startCycle >= 0 && endCycle >= 0) {
       if (inputs.length > 0) sql += ` AND cycle BETWEEN ? AND ?`
@@ -164,13 +172,16 @@ export async function queryLogs(
 ): Promise<Log[]> {
   let logs: DbLog[] = []
   try {
-
-    const queryString = buildLogQueryString({
-      address: contractAddress,
-      topics,
-      fromBlock,
-      toBlock
-    }, false, type)
+    const queryString = buildLogQueryString(
+      {
+        address: contractAddress,
+        topics,
+        fromBlock,
+        toBlock,
+      },
+      false,
+      type
+    )
     const sql = queryString.sql
     let inputs = queryString.values
 
@@ -198,8 +209,11 @@ export async function queryLogs(
   return logs
 }
 
-export async function queryLogCountBetweenCycles(startCycleNumber: number, endCycleNumber: number): Promise<number> {
-  let logs: { 'COUNT(*)': number } = {'COUNT(*)': 0}
+export async function queryLogCountBetweenCycles(
+  startCycleNumber: number,
+  endCycleNumber: number
+): Promise<number> {
+  let logs: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     const sql = `SELECT COUNT(*) FROM logs WHERE cycle BETWEEN ? AND ?`
     logs = await db.get(sql, [startCycleNumber, endCycleNumber])

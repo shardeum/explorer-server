@@ -345,29 +345,6 @@ const start = async (): Promise<void> => {
     reply.send(res)
   })
 
-  server.get('/api/address', async (_request, reply) => {
-    const err = utils.validateTypes(_request.query as object, {
-      address: 's?',
-      accountType: 's?',
-    })
-    if (err) {
-      reply.send({ success: false, error: err })
-      return
-    }
-    const query = _request.query as RequestQuery
-    const accounts = []
-    let account
-    if (query.accountType)
-      account = await Account.queryAccountByAddress(query.address.toLowerCase(), parseInt(query.accountType))
-    else account = await Account.queryAccountByAddress(query.address.toLowerCase())
-    if (account) accounts.push(account)
-    const res: AddressResponse = {
-      success: true,
-      accounts,
-    }
-    reply.send(res)
-  })
-
   server.get('/api/token', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
       page: 's?',
@@ -816,27 +793,6 @@ const start = async (): Promise<void> => {
     }
     if (query.filterAddress) {
       res.filterAddressTokenBalance = filterAddressTokenBalance
-    }
-    reply.send(res)
-  })
-
-  server.get('/api/cycleinfo/:counter', async (_request, reply) => {
-    const err = utils.validateTypes(_request.params as object, { counter: 's' })
-    if (err) {
-      reply.send({ success: false, error: err })
-      return
-    }
-    const params = _request.params as RequestParams
-    const counter: number = parseInt(params.counter)
-    //cycle counter starts from 0
-    if (counter < 0 || Number.isNaN(counter)) {
-      reply.send({ success: false, error: 'Invalid counter' })
-      return
-    }
-    const cycle = await Cycle.queryCycleByCounter(counter)
-    const res = {
-      success: true,
-      cycle,
     }
     reply.send(res)
   })
