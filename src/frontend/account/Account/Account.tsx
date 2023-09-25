@@ -9,7 +9,7 @@ import { breadcrumbsList } from '../../types'
 import { Account as AccountT } from '../../../types'
 
 import styles from './Account.module.scss'
-import {fromWeiNoTrailingComma} from "../../utils/fromWeiNoTrailingComma";
+import { fromWeiNoTrailingComma } from '../../utils/fromWeiNoTrailingComma'
 
 const siblingCount = 3
 const limit = 10
@@ -29,10 +29,12 @@ const tableColumns: IColumnProps<AccountT>[] = [
     ),
   },
   {
-    key: 'account.balance',
+    key: 'account.account.balance',
     value: 'Balance',
     render: (_: unknown, item: AccountT) => (
-      <>{`${Number(fromWeiNoTrailingComma(`0x${item?.account?.balance}`, 'ether')).toFixed()} SHM`}</>
+      <>{`${Number(
+        fromWeiNoTrailingComma(`0x${item?.account?.account?.balance}`, 'ether')
+      ).toFixed()} SHM`}</>
     ),
   },
   {

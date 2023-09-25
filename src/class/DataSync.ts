@@ -9,9 +9,9 @@ import { getDefaultArchiverUrl } from '../archiver'
 
 export let needSyncing = false
 
-export let lastSyncedCycle = 0
-export const syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
-export let dataSyncing = false
+let lastSyncedCycle = 0
+const syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
+let dataSyncing = false
 
 export const toggleNeedSyncing = (): void => {
   needSyncing = !needSyncing
