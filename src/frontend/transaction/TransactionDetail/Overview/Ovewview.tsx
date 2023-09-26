@@ -374,7 +374,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
           <div className={styles.item}>
             <div className={styles.title}>Gas Used:</div>
             <div className={styles.value}>
-              {calculateFullValue(transaction?.wrappedEVMAccount?.readableReceipt?.gasUsed || '0')}
+              {parseInt(transaction?.wrappedEVMAccount?.readableReceipt?.gasUsed || '0')}
             </div>
           </div>
 

@@ -249,7 +249,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
             txHash: txObj.txHash,
             cycle: txObj.cycle,
             timestamp: txObj.timestamp,
-            transactionFee: txObj.wrappedEVMAccount.readableReceipt.gasUsed ?? '0', // Maybe provide with actual token transfer cost
+            transactionFee: txObj.wrappedEVMAccount.amountSpent ?? '0',
             contractInfo,
           }
           if (tx.tokenType === TransactionType.ERC_1155) {

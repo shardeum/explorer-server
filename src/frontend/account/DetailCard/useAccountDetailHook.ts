@@ -25,7 +25,7 @@ export const useAccountDetailHook = ({ id, txType }: detailProps): AccountDetail
   const tType = txType || TransactionSearchType.All
 
   const getAddress = useCallback(async () => {
-    const data = await api.get(`${PATHS.ADDRESS}?address=${id}&accountType=${accountType}`)
+    const data = await api.get(`${PATHS.ACCOUNT}?address=${id}&accountType=${accountType}`)
 
     return data?.data?.accounts as Account[]
   }, [accountType, id])

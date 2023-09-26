@@ -48,7 +48,7 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
 
   const getAddress = useCallback(async () => {
     if (id.length !== 42 && id.length !== 64) return
-    const data = await api.get(`${PATHS.ADDRESS}?address=${id}&accountType=${accountType}`)
+    const data = await api.get(`${PATHS.ACCOUNT}?address=${id}&accountType=${accountType}`)
     return data?.data?.accounts as Account[]
   }, [accountType, id])
 

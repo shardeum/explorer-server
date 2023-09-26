@@ -35,7 +35,7 @@ export const useAccountDetailHook = ({id, txType}: detailProps): AccountDetails 
   const accountType = id && id.length === 64 ? AccountType.NodeAccount2 : AccountType.Account // TODO: I think it has to be EOA
 
   const getAddress = useCallback(async () => {
-    const data = await api.get(`${PATHS.ADDRESS}?address=${id}&accountType=${accountType}`)
+    const data = await api.get(`${PATHS.ACCOUNT}?address=${id}&accountType=${accountType}`)
 
     return data?.data?.accounts as Account[]
   }, [accountType, id])

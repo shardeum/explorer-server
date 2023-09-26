@@ -19,7 +19,6 @@ export const PATHS = {
   RECEIPT_DETAIL: BASE_URL + '/api/receipt',
   CYCLE: BASE_URL + '/api/cycleinfo',
   ACCOUNT: BASE_URL + '/api/account',
-  ADDRESS: BASE_URL + '/api/address',
   TOKEN: BASE_URL + '/api/token',
   LOG: BASE_URL + '/api/log',
   ORIGINAL_TX: BASE_URL + '/api/originalTx',

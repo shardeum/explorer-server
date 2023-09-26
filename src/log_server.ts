@@ -8,6 +8,13 @@ import { evmLogSubscriptionHandler } from './logSubscription/Handler'
 import { removeLogSubscriptionBySocketId } from './logSubscription/SocketManager'
 import * as Storage from './storage'
 
+console.log(process.argv)
+const port = process.argv[2]
+if (port) {
+  config.port.log_server = port
+}
+console.log('Port', config.port.log_server)
+
 const start = async (): Promise<void> => {
   // Init dependencies
   await Storage.initializeDB()
