@@ -5,7 +5,6 @@ import fastifyNextjs from '@fastify/nextjs'
 import fastifyRateLimit from '@fastify/rate-limit'
 import FastifyWebsocket from '@fastify/websocket'
 import * as crypto from '@shardus/crypto-utils'
-import axios from 'axios'
 import Fastify from 'fastify'
 import * as usage from './middleware/usage'
 import * as StatsStorage from './stats'
@@ -40,7 +39,6 @@ import {
 } from './class/cache_per_cycle'
 import {
   AccountResponse,
-  AddressResponse,
   CoinResponse,
   ErrorResponse,
   LogResponse,
@@ -62,10 +60,6 @@ if (port) {
   CONFIG.port.server = port
 }
 console.log('Port', CONFIG.port.server)
-
-interface RequestParams {
-  counter: string
-}
 
 interface RequestQuery {
   page: string
@@ -923,6 +917,7 @@ const start = async (): Promise<void> => {
       endCycle: 's?',
       decode: 's?',
       pending: 's?',
+      txType: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })

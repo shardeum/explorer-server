@@ -1,4 +1,3 @@
-import fs from 'fs'
 import * as socketClient from 'socket.io-client'
 import { config } from '../config'
 import { IndexedLogs, extractLogsFromReceipts } from './CollectorDataParser'

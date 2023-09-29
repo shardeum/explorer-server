@@ -10,7 +10,6 @@ import ERC1155_ABI from '../utils/abis/ERC1155.json'
 import { bytesToHex } from '@ethereumjs/util'
 import { RLP } from '@ethereumjs/rlp'
 import { Erc1155Abi, Erc721Abi } from '../types/abis'
-import { padAndPrefixBlockNumber } from '../utils/index'
 
 const ERC_721_INTERFACE = '0x80ac58cd'
 const ERC_1155_INTERFACE = '0xd9b67a26'

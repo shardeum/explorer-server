@@ -2,7 +2,6 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { padAndPrefixBlockNumber } from '../utils/index'
 
 export interface Log<L = object> {
   cycle: number
@@ -103,8 +102,8 @@ function buildLogQueryString(
   if (Array.isArray(request.topics)) {
     request.topics.forEach((topic, index) => createTopicQuery(index, topic))
   }
-  const fromBlock = request.fromBlock ? padAndPrefixBlockNumber(request.fromBlock) : null
-  const toBlock = request.toBlock ? padAndPrefixBlockNumber(request.toBlock) : null
+  const fromBlock = request.fromBlock ? parseInt(request.fromBlock) : 0
+  const toBlock = request.toBlock ? parseInt(request.toBlock) : 0
   if (fromBlock && toBlock) {
     queryParams.push(`blockNumber BETWEEN ? AND ?`)
     values.push(fromBlock)

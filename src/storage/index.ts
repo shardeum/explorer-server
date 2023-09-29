@@ -1,5 +1,4 @@
 import * as db from './sqlite3storage'
-import { config } from '../config'
 
 export const initializeDB = async (): Promise<void> => {
   await db.init()

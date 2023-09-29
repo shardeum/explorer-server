@@ -236,7 +236,7 @@ export async function queryOriginalTxsData(
     sql += sqlSuffix
     originalTxsData = await db.all(sql, values)
     for (let i = 0; i < originalTxsData.length; i++) {
-      let originalTxData = originalTxsData[i]
+      const originalTxData = originalTxsData[i]
       if (txType) {
         const sql = `SELECT * FROM originalTxsData WHERE txId=?`
         const originalTxDataById: DbOriginalTxData = await db.get(sql, [originalTxData.txId])
