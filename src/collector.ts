@@ -72,7 +72,7 @@ export const checkAndSyncData = async (): Promise<void> => {
   )
   const patchData = CONFIG.patchData
   // Make sure the data that saved are authentic by comparing receipts count of last 10 cycles for receipts data, originalTxs count of last 10 cycles for originalTxData data and 10 last cycles for cycles data
-  if (patchData && totalReceiptsToSync > lastStoredReceiptCount && lastStoredReceiptCount > 10) {
+  if (patchData && lastStoredReceiptCount > 0) {
     const lastStoredReceiptInfo = await receipt.queryLatestReceipts(1)
     if (lastStoredReceiptInfo && lastStoredReceiptInfo.length > 0)
       lastStoredReceiptCycle = lastStoredReceiptInfo[0].cycle
@@ -84,11 +84,7 @@ export const checkAndSyncData = async (): Promise<void> => {
     }
     lastStoredReceiptCycle = receiptResult.matchedCycle
   }
-  if (
-    patchData &&
-    totalOriginalTxsToSync > lastStoredOriginalTxDataCount &&
-    lastStoredOriginalTxDataCount > 10
-  ) {
+  if (patchData && lastStoredOriginalTxDataCount > 0) {
     const lastStoredOriginalTxDataInfo = await originalTxData.queryOriginalTxsData(1)
     if (lastStoredOriginalTxDataInfo && lastStoredOriginalTxDataInfo.length > 0)
       lastStoredOriginalTxDataCycle = lastStoredOriginalTxDataInfo[0].cycle

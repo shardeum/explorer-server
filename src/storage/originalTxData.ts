@@ -1,7 +1,14 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { InternalTXType, TransactionType, OriginalTxData, TransactionSearchType } from '../types'
+import {
+  InternalTXType,
+  TransactionType,
+  OriginalTxData,
+  OriginalTxData2,
+  OriginalTxDataInterface,
+  TransactionSearchType,
+} from '../types'
 import { getTransactionObj, isStakingEVMTx, getStakeTxBlobFromEVMTx } from '../utils/decodeEVMRawTx'
 import { bytesToHex } from '@ethereumjs/util'
 
@@ -10,50 +17,66 @@ type DbOriginalTxData = OriginalTxData & {
   sign: string
 }
 
+enum OriginalTxDataType {
+  OriginalTxData = 'originalTxsData',
+  OriginalTxData2 = 'originalTxsData2',
+}
+
 export const originalTxsMap: Map<string, number> = new Map()
 
-export async function insertOriginalTxData(originalTxData: OriginalTxData): Promise<void> {
+export async function insertOriginalTxData(
+  originalTxData: OriginalTxData | OriginalTxData2,
+  tableName: OriginalTxDataType
+): Promise<void> {
   try {
     const fields = Object.keys(originalTxData).join(', ')
     const placeholders = Object.keys(originalTxData).fill('?').join(', ')
     const values = extractValues(originalTxData)
-    const sql = 'INSERT OR REPLACE INTO originalTxsData (' + fields + ') VALUES (' + placeholders + ')'
+    const sql = `INSERT OR REPLACE INTO ${tableName} (` + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
-    if (config.verbose) console.log('Successfully inserted OriginalTxData', originalTxData.txId)
+    if (config.verbose) console.log(`Successfully inserted ${tableName}`, originalTxData.txId)
   } catch (e) {
     console.log(e)
-    console.log('Unable to insert OriginalTxData or it is already stored in to database', originalTxData)
+    console.log(`Unable to insert ${tableName} or it is already stored in to database`, originalTxData)
   }
 }
 
-export async function bulkInsertOriginalTxsData(originalTxsData: OriginalTxData[]): Promise<void> {
+export async function bulkInsertOriginalTxsData(
+  originalTxsData: OriginalTxData[] | OriginalTxData2[],
+  tableName: OriginalTxDataType
+): Promise<void> {
   try {
     const fields = Object.keys(originalTxsData[0]).join(', ')
     const placeholders = Object.keys(originalTxsData[0]).fill('?').join(', ')
     const values = extractValuesFromArray(originalTxsData)
-    let sql = 'INSERT OR REPLACE INTO originalTxsData (' + fields + ') VALUES (' + placeholders + ')'
+    let sql = `INSERT OR REPLACE INTO ${tableName} (` + fields + ') VALUES (' + placeholders + ')'
     for (let i = 1; i < originalTxsData.length; i++) {
       sql = sql + ', (' + placeholders + ')'
     }
     await db.run(sql, values)
-    console.log('Successfully bulk inserted OriginalTxsData', originalTxsData.length)
+    console.log(`Successfully bulk inserted ${tableName}`, originalTxsData.length)
   } catch (e) {
     console.log(e)
-    console.log('Unable to bulk insert OriginalTxsData', originalTxsData.length)
+    console.log(`Unable to bulk insert ${tableName}`, originalTxsData.length)
   }
 }
 
 export async function processOriginalTxData(originalTxsData: OriginalTxData[]): Promise<void> {
-  console.log('originalTxsData size', originalTxsData.length)
   if (originalTxsData && originalTxsData.length <= 0) return
   const bucketSize = 1000
   let combineOriginalTxsData: OriginalTxData[] = []
+  let combineOriginalTxsData2: OriginalTxData2[] = []
 
   for (const originalTxData of originalTxsData) {
     const txId = originalTxData.txId
     if (originalTxsMap.has(txId)) continue
     originalTxsMap.set(txId, originalTxData.cycle)
     // console.log('originalTxData', originalTxData)
+    combineOriginalTxsData.push(originalTxData)
+    if (combineOriginalTxsData.length >= bucketSize) {
+      await bulkInsertOriginalTxsData(combineOriginalTxsData, OriginalTxDataType.OriginalTxData)
+      combineOriginalTxsData = []
+    }
     try {
       if (originalTxData.originalTxData.tx.raw) {
         // EVM Tx
@@ -72,8 +95,10 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
               } else console.log('Unknown staking evm tx type', internalTxData)
             }
           }
-          combineOriginalTxsData.push({
-            ...originalTxData,
+          combineOriginalTxsData2.push({
+            txId: originalTxData.txId,
+            timestamp: originalTxData.timestamp,
+            cycle: originalTxData.cycle,
             txHash: bytesToHex(txObj.hash()),
             transactionType,
           })
@@ -81,8 +106,10 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
           console.log('Unable to get txObj from EVM raw tx', originalTxData.originalTxData.tx.raw)
         }
       } else {
-        combineOriginalTxsData.push({
-          ...originalTxData,
+        combineOriginalTxsData2.push({
+          txId: originalTxData.txId,
+          timestamp: originalTxData.timestamp,
+          cycle: originalTxData.cycle,
           txHash: '0x' + originalTxData.txId,
           transactionType: TransactionType.InternalTxReceipt,
         })
@@ -90,12 +117,15 @@ export async function processOriginalTxData(originalTxsData: OriginalTxData[]): 
     } catch (e) {
       console.log('Error in processing original Tx data', originalTxData.txId, e)
     }
-    if (combineOriginalTxsData.length >= bucketSize) {
-      await bulkInsertOriginalTxsData(combineOriginalTxsData)
-      combineOriginalTxsData = []
+    if (combineOriginalTxsData2.length >= bucketSize) {
+      await bulkInsertOriginalTxsData(combineOriginalTxsData2, OriginalTxDataType.OriginalTxData2)
+      combineOriginalTxsData2 = []
     }
   }
-  if (combineOriginalTxsData.length > 0) await bulkInsertOriginalTxsData(combineOriginalTxsData)
+  if (combineOriginalTxsData.length > 0)
+    await bulkInsertOriginalTxsData(combineOriginalTxsData, OriginalTxDataType.OriginalTxData)
+  if (combineOriginalTxsData2.length > 0)
+    await bulkInsertOriginalTxsData(combineOriginalTxsData2, OriginalTxDataType.OriginalTxData2)
 }
 
 export async function queryOriginalTxDataCount(
@@ -118,6 +148,7 @@ export async function queryOriginalTxDataCount(
       values.push(afterTimestamp)
     }
     if (txType) {
+      sql = sql.replace('originalTxsData', 'originalTxsData2')
       if ((startCycle && endCycle) || afterTimestamp) sql += ` AND`
       else sql += ` WHERE`
       if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -134,12 +165,12 @@ export async function queryOriginalTxDataCount(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-              ? TransactionType.NodeRewardReceipt
-              : txType === TransactionSearchType.StakeReceipt
-                ? TransactionType.StakeReceipt
-                : txType === TransactionSearchType.UnstakeReceipt
-                  ? TransactionType.UnstakeReceipt
-                  : TransactionType.InternalTxReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
         sql += ` transactionType=?`
         values.push(ty)
       }
@@ -159,7 +190,7 @@ export async function queryOriginalTxsData(
   afterTimestamp?: number,
   startCycle?: number,
   endCycle?: number
-): Promise<OriginalTxData[]> {
+): Promise<OriginalTxDataInterface[]> {
   let originalTxsData: DbOriginalTxData[] = []
   try {
     let sql = `SELECT * FROM originalTxsData`
@@ -175,6 +206,7 @@ export async function queryOriginalTxsData(
       values.push(afterTimestamp)
     }
     if (txType) {
+      sql = sql.replace('originalTxsData', 'originalTxsData2')
       if ((startCycle && endCycle) || afterTimestamp) sql += ` AND`
       else sql += ` WHERE`
       if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -191,31 +223,38 @@ export async function queryOriginalTxsData(
           txType === TransactionSearchType.Receipt
             ? TransactionType.Receipt
             : txType === TransactionSearchType.NodeRewardReceipt
-              ? TransactionType.NodeRewardReceipt
-              : txType === TransactionSearchType.StakeReceipt
-                ? TransactionType.StakeReceipt
-                : txType === TransactionSearchType.UnstakeReceipt
-                  ? TransactionType.UnstakeReceipt
-                  : TransactionType.InternalTxReceipt
+            ? TransactionType.NodeRewardReceipt
+            : txType === TransactionSearchType.StakeReceipt
+            ? TransactionType.StakeReceipt
+            : txType === TransactionSearchType.UnstakeReceipt
+            ? TransactionType.UnstakeReceipt
+            : TransactionType.InternalTxReceipt
         sql += ` transactionType=?`
         values.push(ty)
       }
     }
     sql += sqlSuffix
     originalTxsData = await db.all(sql, values)
-    originalTxsData.forEach((originalTxData: DbOriginalTxData) => {
+    for (let i = 0; i < originalTxsData.length; i++) {
+      let originalTxData = originalTxsData[i]
+      if (txType) {
+        const sql = `SELECT * FROM originalTxsData WHERE txId=?`
+        const originalTxDataById: DbOriginalTxData = await db.get(sql, [originalTxData.txId])
+        originalTxData.originalTxData = originalTxDataById.originalTxData
+        originalTxData.sign = originalTxDataById.sign
+      }
       if (originalTxData.originalTxData)
         originalTxData.originalTxData = JSON.parse(originalTxData.originalTxData)
       if (originalTxData.sign) originalTxData.sign = JSON.parse(originalTxData.sign)
-    })
+    }
   } catch (e) {
     console.log(e)
   }
   if (config.verbose) console.log('OriginalTxData originalTxsData', originalTxsData)
-  return originalTxsData
+  return originalTxsData as unknown as OriginalTxDataInterface[]
 }
 
-export async function queryOriginalTxDataByTxId(txId: string): Promise<OriginalTxData | null> {
+export async function queryOriginalTxDataByTxId(txId: string): Promise<OriginalTxDataInterface | null> {
   try {
     const sql = `SELECT * FROM originalTxsData WHERE txId=?`
     const originalTxData: DbOriginalTxData = await db.get(sql, [txId])
@@ -225,24 +264,28 @@ export async function queryOriginalTxDataByTxId(txId: string): Promise<OriginalT
       if (originalTxData.sign) originalTxData.sign = JSON.parse(originalTxData.sign)
     }
     if (config.verbose) console.log('OriginalTxData txId', originalTxData)
-    return originalTxData as OriginalTxData
+    return originalTxData as unknown as OriginalTxDataInterface
   } catch (e) {
     console.log(e)
   }
   return null
 }
 
-export async function queryOriginalTxDataByTxHash(txHash: string): Promise<OriginalTxData | null> {
+export async function queryOriginalTxDataByTxHash(txHash: string): Promise<OriginalTxDataInterface | null> {
   try {
-    const sql = `SELECT * FROM originalTxsData WHERE txHash=?`
+    const sql = `SELECT * FROM originalTxsData2 WHERE txHash=?`
     const originalTxData: DbOriginalTxData = await db.get(sql, [txHash])
     if (originalTxData) {
+      const sql = `SELECT * FROM originalTxsData WHERE txId=?`
+      const originalTxDataById: DbOriginalTxData = await db.get(sql, [originalTxData.txId])
+      originalTxData.originalTxData = originalTxDataById.originalTxData
+      originalTxData.sign = originalTxDataById.sign
       if (originalTxData.originalTxData)
         originalTxData.originalTxData = JSON.parse(originalTxData.originalTxData)
       if (originalTxData.sign) originalTxData.sign = JSON.parse(originalTxData.sign)
     }
     if (config.verbose) console.log('OriginalTxData txHash', originalTxData)
-    return originalTxData as OriginalTxData
+    return originalTxData as unknown as OriginalTxDataInterface
   } catch (e) {
     console.log(e)
   }

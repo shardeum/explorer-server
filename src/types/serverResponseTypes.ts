@@ -1,4 +1,4 @@
-import { OriginalTxData } from './originalTxData'
+import { OriginalTxDataInterface } from './originalTxData'
 
 export type ErrorResponse = {
   success: boolean
@@ -29,7 +29,7 @@ export type ReceiptResponse = {
 
 export type OriginalTxResponse = {
   success: boolean
-  originalTxs?: OriginalTxData[] | number
+  originalTxs?: OriginalTxDataInterface[] | number
   totalPages?: number
   totalOriginalTxs?: number
 }

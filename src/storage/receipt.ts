@@ -86,6 +86,11 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
 
     // Forward receipt data to LogServer
     await forwardReceiptData([receiptObj])
+    // Receipts size can be big, better to save per 100
+    if (combineReceipts.length >= 100) {
+      await bulkInsertReceipts(combineReceipts)
+      combineReceipts = []
+    }
     const storageKeyValueMap = {}
     for (const account of accounts) {
       const accountType = account.data.accountType as AccountType
@@ -269,11 +274,6 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
         }
         combineTokens = [...combineTokens, ...tokens]
       }
-    }
-    // Receipts size can be big, better to save per 100
-    if (combineReceipts.length >= 100) {
-      await bulkInsertReceipts(combineReceipts)
-      combineReceipts = []
     }
     if (combineAccounts1.length >= bucketSize) {
       await Account.bulkInsertAccounts(combineAccounts1)

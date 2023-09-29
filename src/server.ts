@@ -25,7 +25,7 @@ import {
   OriginalTxResponse,
   TokenTx,
   Transaction as TransactionInterface,
-  OriginalTxData as OriginalTxDataInterface,
+  OriginalTxDataInterface,
   TransactionSearchType,
   TransactionType,
 } from './types'
