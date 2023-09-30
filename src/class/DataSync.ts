@@ -13,6 +13,12 @@ let lastSyncedCycle = 0
 const syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
 let dataSyncing = false
 
+const MAX_RECEIPTS_PER_REQUEST = 1000
+const MAX_ORIGINAL_TXS_PER_REQUEST = 1000
+const MAX_CYCLES_PER_REQUEST = 100
+
+const MAX_CYCLES_FOR_TXS_DATA = 100
+
 export const toggleNeedSyncing = (): void => {
   needSyncing = !needSyncing
   if (config.verbose) console.log('needSyncing', needSyncing)
@@ -168,16 +174,15 @@ export const downloadTxsDataAndCycles = async (
   totalCyclesToSync: number,
   fromCycle = 0
 ): Promise<void> => {
-  const bucketSize = 100
   let completeForReceipt = false
   let completeForCycle = false
   let completeForOriginalTxData = false
   let startReceipt = fromReceipt
   let startCycle = fromCycle
   let startOriginalTxData = fromOriginalTxData
-  let endReceipt = startReceipt + bucketSize
-  let endCycle = startCycle + bucketSize
-  let endOriginalTxData = startOriginalTxData + bucketSize
+  let endReceipt = startReceipt + MAX_RECEIPTS_PER_REQUEST
+  let endCycle = startCycle + MAX_CYCLES_PER_REQUEST
+  let endOriginalTxData = startOriginalTxData + MAX_ORIGINAL_TXS_PER_REQUEST
   let patchData = config.patchData
   if (startReceipt === 0 || startOriginalTxData === 0) patchData = true // This means we don't have any data yet, so sync txs data as well
   if (!patchData) {
@@ -225,14 +230,14 @@ export const downloadTxsDataAndCycles = async (
       if (response && response.data && response.data.receipts) {
         console.log(`Downloaded receipts`, response.data.receipts.length)
         await Receipt.processReceiptData(response.data.receipts)
-        if (response.data.receipts.length < bucketSize) {
+        if (response.data.receipts.length < MAX_RECEIPTS_PER_REQUEST) {
           completeForReceipt = true
           startReceipt += response.data.receipts.length
-          endReceipt = startReceipt + bucketSize
+          endReceipt = startReceipt + MAX_RECEIPTS_PER_REQUEST
           console.log('Download completed for receipts')
         } else {
           startReceipt = endReceipt + 1
-          endReceipt += bucketSize
+          endReceipt += MAX_RECEIPTS_PER_REQUEST
         }
       } else {
         console.log('Receipt', 'Invalid download response', startReceipt, endReceipt)
@@ -246,14 +251,14 @@ export const downloadTxsDataAndCycles = async (
       if (response && response.data && response.data.originalTxs) {
         console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
         await OriginalTxData.processOriginalTxData(response.data.originalTxs)
-        if (response.data.originalTxs.length < bucketSize) {
+        if (response.data.originalTxs.length < MAX_ORIGINAL_TXS_PER_REQUEST) {
           completeForOriginalTxData = true
           startOriginalTxData += response.data.originalTxs.length
-          endOriginalTxData = startOriginalTxData + bucketSize
+          endOriginalTxData = startOriginalTxData + MAX_ORIGINAL_TXS_PER_REQUEST
           console.log('Download completed for originalTxsData')
         } else {
           startOriginalTxData = endOriginalTxData + 1
-          endOriginalTxData += bucketSize
+          endOriginalTxData += MAX_ORIGINAL_TXS_PER_REQUEST
         }
       } else {
         console.log('OriginalTxData', 'Invalid download response', startOriginalTxData, endOriginalTxData)
@@ -280,19 +285,19 @@ export const downloadTxsDataAndCycles = async (
           }
           combineCycles.push(cycleObj)
           // await Cycle.insertOrUpdateCycle(cycleObj);
-          if (combineCycles.length >= bucketSize || i === cycles.length - 1) {
+          if (combineCycles.length >= MAX_CYCLES_PER_REQUEST || i === cycles.length - 1) {
             await Cycle.bulkInsertCycles(combineCycles)
             combineCycles = []
           }
         }
-        if (response.data.cycleInfo.length < bucketSize) {
+        if (response.data.cycleInfo.length < MAX_CYCLES_PER_REQUEST) {
           completeForCycle = true
           startCycle += response.data.cycleInfo.length
-          endCycle = startCycle + bucketSize
+          endCycle = startCycle + MAX_CYCLES_PER_REQUEST
           console.log('Download completed for cycles')
         } else {
           startCycle = endCycle + 1
-          endCycle += bucketSize
+          endCycle += MAX_CYCLES_PER_REQUEST
         }
       } else {
         console.log('Cycle', 'Invalid download response', startCycle, endCycle)
