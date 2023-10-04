@@ -16,8 +16,9 @@ let dataSyncing = false
 const MAX_RECEIPTS_PER_REQUEST = 1000
 const MAX_ORIGINAL_TXS_PER_REQUEST = 1000
 const MAX_CYCLES_PER_REQUEST = 100
+const MAX_ACCOUNTS_PER_REQUEST = 1000
 
-const MAX_CYCLES_FOR_TXS_DATA = 100
+const MAX_BETWEEN_CYCLES_PER_REQUEST = 100
 
 export const toggleNeedSyncing = (): void => {
   needSyncing = !needSyncing
@@ -311,9 +312,9 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
   let completeSyncingAccounts = false
   let completeSyncTransactions = false
   let startAccount = 0
-  let endAccount = startAccount + 10000
+  let endAccount = startAccount + MAX_ACCOUNTS_PER_REQUEST
   let startTransaction = 0
-  let endTransaction = startTransaction + 10000
+  let endTransaction = startTransaction + MAX_ACCOUNTS_PER_REQUEST
   let combineTransactions = []
 
   let totalGenesisAccounts = 0
@@ -340,7 +341,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       console.log(`Downloading accounts from ${startAccount} to ${endAccount}`)
       const response = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5&page=${page}`)
       if (response && response.data && response.data.accounts) {
-        if (response.data.accounts.length < 10000) {
+        if (response.data.accounts.length < MAX_ACCOUNTS_PER_REQUEST) {
           completeSyncingAccounts = true
           console.log('Download completed for accounts')
         }
@@ -351,7 +352,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
         console.log('Genesis Account', 'Invalid download response')
       }
       startAccount = endAccount
-      endAccount += 10000
+      endAccount += MAX_ACCOUNTS_PER_REQUEST
       page++
       // await sleep(1000);
     }
@@ -371,7 +372,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
       console.log(`Downloading transactions from ${startTransaction} to ${endTransaction}`)
       const response = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5&page=${page}`)
       if (response && response.data && response.data.transactions) {
-        if (response.data.transactions.length < 10000) {
+        if (response.data.transactions.length < MAX_ACCOUNTS_PER_REQUEST) {
           completeSyncTransactions = true
           console.log('Download completed for transactions')
         }
@@ -381,7 +382,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
         console.log('Genesis Transaction Receipt', 'Invalid download response')
       }
       startTransaction = endTransaction
-      endTransaction += 10000
+      endTransaction += MAX_ACCOUNTS_PER_REQUEST
       page++
     }
   }
@@ -579,8 +580,7 @@ export const downloadCyclcesBetweenCycles = async (
   startCycle: number,
   totalCyclesToSync: number
 ): Promise<void> => {
-  const bucketSize = 1000
-  let endCycle = startCycle + bucketSize
+  let endCycle = startCycle + MAX_CYCLES_PER_REQUEST
   const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
@@ -588,7 +588,7 @@ export const downloadCyclcesBetweenCycles = async (
     if (response && response.data && response.data.cycleInfo) {
       console.log(`Downloaded cycles`, response.data.cycleInfo.length)
       const cycles = response.data.cycleInfo
-      let combineCycles = []
+      const combineCycles = []
       for (let i = 0; i < cycles.length; i++) {
         // eslint-disable-next-line security/detect-object-injection
         const cycle = cycles[i]
@@ -602,15 +602,11 @@ export const downloadCyclcesBetweenCycles = async (
           cycleMarker: cycle.marker,
         }
         combineCycles.push(cycleObj)
-        // await Cycle.insertOrUpdateCycle(cycleObj);
-        if (combineCycles.length >= bucketSize || i === cycles.length - 1) {
-          await Cycle.bulkInsertCycles(combineCycles)
-          combineCycles = []
-        }
       }
+      await Cycle.bulkInsertCycles(combineCycles)
     }
     startCycle = endCycle + 1
-    endCycle += bucketSize
+    endCycle += MAX_CYCLES_PER_REQUEST
   }
   console.log('Download completed for cycles between counter', startCycle, 'and', endCycle)
 }
@@ -619,7 +615,7 @@ export const downloadReceiptsBetweenCycles = async (
   startCycle: number,
   totalCyclesToSync: number
 ): Promise<void> => {
-  let endCycle = startCycle + 100
+  let endCycle = startCycle + MAX_BETWEEN_CYCLES_PER_REQUEST
   const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
@@ -630,7 +626,7 @@ export const downloadReceiptsBetweenCycles = async (
     if (response && response.data && response.data.receipts) {
       console.log(`Download receipts Count`, response.data.receipts)
       const receiptsCount = response.data.receipts
-      for (let i = 1; i <= Math.ceil(receiptsCount / 100); i++) {
+      for (let i = 1; i <= Math.ceil(receiptsCount / MAX_BETWEEN_CYCLES_PER_REQUEST); i++) {
         response = await axios.get(
           `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
         )
@@ -645,7 +641,7 @@ export const downloadReceiptsBetweenCycles = async (
         console.log('Receipt', 'Invalid download response')
     }
     startCycle = endCycle + 1
-    endCycle += 100
+    endCycle += MAX_BETWEEN_CYCLES_PER_REQUEST
   }
 }
 
@@ -653,7 +649,7 @@ export const downloadOriginalTxsDataBetweenCycles = async (
   startCycle: number,
   totalCyclesToSync: number
 ): Promise<void> => {
-  let endCycle = startCycle + 100
+  let endCycle = startCycle + MAX_BETWEEN_CYCLES_PER_REQUEST
   const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
@@ -664,7 +660,7 @@ export const downloadOriginalTxsDataBetweenCycles = async (
     if (response && response.data && response.data.originalTxs) {
       console.log(`Download originalTxsData Count`, response.data.originalTxs)
       const originalTxsDataCount = response.data.originalTxs
-      for (let i = 1; i <= Math.ceil(originalTxsDataCount / 100); i++) {
+      for (let i = 1; i <= Math.ceil(originalTxsDataCount / MAX_BETWEEN_CYCLES_PER_REQUEST); i++) {
         response = await axios.get(
           `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
         )
@@ -679,6 +675,6 @@ export const downloadOriginalTxsDataBetweenCycles = async (
         console.log('OriginalTxData', 'Invalid download response')
     }
     startCycle = endCycle + 1
-    endCycle += 100
+    endCycle += MAX_BETWEEN_CYCLES_PER_REQUEST
   }
 }
