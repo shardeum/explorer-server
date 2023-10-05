@@ -1357,7 +1357,7 @@ export async function queryTransactionCountByBlock(blockNumber: number, blockHas
   let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   let sql = `SELECT COUNT(*) FROM transactions WHERE transactionType IN (?,?,?) AND `
   const values: any = [TransactionType.Receipt, TransactionType.StakeReceipt, TransactionType.UnstakeReceipt]
-  if (blockNumber > 0) {
+  if (blockNumber >= 0) {
     sql += `blockNumber=? `
     values.push(blockNumber)
   } else if (blockHash) {
@@ -1381,7 +1381,7 @@ export async function queryTransactionsByBlock(
   let transactions: DbTransaction[] = []
   let sql = `SELECT * FROM transactions WHERE transactionType IN (?,?,?) AND `
   const values: any = [TransactionType.Receipt, TransactionType.StakeReceipt, TransactionType.UnstakeReceipt]
-  if (blockNumber > 0) {
+  if (blockNumber >= 0) {
     sql += `blockNumber=? `
     values.push(blockNumber)
   } else if (blockHash) {
