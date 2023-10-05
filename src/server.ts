@@ -164,9 +164,8 @@ const start = async (): Promise<void> => {
       }
       if (count > 100) count = 100 // set to show max 100 cycles
       cycles = await Cycle.queryLatestCycleRecords(count)
-    }
-    if (query.cycleNumber) {
-      let cycleNumber: number = parseInt(query.cycleNumber)
+    } else if (query.cycleNumber) {
+      const cycleNumber: number = parseInt(query.cycleNumber)
       if (cycleNumber < 0 || Number.isNaN(cycleNumber)) {
         reply.send({ success: false, error: 'Invalid cycleNumber' })
         return
