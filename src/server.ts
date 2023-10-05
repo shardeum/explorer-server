@@ -66,8 +66,7 @@ interface RequestQuery {
   count: string
   from: string
   to: string
-  cycle: number
-  partition: number
+  cycleNumber: string
   txId: string
   txHash: string
   address: string
@@ -146,6 +145,7 @@ const start = async (): Promise<void> => {
   server.get('/api/cycleinfo', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
       count: 's?',
+      cycle: 's?',
       to: 's?',
       from: 's?',
       marker: 's?',
@@ -164,6 +164,15 @@ const start = async (): Promise<void> => {
       }
       if (count > 100) count = 100 // set to show max 100 cycles
       cycles = await Cycle.queryLatestCycleRecords(count)
+    }
+    if (query.cycleNumber) {
+      let cycleNumber: number = parseInt(query.cycleNumber)
+      if (cycleNumber < 0 || Number.isNaN(cycleNumber)) {
+        reply.send({ success: false, error: 'Invalid cycleNumber' })
+        return
+      }
+      const cycle = await Cycle.queryCycleByCounter(cycleNumber)
+      if (cycle) cycles = [cycle]
     } else if (query.to && query.from) {
       const from = parseInt(query.from)
       const to = parseInt(query.to)
