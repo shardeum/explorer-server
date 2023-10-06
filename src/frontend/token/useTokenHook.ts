@@ -116,7 +116,7 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
         const { total, transactions, tokenBalance } = await getTransaction()
 
         setTransactions(transactions)
-        if (transactions && transactions.length > 0) {
+        if (transactions.length > 0) {
           const tokenType =
             transactions[0].tokenType === TransactionType.ERC_20
               ? TransactionSearchType.ERC_20

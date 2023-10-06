@@ -48,6 +48,8 @@ const tempHeader: IColumnProps<ReadableReceipt | Transaction | TokenTx | Origina
             ? item?.wrappedEVMAccount?.readableReceipt?.status === 0
               ? 'error'
               : 'success'
+            : 'tokenType' in item
+            ? 'success'
             : 'gray'
         }
         size="medium"

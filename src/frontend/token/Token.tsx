@@ -39,7 +39,6 @@ export const Token: React.FC = () => {
     address: address?.toString(),
   })
 
-
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
 
   const siblingCount = 3
@@ -60,7 +59,7 @@ export const Token: React.FC = () => {
         <>
           {' '}
           {val
-            ? account?.contractType === ContractType.ERC_721
+            ? transactionType === TransactionSearchType.ERC_721
               ? val
               : utils
                   .formatUnits(
@@ -133,15 +132,15 @@ export const Token: React.FC = () => {
               <DetailCard
                 title="Contract Info"
                 titleRight={
-                  account?.contractType === ContractType.GENERIC && (
+                  account?.contractType !== ContractType.GENERIC && (
                     <div className={styles.buttonWrapper}>
-                      <Button
+                      {/* <Button
                         apperance="outlined"
                         className={styles.btn}
                         onClick={() => router.push(`/token/${id}?a=${id}`)}
                       >
                         Token Tracker
-                      </Button>
+                      </Button> */}
                       <Button
                         apperance="outlined"
                         className={styles.btn}
@@ -221,7 +220,7 @@ export const Token: React.FC = () => {
               <div className={styles.title}>BALANCE</div>
               <div className={styles.value}>
                 {tokenBalance
-                  ? account?.contractType === ContractType.ERC_721
+                  ? transactionType === TransactionSearchType.ERC_721
                     ? tokenBalance
                     : utils
                         .formatUnits(
