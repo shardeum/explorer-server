@@ -21,6 +21,7 @@ export const Token: React.FC = () => {
   const {
     account,
     total,
+    transactionType,
     transactions,
     tokenHolders,
     tokens,
@@ -34,14 +35,6 @@ export const Token: React.FC = () => {
     address: address?.toString(),
   })
 
-  const tokenType =
-    account?.contractType === ContractType.ERC_20
-      ? TransactionSearchType.ERC_20
-      : account?.contractType === ContractType.ERC_721
-      ? TransactionSearchType.ERC_721
-      : account?.contractType === ContractType.ERC_1155
-      ? TransactionSearchType.ERC_1155
-      : TransactionSearchType.AllExceptInternalTx
 
   const breadcrumbs = [breadcrumbsList.dashboard, breadcrumbsList.account]
 
@@ -78,7 +71,7 @@ export const Token: React.FC = () => {
     {
       key: TransactionSearchType.AllExceptInternalTx as number,
       value: 'Transfer',
-      content: <TransactionTable data={transactions} txType={tokenType} />,
+      content: <TransactionTable data={transactions} txType={transactionType} />,
     },
     {
       key: 'holder',

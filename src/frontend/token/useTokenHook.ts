@@ -1,6 +1,15 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { api, PATHS } from '../api'
-import { Account, AccountSearchType, Transaction, TransactionSearchType, Token } from '../../types'
+import {
+  Account,
+  AccountSearchType,
+  Transaction,
+  TransactionSearchType,
+  Token,
+  TransactionType,
+  TokenTx,
+} from '../../types'
+import { set } from 'lodash'
 
 interface detailProps {
   id: string
@@ -9,29 +18,29 @@ interface detailProps {
 
 type TokenHookResult = {
   account?: Account
-  transactions: Transaction[]
+  transactions: TokenTx[]
   tokens: Token[]
   tokenHolders: number
   total?: number
   page: number
-  transactionType: number | string
+  transactionType: TransactionSearchType
   filteredAddress: string
   activeTab: number | string
   tokenBalance: string
   setPage: (page: number) => void
-  setTransactionType: (transactionType: number | string) => void
+  setTransactionType: (transactionType: number) => void
   onAddressChange: (e: ChangeEvent<HTMLInputElement>) => void
   onTabChange: (e: TransactionSearchType) => void
 }
 
 export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
   const [account, setAccount] = useState<Account>()
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [transactions, setTransactions] = useState<TokenTx[]>([])
   const [tokens, setTokens] = useState<Token[]>([])
   const [tokenHolders, setTokenHolders] = useState<number>(0)
   const [total, setTotal] = useState<number>()
   const [page, setPage] = useState<number>(1)
-  const [transactionType, setTransactionType] = useState<number | string>(TransactionSearchType.TokenTransfer)
+  const [transactionType, setTransactionType] = useState<number>(TransactionSearchType.AllExceptInternalTx)
   const [filteredAddress, setFilteredAddress] = useState<string>('')
   const [activeTab, setActiveTab] = useState(TransactionSearchType.AllExceptInternalTx)
   const [tokenBalance, setTokenBalance] = useState<string>('')
@@ -60,7 +69,7 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
         tokenBalance,
       }
     }
-    let url = `${PATHS.TRANSACTION}?address=${id}&page=${page}&txType=${transactionType}`
+    let url = `${PATHS.TRANSACTION}?address=${id}&page=${page}&txType=${TransactionSearchType.TokenTransfer}`
 
     if (filteredAddress) {
       url += `&filterAddress=${filteredAddress}`
@@ -69,7 +78,7 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
     const data = await api.get(url)
 
     return {
-      transactions: data?.data?.transactions as Transaction[],
+      transactions: data?.data?.transactions as TokenTx[],
       total: data?.data?.totalTransactions,
       tokenBalance: data?.data?.filterAddressTokenBalance,
     }
@@ -99,9 +108,22 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
         (accounts && accounts.length > 0 && accounts[0].ethAddress) ||
         (accounts && accounts.length > 0 && accounts[0].accountId)
       ) {
+        // make sure the account is a contract
+        if (accounts[0].contractType === null) return
         const { total, transactions, tokenBalance } = await getTransaction()
 
-        setTransactions(transactions as Transaction[])
+        setTransactions(transactions)
+        if (transactions && transactions.length > 0) {
+          const tokenType =
+            transactions[0].tokenType === TransactionType.ERC_20
+              ? TransactionSearchType.ERC_20
+              : transactions[0].tokenType === TransactionType.ERC_721
+              ? TransactionSearchType.ERC_721
+              : transactions[0].tokenType === TransactionType.ERC_1155
+              ? TransactionSearchType.ERC_1155
+              : TransactionSearchType.AllExceptInternalTx
+          setTransactionType(tokenType)
+        }
         setTotal(total)
         setAccount(accounts[0])
         setTokenBalance(tokenBalance)
