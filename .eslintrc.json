@@ -15,9 +15,7 @@
     "plugin:no-unsanitized/DOM",
     "prettier"
   ],
-  "ignorePatterns": [
-    "collector.ts"
-  ],
+  "ignorePatterns": [],
   "rules": {
     "no-empty": [
       1,

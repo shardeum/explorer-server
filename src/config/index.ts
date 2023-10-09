@@ -41,7 +41,7 @@ export const config: Config = {
     host: process.env.COLLECTOR_HOST || '0.0.0.0',
   },
   log_server: {
-    port: Number(process.env.LOG_SERVER_LISTEN_PORT) || 4447,
+    port: Number(process.env.LOG_SERVER_LISTEN_PORT) || 4446,
     host: process.env.LOG_SERVER_HOST || '0.0.0.0',
   },
   server: {
@@ -56,7 +56,7 @@ export const config: Config = {
 
   rpcUrl: process.env.RPC_URL || 'http://localhost:8080',
   apiUrl: '',
-  dbPath: process.env.DB_PATH.replace(/\/+$/, '') || '.', // remove trailing /
+  dbPath: process.env.DB_PATH?.replace(/\/+$/, '') || '.', // remove trailing /
   verbose: false,
   genesisSHMSupply: 100000000,
   rateLimit: 100,

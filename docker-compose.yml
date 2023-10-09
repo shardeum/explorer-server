@@ -27,13 +27,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  rpc-data-server:
-    image: shardeum/explorer:dev
-    extends:
-      service: collector
-    depends_on: [collector]
-    command: ['run', 'rpc_data_server', '4445']
+    
+  // TODO - add log_server service
 
   aggregator:
     image: shardeum/explorer:dev
