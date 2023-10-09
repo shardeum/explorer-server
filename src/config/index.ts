@@ -1,46 +1,34 @@
 type Config = {
-  env: string;
+  env: string
   subscription: {
-    enabled: boolean;
-  };
+    enabled: boolean
+  }
   collector: {
-    port: number;
-    host: string;
-  };
-  rpc_data_collector: {
-    port: number;
-    host: string;
-  };
-  distributor: {
-    port: number;
-    host: string;
-  };
-  collector_distributor_sender: {
-    port: number;
-    host: string ;
-  };
+    port: number
+    host: string
+  }
   log_server: {
-    port: number;
-    host: string ;
-  };
+    port: number
+    host: string
+  }
   server: {
-    port: number;
-    host: string;
-  };
+    port: number
+    host: string
+  }
   archiverInfo: {
-    ip: string;
-    port: number;
-    publicKey: string;
-  };
-  rpcUrl: string;
-  apiUrl: string;
-  dbPath: string;
-  verbose: boolean;
-  genesisSHMSupply: number;
-  rateLimit: number;
-  patchData: boolean;
-  GTM_Id: string;
-  USAGE_ENDPOINTS_KEY: string;
+    ip: string
+    port: number
+    publicKey: string
+  }
+  rpcUrl: string
+  apiUrl: string
+  dbPath: string
+  verbose: boolean
+  genesisSHMSupply: number
+  rateLimit: number
+  patchData: boolean
+  GTM_Id: string
+  USAGE_ENDPOINTS_KEY: string
 }
 
 export const config: Config = {
@@ -51,18 +39,6 @@ export const config: Config = {
   collector: {
     port: Number(process.env.COLLECTOR_PORT) || 4444,
     host: process.env.COLLECTOR_HOST || '0.0.0.0',
-  },
-  rpc_data_collector: {
-    port: Number(process.env.RPCDC_PORT) || 4445,
-    host: process.env.RPCDC_HOST || '0.0.0.0',
-  },
-  distributor: {
-    port: Number(process.env.DISTRIBUTOR_PORT) || 4446,
-    host: process.env.DISTRIBUTOR_HOST || '0.0.0.0',
-  },
-  collector_distributor_sender: {
-    port: Number(process.env.COLLECTOR_DISTRIBUTOR_SENDER_LISTEN_PORT) || 4447,
-    host: process.env.COLLECTOR_DISTRIBUTOR_SENDER_HOST || '0.0.0.0',
   },
   log_server: {
     port: Number(process.env.LOG_SERVER_LISTEN_PORT) || 4447,
@@ -90,5 +66,4 @@ export const config: Config = {
 }
 
 export const ARCHIVER_INFO = `${config.archiverInfo.ip}:${config.archiverInfo.port}:${config.archiverInfo.publicKey}`
-export const RPC_DATA_SERVER_URL = `http://${config.rpc_data_collector.host}:${config.rpc_data_collector.port}`
-export const COLLECTOR_DISTRIBUTOR_URL = `http://${config.collector_distributor_sender.host}:${config.collector_distributor_sender.port}`
+export const COLLECTOR_DISTRIBUTOR_URL = `http://${config.collector.host}:${config.collector.port}`
