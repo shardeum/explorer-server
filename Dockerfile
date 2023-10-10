@@ -11,7 +11,7 @@ SHELL [ "/bin/bash", "-cex" ]
 ENV NODE_ENV=${NODE_ENV}
 
 # Create app directory
-WORKDIR /home/node/app
+WORKDIR /app
 
 # Bundle app source
 COPY . .

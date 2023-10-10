@@ -2,24 +2,29 @@
 version: '3'
 services:
   collector:
-    image: shardeum/explorer:dev
-    build:
-      context: .
+    image: &image shardeum/explorer-stack:dev
+    container_name: explorer-collector
+    build: .
     restart: unless-stopped
-    network_mode: container:shardeum-test-container
     command: ['run', 'collector']
-    volumes:
+    volumes: &volume
       - ./data/:/app/data/
-    env_file: .env
+    env_file: &env-file .env
     configs:
       - source: archiverconfig
-        target: /home/node/app/archiverConfig.json
+        target: /app/archiverConfig.json
+    ports:
+      - 6001:6001 # explorer server frontend
+      - 4444:4444 # collector
+      - 4446:4446 # log server
 
   explorer:
-    image: shardeum/explorer:dev
-    extends:
-      service: collector
     depends_on: [collector]
+    image: *image
+    container_name: explorer-server
+    network_mode: &network-mode container:explorer-collector
+    env_file: *env-file
+    volumes: *volume
     command: ['run', 'server', '6001']
     healthcheck:
       test: ['CMD', 'curl', '-L', '--fail', 'localhost:6001']
@@ -27,15 +32,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    
-  // TODO - add log_server service
 
-  aggregator:
-    image: shardeum/explorer:dev
-    extends:
-      service: collector
+  log-server:
     depends_on: [collector]
+    image: *image
+    container_name: explorer-log-server
+    network_mode: *network-mode
+    env_file: *env-file
+    volumes: *volume
+    command: ['run', 'log_server']
+
+  ## start this after data gets synced
+  aggregator:
+    depends_on: [collector]
+    image: *image
+    container_name: explorer-aggregator
+    network_mode: *network-mode
     command: ['run', 'aggregator']
+    env_file: *env-file
+    volumes: *volume
 
 configs:
   archiverconfig:

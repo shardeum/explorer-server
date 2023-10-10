@@ -20,6 +20,7 @@ Sharduem explorer consists of four servers.
 - API and UI server --> server.ts
 - RPC Data Collector --> rpc_data_server.ts
 - Data Stats Aggregator --> aggregator.ts
+- Log Server --> log_server.ts
 
 Explorer server use Fastify.js and UI is developed using NextJS. For data storage, we are using `sqlite` for now.
 
@@ -77,7 +78,7 @@ npm run flush
 
 > Make sure necessary components which are required to run explore are running by smoke testing stack in networking mode host
 
-Create `DB_PATH=./data` to persist the databases to `./data` directory else create empty `.env` file
+Create `DB_PATH=./data` to persist the databases to `./data` directory else create empty `.env` file. Add necessary environment variables to `.env` file.
 
 ```shell
 echo 'DB_PATH=./data' >.env
@@ -93,6 +94,8 @@ docker compose up
 # OR
 # Run services in detach mode
 docker compose up -d
+
+# Open localhost:6001 in browser
 ```
 
 Check the logs
