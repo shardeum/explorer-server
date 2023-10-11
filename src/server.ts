@@ -47,6 +47,7 @@ import {
   TransactionResponse,
 } from './types'
 import { getStakeTxBlobFromEVMTx, getTransactionObj } from './utils/decodeEVMRawTx'
+import { bytesToHex, bigIntToHex } from '@ethereumjs/util'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -700,9 +701,9 @@ const start = async (): Promise<void> => {
               const readableReceipt = {
                 from: txObj.getSenderAddress().toString(),
                 to: txObj.to ? txObj.to.toString() : null,
-                nonce: txObj.nonce.toString(16),
-                value: txObj.value.toString(16),
-                data: '0x' + txObj.data.toString(),
+                nonce: bigIntToHex(txObj.nonce),
+                value: bigIntToHex(txObj.value),
+                data: bytesToHex(txObj.data),
                 // contractAddress // TODO: add contract address
               }
               if (
@@ -715,8 +716,8 @@ const start = async (): Promise<void> => {
               originalTx.originalTxData = { ...originalTx.originalTxData, readableReceipt }
             }
           }
-          // Assume the tx is expired if the original tx is more than 15 seconds old
-          const ExpiredTxTimestamp_MS = 15000
+          // Assume the tx is expired if the original tx is more than 20 seconds old
+          const ExpiredTxTimestamp_MS = 20000
           const txStatus = Date.now() - originalTx.timestamp > ExpiredTxTimestamp_MS ? 'Expired' : 'Pending'
           transactions = [{ ...originalTx, txStatus }]
           txHashQueryCache.set(txHash, { success: true, transactions })
@@ -1096,9 +1097,9 @@ const start = async (): Promise<void> => {
             const readableReceipt = {
               from: txObj.getSenderAddress().toString(),
               to: txObj.to ? txObj.to.toString() : null,
-              nonce: txObj.nonce.toString(16),
-              value: txObj.value.toString(16),
-              data: '0x' + txObj.data.toString(),
+              nonce: bigIntToHex(txObj.nonce),
+              value: bigIntToHex(txObj.value),
+              data: bytesToHex(txObj.data),
               // contractAddress // TODO: add contract address
             }
             if (
