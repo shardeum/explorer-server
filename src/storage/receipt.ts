@@ -73,6 +73,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
   let combineTokenTransactions: TokenTx<object>[] = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2: TokenTx<object>[] = [] // For TransactionType (ERC1155)
   let combineTokens: Account.Token[] = [] // For Tokens owned by an address
+  const contractAccountsIdToDecode = []
   for (const receiptObj of receipts) {
     const { accounts, cycle, result, tx, receipt } = receiptObj
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
@@ -116,10 +117,9 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
           const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
-            const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
-            accObj.contractInfo = contractInfo
-            accObj.contractType = contractType
             await Account.insertAccount(accObj)
+            // Decode contract accounts at the end and update the account
+            contractAccountsIdToDecode.push(accObj.accountId)
           } else {
             if (accountExist.timestamp < accObj.timestamp) {
               await Account.updateAccount(accObj.accountId, accObj)
@@ -304,6 +304,15 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
   if (combineTokenTransactions2.length > 0)
     await Transaction.bulkInsertTokenTransactions(combineTokenTransactions2)
   if (combineTokens.length > 0) await Account.bulkInsertTokens(combineTokens)
+  if (contractAccountsIdToDecode.length > 0) {
+    for (const accountId of contractAccountsIdToDecode) {
+      const accObj = await Account.queryAccountByAccountId(accountId)
+      const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
+      accObj.contractInfo = contractInfo
+      accObj.contractType = contractType
+      await Account.insertAccount(accObj)
+    }
+  }
   if (!cleanReceiptsMapByCycle) resetReceiptsMap()
 }
 
