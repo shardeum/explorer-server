@@ -5,9 +5,10 @@ graph TB
   collector -.->|Fetches data to index| archiver
   collector ==>|Index chain data| DB
   collector -.-> |data decoding info| json-rpc-server
-  explorer -.->|query nodeslist for some data query from one of the node| archiver
   explorer -->|read from db| DB
-  aggrigator <==> |cron based aggigate stats to| DB
+  aggigate <==> |cron based aggigate stats to| DB
+  log-server <==> |cron based aggigate stats to| DB
+  json-rpc-server -.-> |log_subscription| log-server --> |listen logs| collector
 ```
 
 ## Data Collector / Indexer / API Server for the Shardeum Network
