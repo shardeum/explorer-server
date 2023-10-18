@@ -10,7 +10,7 @@ services:
     network_mode: &network-mode host
     volumes: &volume
       - ./data/:/app/data/
-      - ./src/config/index.ts:/app/src/config/index.ts
+      # - ./src/config/index.ts:/app/src/config/index.ts
       # - ./entrypoint.sh:/entrypoint.sh
     env_file: &env-file .env
     configs:
