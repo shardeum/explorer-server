@@ -22,8 +22,7 @@ RUN \
   --mount=type=cache,target=/root/.npm \
   <<EOF
 npm install
-npm run build:release
-npm run prepare
+npm install pm2 -g
 EOF
 
-ENTRYPOINT [ "npm" ]
+ENTRYPOINT [ "/app/entrypoint.sh" ]

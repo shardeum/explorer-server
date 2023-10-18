@@ -6,32 +6,29 @@ services:
     container_name: explorer-collector
     build: .
     restart: unless-stopped
-    command: ['run', 'collector']
+    command: ['collector']
+    network_mode: &network-mode host
     volumes: &volume
       - ./data/:/app/data/
+      - ./src/config/index.ts:/app/src/config/index.ts
+      # - ./entrypoint.sh:/entrypoint.sh
     env_file: &env-file .env
     configs:
       - source: archiverconfig
         target: /app/archiverConfig.json
-    ports:
-      - 6001:6001 # explorer server frontend
-      - 4444:4444 # collector
-      - 4446:4446 # log server
+    # ports:
+    #   - 4444:4444 # collector
 
   explorer:
     depends_on: [collector]
     image: *image
     container_name: explorer-server
-    network_mode: &network-mode container:explorer-collector
+    network_mode: *network-mode
     env_file: *env-file
     volumes: *volume
-    command: ['run', 'server', '6001']
-    healthcheck:
-      test: ['CMD', 'curl', '-L', '--fail', 'localhost:6001']
-      start_period: 10s
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    command: ['server']
+    # ports:
+    #   - 6001:6001 # explorer server frontend
 
   log-server:
     depends_on: [collector]
@@ -40,7 +37,9 @@ services:
     network_mode: *network-mode
     env_file: *env-file
     volumes: *volume
-    command: ['run', 'log_server']
+    command: ['log_server']
+    # ports:
+    #   - 4446:4446 # log server
 
   ## start this after data gets synced
   aggregator:
@@ -48,9 +47,17 @@ services:
     image: *image
     container_name: explorer-aggregator
     network_mode: *network-mode
-    command: ['run', 'aggregator']
+    command: ['aggregator']
     env_file: *env-file
     volumes: *volume
+
+  # proxy:
+  #   image: caddy
+  #   container_name: explorer-proxy
+  #   restart: unless-stopped
+  #   entrypoint: caddy reverse-proxy --from :8080 --to explorer:6001
+    # ports:
+    #   - 8080:8080
 
 configs:
   archiverconfig:

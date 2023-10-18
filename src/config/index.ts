@@ -42,7 +42,7 @@ export const config: Config = {
   },
   log_server: {
     port: Number(process.env.LOG_SERVER_LISTEN_PORT) || 4446,
-    host: process.env.LOG_SERVER_HOST || '0.0.0.0',
+    host: process.env.LOG_SERVER_LISTEN_HOST || '0.0.0.0',
   },
   server: {
     port: Number(process.env.PORT) || 6001,

@@ -77,12 +77,16 @@ npm run flush
 
 ## Docker setup
 
-> Make sure necessary components which are required to run explore are running by smoke testing stack in networking mode host
+> Default NODE_ENV=production
 
-Create `DB_PATH=./data` to persist the databases to `./data` directory else create empty `.env` file. Add necessary environment variables to `.env` file.
+Setup `archiverConfig.json`
+
+- `DB_PATH=./data` to persist the databases to `./data` directory
+- `NO_OF_EXPLORERS=1` (default) no of explorer service(s) to run inside container, Port will be incremented by 1 from default port which is 6001 for each explorer service replicas. (6001, 6002, 6003, ...). You can take refrence from `.env.dev` file.
 
 ```shell
 echo 'DB_PATH=./data' >.env
+echo 'NO_OF_EXPLORERS=2' >.env
 # else
 echo >.env
 ```
@@ -91,12 +95,14 @@ Start explore stack
 
 ```shell
 # Run services in attach mode
-docker compose up
-# OR
-# Run services in detach mode
-docker compose up -d
-
+docker compose up collector explorer log-server -d # collector, explorer server, log server
 # Open localhost:6001 in browser
+```
+
+Start aggrigator after data gets synced
+
+```shell
+docker compose up aggregator -d
 ```
 
 Check the logs
