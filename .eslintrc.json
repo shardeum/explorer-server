@@ -16,7 +16,13 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "collector.ts"
+    "collector.ts",
+    "**/types/*.ts",
+    "**/utils/*.ts",
+    "**/storage/*.ts",
+    "**/class/*.ts",
+    "**/token/*.ts",
+    "server.ts"
   ],
   "rules": {
     "no-empty": [
