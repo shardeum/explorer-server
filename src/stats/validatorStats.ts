@@ -34,10 +34,8 @@ export async function insertValidatorStats(validator: ValidatorStats): Promise<v
     const values = extractValues(validator)
     const sql = 'INSERT OR REPLACE INTO validators (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
-    // if (config.verbose)
     console.log('Successfully inserted ValidatorStats', validator.cycle)
   } catch (e) {
-    // }
     console.log(e)
     console.log('Unable to insert validatorStats or it is already stored in to database', validator.cycle)
   }

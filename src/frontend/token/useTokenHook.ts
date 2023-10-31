@@ -3,13 +3,11 @@ import { api, PATHS } from '../api'
 import {
   Account,
   AccountSearchType,
-  Transaction,
   TransactionSearchType,
   Token,
   TransactionType,
   TokenTx,
 } from '../../types'
-import { set } from 'lodash'
 
 interface detailProps {
   id: string

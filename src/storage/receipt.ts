@@ -1,7 +1,15 @@
 import { config } from '../config'
 import * as Account from './account'
 import * as Transaction from './transaction'
-import { AccountType, TokenTx, TransactionType, WrappedAccount, WrappedEVMAccount, Receipt } from '../types'
+import {
+  AccountType,
+  TokenTx,
+  TransactionType,
+  WrappedAccount,
+  WrappedEVMAccount,
+  Receipt,
+  ERC20ContractDetail,
+} from '../types'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
@@ -308,7 +316,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
     for (const accountId of contractAccountsIdToDecode) {
       const accObj = await Account.queryAccountByAccountId(accountId)
       const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
-      accObj.contractInfo = contractInfo
+      accObj.contractInfo = contractInfo as ERC20ContractDetail
       accObj.contractType = contractType
       await Account.insertAccount(accObj)
     }

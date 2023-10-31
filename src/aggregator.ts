@@ -9,6 +9,7 @@ import * as ValidatorStats from './stats/validatorStats'
 import * as Storage from './storage'
 import * as Cycle from './storage/cycle'
 import * as StatsFunctions from './class/StatsFunctions'
+// import { config } from './config/index'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -57,7 +58,7 @@ const start = async (): Promise<void> => {
       else StatsFunctions.recordOldValidatorsStats(latestCycleCounter, lastCheckedCycleForValidators)
       lastCheckedCycleForValidators = latestCycleCounter
     }
-    // console.log(latestCycleCounter - waitCycleForTxs, lastCheckedCycleForTxs)
+    // /* prettier-ignore */ if (config.verbose)  console.log(latestCycleCounter - waitCycleForTxs, lastCheckedCycleForTxs)
     if (latestCycleCounter - waitCycleForStats > lastCheckedCycleForTxs) {
       StatsFunctions.recordTransactionsStats(latestCycleCounter - waitCycleForStats, lastCheckedCycleForTxs)
       lastCheckedCycleForTxs = latestCycleCounter - waitCycleForStats

@@ -19,10 +19,8 @@ export async function insertTransactionStats(transactionStats: TransactionStats)
     const values = extractValues(transactionStats)
     const sql = 'INSERT OR REPLACE INTO transactions (' + fields + ') VALUES (' + placeholders + ')'
     await db.run(sql, values)
-    // if (config.verbose)
     console.log('Successfully inserted TransactionStats', transactionStats.cycle)
   } catch (e) {
-    // }
     console.log(e)
     console.log(
       'Unable to insert transactionStats or it is already stored in to database',

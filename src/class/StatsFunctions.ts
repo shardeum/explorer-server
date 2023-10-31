@@ -7,6 +7,7 @@ import { TransactionSearchType, TransactionType } from '../types'
 import BN from 'bn.js'
 import BigNumber from 'decimal.js'
 import { CycleRecord } from '@shardus/types/build/src/p2p/CycleCreatorTypes'
+import { config } from '../config/index'
 
 export const insertValidatorStats = async (cycleRecord: CycleRecord): Promise<void> => {
   const validatorsInfo: ValidatorStats.ValidatorStats = {
@@ -102,7 +103,7 @@ export const recordTransactionsStats = async (
           timestamp: cycle.cycleRecord.start,
         })
       }
-      // console.log('combineTransactionStats', combineTransactionStats)
+      /* prettier-ignore */ if (config.verbose)  console.log('combineTransactionStats', combineTransactionStats)
       await TransactionStats.bulkInsertTransactionsStats(combineTransactionStats)
       combineTransactionStats = []
     } else {

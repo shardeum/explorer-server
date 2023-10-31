@@ -21,6 +21,7 @@ import {
   downloadOriginalTxsDataBetweenCycles,
 } from './class/DataSync'
 import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
+import { config } from './config/index'
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
@@ -171,7 +172,7 @@ const start = async (): Promise<void> => {
     })
 
     socketClient.on(ArchiverReceiptWsEvent, async (data: Data) => {
-      // console.log('RECEIVED RECEIPT')
+      /* prettier-ignore */ if (config.verbose)  console.log('RECEIVED RECEIPT')
       try {
         validateData(data)
       } catch (e) {

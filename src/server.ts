@@ -28,6 +28,8 @@ import {
   TransactionSearchType,
   TransactionType,
   TxMethodFilter,
+  InternalTx,
+  WrappedDataReceipt,
 } from './types'
 import * as utils from './utils'
 // config variables
@@ -51,6 +53,7 @@ import { getStakeTxBlobFromEVMTx, getTransactionObj } from './utils/decodeEVMRaw
 import { bytesToHex, bigIntToHex } from '@ethereumjs/util'
 import path from 'path'
 import fs from 'fs'
+import { config } from './config/index'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -214,7 +217,7 @@ const start = async (): Promise<void> => {
         return
       }
       cycles = await Cycle.queryCycleRecordsBetween(from, to)
-      // console.log('cycles', cycles);
+      /* prettier-ignore */ if (config.verbose)  console.log('cycles', cycles);
     } else if (query.marker) {
       const cycle = await Cycle.queryCycleByMarker(query.marker)
       if (cycle) {
@@ -466,7 +469,7 @@ const start = async (): Promise<void> => {
       reply.send({ success: false, error: err })
       return
     }
-    // console.log('Request', _request.query);
+    /* prettier-ignore */ if (config.verbose)  console.log('Request', _request.query);
     const query = _request.query as RequestQuery
     const itemsPerPage = 10
     let totalPages = 0
@@ -784,7 +787,7 @@ const start = async (): Promise<void> => {
                 originalTx.transactionType === TransactionType.StakeReceipt ||
                 originalTx.transactionType === TransactionType.UnstakeReceipt
               ) {
-                const internalTxData: any = getStakeTxBlobFromEVMTx(txObj)
+                const internalTxData: InternalTx = getStakeTxBlobFromEVMTx(txObj) as InternalTx
                 readableReceipt['internalTxData'] = internalTxData
               }
               originalTx.originalTxData = { ...originalTx.originalTxData, readableReceipt }
@@ -888,7 +891,7 @@ const start = async (): Promise<void> => {
       reply.send({ success: false, error: err })
       return
     }
-    // console.log('Request', _request.query);
+    /* prettier-ignore */ if (config.verbose)  console.log('Request', _request.query);
     const query = _request.query as RequestQuery
     const itemsPerPage = 10
     let totalPages = 0
@@ -1006,7 +1009,7 @@ const start = async (): Promise<void> => {
       reply.send({ success: false, error: err })
       return
     }
-    // console.log('Request', _request.query);
+    /* prettier-ignore */ if (config.verbose)  console.log('Request', _request.query);
     const query = _request.query as RequestQuery
     const itemsPerPage = 10
     let totalPages = 0
@@ -1180,7 +1183,7 @@ const start = async (): Promise<void> => {
               originalTx.transactionType === TransactionType.StakeReceipt ||
               originalTx.transactionType === TransactionType.UnstakeReceipt
             ) {
-              const internalTxData: any = getStakeTxBlobFromEVMTx(txObj)
+              const internalTxData: InternalTx = getStakeTxBlobFromEVMTx(txObj) as InternalTx
               readableReceipt['internalTxData'] = internalTxData
             }
             originalTx.originalTxData = { ...originalTx.originalTxData, readableReceipt }
@@ -1312,10 +1315,13 @@ const start = async (): Promise<void> => {
           for (let i = 0; i < logs.length; i++) {
             const txs = await Transaction.queryTransactionByHash(logs[i].txHash) // eslint-disable-line security/detect-object-injection
             if (txs.length > 0) {
-              const success = txs.filter((tx: any) => tx?.wrappedEVMAccount?.readableReceipt?.status === 1)
+              const success = txs.filter(
+                (tx: TransactionInterface) =>
+                  (tx?.wrappedEVMAccount as WrappedDataReceipt)?.readableReceipt?.status === 1
+              )
               transactions.push(success[0])
             }
-            // console.log(logs[i].txHash, transactions) // eslint-disable-line security/detect-object-injection
+            /* prettier-ignore */ if (config.verbose) console.log(logs[i].txHash, transactions) // eslint-disable-line security/detect-object-injection
           }
         }
       }
@@ -1389,7 +1395,7 @@ const start = async (): Promise<void> => {
         return
       }
       validatorStats = await ValidatorStats.queryValidatorStatsBetween(startCycle, endCycle)
-      // console.log('validators', validators);
+      // /* prettier-ignore */ if (config.verbose)  console.log('validators', validators);
     } else {
       reply.send({
         success: false,
@@ -1469,7 +1475,7 @@ const start = async (): Promise<void> => {
         return
       }
       transactionStats = await TransactionStats.queryTransactionStatsBetween(startCycle, endCycle)
-      // console.log('transactions', transactions);
+      // /* prettier-ignore */ if (config.verbose)  console.log('transactions', transactions);
     } else {
       reply.send({
         success: false,

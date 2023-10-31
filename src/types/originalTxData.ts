@@ -4,7 +4,22 @@ export interface OriginalTxData {
   txId: string
   timestamp: number
   cycle: number
-  originalTxData: any
+  originalTxData: {
+    tx: {
+      raw: string
+      timestamp: number
+    }
+    timestampReceipt?: {
+      cycleCounter: number
+      cycleMarker: string
+      sign: {
+        owner: string
+        sig: string
+      }
+      timestamp: number
+      txId: string
+    }
+  }
   sign: {
     owner: string
     sig: string
@@ -24,7 +39,30 @@ export interface OriginalTxDataInterface {
   txId: string
   timestamp: number
   cycle: number
-  originalTxData?: any
+  originalTxData?: {
+    tx: {
+      raw: string
+      timestamp: number
+    }
+    timestampReceipt?: {
+      cycleCounter: number
+      cycleMarker: string
+      sign: {
+        owner: string
+        sig: string
+      }
+      timestamp: number
+      txId: string
+    }
+    readableReceipt?: {
+      from: string
+      to: string
+      nonce: string
+      value: string
+      data: string
+      internalTxData?: unknown
+    }
+  }
   sign?: {
     owner: string
     sig: string

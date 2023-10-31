@@ -318,7 +318,7 @@ export const decodeTx = async (
               if (Object.keys(storageKeyValueMap).length === 0) {
                 const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                 contractStorage = await queryAccountByAccountId(shardusAddress)
-                // console.log('contractStorage', contractStorage)
+                /* prettier-ignore */ if (config.verbose)  console.log('contractStorage', contractStorage)
               }
               if (!contractStorage)
                 for (let i = 0; i < 20; i++) {
@@ -326,21 +326,21 @@ export const decodeTx = async (
                     { type: 'uint', value: tokenTx.tokenFrom },
                     { type: 'uint', value: '' + i }
                   )
-                  // console.log('calculatedKey', calculatedKey + log.address)
+                  /* prettier-ignore */ if (config.verbose)  console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
-                    // console.log('contractStorage', contractStorage)
+                    /* prettier-ignore */ if (config.verbose)  console.log('contractStorage', contractStorage)
                     break
                   } else if (storageKeyValueMap[calculatedKey + log.address]) break
                 }
-              // console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
+              /* prettier-ignore */ if (config.verbose)  console.log(tokenTx.tokenType, tokenTx.tokenFrom, calculatedKey + log.address)
             }
             if (
               storageKeyValueMap[calculatedKey + log.address] ||
               (contractStorage && contractStorage.ethAddress === log.address)
             ) {
-              // console.log(storageKeyValueMap[calculatedKey + log.address])
+              /* prettier-ignore */ if (config.verbose)  console.log(storageKeyValueMap[calculatedKey + log.address])
               const value = contractStorage
                 ? Uint8Array.from(Object.values(contractStorage.account['value']))
                 : Uint8Array.from(Object.values(storageKeyValueMap[calculatedKey + log.address].value))
@@ -351,14 +351,14 @@ export const decodeTx = async (
                 // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
                 //   tokenValue = Web3.utils.hexToNumberString('0x' + decode)
                 // }
-                // console.log('decode', decode)
+                // /* prettier-ignore */ if (config.verbose)  console.log('decode', decode)
                 // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
                 tokenValue = decode?.length > 0 ? Web3.utils.hexToNumberString(bytesToHex(decode)) : '0'
               } catch (e) {
                 console.error('Error in decoding tokenValue from contract Storage', e)
                 tokenValue = '0'
               }
-              // console.log(calculatedKey, tokenValue)
+              /* prettier-ignore */ if (config.verbose)  console.log(calculatedKey, tokenValue)
             }
             tokens.push({
               ethAddress: tokenTx.tokenFrom,
@@ -373,7 +373,7 @@ export const decodeTx = async (
               { type: 'uint', value: tokenTx.tokenTo },
               { type: 'uint', value: storageKey }
             )
-            // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
+            /* prettier-ignore */ if (config.verbose)  console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             let contractStorage: Account | null = null
             if (
               Object.keys(storageKeyValueMap).length === 0 ||
@@ -382,7 +382,7 @@ export const decodeTx = async (
               if (Object.keys(storageKeyValueMap).length === 0) {
                 const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                 contractStorage = await queryAccountByAccountId(shardusAddress)
-                // console.log('contractStorage', contractStorage)
+                /* prettier-ignore */ if (config.verbose)  console.log('contractStorage', contractStorage)
               }
               if (!contractStorage)
                 for (let i = 0; i < 20; i++) {
@@ -390,11 +390,11 @@ export const decodeTx = async (
                     { type: 'uint', value: tokenTx.tokenTo },
                     { type: 'uint', value: '' + i }
                   )
-                  // console.log('calculatedKey', calculatedKey + log.address)
+                  /* prettier-ignore */ if (config.verbose)  console.log('calculatedKey', calculatedKey + log.address)
                   if (Object.keys(storageKeyValueMap).length === 0) {
                     const shardusAddress = log.address.slice(2).substring(0, 8) + calculatedKey?.substring(8)
                     contractStorage = await queryAccountByAccountId(shardusAddress)
-                    // console.log('contractStorage', contractStorage)
+                    /* prettier-ignore */ if (config.verbose)  console.log('contractStorage', contractStorage)
                     break
                   } else if (
                     storageKeyValueMap[calculatedKey + log.address] &&
@@ -402,13 +402,13 @@ export const decodeTx = async (
                   )
                     break
                 }
-              // console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
+              /* prettier-ignore */ if (config.verbose)  console.log(tokenTx.tokenType, tokenTx.tokenTo, calculatedKey + log.address)
             }
             if (
               storageKeyValueMap[calculatedKey + log.address] ||
               (contractStorage && contractStorage.ethAddress === log.address)
             ) {
-              // console.log(storageKeyValueMap[calculatedKey + log.address].value)
+              /* prettier-ignore */ if (config.verbose)  console.log(storageKeyValueMap[calculatedKey + log.address].value)
               const value = contractStorage
                 ? Uint8Array.from(Object.values(contractStorage.account['value']))
                 : Uint8Array.from(Object.values(storageKeyValueMap[calculatedKey + log.address].value))
@@ -419,14 +419,14 @@ export const decodeTx = async (
                 // } else if (tokenTx.tokenType === TransactionType.ERC_721) {
                 //   tokenValue = Web3.utils.hexToNumberString('0x' + decode)
                 // }
-                // console.log('decode', decode)
+                // /* prettier-ignore */ if (config.verbose) console.log('decode', decode)
                 // tokenValue = '0x' + decode // Seems we can use this as well; but it needs some adaptive changes when decoding in the frontend
                 tokenValue = decode?.length > 0 ? Web3.utils.hexToNumberString(bytesToHex(decode)) : '0'
               } catch (e) {
                 console.error('Error in decoding tokenValue from contract Storage', e)
                 tokenValue = '0'
               }
-              // console.log(calculatedKey, tokenValue)
+              /* prettier-ignore */ if (config.verbose)  console.log(calculatedKey, tokenValue)
             }
             if (tokenValue !== '0') {
               tokens.push({
@@ -508,7 +508,7 @@ export const getContractInfo = async (
     contractType = ContractType.ERC_20
     // await sleep(200); // Awaiting a bit to refresh the service points of the validator
   } catch (e) {
-    // console.log(e);
+    // /* prettier-ignore */ if (config.verbose) console.log(e);
     console.log('Non ERC 20 Contract', contractAddress) // It could be not ERC 20 Contract
     // await sleep(100); // Awaiting a bit to refresh the service points of the validator
   }

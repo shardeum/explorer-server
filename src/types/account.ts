@@ -13,7 +13,7 @@ export interface Account {
   hash: string
   accountType: AccountType
   contractType?: ContractType
-  contractInfo?: any
+  contractInfo?: ERC20ContractDetail
 }
 
 export interface Token {

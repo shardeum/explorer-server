@@ -4,11 +4,12 @@ import { config as CONFIG } from '../config'
 import { insertOrUpdateCycle } from '../storage/cycle'
 import { processReceiptData } from '../storage/receipt'
 import { processOriginalTxData } from '../storage/originalTxData'
+import { Receipt, Cycle, OriginalTxData } from '../types'
 
 export interface Data {
-  receipts: any[]
-  cycles: any[]
-  originalTxsData: any[]
+  receipts: Receipt[]
+  cycles: Cycle[]
+  originalTxsData: OriginalTxData[]
   sign: {
     owner: string
     sig: string

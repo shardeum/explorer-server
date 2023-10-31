@@ -1,9 +1,9 @@
 import { TransactionFactory, Transaction, TransactionType } from '@ethereumjs/tx'
 import { bytesToHex, toAscii, toBytes } from '@ethereumjs/util'
+import { config } from '../config'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getTransactionObj(
-  tx: any
+  tx: any // eslint-disable-line @typescript-eslint/no-explicit-any
 ): Transaction[TransactionType.Legacy] | Transaction[TransactionType.AccessListEIP2930] {
   if (!tx.raw) throw Error('tx has no raw field')
   let transactionObj
@@ -11,14 +11,14 @@ export function getTransactionObj(
   try {
     transactionObj = TransactionFactory.fromSerializedData<TransactionType.Legacy>(serializedInput)
   } catch (e) {
-    // console.log('Unable to get legacy transaction obj', e)
+    /* prettier-ignore */ if (config.verbose) console.log('Unable to get legacy transaction obj', e)
   }
   if (!transactionObj) {
     try {
       transactionObj =
         TransactionFactory.fromSerializedData<TransactionType.AccessListEIP2930>(serializedInput)
     } catch (e) {
-      // console.log('Unable to get transaction obj', e)
+      /* prettier-ignore */ if (config.verbose) console.log('Unable to get transaction obj', e)
     }
   }
 

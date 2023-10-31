@@ -79,7 +79,7 @@ export async function updateTransaction(_txId: string, transaction: Partial<Tran
     })
     if (config.verbose) console.log('Successfully Updated Transaction', transaction.txId, transaction.txHash)
   } catch (e) {
-    // console.log(e);
+    /* prettier-ignore */ if (config.verbose) console.log(e);
     console.log('Unable to update Transaction', transaction.txId, transaction.txHash)
   }
 }
@@ -1093,7 +1093,7 @@ export async function queryTransactionCountByTimestamp(
     )
       sql = `SELECT COUNT(*) FROM tokenTxs WHERE `
   }
-  const values: any = []
+  const values: (number | string)[] = []
   if (afterTimestamp > 0) {
     sql += `timestamp>? `
     values.push(afterTimestamp)
@@ -1229,7 +1229,7 @@ export async function queryTransactionsByTimestamp(
     )
       sql = `SELECT * FROM tokenTxs WHERE `
   }
-  const values: any = []
+  const values: (number | string)[] = []
   let sqlSuffix = ''
   if (afterTimestamp > 0) {
     sql += `timestamp>? `
@@ -1365,7 +1365,11 @@ export async function queryTransactionsByTimestamp(
 export async function queryTransactionCountByBlock(blockNumber: number, blockHash: string): Promise<number> {
   let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   let sql = `SELECT COUNT(*) FROM transactions WHERE transactionType IN (?,?,?) AND `
-  const values: any = [TransactionType.Receipt, TransactionType.StakeReceipt, TransactionType.UnstakeReceipt]
+  const values: (number | string)[] = [
+    TransactionType.Receipt,
+    TransactionType.StakeReceipt,
+    TransactionType.UnstakeReceipt,
+  ]
   if (blockNumber >= 0) {
     sql += `blockNumber=? `
     values.push(blockNumber)
@@ -1389,7 +1393,11 @@ export async function queryTransactionsByBlock(
 ): Promise<DbTransaction[]> {
   let transactions: DbTransaction[] = []
   let sql = `SELECT * FROM transactions WHERE transactionType IN (?,?,?) AND `
-  const values: any = [TransactionType.Receipt, TransactionType.StakeReceipt, TransactionType.UnstakeReceipt]
+  const values: (number | string)[] = [
+    TransactionType.Receipt,
+    TransactionType.StakeReceipt,
+    TransactionType.UnstakeReceipt,
+  ]
   if (blockNumber >= 0) {
     sql += `blockNumber=? `
     values.push(blockNumber)
