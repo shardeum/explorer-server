@@ -757,8 +757,8 @@ const start = async (): Promise<void> => {
       reply.send(res)
       return
     } else if (query.blockNumber || query.blockHash) {
-      const blockNumber = query.blockNumber ? parseInt(query.blockNumber) : null
-      const blockHash = query.blockHash ? query.blockHash.toLowerCase() : null
+      const blockNumber = query.blockNumber ? parseInt(query.blockNumber) : undefined
+      const blockHash = query.blockHash ? query.blockHash.toLowerCase() : undefined
 
       if (blockNumber && (blockNumber < 0 || Number.isNaN(blockNumber))) {
         return reply.send({ success: false, error: 'invalid block Number' })
