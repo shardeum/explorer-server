@@ -13,5 +13,5 @@ export const isNodeAccount = async (searchText: string): Promise<boolean> => {
   const {
     data: { success, accounts },
   } = await api.get(`${PATHS.ACCOUNT}?address=${searchText}&accountType=${AccountType.NodeAccount2}`)
-  return success && accounts[0].accountId === searchText
+  return success && accounts?.[0]?.accountId === searchText
 }
