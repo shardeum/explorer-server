@@ -23,7 +23,7 @@ export const config = {
   rateLimit: 100,
   patchData: false,
   GTM_Id: '',
-  USAGE_ENDPOINTS_KEY: process.env.USAGE_ENDPOINTS_KEY || 'ceba96f6eafd2ea59e68a0b0d754a939',
+  USAGE_ENDPOINTS_KEY: '',
 }
 
 export const ARCHIVER_INFO = `${config.archiverInfo.ip}:${config.archiverInfo.port}:${config.archiverInfo.publicKey}`

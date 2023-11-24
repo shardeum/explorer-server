@@ -31,7 +31,7 @@ import {
 } from './types'
 import * as utils from './utils'
 // config variables
-import { config as CONFIG } from './config'
+import { config as CONFIG, config } from './config'
 import {
   coinStatsCacheRecord,
   isCacheRecordValid,
@@ -49,6 +49,8 @@ import {
 } from './types'
 import { getStakeTxBlobFromEVMTx, getTransactionObj } from './utils/decodeEVMRawTx'
 import { bytesToHex, bigIntToHex } from '@ethereumjs/util'
+import path from 'path'
+import fs from 'fs'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
@@ -62,6 +64,25 @@ if (port) {
   CONFIG.port.server = port
 }
 console.log('Port', CONFIG.port.server)
+
+// Pull in secrets
+const secretsPath = path.join(__dirname, '../.secrets')
+const secrets = {}
+
+if (fs.existsSync(secretsPath)) {
+  const lines = fs.readFileSync(secretsPath, 'utf-8').split('\n').filter(Boolean)
+
+  lines.forEach((line) => {
+    const [key, value] = line.split('=')
+    secrets[key.trim()] = value.trim()
+  })
+}
+
+if (secrets['USAGE_ENDPOINTS_KEY'] === undefined) config.USAGE_ENDPOINTS_KEY = ''
+else config.USAGE_ENDPOINTS_KEY = secrets['USAGE_ENDPOINTS_KEY']
+
+// Now, secrets contain your secrets, for example:
+// const apiKey = secrets.API_KEY;
 
 interface RequestQuery {
   page: string

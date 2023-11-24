@@ -1,6 +1,5 @@
 // require("dotenv").config();
 
-import * as crypto from '@shardus/crypto-utils'
 import cron from 'node-cron'
 import * as StatsStorage from './stats'
 import * as CoinStats from './stats/coinStats'
@@ -9,8 +8,6 @@ import * as ValidatorStats from './stats/validatorStats'
 import * as Storage from './storage'
 import * as Cycle from './storage/cycle'
 import * as StatsFunctions from './class/StatsFunctions'
-
-crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
 import { config as CONFIG } from './config'
