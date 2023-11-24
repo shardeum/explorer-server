@@ -62,31 +62,31 @@ export function validateTypes(inp: object, def: object): string {
 
 export function padAndPrefixBlockNumber(hexString: string | number, padding = '0', count = 16): string {
   if (typeof hexString === 'number' || /^[0-9]+$/.test(hexString.toString())) {
-    hexString = '0x' + parseInt(hexString.toString(), 10).toString(16);
+    hexString = '0x' + parseInt(hexString.toString(), 10).toString(16)
   }
 
   if (typeof hexString !== 'string' || typeof padding !== 'string' || typeof count !== 'number') {
-    throw new TypeError('Invalid argument type');
+    throw new TypeError('Invalid argument type')
   }
 
   if (hexString.substring(0, 2) !== '0x' || !/^[0-9a-fA-F]+$/.test(hexString.slice(2))) {
-    throw new Error('Invalid hexString: must start with 0x and contain only hexadecimal digits');
+    throw new Error('Invalid hexString: must start with 0x and contain only hexadecimal digits')
   }
 
   if (padding.length !== 1) {
-    throw new Error('Invalid padding: must be a single character');
+    throw new Error('Invalid padding: must be a single character')
   }
 
-  const hexNumber = hexString.slice(2);
-  const paddingNeeded = count - hexNumber.length;
+  const hexNumber = hexString.slice(2)
+  const paddingNeeded = count - hexNumber.length
 
   if (paddingNeeded < 0) {
-    throw new Error('Invalid count: count must be greater or equal to length of the hex string.');
+    throw new Error('Invalid count: count must be greater or equal to length of the hex string.')
   }
 
-  const paddedHexString = '0x' + padding.repeat(paddingNeeded) + hexNumber;
+  const paddedHexString = '0x' + padding.repeat(paddingNeeded) + hexNumber
 
-  return paddedHexString;
+  return paddedHexString
 }
 
 export async function sleep(time: number): Promise<boolean> {

@@ -6,4 +6,10 @@ export type { ContractQuery } from './contract'
 export { TransactionSearchList } from './transaction'
 export { contractTypes } from './contract'
 export { breadcrumbsList } from './routes'
-export { TransactionType, TransactionSearchType, ContractType, AccountSearchType, AccountType } from '../../types'
+export {
+  TransactionType,
+  TransactionSearchType,
+  ContractType,
+  AccountSearchType,
+  AccountType,
+} from '../../types'

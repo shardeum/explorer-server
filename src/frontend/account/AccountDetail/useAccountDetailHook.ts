@@ -9,19 +9,19 @@ interface detailProps {
 }
 
 export type AccountDetails = {
-  account: Account | undefined;
-  accountType: AccountType;
-  transactions: Transaction[];
-  totalPages: number;
-  totalTransactions: number;
-  tokens: Token[];
-  page: number;
-  transactionType: TransactionSearchType;
-  setPage: (page: number) => void;
-  setTransactionType: (type: TransactionSearchType) => void;
+  account: Account | undefined
+  accountType: AccountType
+  transactions: Transaction[]
+  totalPages: number
+  totalTransactions: number
+  tokens: Token[]
+  page: number
+  transactionType: TransactionSearchType
+  setPage: (page: number) => void
+  setTransactionType: (type: TransactionSearchType) => void
 }
 
-export const useAccountDetailHook = ({id, txType}: detailProps): AccountDetails => {
+export const useAccountDetailHook = ({ id, txType }: detailProps): AccountDetails => {
   const [account, setAccount] = useState<Account>()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalPages, setTotalPages] = useState<number>(1)

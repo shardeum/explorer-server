@@ -68,7 +68,10 @@ export async function queryLatestTransactionStats(count: number): Promise<Transa
   }
 }
 
-export async function queryTransactionStatsBetween(startCycle: number, endCycle: number): Promise<TransactionStats[]> {
+export async function queryTransactionStatsBetween(
+  startCycle: number,
+  endCycle: number
+): Promise<TransactionStats[]> {
   try {
     const sql = `SELECT * FROM transactions WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC LIMIT 100`
     const transactionsStats: TransactionStats[] = await db.all(sql, [startCycle, endCycle])

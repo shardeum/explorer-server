@@ -2,7 +2,7 @@ import web3 from 'web3'
 import { utils } from 'ethers'
 import { TokenTx, TransactionType } from '../../types'
 import BN from 'bn.js'
-import {fromWeiNoTrailingComma} from "./fromWeiNoTrailingComma";
+import { fromWeiNoTrailingComma } from './fromWeiNoTrailingComma'
 
 export const calculateValue = (value: string | BN): string => {
   try {
