@@ -1,5 +1,6 @@
 import moment from 'moment'
 import type { FastifyError, FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
+import crypto from 'crypto'
 
 import { config as CONFIG } from '../config'
 
@@ -19,8 +20,16 @@ const usageMetrics: UsageMetrics = {
 
 const validateSecurityKey = (req: FastifyRequest, reply: FastifyReply): boolean => {
   const securityKey = req.headers['x-usage-key']
+  let keyBuffer: Buffer
+  // convert to a buffer for safe checking
+  if (typeof securityKey === 'string') {
+    keyBuffer = Buffer.from(securityKey)
+  } else {
+    // If it's an array, join the elements into a single string
+    keyBuffer = Buffer.from(securityKey.join(', '))
+  }
 
-  if (CONFIG.USAGE_ENDPOINTS_KEY === securityKey) {
+  if (crypto.timingSafeEqual(Buffer.from(CONFIG.USAGE_ENDPOINTS_KEY), keyBuffer)) {
     return true
   }
 
