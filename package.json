@@ -16,6 +16,7 @@
     "build:release": "npm run prepare && npm run build",
     "lint": "eslint './src/**/*.ts'",
     "lint-windows": "eslint ./src/**/*.ts",
+    "format-check": "prettier --check './src/**/*.ts'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "check": "gts check",
     "clean": "gts clean",
