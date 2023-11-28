@@ -3,6 +3,7 @@ dotenv.config()
 
 import { Data, validateData } from './class/validateData'
 import * as ioclient from 'socket.io-client'
+import * as crypto from '@shardus/crypto-utils'
 import * as Storage from './storage'
 import * as cycle from './storage/cycle'
 import * as receipt from './storage/receipt'
@@ -20,6 +21,7 @@ import {
   downloadOriginalTxsDataBetweenCycles,
 } from './class/DataSync'
 import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
+crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
 // config variables
 import { config as CONFIG } from './config'
