@@ -2,7 +2,7 @@
 version: '3'
 services:
   collector:
-    image: &image shardeum/explorer-stack:dev
+    image: &image shardeum/shardeum-explorer:dev
     container_name: explorer-collector
     build: .
     restart: unless-stopped
