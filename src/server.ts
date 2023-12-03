@@ -112,6 +112,7 @@ const start = async (): Promise<void> => {
 
   const server = Fastify({
     logger: false,
+    pluginTimeout: 120_000,
   })
 
   await server.register(FastifyWebsocket)
