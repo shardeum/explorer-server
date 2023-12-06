@@ -1471,7 +1471,7 @@ const start = async (): Promise<void> => {
   server.listen(
     {
       port: CONFIG.server.port,
-      host: CONFIG.server.host,
+      host: '0.0.0.0',
     },
     async (err) => {
       if (err) {
@@ -1479,7 +1479,7 @@ const start = async (): Promise<void> => {
         console.log(err)
         throw err
       }
-      console.log(`Shardeum explorer server is listening on: ${CONFIG.server.host}:${CONFIG.server.port}`)
+      console.log(`Shardeum explorer server is listening on: 0.0.0.0:${CONFIG.server.port}`)
     }
   )
 }

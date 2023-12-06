@@ -50,16 +50,16 @@ const start = async (): Promise<void> => {
   server.listen(
     {
       port: config.log_server.port,
-      host: config.log_server.host,
+      host: '0.0.0.0',
     },
     async (err) => {
       if (err) {
         server.log.error(
-          `Error starting distributor on: ${config.log_server.host}:${config.log_server.port}. Error ${err}`
+          `Error starting distributor on: 0.0.0.0:${config.log_server.port}. Error ${err}`
         )
         throw err
       }
-      console.log(`Distributor server is listening on: ${config.log_server.host}:${config.log_server.port}`)
+      console.log(`Distributor server is listening on: 0.0.0.0:${config.log_server.port}`)
     }
   )
 }
