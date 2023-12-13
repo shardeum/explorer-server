@@ -1,0 +1,68 @@
+---
+version: '3'
+services:
+  collector:
+    image: &image registry.gitlab.com/shardeum/shardeum-explorer:dev
+    container_name: explorer-collector
+    build: .
+    restart: unless-stopped
+    command: ['collector']
+    network_mode: &network-mode host
+    volumes: &volume
+      - ./data/:/app/data/
+      # - ./src/config/index.ts:/app/src/config/index.ts
+      # - ./entrypoint.sh:/entrypoint.sh
+    environment: &envs
+      - DB_PATH=/app/data/
+      - ARCHIVERIP=3.77.203.3
+    configs:
+      - source: archiverconfig
+        target: /app/archiverConfig.json
+    # ports:
+    #   - 4444:4444 # collector
+
+  explorer:
+    depends_on: [collector]
+    image: *image
+    container_name: explorer-server
+    network_mode: *network-mode
+    environment: *envs
+    volumes: *volume
+    command: ['server']
+    # ports:
+    #   - 6001:6001 # explorer server frontend
+
+  log-server:
+    depends_on: [collector]
+    image: *image
+    container_name: explorer-log-server
+    network_mode: *network-mode
+    environment: *envs
+    volumes: *volume
+    command: ['log_server']
+    # ports:
+    #   - 4446:4446 # log server
+
+  ## start this after data gets synced
+  aggregator:
+    depends_on: [collector]
+    image: *image
+    container_name: explorer-aggregator
+    network_mode: *network-mode
+    command: ['aggregator']
+    profiles:
+      - aggregator
+    environment: *envs
+    volumes: *volume
+
+  # proxy:
+  #   image: caddy
+  #   container_name: explorer-proxy
+  #   restart: unless-stopped
+  #   entrypoint: caddy reverse-proxy --from :8080 --to explorer:6001
+    # ports:
+    #   - 8080:8080
+
+configs:
+  archiverconfig:
+    file: ./archiverConfig.json

@@ -19,6 +19,7 @@ export const config = {
   apiUrl: '',
   verbose: false,
   genesisSHMSupply: 100000000,
+  dbPath: process.env.DB_PATH?.replace(/\/+$/, '') || '.', // remove
   rateLimit: 100,
   patchData: false,
   GTM_Id: '',
