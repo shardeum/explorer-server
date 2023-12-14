@@ -11,7 +11,7 @@ export const config = {
     port: process.env.ARCHIVERPORT || '4000',
     publicKey: process.env.ARCHIVERPK || '758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
   },
-  rpcUrl: 'http://localhost:8080',
+  rpcUrl: process.env.RPC_URL || 'http://localhost:8080',
   apiUrl: '',
   EXPLORER_DB: 'explorer-db',
   TRANSACTION_DB: 'transaction-db',
