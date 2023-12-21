@@ -1,5 +1,10 @@
+export enum envEnum {
+  DEV,
+  PROD,
+}
+
 export const config = {
-  env: process.env.NODE_ENV || 'development', // development, production
+  env: process.env.NODE_ENV || envEnum.DEV,
   host: process.env.HOST || '127.0.0.1',
   subscription: {
     enabled: false,

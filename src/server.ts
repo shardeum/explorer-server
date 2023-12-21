@@ -31,7 +31,7 @@ import {
 } from './types'
 import * as utils from './utils'
 // config variables
-import { config as CONFIG, config } from './config'
+import { config as CONFIG, config, envEnum } from './config'
 import {
   coinStatsCacheRecord,
   isCacheRecordValid,
@@ -65,24 +65,27 @@ if (port) {
 }
 console.log('Port', CONFIG.port.server)
 
-// Pull in secrets
-const secretsPath = path.join(__dirname, '../.secrets')
-const secrets = {}
+if (config.env == envEnum.DEV) {
+  //default debug mode
+  //  pragma: allowlist nextline secret
+  config.USAGE_ENDPOINTS_KEY = 'ceba96f6eafd2ea59e68a0b0d754a939'
+} else {
+  // Pull in secrets
+  const secretsPath = path.join(__dirname, '../.secrets')
+  const secrets = {}
 
-if (fs.existsSync(secretsPath)) {
-  const lines = fs.readFileSync(secretsPath, 'utf-8').split('\n').filter(Boolean)
+  if (fs.existsSync(secretsPath)) {
+    const lines = fs.readFileSync(secretsPath, 'utf-8').split('\n').filter(Boolean)
 
-  lines.forEach((line) => {
-    const [key, value] = line.split('=')
-    secrets[key.trim()] = value.trim()
-  })
+    lines.forEach((line) => {
+      const [key, value] = line.split('=')
+      secrets[key.trim()] = value.trim()
+    })
+  }
+
+  if (secrets['USAGE_ENDPOINTS_KEY'] === undefined) config.USAGE_ENDPOINTS_KEY = ''
+  else config.USAGE_ENDPOINTS_KEY = secrets['USAGE_ENDPOINTS_KEY']
 }
-
-if (secrets['USAGE_ENDPOINTS_KEY'] === undefined) config.USAGE_ENDPOINTS_KEY = ''
-else config.USAGE_ENDPOINTS_KEY = secrets['USAGE_ENDPOINTS_KEY']
-
-// Now, secrets contain your secrets, for example:
-// const apiKey = secrets.API_KEY;
 
 interface RequestQuery {
   page: string
