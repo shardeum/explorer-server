@@ -27,6 +27,7 @@ import {
   OriginalTxDataInterface,
   TransactionSearchType,
   TransactionType,
+  TxMethodFilter,
 } from './types'
 import * as utils from './utils'
 // config variables
@@ -74,6 +75,9 @@ interface RequestQuery {
   contractAddress: string
   token: string
   filterAddress: string
+  txFrom: string
+  txTo: string
+  nominee: string
   txType: string
   startCycle: string
   endCycle: string
@@ -430,6 +434,9 @@ const start = async (): Promise<void> => {
       afterTimestamp: 's?',
       blockNumber: 's?',
       blockHash: 's?',
+      txFrom: 's?',
+      txTo: 's?',
+      nominee: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -630,6 +637,48 @@ const start = async (): Promise<void> => {
         const result = await Account.queryTokenBalance(address, filterAddress)
         if (result.success) filterAddressTokenBalance = Number(result.balance)
       }
+    } else if (query.txFrom || query.txTo || query.nominee) {
+      const account = query.txFrom
+        ? { address: query.txFrom.toLowerCase(), txMethod: TxMethodFilter.TxFrom }
+        : query.txTo
+        ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
+        : query.nominee
+        ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
+        : null
+      let page: number
+      if (query.page) {
+        page = parseInt(query.page)
+        if (page <= 0 || Number.isNaN(page)) {
+          reply.send({ success: false, error: 'Invalid page number' })
+          return
+        }
+      } else page = 1
+      // checking totalPages first
+      totalTransactions = await Transaction.queryTransactionCount(
+        account.address,
+        txType,
+        null,
+        account.txMethod
+      )
+      if (totalTransactions <= 0) {
+        reply.send({ success: true, transactions: [], totalPages: 0 })
+        return
+      }
+      totalPages = Math.ceil(totalTransactions / itemsPerPage)
+      if (page > totalPages) {
+        reply.send({
+          success: false,
+          error: 'Page no is greater than the totalPage',
+        })
+      }
+      transactions = await Transaction.queryTransactions(
+        (page - 1) * itemsPerPage,
+        itemsPerPage,
+        account.address,
+        txType,
+        null,
+        account.txMethod
+      )
     } else if (query.page) {
       const page: number = parseInt(query.page)
       if (page <= 0 || Number.isNaN(page)) {

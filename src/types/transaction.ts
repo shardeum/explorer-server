@@ -132,3 +132,9 @@ export interface Log {
   transactionHash: string
   transactionIndex: string
 }
+
+export enum TxMethodFilter {
+  TxFrom = 'txFrom',
+  TxTo = 'txTo',
+  Nominee = 'nominee',
+}

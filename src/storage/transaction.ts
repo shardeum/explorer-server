@@ -10,6 +10,7 @@ import {
   WrappedEVMAccount,
   WrappedDataReceipt,
   InternalTXType,
+  TxMethodFilter,
 } from '../types'
 import Web3 from 'web3'
 import * as Account from './account'
@@ -311,12 +312,16 @@ export const getWeb3 = function (): Promise<Web3> {
 export async function queryTransactionCount(
   address?: string,
   txType?: TransactionSearchType,
-  filterAddress?: string
+  filterAddress?: string,
+  filterType?: TxMethodFilter
 ): Promise<number> {
   let transactions: { 'COUNT(*)': number } = { 'COUNT(*)': 0 }
   try {
     if (address) {
-      if (!txType) {
+      if (filterType) {
+        const sql = `SELECT COUNT(*) FROM transactions WHERE ${filterType}=?`
+        transactions = await db.get(sql, [address])
+      } else if (!txType) {
         const sql = `SELECT COUNT(*) FROM transactions WHERE txFrom=? OR txTo=? OR nominee=?`
         transactions = await db.get(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -449,12 +454,16 @@ export async function queryTransactions(
   limit = 10,
   address?: string,
   txType?: TransactionSearchType,
-  filterAddress?: string
+  filterAddress?: string,
+  filterType?: TxMethodFilter
 ): Promise<(DbTransaction | DbTokenTx)[]> {
   let transactions: (DbTransaction | DbTokenTx)[] = []
   try {
     if (address) {
-      if (!txType) {
+      if (filterType) {
+        const sql = `SELECT * FROM transactions WHERE ${filterType}=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+        transactions = await db.all(sql, [address])
+      } else if (!txType) {
         const sql = `SELECT * FROM transactions WHERE (txFrom=? OR txTo=? OR nominee=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [address, address, address])
       } else if (txType === TransactionSearchType.AllExceptInternalTx) {
