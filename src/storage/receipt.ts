@@ -213,7 +213,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
           else combineTransactions.push(txObj)
         } else {
           if (transactionExist.cycle <= txObj.cycle && transactionExist.timestamp < txObj.timestamp) {
-            await Transaction.insertTransaction(tx)
+            await Transaction.insertTransaction(txObj)
           }
           newTx = false
         }
