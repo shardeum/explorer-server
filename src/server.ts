@@ -53,7 +53,7 @@ import { getStakeTxBlobFromEVMTx, getTransactionObj } from './utils/decodeEVMRaw
 import { bytesToHex, bigIntToHex } from '@ethereumjs/util'
 import path from 'path'
 import fs from 'fs'
-import { config } from './config/index'
+//import { config } from './config/index'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
 
