@@ -578,7 +578,8 @@ export async function downloadOriginalTxsDataByCycle(
 
 export const downloadCyclcesBetweenCycles = async (
   startCycle: number,
-  totalCyclesToSync: number
+  totalCyclesToSync: number,
+  saveOnlyNewData = false
 ): Promise<void> => {
   let endCycle = startCycle + MAX_CYCLES_PER_REQUEST
   const archiverUrl = await getDefaultArchiverUrl()
@@ -601,6 +602,10 @@ export const downloadCyclcesBetweenCycles = async (
           cycleRecord: cycle,
           cycleMarker: cycle.marker,
         }
+        if (saveOnlyNewData) {
+          const existingCycle = await Cycle.queryCycleByCounter(cycleObj.counter)
+          if (existingCycle) continue
+        } else combineCycles.push(cycleObj)
         combineCycles.push(cycleObj)
       }
       await Cycle.bulkInsertCycles(combineCycles)
@@ -613,7 +618,8 @@ export const downloadCyclcesBetweenCycles = async (
 
 export const downloadReceiptsBetweenCycles = async (
   startCycle: number,
-  totalCyclesToSync: number
+  totalCyclesToSync: number,
+  saveOnlyNewData = false
 ): Promise<void> => {
   let endCycle = startCycle + MAX_BETWEEN_CYCLES_PER_REQUEST
   const archiverUrl = await getDefaultArchiverUrl()
@@ -633,7 +639,7 @@ export const downloadReceiptsBetweenCycles = async (
         if (response && response.data && response.data.receipts) {
           console.log(`Downloaded receipts`, response.data.receipts.length)
           const receipts = response.data.receipts
-          await Receipt.processReceiptData(receipts)
+          await Receipt.processReceiptData(receipts, saveOnlyNewData)
         }
       }
     } else {
@@ -647,7 +653,8 @@ export const downloadReceiptsBetweenCycles = async (
 
 export const downloadOriginalTxsDataBetweenCycles = async (
   startCycle: number,
-  totalCyclesToSync: number
+  totalCyclesToSync: number,
+  saveOnlyNewData = false
 ): Promise<void> => {
   let endCycle = startCycle + MAX_BETWEEN_CYCLES_PER_REQUEST
   const archiverUrl = await getDefaultArchiverUrl()
@@ -667,7 +674,7 @@ export const downloadOriginalTxsDataBetweenCycles = async (
         if (response && response.data && response.data.originalTxs) {
           console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
           const originalTxsData = response.data.originalTxs
-          await OriginalTxData.processOriginalTxData(originalTxsData)
+          await OriginalTxData.processOriginalTxData(originalTxsData, saveOnlyNewData)
         }
       }
     } else {

@@ -64,7 +64,7 @@ export async function bulkInsertReceipts(receipts: Receipt[]): Promise<void> {
   }
 }
 
-export async function processReceiptData(receipts: Receipt[]): Promise<void> {
+export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = false): Promise<void> {
   if (receipts && receipts.length <= 0) return
   if (!cleanReceiptsMapByCycle) {
     const currentTime = Date.now()
@@ -87,9 +87,11 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
       continue
     }
-    const receiptExist = await queryReceiptByReceiptId(tx.txId)
+    if (saveOnlyNewData) {
+      const receiptExist = await queryReceiptByReceiptId(tx.txId)
+      if (!receiptExist) combineReceipts.push(receiptObj as unknown as Receipt)
+    } else combineReceipts.push(receiptObj as unknown as Receipt)
     let txReceipt: WrappedAccount = receipt
-    if (!receiptExist) combineReceipts.push(receiptObj as unknown as Receipt)
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
 
@@ -152,7 +154,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
       if (index > -1) {
         // eslint-disable-next-line security/detect-object-injection
         const accountExist = combineAccounts1[index]
-        if (accountExist.cycle < accObj.cycle && accountExist.timestamp < accObj.timestamp) {
+        if (accountExist.timestamp < accObj.timestamp) {
           combineAccounts1.splice(index, 1)
           combineAccounts1.push(accObj)
         }
@@ -220,7 +222,7 @@ export async function processReceiptData(receipts: Receipt[]): Promise<void> {
           if (txObj.nominee) await Transaction.insertTransaction(txObj)
           else combineTransactions.push(txObj)
         } else {
-          if (transactionExist.cycle <= txObj.cycle && transactionExist.timestamp < txObj.timestamp) {
+          if (transactionExist.timestamp < txObj.timestamp) {
             await Transaction.insertTransaction(txObj)
           }
           newTx = false
