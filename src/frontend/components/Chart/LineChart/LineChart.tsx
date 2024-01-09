@@ -42,6 +42,7 @@ export const LineChart: React.FC<LineChartProps> = (props: LineChartProps) => {
       {
         name: name,
         data: data,
+        findNearestPointBy: 'xy',
       },
     ],
     legend: {
