@@ -1,12 +1,14 @@
 import React from 'react'
 
-import { LineChart } from '../../components'
+import { LineChart, StackedLineChart } from '../../components'
 
 import styles from './ChartDetail.module.scss'
+import { TransactionStats } from '../../../stats/transactionStats'
+import { convertTransactionStatsToSeriesData } from '../../utils/transformChartData'
 
 export interface ChartDetailProps {
   validatorStats: number[][]
-  transactionStats: number[][]
+  transactionStats: TransactionStats[]
 }
 
 export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
@@ -20,9 +22,9 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
         />
       </div>
       <div className={styles.item}>
-        <LineChart
+        <StackedLineChart
           title="TOTAL TRANSACTION HISTORY IN LAST 1000 CYCLES"
-          data={data.transactionStats}
+          data={convertTransactionStatsToSeriesData(data.transactionStats)}
           name="Transactions"
         />
       </div>

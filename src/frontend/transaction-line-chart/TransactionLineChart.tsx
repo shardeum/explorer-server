@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { ContentLayout, LineStockChart } from '../components'
+import { ContentLayout, StackedLineStockChart } from '../components'
 
 import styles from './TransactionLineChart.module.scss'
 import { useStats } from '../api'
+import { convertTransactionStatsToSeriesData } from '../utils/transformChartData'
 
 export const TransactionLineChart: React.FC = () => {
   const height = 600
@@ -11,18 +12,19 @@ export const TransactionLineChart: React.FC = () => {
   const { transactionStats, loading } = useStats({
     transactionStatsCount: 10000000,
   })
+
   return (
     <div className={styles.TransactionLineChart}>
       <ContentLayout title="Transactions per Cycle Chart">
         {loading ? (
           <div>Loading...</div>
         ) : (
-          <LineStockChart
+          <StackedLineStockChart
             title="Transactions per Cycle Chart"
             centerTitle
             subTitle="Click and drag in the plot area to zoom in"
             height={height}
-            data={transactionStats}
+            data={convertTransactionStatsToSeriesData(transactionStats)}
             name="Transactions"
           />
         )}

@@ -18,15 +18,16 @@ export const useStats = (query: {
   validatorStatsCount?: number
   transactionStatsCount?: number
   fetchCoinStats?: boolean
+  transactionResponseType?: string | undefined
 }): StatsResult => {
-  const { validatorStatsCount, transactionStatsCount, fetchCoinStats } = query
+  const { validatorStatsCount, transactionStatsCount, fetchCoinStats, transactionResponseType } = query
 
   // set query paths to `null` if we shouldn't fetch them
   const validatorStatsQuery = validatorStatsCount
     ? `${PATHS.STATS_VALIDATOR}?count=${validatorStatsCount}&responseType=array`
     : null
   const transactionStatsQuery = transactionStatsCount
-    ? `${PATHS.STATS_TRANSACTION}?count=${transactionStatsCount}&responseType=array`
+    ? `${PATHS.STATS_TRANSACTION}?count=${transactionStatsCount}&responseType=${transactionResponseType}`
     : null
   const coinStatsQuery = fetchCoinStats ? `${PATHS.STATS_COIN}` : null
 

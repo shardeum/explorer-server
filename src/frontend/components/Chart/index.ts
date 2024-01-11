@@ -1,2 +1,2 @@
-export { LineChart, LineStockChart } from './LineChart'
+export { LineChart, LineStockChart, StackedLineChart, StackedLineStockChart } from './LineChart'
 export { BarChart } from './BarChart'

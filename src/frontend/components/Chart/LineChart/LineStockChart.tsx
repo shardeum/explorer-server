@@ -82,6 +82,11 @@ export const LineStockChart: React.FC<LineStockChartProps> = (props) => {
       },
     },
     series: seriesData,
+    plotOptions: {
+      series: {
+        findNearestPointBy: 'xy',
+      },
+    },
     legend: {
       enabled: true,
       layout: 'horizontal',

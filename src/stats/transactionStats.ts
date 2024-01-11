@@ -4,12 +4,12 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
 
 export interface TransactionStats {
-  cycle: number
+  timestamp: number
   totalTxs: number
   totalInternalTxs: number
   totalStakeTxs: number
   totalUnstakeTxs: number
-  timestamp: number
+  cycle: number
 }
 
 export async function insertTransactionStats(transactionStats: TransactionStats): Promise<void> {
