@@ -1,6 +1,7 @@
 import { TransactionFactory, Transaction, TransactionType } from '@ethereumjs/tx'
 import { bytesToHex, toAscii, toBytes } from '@ethereumjs/util'
 import { config } from '../config'
+import { TransactionType as TransactionType2, OriginalTxDataInterface } from '../types'
 
 export function getTransactionObj(
   tx: any // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -46,5 +47,31 @@ export function getStakeTxBlobFromEVMTx(
     return JSON.parse(stakeTxString)
   } catch (e) {
     console.log('Unable to get stakeTxBlobFromEVMTx', e)
+  }
+}
+
+export function decodeEVMRawTxData(originalTxData: OriginalTxDataInterface): void {
+  if (originalTxData.originalTxData.tx.raw) {
+    // EVM Tx
+    const txObj = getTransactionObj(originalTxData.originalTxData.tx)
+    // Custom readableReceipt for originalTxsData
+    if (txObj) {
+      const readableReceipt = {
+        from: txObj.getSenderAddress().toString(),
+        to: txObj.to ? txObj.to.toString() : null,
+        nonce: txObj.nonce.toString(16),
+        value: txObj.value.toString(16),
+        data: '0x' + txObj.data.toString(),
+        // contractAddress // TODO: add contract address
+      }
+      if (
+        originalTxData.transactionType === TransactionType2.StakeReceipt ||
+        originalTxData.transactionType === TransactionType2.UnstakeReceipt
+      ) {
+        const internalTxData = getStakeTxBlobFromEVMTx(txObj)
+        readableReceipt['internalTxData'] = internalTxData
+      }
+      originalTxData.originalTxData = { ...originalTxData.originalTxData, readableReceipt }
+    }
   }
 }

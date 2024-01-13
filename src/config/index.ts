@@ -29,6 +29,8 @@ export const config = {
   patchData: false,
   GTM_Id: '',
   USAGE_ENDPOINTS_KEY: '',
+  enableTxHashCache: true,
+  findTxHashInOriginalTx: true,
 }
 
 export const ARCHIVER_INFO = `${config.archiverInfo.ip}:${config.archiverInfo.port}:${config.archiverInfo.publicKey}`
