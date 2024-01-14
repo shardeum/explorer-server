@@ -30,16 +30,16 @@ export async function validateData(data: Data): Promise<void> {
   if (err) {
     return
   }
-  if (data.sign.owner !== CONFIG.archiverInfo.publicKey) {
-    console.log('Data received from archive-server has invalid key')
+  if (data.sign.owner !== CONFIG.distributorInfo.publicKey) {
+    console.log('Data received from distributor has invalid key')
     return
   }
   if (!crypto.verifyObj(data)) {
-    console.log('Data received from archive-server has invalid signature')
+    console.log('Data received from distributor has invalid signature')
     return
   }
   if (!data.receipts && !data.cycles && !data.originalTxsData) {
-    console.log('Data received from archive-server is invalid')
+    console.log('Data received from distributor is invalid')
     return
   }
   const { receipts, cycles, originalTxsData } = data

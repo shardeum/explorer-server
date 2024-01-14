@@ -4,8 +4,8 @@ import * as Transaction from '../storage/transaction'
 import * as Cycle from '../storage/cycle'
 import * as Receipt from '../storage/receipt'
 import * as OriginalTxData from '../storage/originalTxData'
-import { config } from '../config'
-import { getDefaultArchiverUrl } from '../archiver'
+import { config, DISTRIBUTOR_URL } from '../config'
+import * as crypto from '@shardus/crypto-utils'
 
 export let needSyncing = false
 
@@ -34,6 +34,56 @@ export const updateLastSyncedCycle = (cycle: number): void => {
   lastSyncedCycle = cycle
 }
 
+export enum DataType {
+  CYCLE = 'cycleinfo',
+  RECEIPT = 'receipt',
+  ORIGINALTX = 'originalTx',
+  ACCOUNT = 'account',
+  TRANSACTION = 'transaction',
+  TOTALDATA = 'totalData',
+}
+
+export const queryFromDistributor = async (type: DataType, queryParameters: any): Promise<any> => {
+  const data = {
+    ...queryParameters,
+    sender: config.collectorInfo.publicKey,
+  }
+  crypto.signObj(data, config.collectorInfo.secretKey, config.collectorInfo.publicKey)
+  let url
+  switch (type) {
+    case DataType.CYCLE:
+      url = `${DISTRIBUTOR_URL}/cycleinfo`
+      break
+    case DataType.RECEIPT:
+      url = `${DISTRIBUTOR_URL}/receipt`
+      break
+    case DataType.ORIGINALTX:
+      url = `${DISTRIBUTOR_URL}/originalTx`
+      break
+    case DataType.ACCOUNT:
+      url = `${DISTRIBUTOR_URL}/account`
+      break
+    case DataType.TRANSACTION:
+      url = `${DISTRIBUTOR_URL}/transaction`
+      break
+    case DataType.TOTALDATA:
+      url = `${DISTRIBUTOR_URL}/totalData`
+      break
+  }
+  try {
+    const response = await axios.post(url, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    })
+    return response
+  } catch (e) {
+    console.log(`Error while querying ${url} for data ${data}`, e)
+    return null
+  }
+}
+
 export async function compareWithOldReceiptsData(
   lastStoredReceiptCycle = 0
 ): Promise<{ success: boolean; matchedCycle: number }> {
@@ -41,15 +91,12 @@ export async function compareWithOldReceiptsData(
   const endCycle = lastStoredReceiptCycle
   const startCycle = endCycle - numberOfCyclesTocompare > 0 ? endCycle - numberOfCyclesTocompare : 0
   let downloadedReceiptCountByCycles: { cycle: number; receipts: number }[]
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
-  )
+  const response = await queryFromDistributor(DataType.RECEIPT, { startCycle, endCycle, type: 'tally' })
   if (response && response.data && response.data.receipts) {
     downloadedReceiptCountByCycles = response.data.receipts
   } else {
     throw Error(
-      `Can't fetch receipts data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${archiverUrl}`
+      `Can't fetch receipts data from cycle ${startCycle} to cycle ${endCycle}  from distributor ${DISTRIBUTOR_URL}`
     )
   }
   const oldReceiptCountByCycle = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
@@ -81,15 +128,12 @@ export async function compareWithOldOriginalTxsData(
   const endCycle = lastStoredOriginalTxDataCycle
   const startCycle = endCycle - numberOfCyclesTocompare > 0 ? endCycle - numberOfCyclesTocompare : 0
   let downloadedOriginalTxDataCountByCycles: { cycle: number; originalTxsData: number }[]
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
-  )
+  const response = await queryFromDistributor(DataType.ORIGINALTX, { startCycle, endCycle, type: 'tally' })
   if (response && response.data && response.data.originalTxs) {
     downloadedOriginalTxDataCountByCycles = response.data.originalTxs
   } else {
     throw Error(
-      `Can't fetch originalTxsData data from cycle ${startCycle} to cycle ${endCycle}  from archiver ${archiverUrl}`
+      `Can't fetch originalTxsData data from cycle ${startCycle} to cycle ${endCycle}  from distributor ${DISTRIBUTOR_URL}`
     )
   }
   const oldOriginalTxDataCountByCycle = await OriginalTxData.queryOriginalTxDataCountByCycles(
@@ -126,10 +170,10 @@ export const compareWithOldCyclesData = async (
   let downloadedCycles: Cycle.Cycle[]
 
   const numberOfCyclesTocompare = 10
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/cycleinfo?start=${lastCycleCounter - numberOfCyclesTocompare}&end=${lastCycleCounter - 1}`
-  )
+  const response = await queryFromDistributor(DataType.CYCLE, {
+    start: lastCycleCounter - numberOfCyclesTocompare,
+    end: lastCycleCounter - 1,
+  })
   if (response && response.data && response.data.cycleInfo) {
     downloadedCycles = response.data.cycleInfo
   } else {
@@ -190,14 +234,13 @@ export const downloadTxsDataAndCycles = async (
     completeForReceipt = true
     completeForOriginalTxData = true
   }
-  const archiverUrl = await getDefaultArchiverUrl()
   while (!completeForReceipt || !completeForCycle || !completeForOriginalTxData) {
     if (
       endReceipt >= totalReceiptsToSync ||
       endCycle >= totalCyclesToSync ||
       endOriginalTxData >= totalOriginalTxsToSync
     ) {
-      const res = await axios.get(`${archiverUrl}/totalData`)
+      const res = await queryFromDistributor(DataType.TOTALDATA, {})
       if (res.data && res.data.totalCycles && res.data.totalReceipts) {
         if (totalReceiptsToSync < res.data.totalReceipts) {
           completeForReceipt = false
@@ -227,7 +270,7 @@ export const downloadTxsDataAndCycles = async (
     }
     if (!completeForReceipt) {
       console.log(`Downloading receipts from ${startReceipt} to ${endReceipt}`)
-      const response = await axios.get(`${archiverUrl}/receipt?start=${startReceipt}&end=${endReceipt}`)
+      const response = await queryFromDistributor(DataType.RECEIPT, { start: startReceipt, end: endReceipt })
       if (response && response.data && response.data.receipts) {
         console.log(`Downloaded receipts`, response.data.receipts.length)
         await Receipt.processReceiptData(response.data.receipts)
@@ -246,9 +289,10 @@ export const downloadTxsDataAndCycles = async (
     }
     if (!completeForOriginalTxData) {
       console.log(`Downloading originalTxsData from ${startOriginalTxData} to ${endOriginalTxData}`)
-      const response = await axios.get(
-        `${archiverUrl}/originalTx?start=${startOriginalTxData}&end=${endOriginalTxData}`
-      )
+      const response = await queryFromDistributor(DataType.ORIGINALTX, {
+        start: startOriginalTxData,
+        end: endOriginalTxData,
+      })
       if (response && response.data && response.data.originalTxs) {
         console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
         await OriginalTxData.processOriginalTxData(response.data.originalTxs)
@@ -267,7 +311,7 @@ export const downloadTxsDataAndCycles = async (
     }
     if (!completeForCycle) {
       console.log(`Downloading cycles from ${startCycle} to ${endCycle}`)
-      const response = await axios.get(`${archiverUrl}/cycleinfo?start=${startCycle}&end=${endCycle}`)
+      const response = await queryFromDistributor(DataType.CYCLE, { start: startCycle, end: endCycle })
       if (response && response.data && response.data.cycleInfo) {
         console.log(`Downloaded cycles`, response.data.cycleInfo.length)
         const cycles = response.data.cycleInfo
@@ -326,9 +370,8 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     return
   }
 
-  const archiverUrl = await getDefaultArchiverUrl()
   if (totalExistingGenesisAccounts === 0) {
-    const res = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5`)
+    const res = await queryFromDistributor(DataType.ACCOUNT, { startCycle: 0, endCycle: 5 })
     if (res && res.data && res.data.totalAccounts) {
       totalGenesisAccounts = res.data.totalAccounts
     } else {
@@ -339,7 +382,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     let page = 1
     while (!completeSyncingAccounts) {
       console.log(`Downloading accounts from ${startAccount} to ${endAccount}`)
-      const response = await axios.get(`${archiverUrl}/account?startCycle=0&endCycle=5&page=${page}`)
+      const response = await queryFromDistributor(DataType.ACCOUNT, { startCycle: 0, endCycle: 5, page })
       if (response && response.data && response.data.accounts) {
         if (response.data.accounts.length < MAX_ACCOUNTS_PER_REQUEST) {
           completeSyncingAccounts = true
@@ -359,7 +402,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     await Transaction.processTransactionData(combineTransactions)
   }
   if (totalExistingGenesisTransactionReceipts === 0) {
-    const res = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5`)
+    const res = await queryFromDistributor(DataType.TRANSACTION, { startCycle: 0, endCycle: 5 })
     if (res && res.data && res.data.totalTransactions) {
       totalGenesisTransactionReceipts = res.data.totalTransactions
     } else {
@@ -370,7 +413,7 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     let page = 1
     while (!completeSyncTransactions) {
       console.log(`Downloading transactions from ${startTransaction} to ${endTransaction}`)
-      const response = await axios.get(`${archiverUrl}/transaction?startCycle=0&endCycle=5&page=${page}`)
+      const response = await queryFromDistributor(DataType.TRANSACTION, { startCycle: 0, endCycle: 5, page })
       if (response && response.data && response.data.transactions) {
         if (response.data.transactions.length < MAX_ACCOUNTS_PER_REQUEST) {
           completeSyncTransactions = true
@@ -428,15 +471,12 @@ export async function compareReceiptsCountByCycles(
 ): Promise<{ cycle: number; receipts: number }[]> {
   const unMatchedCycle = []
   let downloadedReceiptCountByCycle: { cycle: number; receipts: number }[]
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
-  )
+  const response = await queryFromDistributor(DataType.RECEIPT, { startCycle, endCycle, type: 'tally' })
   if (response && response.data && response.data.receipts) {
     downloadedReceiptCountByCycle = response.data.receipts
   } else {
     console.log(
-      `Can't fetch receipts count between cycle ${startCycle} and cycle ${endCycle} from archiver ${archiverUrl}`
+      `Can't fetch receipts count between cycle ${startCycle} and cycle ${endCycle} from distributor ${DISTRIBUTOR_URL}`
     )
     return
   }
@@ -464,15 +504,12 @@ export async function compareOriginalTxsCountByCycles(
 ): Promise<{ cycle: number; originalTxsData: number }[]> {
   const unMatchedCycle = []
   let downloadedOriginalTxDataCountByCycle: { cycle: number; originalTxsData: number }[]
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(
-    `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&type=tally`
-  )
+  const response = await queryFromDistributor(DataType.ORIGINALTX, { startCycle, endCycle, type: 'tally' })
   if (response && response.data && response.data.originalTxs) {
     downloadedOriginalTxDataCountByCycle = response.data.originalTxs
   } else {
     console.log(
-      `Can't fetch originalTxs count between cycle ${startCycle} and cycle ${endCycle} from archiver ${archiverUrl}`
+      `Can't fetch originalTxs count between cycle ${startCycle} and cycle ${endCycle} from distributor ${DISTRIBUTOR_URL}`
     )
     return
   }
@@ -503,13 +540,14 @@ export async function downloadReceiptsByCycle(
   for (const { cycle, receipts } of data) {
     let page = 1
     let totalDownloadedReceipts = 0
-    const archiverUrl = await getDefaultArchiverUrl()
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const response = await axios.get(
-        `${archiverUrl}/receipt?startCycle=${cycle}&endCycle=${cycle}&page=${page}`
-      )
+      const response = await queryFromDistributor(DataType.RECEIPT, {
+        startCycle: cycle,
+        endCycle: cycle,
+        page,
+      })
       if (response && response.data && response.data.receipts) {
         const downloadedReceipts = response.data.receipts
         if (downloadedReceipts.length > 0) {
@@ -517,7 +555,7 @@ export async function downloadReceiptsByCycle(
           await Receipt.processReceiptData(downloadedReceipts)
         } else {
           console.log(
-            `Got 0 receipts when querying for page ${page} of cycle ${cycle} from archiver ${archiverUrl}`
+            `Got 0 receipts when querying for page ${page} of cycle ${cycle} from distributor ${DISTRIBUTOR_URL}`
           )
           break
         }
@@ -528,7 +566,9 @@ export async function downloadReceiptsByCycle(
           break
         }
       } else {
-        console.log(`Can't fetch receipts for  page ${page} of cycle ${cycle} from archiver ${archiverUrl}`)
+        console.log(
+          `Can't fetch receipts for  page ${page} of cycle ${cycle} from distributor ${DISTRIBUTOR_URL}`
+        )
         break
       }
     }
@@ -541,13 +581,14 @@ export async function downloadOriginalTxsDataByCycle(
   for (const { cycle, originalTxsData } of data) {
     let page = 1
     let totalDownloadOriginalTxsData = 0
-    const archiverUrl = await getDefaultArchiverUrl()
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const response = await axios.get(
-        `${archiverUrl}/originalTx?startCycle=${cycle}&endCycle=${cycle}&page=${page}`
-      )
+      const response = await queryFromDistributor(DataType.ORIGINALTX, {
+        startCycle: cycle,
+        endCycle: cycle,
+        page,
+      })
       if (response && response.data && response.data.originalTxs) {
         const downloadedOriginalTxsData = response.data.originalTxs
         if (downloadedOriginalTxsData.length > 0) {
@@ -555,7 +596,7 @@ export async function downloadOriginalTxsDataByCycle(
           await OriginalTxData.processOriginalTxData(downloadedOriginalTxsData)
         } else {
           console.log(
-            `Got 0 originalTxData when querying for page ${page} of cycle ${cycle} from archiver ${archiverUrl}`
+            `Got 0 originalTxData when querying for page ${page} of cycle ${cycle} from distributor ${DISTRIBUTOR_URL}`
           )
           break
         }
@@ -568,7 +609,7 @@ export async function downloadOriginalTxsDataByCycle(
         }
       } else {
         console.log(
-          `Can't fetch originalTxsData for  page ${page} of cycle ${cycle} from archiver ${archiverUrl}`
+          `Can't fetch originalTxsData for  page ${page} of cycle ${cycle} from distributor ${DISTRIBUTOR_URL}`
         )
         break
       }
@@ -582,10 +623,9 @@ export const downloadCyclcesBetweenCycles = async (
   saveOnlyNewData = false
 ): Promise<void> => {
   let endCycle = startCycle + MAX_CYCLES_PER_REQUEST
-  const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
-    const response = await axios.get(`${archiverUrl}/cycleinfo?start=${startCycle}&end=${endCycle}`)
+    const response = await queryFromDistributor(DataType.CYCLE, { startCycle, endCycle })
     if (response && response.data && response.data.cycleInfo) {
       console.log(`Downloaded cycles`, response.data.cycleInfo.length)
       const cycles = response.data.cycleInfo
@@ -622,20 +662,15 @@ export const downloadReceiptsBetweenCycles = async (
   saveOnlyNewData = false
 ): Promise<void> => {
   let endCycle = startCycle + MAX_BETWEEN_CYCLES_PER_REQUEST
-  const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
     console.log(`Downloading receipts from cycle ${startCycle} to cycle ${endCycle}`)
-    let response = await axios.get(
-      `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&type=count`
-    )
+    let response = await queryFromDistributor(DataType.RECEIPT, { startCycle, endCycle, type: 'count' })
     if (response && response.data && response.data.receipts) {
       console.log(`Download receipts Count`, response.data.receipts)
       const receiptsCount = response.data.receipts
       for (let i = 1; i <= Math.ceil(receiptsCount / MAX_BETWEEN_CYCLES_PER_REQUEST); i++) {
-        response = await axios.get(
-          `${archiverUrl}/receipt?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
-        )
+        response = await queryFromDistributor(DataType.RECEIPT, { startCycle, endCycle, page: i })
         if (response && response.data && response.data.receipts) {
           console.log(`Downloaded receipts`, response.data.receipts.length)
           const receipts = response.data.receipts
@@ -657,20 +692,15 @@ export const downloadOriginalTxsDataBetweenCycles = async (
   saveOnlyNewData = false
 ): Promise<void> => {
   let endCycle = startCycle + MAX_BETWEEN_CYCLES_PER_REQUEST
-  const archiverUrl = await getDefaultArchiverUrl()
   for (; startCycle <= totalCyclesToSync; ) {
     if (endCycle > totalCyclesToSync) endCycle = totalCyclesToSync
     console.log(`Downloading originalTxsData from cycle ${startCycle} to cycle ${endCycle}`)
-    let response = await axios.get(
-      `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&type=count`
-    )
+    let response = await queryFromDistributor(DataType.ORIGINALTX, { startCycle, endCycle, type: 'count' })
     if (response && response.data && response.data.originalTxs) {
       console.log(`Download originalTxsData Count`, response.data.originalTxs)
       const originalTxsDataCount = response.data.originalTxs
       for (let i = 1; i <= Math.ceil(originalTxsDataCount / MAX_BETWEEN_CYCLES_PER_REQUEST); i++) {
-        response = await axios.get(
-          `${archiverUrl}/originalTx?startCycle=${startCycle}&endCycle=${endCycle}&page=${i}`
-        )
+        response = await queryFromDistributor(DataType.ORIGINALTX, { startCycle, endCycle, page: i })
         if (response && response.data && response.data.originalTxs) {
           console.log(`Downloaded originalTxsData`, response.data.originalTxs.length)
           const originalTxsData = response.data.originalTxs

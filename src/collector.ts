@@ -19,20 +19,20 @@ import {
   downloadReceiptsBetweenCycles,
   compareWithOldOriginalTxsData,
   downloadOriginalTxsDataBetweenCycles,
+  queryFromDistributor,
+  DataType,
 } from './class/DataSync'
 import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
-import { config } from './config/index'
-crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
-
 // config variables
-import { config as CONFIG } from './config'
-import axios from 'axios'
-import { getDefaultArchiverUrl } from './archiver'
+import { config as CONFIG, DISTRIBUTOR_URL } from './config'
+
+
+
 if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
 }
 
-const ArchiverReceiptWsEvent = 'RECEIPT'
+const DistributorFirehoseEvent = 'FIREHOSE'
 
 export const checkAndSyncData = async (): Promise<void> => {
   let lastStoredReceiptCount = await receipt.queryReceiptCount()
@@ -43,8 +43,7 @@ export const checkAndSyncData = async (): Promise<void> => {
   let totalOriginalTxsToSync = 0
   let lastStoredReceiptCycle = 0
   let lastStoredOriginalTxDataCycle = 0
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(`${archiverUrl}/totalData`)
+  const response = await queryFromDistributor(DataType.TOTALDATA, {})
   if (
     response.data &&
     response.data.totalReceipts >= 0 &&
@@ -160,19 +159,19 @@ export const checkAndSyncData = async (): Promise<void> => {
 
 // Setup Log Directory
 const start = async (): Promise<void> => {
+  crypto.init(CONFIG.haskKey)
   await Storage.initializeDB()
-  const archiverUrl = await getDefaultArchiverUrl()
 
   await checkAndSyncData()
   setupCollectorSocketServer()
   try {
-    const socketClient = ioclient.connect(archiverUrl)
+    const socketClient = ioclient.connect(DISTRIBUTOR_URL)
     socketClient.on('connect', () => {
       console.log('connected to archive server')
     })
 
-    socketClient.on(ArchiverReceiptWsEvent, async (data: Data) => {
-      /* prettier-ignore */ if (config.verbose)  console.log('RECEIVED RECEIPT')
+    socketClient.on(DistributorFirehoseEvent, async (data: Data) => {
+      /* prettier-ignore */ if (CONFIG.verbose)  console.log('RECEIVED FIREHOSE DATA', DistributorFirehoseEvent)
       try {
         validateData(data)
       } catch (e) {

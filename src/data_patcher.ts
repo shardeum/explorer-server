@@ -6,12 +6,7 @@ import * as Storage from './storage'
 import * as DataSync from './class/DataSync'
 import * as StatsStorage from './stats'
 import * as StatsFunctions from './class/StatsFunctions'
-
-crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
-
-// config variables
-import axios from 'axios'
-import { getDefaultArchiverUrl } from './archiver'
+import { config } from './config'
 
 let startCycle = 0
 
@@ -25,12 +20,12 @@ const patchOnlyMissingData = true
 
 // Setup Log Directory
 const start = async (): Promise<void> => {
+  crypto.init(config.haskKey)
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
 
   let totalCyclesToSync = 0
-  const archiverUrl = await getDefaultArchiverUrl()
-  const response = await axios.get(`${archiverUrl}/totalData`)
+  const response = await DataSync.queryFromDistributor(DataSync.DataType.TOTALDATA, {})
   if (response.data && response.data.totalReceipts >= 0 && response.data.totalCycles >= 0) {
     totalCyclesToSync = response.data.totalCycles
     console.log('totalCyclesToSync', totalCyclesToSync)
