@@ -20,9 +20,8 @@ type DbReceipt = Receipt & {
   tx: string
   beforeStateAccounts: string
   accounts: string
-  receipt: string
-  result: string
-  sign: string
+  appReceiptData: string | null
+  appliedReceipt: string
 }
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
@@ -83,7 +82,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
   let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   const contractAccountsIdToDecode = []
   for (const receiptObj of receipts) {
-    const { accounts, cycle, result, tx, receipt } = receiptObj
+    const { accounts, cycle, tx, appReceiptData } = receiptObj
     if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
       continue
     }
@@ -91,7 +90,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       const receiptExist = await queryReceiptByReceiptId(tx.txId)
       if (!receiptExist) combineReceipts.push(receiptObj as unknown as Receipt)
     } else combineReceipts.push(receiptObj as unknown as Receipt)
-    let txReceipt: WrappedAccount = receipt
+    let txReceipt = appReceiptData as WrappedAccount
     receiptsMap.set(tx.txId, cycle)
     if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
 
@@ -110,7 +109,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
         cycle: cycle,
         timestamp: account.timestamp,
         account: account.data,
-        hash: account.stateId,
+        hash: account.hash,
         accountType,
       } as Account.Account
       if (
@@ -196,7 +195,6 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       if (transactionType !== (-1 as TransactionType)) {
         const txObj = {
           txId: tx.txId,
-          result,
           cycle: cycle,
           blockNumber: parseInt(txReceipt.data.readableReceipt.blockNumber),
           blockHash: txReceipt.data.readableReceipt.blockHash,
@@ -250,6 +248,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
                 } as WrappedEVMAccount,
                 hash: 'Ox',
                 accountType: AccountType.Account,
+                isGlobal: false,
               }
               combineAccounts1.push(accObj)
             }
@@ -332,12 +331,10 @@ export async function queryReceiptByReceiptId(receiptId: string): Promise<Receip
     const receipt: DbReceipt = await db.get(sql, [receiptId])
     if (receipt) {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-      if (receipt.beforeStateAccounts)
-        (receipt as Receipt).beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
-      if (receipt.accounts) (receipt as Receipt).accounts = JSON.parse(receipt.accounts)
-      if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
-      if (receipt.sign) (receipt as Receipt).sign = JSON.parse(receipt.sign)
+      if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
+      if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
+      if (receipt.appReceiptData) receipt.appReceiptData = JSON.parse(receipt.appReceiptData)
+      if (receipt.appliedReceipt) receipt.appliedReceipt = JSON.parse(receipt.appliedReceipt)
     }
     if (config.verbose) console.log('Receipt receiptId', receipt)
     return receipt as Receipt
@@ -357,9 +354,8 @@ export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
       if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
-      if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
-      if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
+      if (receipt.appReceiptData) receipt.appReceiptData = JSON.parse(receipt.appReceiptData)
+      if (receipt.appliedReceipt) receipt.appliedReceipt = JSON.parse(receipt.appliedReceipt)
     })
 
     if (config.verbose) console.log('Receipt latest', receipts)
@@ -381,9 +377,8 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
       if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
-      if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
-      if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
+      if (receipt.appReceiptData) receipt.appReceiptData = JSON.parse(receipt.appReceiptData)
+      if (receipt.appliedReceipt) receipt.appliedReceipt = JSON.parse(receipt.appliedReceipt)
     })
   } catch (e) {
     console.log(e)
@@ -441,9 +436,8 @@ export async function queryReceiptsBetweenCycles(
       if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
       if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
       if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
-      if (receipt.result) (receipt as Receipt).result = JSON.parse(receipt.result)
-      if (receipt.receipt) (receipt as Receipt).receipt = JSON.parse(receipt.receipt)
-      if (receipt.sign) receipt.sign = JSON.parse(receipt.sign)
+      if (receipt.appReceiptData) receipt.appReceiptData = JSON.parse(receipt.appReceiptData)
+      if (receipt.appliedReceipt) receipt.appliedReceipt = JSON.parse(receipt.appliedReceipt)
     })
   } catch (e) {
     console.log(e)

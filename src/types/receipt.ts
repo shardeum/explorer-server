@@ -1,18 +1,82 @@
-import { Log, Transaction } from './transaction'
-import { WrappedAccount } from './account'
-export interface Receipt {
-  receiptId: string
-  tx: Transaction // TODO: Correct type
-  receipt: WrappedAccount
-  cycle: number
-  timestamp: number
-  result: object
-  beforeStateAccounts: WrappedAccount[]
-  accounts: WrappedAccount[]
-  sign: {
-    owner: string
-    sig: string
+import { Log } from './transaction'
+import { Signature } from '@shardus/crypto-utils'
+/**
+ * ArchiverReceipt is the full data (shardusReceipt + appReceiptData + accounts ) of a tx that is sent to the archiver
+ */
+export interface ArchiverReceipt {
+  tx: {
+    originalTxData: object
+    txId: string
+    timestamp: number
   }
+  cycle: number
+  beforeStateAccounts: AccountCopy[]
+  accounts: AccountCopy[]
+  appReceiptData?: any // TODO: Create type of appReceiptData
+  appliedReceipt: AppliedReceipt2
+  executionShardKey: string
+}
+
+export interface AccountCopy {
+  accountId: string
+  data: any // Todo: Create a type of different accounts
+  timestamp: number
+  hash: string
+  cycleNumber: number
+  isGlobal?: boolean
+}
+
+export type AppliedVote = {
+  txid: string
+  transaction_result: boolean
+  account_id: string[]
+  //if we add hash state before then we could prove a dishonest apply vote
+  //have to consider software version
+  account_state_hash_after: string[]
+  account_state_hash_before: string[]
+  cant_apply: boolean // indicates that the preapply could not give a pass or fail
+  node_id: string // record the node that is making this vote.. todo could look this up from the sig later
+  sign: Signature
+  // hash of app data
+  app_data_hash: string
+}
+
+/**
+ * a space efficent version of the receipt
+ *
+ * use TellSignedVoteHash to send just signatures of the vote hash (votes must have a deterministic sort now)
+ * never have to send or request votes individually, should be able to rely on existing receipt send/request
+ * for nodes that match what is required.
+ */
+export type AppliedReceipt2 = {
+  txid: string
+  result: boolean
+  //single copy of vote
+  appliedVote: AppliedVote
+  confirmOrChallenge: ConfirmOrChallengeMessage
+  //all signatures for this vote
+  signatures: [Signature] //Could have all signatures or best N.  (lowest signature value?)
+  // hash of app data
+  app_data_hash: string
+}
+
+export type ConfirmOrChallengeMessage = {
+  message: string
+  nodeId: string
+  appliedVote: AppliedVote
+  sign: Signature
+}
+export interface Receipt extends ArchiverReceipt {
+  receiptId: string
+  timestamp: number
+}
+
+export type DBReceipt = Receipt & {
+  tx: string
+  beforeStateAccounts: string
+  accounts: string
+  appReceiptData: string | null
+  appliedReceipt: string
 }
 export interface ReadableReceipt {
   status?: boolean | string | number

@@ -10,6 +10,7 @@ export interface Account {
   timestamp: number
   ethAddress: string
   account: WrappedEVMAccount
+  isGlobal: boolean
   hash: string
   accountType: AccountType
   contractType?: ContractType
@@ -151,10 +152,8 @@ export interface NodeAccount extends BaseAccount {
 /** Unrelated to `WrappedEVMAccount`,  */
 export interface WrappedAccount {
   accountId: string
-  stateId: string
   data: WrappedDataReceipt & WrappedEVMAccount
   timestamp: number
-  accountCreated?: boolean
 }
 
 export interface NetworkAccount extends BaseAccount {

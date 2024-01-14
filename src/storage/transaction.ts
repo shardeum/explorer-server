@@ -27,7 +27,6 @@ type DbTransaction = Transaction & {
   wrappedEVMAccount: string
   originalTxData: string
   contractInfo: string
-  result: string
 }
 
 type DbTokenTx = TokenTx & {
@@ -67,13 +66,10 @@ export async function bulkInsertTransactions(transactions: Transaction[]): Promi
 
 export async function updateTransaction(_txId: string, transaction: Partial<Transaction>): Promise<void> {
   try {
-    const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, accountId = $accountId, txHash = $txHash WHERE txId = $txId `
+    const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, txHash = $txHash WHERE txId = $txId `
     await db.run(sql, {
-      $result: transaction.result,
       $cycle: transaction.cycle,
-      // $partition: transaction.partition,
       $wrappedEVMAccount: transaction.wrappedEVMAccount && JSON.stringify(transaction.wrappedEVMAccount),
-      $accountId: transaction.accountId,
       $txHash: transaction.txHash,
       $txId: transaction.txId,
     })
@@ -165,14 +161,11 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
     if (isReceiptData(transaction.data)) {
       const txObj: Transaction = {
         txId: transaction.data?.txId,
-        result: { txIdShort: '', txResult: '' }, // temp placeholder
         cycle: transaction.cycleNumber,
         blockNumber: parseInt(transaction.data.readableReceipt.blockNumber),
         blockHash: transaction.data.readableReceipt.blockHash,
-        partition: 0, // Setting to 0
         timestamp: transaction.timestamp,
         wrappedEVMAccount: transaction.data,
-        accountId: transaction.accountId,
         transactionType:
           transaction.data.accountType === AccountType.Receipt
             ? TransactionType.Receipt
@@ -227,6 +220,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
               } as WrappedEVMAccount,
               hash: 'Ox',
               accountType: AccountType.Account,
+              isGlobal: false,
             }
             combineAccounts.push(accObj)
           } else {
@@ -596,8 +590,6 @@ export async function queryTransactions(
         (transaction as Transaction).wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
       if ('originalTxData' in transaction && transaction.originalTxData)
         (transaction as Transaction).originalTxData = JSON.parse(transaction.originalTxData)
-      if ('result' in transaction && transaction.result)
-        (transaction as Transaction).result = JSON.parse(transaction.result)
       if ('contractInfo' in transaction && transaction.contractInfo)
         (transaction as TokenTx).contractInfo = JSON.parse(transaction.contractInfo)
     })
@@ -618,7 +610,6 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
       if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
-      if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
     }
     if (detail) {
       const sql = `SELECT * FROM tokenTxs WHERE txId=?`
@@ -646,7 +637,6 @@ export async function queryTransactionByHash(txHash: string, detail = false): Pr
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
         if (detail) {
           const sql = `SELECT * FROM tokenTxs WHERE txId=? ORDER BY cycle DESC, timestamp DESC`
           const tokenTxs: DbTokenTx[] = await db.all(sql, [transaction.txId])
@@ -677,7 +667,6 @@ export async function queryTransactionsForCycle(cycleNumber: number): Promise<Tr
         if (transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if (transaction.result) (transaction as Transaction).result = JSON.parse(transaction.result)
         if (transaction.contractInfo)
           (transaction as Transaction).contractInfo = JSON.parse(transaction.contractInfo)
         return transaction as Transaction
@@ -845,8 +834,6 @@ export async function queryTransactionsBetweenCycles(
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if ('originalTxData' in transaction && transaction.originalTxData)
           transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if ('result' in transaction && transaction.result)
-          (transaction as Transaction).result = JSON.parse(transaction.result)
         if ('contractInfo' in transaction && transaction.contractInfo)
           transaction.contractInfo = JSON.parse(transaction.contractInfo)
       })
@@ -1347,8 +1334,6 @@ export async function queryTransactionsByTimestamp(
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
         if ('originalTxData' in transaction && transaction.originalTxData)
           transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if ('result' in transaction && transaction.result)
-          (transaction as Transaction).result = JSON.parse(transaction.result)
         if ('contractInfo' in transaction && transaction.contractInfo)
           transaction.contractInfo = JSON.parse(transaction.contractInfo)
       })
@@ -1411,8 +1396,6 @@ export async function queryTransactionsByBlock(
       transactions.forEach((transaction) => {
         if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
           transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if ('result' in transaction && transaction.result)
-          (transaction as Transaction).result = JSON.parse(transaction.result)
         if ('contractInfo' in transaction && transaction.contractInfo)
           transaction.contractInfo = JSON.parse(transaction.contractInfo)
       })
