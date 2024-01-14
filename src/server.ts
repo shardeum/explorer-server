@@ -1501,18 +1501,15 @@ const start = async (): Promise<void> => {
   })
 
   server.get('/totalData', async (_request, reply) => {
-    const totalCycles = await Cycle.queryCycleCount()
-    const totalAccounts = await Account.queryAccountCount(AccountSearchType.All)
-    const totalTransactions = await Transaction.queryTransactionCount()
-    const totalReceipts = await Receipt.queryReceiptCount()
-    const totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
-    reply.send({
-      totalCycles,
-      totalAccounts,
-      totalTransactions,
-      totalReceipts,
-      totalOriginalTxs,
-    })
+    const res: any = {}
+    res.totalCycles = await Cycle.queryCycleCount()
+    if (config.indexData.indexReceipt) {
+      res.totalAccounts = await Account.queryAccountCount(AccountSearchType.All)
+      res.totalTransactions = await Transaction.queryTransactionCount()
+    }
+    res.totalReceipts = await Receipt.queryReceiptCount()
+    res.totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
+    reply.send(res)
   })
 
   server.listen(

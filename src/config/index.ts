@@ -31,6 +31,12 @@ export const config = {
   USAGE_ENDPOINTS_KEY: '',
   enableTxHashCache: true,
   findTxHashInOriginalTx: true,
+  indexData: {
+    indexReceipt: true,
+    indexOriginalTxData: true,
+    decodeContractInfo: true,
+    decodeTokenTransfer: true,
+  },
 }
 
 export const ARCHIVER_INFO = `${config.archiverInfo.ip}:${config.archiverInfo.port}:${config.archiverInfo.publicKey}`

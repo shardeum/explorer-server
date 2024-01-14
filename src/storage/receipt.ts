@@ -101,6 +101,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       await bulkInsertReceipts(combineReceipts)
       combineReceipts = []
     }
+    if (!config.indexData.indexReceipt) continue
     const storageKeyValueMap = {}
     for (const account of accounts) {
       const accountType = account.data.accountType as AccountType
@@ -119,6 +120,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       ) {
         accObj.ethAddress = account.data.ethAddress.toLowerCase()
         if (
+          config.indexData.decodeContractInfo &&
           accountType === AccountType.Account &&
           'account' in accObj.account &&
           bytesToHex(Uint8Array.from(Object.values(accObj.account.account.codeHash))) !== EOA_CodeHash
@@ -136,7 +138,11 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           }
           continue
         }
-        if (accountType === AccountType.ContractStorage && 'key' in accObj.account) {
+        if (
+          config.indexData.decodeTokenTransfer &&
+          accountType === AccountType.ContractStorage &&
+          'key' in accObj.account
+        ) {
           storageKeyValueMap[accObj.account.key + accObj.ethAddress] = accObj.account
         }
       } else if (
