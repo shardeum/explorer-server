@@ -1,11 +1,3 @@
-export interface ERC20ContractDetail {
-  name: string
-  decimals: string
-  symbol: string
-  totalSupply: string
-  txHash: string
-}
-
 export interface NetworkParameters {
   title: string
   description: string

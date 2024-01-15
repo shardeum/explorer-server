@@ -475,7 +475,7 @@ const start = async (): Promise<void> => {
     let totalTransactions = 0
     let totalStakeTxs = 0
     let totalUnstakeTxs = 0
-    let transactions: (TransactionInterface | TokenTx<string> | OriginalTxDataInterface)[]
+    let transactions: (TransactionInterface | TokenTx | OriginalTxDataInterface)[]
     let txType: TransactionSearchType
     let filterAddressTokenBalance = 0
     if (query.txType) {

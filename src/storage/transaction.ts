@@ -11,6 +11,7 @@ import {
   WrappedDataReceipt,
   InternalTXType,
   TxMethodFilter,
+  ContractInfo,
 } from '../types'
 import Web3 from 'web3'
 import * as Account from './account'
@@ -94,7 +95,7 @@ export async function insertTokenTransaction(tokenTx: TokenTx): Promise<void> {
   }
 }
 
-export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx<C>[]): Promise<void> {
+export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx[]): Promise<void> {
   try {
     const fields = Object.keys(tokenTxs[0]).join(', ')
     const placeholders = Object.keys(tokenTxs[0]).fill('?').join(', ')
@@ -154,8 +155,8 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
   const combineAccounts: Account.Account[] = []
   const existingAccounts: string[] = [] // To save perf on querying from the db again and again, save the existing account that is queried once in memory
   let combineTransactions: Transaction[] = []
-  let combineTokenTransactions: TokenTx<Record<string, never>>[] = [] // For TransactionType (Internal ,ERC20, ERC721)
-  let combineTokenTransactions2: TokenTx<Record<string, never>>[] = [] // For TransactionType (ERC1155)
+  let combineTokenTransactions: TokenTx[] = [] // For TransactionType (Internal ,ERC20, ERC721)
+  let combineTokenTransactions2: TokenTx[] = [] // For TransactionType (ERC1155)
   let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   for (const transaction of transactions) {
     if (isReceiptData(transaction.data)) {
@@ -232,13 +233,13 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
         const accountExist = await Account.queryAccountByAccountId(
           tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
         )
-        let contractInfo = {}
+        let contractInfo = {} as ContractInfo
         if (accountExist && accountExist.contractInfo) {
           contractInfo = accountExist.contractInfo
         }
         // wrapped data must be a receipt here. this type guard ensures that
         if ('readableReceipt' in txObj.wrappedEVMAccount) {
-          const obj = {
+          const obj: TokenTx = {
             ...tx,
             txId: txObj.txId,
             txHash: txObj.txHash,
@@ -586,12 +587,9 @@ export async function queryTransactions(
     }
 
     transactions.forEach((transaction: DbTokenTx | DbTransaction) => {
-      if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
-        (transaction as Transaction).wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-      if ('originalTxData' in transaction && transaction.originalTxData)
-        (transaction as Transaction).originalTxData = JSON.parse(transaction.originalTxData)
-      if ('contractInfo' in transaction && transaction.contractInfo)
-        (transaction as TokenTx).contractInfo = JSON.parse(transaction.contractInfo)
+      if ('transactionType' in transaction && transaction.transactionType)
+        deserializeDbTransaction(transaction)
+      else if ('tokenType' in transaction && transaction.tokenType) deserializeDbToken(transaction)
     })
 
     if (config.verbose) console.log('transactions', transactions)
@@ -631,19 +629,13 @@ export async function queryTransactionByHash(txHash: string, detail = false): Pr
     const sql = `SELECT * FROM transactions WHERE txHash=? ORDER BY cycle DESC, timestamp DESC`
     const transactions: DbTransaction[] = await db.all(sql, [txHash])
     if (transactions.length > 0) {
-      for (let i = 0; i < transactions.length; i++) {
-        // eslint-disable-next-line security/detect-object-injection
-        const transaction = transactions[i]
-        if (transaction.wrappedEVMAccount)
-          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
+      for (const transaction of transactions) {
+        deserializeDbTransaction(transaction)
         if (detail) {
           const sql = `SELECT * FROM tokenTxs WHERE txId=? ORDER BY cycle DESC, timestamp DESC`
           const tokenTxs: DbTokenTx[] = await db.all(sql, [transaction.txId])
           if (tokenTxs.length > 0) {
-            tokenTxs.forEach((tokenTx: { contractInfo: string }) => {
-              if (tokenTx.contractInfo) tokenTx.contractInfo = JSON.parse(tokenTx.contractInfo)
-            })
+            tokenTxs.forEach((tokenTx: DbTokenTx) => deserializeDbToken(tokenTx))
             transaction.tokenTxs = tokenTxs
           }
         }
@@ -663,14 +655,7 @@ export async function queryTransactionsForCycle(cycleNumber: number): Promise<Tr
     const sql = `SELECT * FROM transactions WHERE cycle=? ORDER BY timestamp ASC`
     transactions = await db.all(sql, [cycleNumber])
     if (transactions.length > 0) {
-      transactions.forEach((transaction: DbTransaction) => {
-        if (transaction.wrappedEVMAccount)
-          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if (transaction.contractInfo)
-          (transaction as Transaction).contractInfo = JSON.parse(transaction.contractInfo)
-        return transaction as Transaction
-      })
+      transactions.forEach((transaction: DbTransaction) => deserializeDbTransaction(transaction))
     }
     if (config.verbose) console.log('transactions for cycle', cycleNumber, transactions)
   } catch (e) {
@@ -829,13 +814,10 @@ export async function queryTransactionsBetweenCycles(
       transactions = await db.all(sql, [start, end])
     }
     if (transactions.length > 0) {
-      transactions.forEach((transaction) => {
-        if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
-          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if ('originalTxData' in transaction && transaction.originalTxData)
-          transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if ('contractInfo' in transaction && transaction.contractInfo)
-          transaction.contractInfo = JSON.parse(transaction.contractInfo)
+      transactions.forEach((transaction: DbTransaction | DbTokenTx) => {
+        if ('transactionType' in transaction && transaction.transactionType)
+          deserializeDbTransaction(transaction)
+        else if ('tokenType' in transaction && transaction.tokenType) deserializeDbToken(transaction)
       })
     }
   } catch (e) {
@@ -1330,12 +1312,9 @@ export async function queryTransactionsByTimestamp(
     transactions = await db.all(sql, values)
     if (transactions.length > 0) {
       transactions.forEach((transaction) => {
-        if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
-          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if ('originalTxData' in transaction && transaction.originalTxData)
-          transaction.originalTxData = JSON.parse(transaction.originalTxData)
-        if ('contractInfo' in transaction && transaction.contractInfo)
-          transaction.contractInfo = JSON.parse(transaction.contractInfo)
+        if ('transactionType' in transaction && transaction.transactionType)
+          deserializeDbTransaction(transaction)
+        else if ('tokenType' in transaction && transaction.tokenType) deserializeDbToken(transaction)
       })
     }
   } catch (e) {
@@ -1393,12 +1372,7 @@ export async function queryTransactionsByBlock(
   try {
     transactions = await db.all(sql, values)
     if (transactions.length > 0) {
-      transactions.forEach((transaction) => {
-        if ('wrappedEVMAccount' in transaction && transaction.wrappedEVMAccount)
-          transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-        if ('contractInfo' in transaction && transaction.contractInfo)
-          transaction.contractInfo = JSON.parse(transaction.contractInfo)
-      })
+      transactions.forEach((transaction) => deserializeDbTransaction(transaction))
     }
   } catch (e) {
     console.log(e)
@@ -1417,4 +1391,13 @@ export async function queryTokenTxByTxId(txId: string): Promise<DbTokenTx[] | nu
     console.log(e)
   }
   return null
+}
+
+function deserializeDbTransaction(transaction: DbTransaction): void {
+  transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
+  transaction.originalTxData = JSON.parse(transaction.originalTxData)
+}
+
+function deserializeDbToken(transaction: DbTokenTx): void {
+  transaction.contractInfo = JSON.parse(transaction.contractInfo)
 }

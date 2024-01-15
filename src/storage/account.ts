@@ -1,15 +1,7 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import {
-  AccountType,
-  AccountSearchType,
-  WrappedEVMAccount,
-  Account,
-  Token,
-  ContractType,
-  ERC20ContractDetail,
-} from '../types'
+import { AccountType, AccountSearchType, WrappedEVMAccount, Account, Token, ContractType, ContractInfo } from '../types'
 import { bytesToHex } from '@ethereumjs/util'
 import { getContractInfo } from '../class/TxDecoder'
 
@@ -372,7 +364,7 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
         bytesToHex(Uint8Array.from(Object.values(accObj.account.account.codeHash))) !== EOA_CodeHash
       ) {
         const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
-        accObj.contractInfo = contractInfo as ERC20ContractDetail
+        accObj.contractInfo = contractInfo as ContractInfo
         accObj.contractType = contractType
         await insertAccount(accObj)
         continue

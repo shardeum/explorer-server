@@ -1,8 +1,17 @@
 import { Account as EVMAccount } from '@ethereumjs/util'
 import { TxReceipt } from '@ethereumjs/vm/dist/types'
 import { ReadableReceipt } from './receipt'
-import { ERC20ContractDetail, NetworkParameters } from '.'
-import { TokenTx, TransactionType } from './transaction'
+import { NetworkParameters } from '.'
+import { ContractInfo, TokenTx, TransactionType } from './transaction'
+
+export interface AccountCopy {
+  accountId: string
+  data: any // Todo: Create a type of different accounts
+  timestamp: number
+  hash: string
+  cycleNumber: number
+  isGlobal?: boolean
+}
 
 export interface Account {
   accountId: string
@@ -14,7 +23,7 @@ export interface Account {
   hash: string
   accountType: AccountType
   contractType?: ContractType
-  contractInfo?: ERC20ContractDetail
+  contractInfo?: ContractInfo
 }
 
 export interface Token {
@@ -132,7 +141,7 @@ export interface WrappedDataReceipt {
   /** For debug tx */
   balance: string
   amountSpent: string
-  contractInfo: ERC20ContractDetail
+  contractInfo: ContractInfo
   nonce: string
   readableReceipt: ReadableReceipt
   receipt: TxReceipt

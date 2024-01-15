@@ -14,7 +14,6 @@ export interface Transaction {
   nominee?: string
   originalTxData: unknown
   tokenTxs?: TokenTx[]
-  contractInfo?: ContractInfo
   txStatus?: TxStatus
   data?: unknown
 }
@@ -40,11 +39,11 @@ export interface ContractInfo {
   symbol: string
 }
 
-export interface TokenTx<C = object> {
+export interface TokenTx {
   cycle: number
   timestamp: number
   contractAddress: string
-  contractInfo?: C
+  contractInfo: ContractInfo
   tokenFrom: string
   tokenTo: string
   tokenValue: string

@@ -1,3 +1,4 @@
+import { AccountCopy } from './account'
 import { Log } from './transaction'
 import { Signature } from '@shardus/crypto-utils'
 /**
@@ -15,15 +16,6 @@ export interface ArchiverReceipt {
   appReceiptData?: any // TODO: Create type of appReceiptData
   appliedReceipt: AppliedReceipt2
   executionShardKey: string
-}
-
-export interface AccountCopy {
-  accountId: string
-  data: any // Todo: Create a type of different accounts
-  timestamp: number
-  hash: string
-  cycleNumber: number
-  isGlobal?: boolean
 }
 
 export type AppliedVote = {
@@ -71,13 +63,6 @@ export interface Receipt extends ArchiverReceipt {
   timestamp: number
 }
 
-export type DBReceipt = Receipt & {
-  tx: string
-  beforeStateAccounts: string
-  accounts: string
-  appReceiptData: string | null
-  appliedReceipt: string
-}
 export interface ReadableReceipt {
   status?: boolean | string | number
   transactionHash: string
