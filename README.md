@@ -21,7 +21,7 @@ Default port: 6001
 npm install
 ```
 
-> Add `archvier` info and `rpc` server info in the `src/config/index.ts`
+> Add `archvier` info and `rpc` server info in the `src/config/index.ts`, the latest archiver public key can be found on archiver_ip/archivers, ie http://45.56.123.96:4000/archivers for 1.9.0
 
 ```
 npm run prepare // compile the update
@@ -43,12 +43,6 @@ View the explorer in the web
 
 ```
 http://localhost:6001 <<OR>> http://localhost:<port>
-```
-
-Start the RPC data collector server
-
-```
-npm run rpc_data_server << OR >> pm2 start --name explorer-rpc-data-collector npm -- run rpc_data_server <port>
 ```
 
 Start the data stats aggregator server
