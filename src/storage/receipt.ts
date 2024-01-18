@@ -199,15 +199,13 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
-        const txObj = {
+        const txObj : Transaction.Transaction = {
           txId: tx.txId,
           cycle: cycle,
           blockNumber: parseInt(txReceipt.data.readableReceipt.blockNumber),
           blockHash: txReceipt.data.readableReceipt.blockHash,
-          // partition: Number(partition), // We don't know the partition now
           timestamp: tx.timestamp,
           wrappedEVMAccount: txReceipt.data,
-          accountId: txReceipt.accountId,
           transactionType,
           txHash: txReceipt.data.ethAddress,
           txFrom: txReceipt.data.readableReceipt.from,
@@ -215,7 +213,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
             ? txReceipt.data.readableReceipt.to
             : txReceipt.data.readableReceipt.contractAddress,
           originalTxData: tx.originalTxData || {},
-        } as Transaction.Transaction
+        }
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
         }
