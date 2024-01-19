@@ -1,12 +1,10 @@
+import WebSocket from 'ws'
 import * as dotenv from 'dotenv'
 dotenv.config()
-
-import { Data, validateData } from './class/validateData'
-import * as ioclient from 'socket.io-client'
-import * as crypto from '@shardus/crypto-utils'
 import * as Storage from './storage'
 import * as cycle from './storage/cycle'
 import * as receipt from './storage/receipt'
+import * as crypto from '@shardus/crypto-utils'
 import * as originalTxData from './storage/originalTxData'
 import {
   downloadTxsDataAndCycles,
@@ -21,15 +19,23 @@ import {
   queryFromDistributor,
   DataType,
 } from './class/DataSync'
+
+import { sleep } from './utils'
+import { validateData } from './class/validateData'
+import { DistributorSocketCloseCodes } from './types'
+import { config as CONFIG, DISTRIBUTOR_URL } from './config'
 import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
 // config variables
-import { config as CONFIG, DISTRIBUTOR_URL } from './config'
-
-
 
 if (process.env.PORT) {
   CONFIG.port.collector = process.env.PORT
 }
+let ws: WebSocket
+let reconnecting = false
+let connected = false
+
+const { hashKey, patchData, verbose, DISTRIBUTOR_RECONNECT_INTERVAL, CONNECT_TO_DISTRIBUTOR_MAX_RETRY } =
+  CONFIG
 
 const DistributorFirehoseEvent = 'FIREHOSE'
 
@@ -69,7 +75,6 @@ export const checkAndSyncData = async (): Promise<void> => {
     'lastStoredOriginalTxDataCount',
     lastStoredOriginalTxDataCount
   )
-  const patchData = CONFIG.patchData
   // Make sure the data that saved are authentic by comparing receipts count of last 10 cycles for receipts data, originalTxs count of last 10 cycles for originalTxData data and 10 last cycles for cycles data
   if (patchData && lastStoredReceiptCount > 0) {
     const lastStoredReceiptInfo = await receipt.queryLatestReceipts(1)
@@ -153,27 +158,81 @@ export const checkAndSyncData = async (): Promise<void> => {
   }
 }
 
+const attemptReconnection = (): void => {
+  console.log(`Re-connecting Distributor in ${DISTRIBUTOR_RECONNECT_INTERVAL / 1000}s...`)
+  reconnecting = true
+  setTimeout(connectToDistributor, DISTRIBUTOR_RECONNECT_INTERVAL)
+}
+
+const connectToDistributor = (): void => {
+  const collectorInfo = {
+    subscriptionType: DistributorFirehoseEvent,
+    timestamp: Date.now(),
+  }
+  const signedObject = JSON.parse(crypto.stringify({ collectorInfo, sender: CONFIG.collectorInfo.publicKey }))
+  crypto.signObj(signedObject, CONFIG.collectorInfo.secretKey, CONFIG.collectorInfo.publicKey)
+  const queryString = encodeURIComponent(JSON.stringify(signedObject))
+  console.log('--> Query String:', queryString)
+  const URL = `${DISTRIBUTOR_URL}?data=${queryString}`
+  ws = new WebSocket(URL)
+
+  ws.onopen = () => {
+    console.log(`✅ Socket connected to the Distributor @ ${DISTRIBUTOR_URL}`)
+    connected = true
+    reconnecting = false
+  }
+
+  // Listening to FIREHOSE data from the Distributor
+  ws.on('message', (data: string) => {
+    try {
+      if (verbose) console.log('Received FIREHOSE data from Distributor:', data)
+      validateData(JSON.parse(data))
+    } catch (e) {
+      console.log('Error in processing received data!', e)
+    }
+  })
+  ws.onerror = (error) => {
+    console.error('Distributor WebSocket error:', error.message)
+    reconnecting = false
+  }
+
+  // Listening to Socket termination event from the Distributor
+  ws.onclose = (closeEvent: WebSocket.CloseEvent) => {
+    switch (closeEvent.code) {
+      case DistributorSocketCloseCodes.DUPLICATE_CONNECTION_CODE:
+        console.log(
+          '❌ Socket Connection w/ same client credentials attempted. Dropping existing connection.'
+        )
+        break
+      case DistributorSocketCloseCodes.SUBSCRIBER_EXPIRATION_CODE:
+        console.log('❌ Subscription Validity Expired. Connection Terminated.')
+        break
+      default:
+        console.log(`❌ Socket Connection w/ Distributor Terminated with code: ${closeEvent.code}`)
+        reconnecting = false
+        break
+    }
+    if (!reconnecting) attemptReconnection()
+  }
+}
+
 // Setup Log Directory
 const start = async (): Promise<void> => {
-  crypto.init(CONFIG.haskKey)
+  let retry = 0
+  crypto.init(hashKey)
   await Storage.initializeDB()
 
   await checkAndSyncData()
   setupCollectorSocketServer()
   try {
-    const socketClient = ioclient.connect(DISTRIBUTOR_URL)
-    socketClient.on('connect', () => {
-      console.log('connected to archive server')
-    })
-
-    socketClient.on(DistributorFirehoseEvent, async (data: Data) => {
-      /* prettier-ignore */ if (CONFIG.verbose)  console.log('RECEIVED FIREHOSE DATA', DistributorFirehoseEvent)
-      try {
-        validateData(data)
-      } catch (e) {
-        console.log('Error in processing received data!', e)
+    while (!connected) {
+      connectToDistributor()
+      retry++
+      await sleep(DISTRIBUTOR_RECONNECT_INTERVAL)
+      if (!connected && retry > CONNECT_TO_DISTRIBUTOR_MAX_RETRY) {
+        throw Error(`Cannot connect to the Distributor @ ${DISTRIBUTOR_URL}`)
       }
-    })
+    }
   } catch (e) {
     console.log(e)
   }

@@ -20,7 +20,7 @@ const patchOnlyMissingData = true
 
 // Setup Log Directory
 const start = async (): Promise<void> => {
-  crypto.init(config.haskKey)
+  crypto.init(config.hashKey)
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
 

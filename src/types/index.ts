@@ -9,6 +9,11 @@ export interface NetworkParameters {
   maintenanceFee: number
 }
 
+export enum DistributorSocketCloseCodes {
+  DUPLICATE_CONNECTION_CODE = 1000,
+  SUBSCRIBER_EXPIRATION_CODE,
+}
+
 export * from './account'
 export * from './cycle'
 export * from './originalTxData'
