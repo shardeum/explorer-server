@@ -29,7 +29,7 @@ export function getTransactionObj(
   }
 }
 
-const stakeTargetAddress = '0x0000000000000000000000000000000000000001' //dev-relaunch required to change this '0x0000000000000000000000000000000000010000',
+const stakeTargetAddress = '0x0000000000000000000000000000000000010000' 
 
 export function isStakingEVMTx(
   transaction: Transaction[TransactionType.Legacy] | Transaction[TransactionType.AccessListEIP2930]
