@@ -204,7 +204,10 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
             ? txReceipt.data.readableReceipt.to
             : txReceipt.data.readableReceipt.contractAddress,
           originalTxData: tx.originalTxData || {},
-        }
+          internalTXType: txReceipt.data.readableReceipt.internalTx
+            ? txReceipt.data.readableReceipt.internalTx.internalTXType
+            : null,
+        } as Transaction.Transaction
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
         }

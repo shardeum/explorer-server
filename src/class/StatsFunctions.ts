@@ -3,7 +3,7 @@ import * as TransactionStats from '../stats/transactionStats'
 import * as ValidatorStats from '../stats/validatorStats'
 import * as Cycle from '../storage/cycle'
 import * as Transaction from '../storage/transaction'
-import { TransactionSearchType, TransactionType } from '../types'
+import { InternalTXType, TransactionSearchType, TransactionType } from '../types'
 import BN from 'bn.js'
 import BigNumber from 'decimal.js'
 import { CycleRecord } from '@shardus/types/build/src/p2p/CycleCreatorTypes'
@@ -80,10 +80,15 @@ export const recordTransactionsStats = async (
         endCycle,
         TransactionSearchType.UnstakeReceipt
       )
+
       const internalTransactions = await Transaction.queryTransactionCountByCycles(
         startCycle,
         endCycle,
         TransactionSearchType.InternalTxReceipt
+      )
+      const granularInternalTransactions = await Transaction.queryInternalTransactionCountByCycles(
+        startCycle,
+        endCycle
       )
       for (const cycle of cycles) {
         const txsCycle = transactions.filter((a: { cycle: number }) => a.cycle === cycle.counter)
@@ -94,12 +99,76 @@ export const recordTransactionsStats = async (
         const unstakeTxsCycle = unstakeTransactions.filter(
           (a: { cycle: number }) => a.cycle === cycle.counter
         )
+
+        const granularInternalTxCounts = {
+          totalSetGlobalCodeBytesTxs: 0,
+          totalInitNetworkTxs: 0,
+          totalNodeRewardTxs: 0,
+          totalChangeConfigTxs: 0,
+          totalApplyChangeConfigTxs: 0,
+          totalSetCertTimeTxs: 0,
+          totalStakeTxs: 0,
+          totalUnstakeTxs: 0,
+          totalInitRewardTimesTxs: 0,
+          totalClaimRewardTxs: 0,
+          totalChangeNetworkParamTxs: 0,
+          totalApplyNetworkParamTxs: 0,
+          totalPenaltyTxs: 0,
+        }
+
+        granularInternalTransactions
+          .filter(({ cycle: c }) => c === cycle.counter)
+          .forEach(({ internalTXType, count }) => {
+            switch (internalTXType) {
+              case InternalTXType.SetGlobalCodeBytes:
+                granularInternalTxCounts.totalSetGlobalCodeBytesTxs += count
+                break
+              case InternalTXType.InitNetwork:
+                granularInternalTxCounts.totalInitNetworkTxs += count
+                break
+              case InternalTXType.NodeReward:
+                granularInternalTxCounts.totalNodeRewardTxs += count
+                break
+              case InternalTXType.ChangeConfig:
+                granularInternalTxCounts.totalChangeConfigTxs += count
+                break
+              case InternalTXType.ApplyChangeConfig:
+                granularInternalTxCounts.totalApplyChangeConfigTxs += count
+                break
+              case InternalTXType.SetCertTime:
+                granularInternalTxCounts.totalSetCertTimeTxs += count
+                break
+              case InternalTXType.Stake:
+                granularInternalTxCounts.totalStakeTxs += count
+                break
+              case InternalTXType.Unstake:
+                granularInternalTxCounts.totalUnstakeTxs += count
+                break
+              case InternalTXType.InitRewardTimes:
+                granularInternalTxCounts.totalInitRewardTimesTxs += count
+                break
+              case InternalTXType.ClaimReward:
+                granularInternalTxCounts.totalClaimRewardTxs += count
+                break
+              case InternalTXType.ChangeNetworkParam:
+                granularInternalTxCounts.totalChangeNetworkParamTxs += count
+                break
+              case InternalTXType.ApplyNetworkParam:
+                granularInternalTxCounts.totalApplyNetworkParamTxs += count
+                break
+              case InternalTXType.Penalty:
+                granularInternalTxCounts.totalPenaltyTxs += count
+                break
+            }
+          })
+
         combineTransactionStats.push({
           cycle: cycle.counter,
           totalTxs: txsCycle.length > 0 ? txsCycle[0].transactions : 0,
           totalInternalTxs: internalTxsCycle.length > 0 ? internalTxsCycle[0].transactions : 0,
           totalStakeTxs: stakeTxsCycle.length > 0 ? stakeTxsCycle[0].transactions : 0,
           totalUnstakeTxs: unstakeTxsCycle.length > 0 ? unstakeTxsCycle[0].transactions : 0,
+          ...granularInternalTxCounts,
           timestamp: cycle.cycleRecord.start,
         })
       }

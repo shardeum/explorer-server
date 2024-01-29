@@ -15,10 +15,21 @@ interface SeriesData {
 
 export function convertTransactionStatsToSeriesData(transactionStats: TransactionStats[]): SeriesData[] {
   const seriesData: SeriesData[] = [
-    { name: 'Total Txs', data: [], zIndex: 4 },
-    { name: 'Total Internal Txs', data: [], zIndex: 3 },
-    { name: 'Total Stake Txs', data: [], zIndex: 2 },
-    { name: 'Total Unstake Txs', data: [], zIndex: 1 },
+    { name: 'Total Txs', data: [], zIndex: 10 },
+    { name: 'Total Internal', data: [], zIndex: 9 },
+    { name: 'Stake', data: [], zIndex: 8 },
+    { name: 'Unstake', data: [], zIndex: 7 },
+    { name: 'Set Global Code Bytes', data: [], zIndex: 6 },
+    { name: 'Init Network', data: [], zIndex: 5 },
+    { name: 'Node Reward', data: [], zIndex: 4 },
+    { name: 'Change Config', data: [], zIndex: 3 },
+    { name: 'Apply Change Config', data: [], zIndex: 2 },
+    { name: 'Set Cert Time', data: [], zIndex: 1 },
+    { name: 'Init Reward Times', data: [], zIndex: 0 },
+    { name: 'Claim Reward', data: [], zIndex: -1 },
+    { name: 'Change Network Param', data: [], zIndex: -2 },
+    { name: 'Apply Network Param', data: [], zIndex: -3 },
+    { name: 'Penalty', data: [], zIndex: -4 },
   ]
 
   transactionStats.forEach((stat) => {
@@ -28,6 +39,17 @@ export function convertTransactionStatsToSeriesData(transactionStats: Transactio
     seriesData[1].data.push({ x: timestampMillis, y: stat.totalInternalTxs, cycle: stat.cycle })
     seriesData[2].data.push({ x: timestampMillis, y: stat.totalStakeTxs, cycle: stat.cycle })
     seriesData[3].data.push({ x: timestampMillis, y: stat.totalUnstakeTxs, cycle: stat.cycle })
+    seriesData[4].data.push({ x: timestampMillis, y: stat.totalSetGlobalCodeBytesTxs, cycle: stat.cycle })
+    seriesData[5].data.push({ x: timestampMillis, y: stat.totalInitNetworkTxs, cycle: stat.cycle })
+    seriesData[6].data.push({ x: timestampMillis, y: stat.totalNodeRewardTxs, cycle: stat.cycle })
+    seriesData[7].data.push({ x: timestampMillis, y: stat.totalChangeConfigTxs, cycle: stat.cycle })
+    seriesData[8].data.push({ x: timestampMillis, y: stat.totalApplyChangeConfigTxs, cycle: stat.cycle })
+    seriesData[9].data.push({ x: timestampMillis, y: stat.totalSetCertTimeTxs, cycle: stat.cycle })
+    seriesData[10].data.push({ x: timestampMillis, y: stat.totalInitRewardTimesTxs, cycle: stat.cycle })
+    seriesData[11].data.push({ x: timestampMillis, y: stat.totalClaimRewardTxs, cycle: stat.cycle })
+    seriesData[12].data.push({ x: timestampMillis, y: stat.totalChangeNetworkParamTxs, cycle: stat.cycle })
+    seriesData[13].data.push({ x: timestampMillis, y: stat.totalApplyNetworkParamTxs, cycle: stat.cycle })
+    seriesData[14].data.push({ x: timestampMillis, y: stat.totalPenaltyTxs, cycle: stat.cycle })
   })
 
   return seriesData

@@ -89,4 +89,8 @@ export interface ReadableReceipt {
     reward?: string
     penalty?: string
   }
+  internalTx?: {
+    isInternalTx: boolean
+    internalTXType: number
+  }
 }

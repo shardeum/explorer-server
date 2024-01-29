@@ -110,6 +110,9 @@ export async function processOriginalTxData(
             cycle: originalTxData.cycle,
             txHash: bytesToHex(txObj.hash()),
             transactionType,
+            internalTXType: originalTxData.originalTxData.tx.isInternalTx
+              ? originalTxData.originalTxData.tx.internalTXType
+              : null,
           })
         } else {
           console.log('Unable to get txObj from EVM raw tx', originalTxData.originalTxData.tx.raw)
@@ -121,6 +124,9 @@ export async function processOriginalTxData(
           cycle: originalTxData.cycle,
           txHash: '0x' + originalTxData.txId,
           transactionType: TransactionType.InternalTxReceipt,
+          internalTXType: originalTxData.originalTxData.tx.isInternalTx
+            ? originalTxData.originalTxData.tx.internalTXType
+            : null,
         })
       }
     } catch (e) {

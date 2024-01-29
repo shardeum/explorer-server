@@ -183,6 +183,9 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
           ? transaction.data.readableReceipt.to
           : transaction.data.readableReceipt.contractAddress,
         originalTxData: {},
+        internalTXType: transaction.data.readableReceipt.internalTx
+          ? transaction.data.readableReceipt.internalTx.internalTXType
+          : null,
       }
 
       const { txs, accs, tokens } = await decodeTx(txObj)
@@ -247,6 +250,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
             timestamp: txObj.timestamp,
             transactionFee: txObj.wrappedEVMAccount.amountSpent ?? '0',
             contractInfo,
+            internalTXType: txObj.internalTXType,
           }
           if (tx.tokenType === TransactionType.ERC_1155) {
             combineTokenTransactions2.push(obj)
@@ -1040,6 +1044,29 @@ export async function queryTransactionCountByCycles(
       transactions: receipt['COUNT(*)'],
     }
   })
+}
+
+export async function queryInternalTransactionCountByCycles(start, end) {
+  let transactions = []
+  try {
+    const sql = `
+      SELECT cycle, internalTXType, COUNT(*) as count 
+      FROM transactions 
+      WHERE transactionType = ${TransactionType.InternalTxReceipt} 
+      AND cycle BETWEEN ? AND ? 
+      GROUP BY cycle, internalTXType 
+      ORDER BY cycle ASC`
+
+    transactions = await db.all(sql, [start, end])
+  } catch (e) {
+    console.error(e)
+  }
+
+  return transactions.map(({ cycle, internalTXType, count }) => ({
+    cycle,
+    internalTXType,
+    count,
+  }))
 }
 
 export async function queryTransactionCountByTimestamp(

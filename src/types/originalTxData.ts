@@ -8,6 +8,8 @@ export interface OriginalTxData {
     tx: {
       raw: string
       timestamp: number
+      isInternalTx?: boolean
+      internalTXType?: number
     }
     timestampReceipt?: {
       cycleCounter: number
@@ -32,6 +34,7 @@ export interface OriginalTxData2 {
   timestamp: number
   cycle: number
   transactionType: TransactionType
+  internalTXType?: number
 }
 
 // Combine the two interfaces above into one

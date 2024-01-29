@@ -9,6 +9,17 @@ export interface TransactionStats {
   totalInternalTxs: number
   totalStakeTxs: number
   totalUnstakeTxs: number
+  totalSetGlobalCodeBytesTxs: number
+  totalInitNetworkTxs: number
+  totalNodeRewardTxs: number
+  totalChangeConfigTxs: number
+  totalApplyChangeConfigTxs: number
+  totalSetCertTimeTxs: number
+  totalInitRewardTimesTxs: number
+  totalClaimRewardTxs: number
+  totalChangeNetworkParamTxs: number
+  totalApplyNetworkParamTxs: number
+  totalPenaltyTxs: number
   cycle: number
 }
 
