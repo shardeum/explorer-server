@@ -15,15 +15,7 @@
     "plugin:no-unsanitized/DOM",
     "prettier"
   ],
-  "ignorePatterns": [
-    "collector.ts",
-    "**/types/*.ts",
-    "**/utils/*.ts",
-    "**/storage/*.ts",
-    "**/class/*.ts",
-    "**/token/*.ts",
-    "server.ts"
-  ],
+  "ignorePatterns": [],
   "rules": {
     "no-empty": [
       1,
