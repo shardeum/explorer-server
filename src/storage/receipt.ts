@@ -27,10 +27,6 @@ type DbReceipt = Receipt & {
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
 export let receiptsMap: Map<string, number> = new Map()
-export let newestReceiptsMap: Map<string, number> = new Map()
-export let lastReceiptMapResetTimestamp = 0
-export let newestReceiptsMapIsReset = false
-export const cleanReceiptsMapByCycle = true
 
 export async function insertReceipt(receipt: Receipt): Promise<void> {
   try {
@@ -65,14 +61,6 @@ export async function bulkInsertReceipts(receipts: Receipt[]): Promise<void> {
 
 export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = false): Promise<void> {
   if (receipts && receipts.length <= 0) return
-  if (!cleanReceiptsMapByCycle) {
-    const currentTime = Date.now()
-    if (currentTime - lastReceiptMapResetTimestamp >= 60000 && !newestReceiptsMapIsReset) {
-      newestReceiptsMap = new Map() // To save 30s data; So even when receiptMap is reset, this still has the record and will skip saving if it finds one
-      newestReceiptsMapIsReset = true
-      if (config.verbose) console.log('Newest Receipts Map Reset!', newestReceiptsMap)
-    }
-  }
   const bucketSize = 1000
   let combineReceipts: Receipt[] = []
   let combineAccounts1: Account.Account[] = []
@@ -82,8 +70,8 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
   let combineTokens: Account.Token[] = [] // For Tokens owned by an address
   const contractAccountsIdToDecode = []
   for (const receiptObj of receipts) {
-    const { accounts, cycle, tx, appReceiptData } = receiptObj
-    if (receiptsMap.has(tx.txId) || newestReceiptsMap.has(tx.txId)) {
+    const { accounts, cycle, tx, appReceiptData, timestamp } = receiptObj
+    if (receiptsMap.has(tx.txId) && receiptsMap.get(tx.txId) === timestamp) {
       continue
     }
     if (saveOnlyNewData) {
@@ -91,8 +79,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       if (!receiptExist) combineReceipts.push(receiptObj as unknown as Receipt)
     } else combineReceipts.push(receiptObj as unknown as Receipt)
     let txReceipt = appReceiptData as WrappedAccount
-    receiptsMap.set(tx.txId, cycle)
-    if (!cleanReceiptsMapByCycle) newestReceiptsMap.set(tx.txId, cycle)
+    receiptsMap.set(tx.txId, tx.timestamp)
 
     // Forward receipt data to LogServer
     await forwardReceiptData([receiptObj])
@@ -112,6 +99,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
         account: account.data,
         hash: account.hash,
         accountType,
+        isGlobal: account.isGlobal,
       } as Account.Account
       if (
         accountType === AccountType.Account ||
@@ -199,7 +187,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
-        const txObj : Transaction.Transaction = {
+        const txObj: Transaction.Transaction = {
           txId: tx.txId,
           cycle: cycle,
           blockNumber: parseInt(txReceipt.data.readableReceipt.blockNumber),
@@ -326,7 +314,6 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       await Account.insertAccount(accObj)
     }
   }
-  if (!cleanReceiptsMapByCycle) resetReceiptsMap()
 }
 
 export async function queryReceiptByReceiptId(receiptId: string): Promise<Receipt | null> {
@@ -447,18 +434,9 @@ function deserializeDbReceipt(receipt: DbReceipt): void {
   if (receipt.appliedReceipt) receipt.appliedReceipt = JSON.parse(receipt.appliedReceipt)
 }
 
-export function resetReceiptsMap(): void {
-  if (Date.now() - lastReceiptMapResetTimestamp >= 120000) {
-    receiptsMap = new Map()
-    lastReceiptMapResetTimestamp = Date.now()
-    newestReceiptsMapIsReset = false
-    if (config.verbose) console.log('Receipts Map Reset!', receiptsMap)
-  }
-}
-
-export function cleanReceiptsMap(endCycle: number): void {
+export function cleanOldReceiptsMap(timestamp: number): void {
   for (const [key, value] of receiptsMap) {
-    if (value <= endCycle) receiptsMap.delete(key)
+    if (value < timestamp) receiptsMap.delete(key)
   }
-  if (config.verbose) console.log('Receipts Map clean by cycles!', endCycle, receiptsMap)
+  if (config.verbose) console.log('Clean Old Receipts Map', timestamp, receiptsMap)
 }

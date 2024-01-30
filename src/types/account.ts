@@ -10,7 +10,7 @@ export interface AccountCopy {
   timestamp: number
   hash: string
   cycleNumber: number
-  isGlobal?: boolean
+  isGlobal: boolean
 }
 
 export interface Account {

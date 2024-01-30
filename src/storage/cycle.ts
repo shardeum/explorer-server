@@ -2,7 +2,8 @@ import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { Cycle } from '../types'
 import { config } from '../config/index'
-import { checkIfAnyTxsDataMissing } from '../class/DataSync'
+import { cleanOldReceiptsMap } from './receipt'
+import { cleanOldOriginalTxsMap } from './originalTxData'
 
 export let Collection: unknown
 
@@ -81,7 +82,10 @@ export async function insertOrUpdateCycle(cycle: Cycle): Promise<void> {
         await updateCycle(cycleInfo.cycleMarker, cycleInfo)
     } else {
       await insertCycle(cycleInfo)
-      await checkIfAnyTxsDataMissing(cycleInfo.counter)
+      // Clean up receipts map that are older than last 2 minutes
+      const CLEAN_UP_TIMESTMAP_MS = Date.now() - 2 * 60 * 1000
+      cleanOldReceiptsMap(CLEAN_UP_TIMESTMAP_MS)
+      cleanOldOriginalTxsMap(CLEAN_UP_TIMESTMAP_MS)
     }
   } else {
     console.log('No cycleRecord or cycleMarker in cycle,', cycle)

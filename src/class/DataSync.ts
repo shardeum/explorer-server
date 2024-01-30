@@ -9,10 +9,6 @@ import * as crypto from '@shardus/crypto-utils'
 
 export let needSyncing = false
 
-let lastSyncedCycle = 0
-const syncCycleInterval = 10 // To query in every 5 cycles ( the other 5 cycles receipt could be not finalized yet )
-let dataSyncing = false
-
 const MAX_RECEIPTS_PER_REQUEST = 1000
 const MAX_ORIGINAL_TXS_PER_REQUEST = 1000
 const MAX_CYCLES_PER_REQUEST = 100
@@ -23,15 +19,6 @@ const MAX_BETWEEN_CYCLES_PER_REQUEST = 100
 export const toggleNeedSyncing = (): void => {
   needSyncing = !needSyncing
   if (config.verbose) console.log('needSyncing', needSyncing)
-}
-
-export const toggleDataSyncing = (): void => {
-  dataSyncing = !dataSyncing
-  if (config.verbose) console.log('dataSyncing', dataSyncing)
-}
-
-export const updateLastSyncedCycle = (cycle: number): void => {
-  lastSyncedCycle = cycle
 }
 
 export enum DataType {
@@ -430,38 +417,6 @@ export const downloadAndSyncGenesisAccounts = async (): Promise<void> => {
     }
   }
   console.log('Sync Genesis accounts and transaction receipts completed!')
-}
-
-export const checkIfAnyTxsDataMissing = async (cycle: number): Promise<void> => {
-  if (config.verbose) console.log(!needSyncing, !dataSyncing, cycle - lastSyncedCycle, syncCycleInterval)
-  if (!needSyncing && !dataSyncing && cycle - lastSyncedCycle >= syncCycleInterval) {
-    const cycleToSyncTo = lastSyncedCycle + syncCycleInterval - 5
-    toggleDataSyncing()
-    // await (cycleToSyncTo, lastSyncedCycle)
-    const unMatchedCycleForReceipts = await compareReceiptsCountByCycles(lastSyncedCycle + 1, cycleToSyncTo)
-    console.log(
-      `Check receipts data between ${lastSyncedCycle + 1} and ${cycleToSyncTo}`,
-      'unMatchedCycleForReceipts',
-      unMatchedCycleForReceipts
-    )
-    if (unMatchedCycleForReceipts.length > 0) await downloadReceiptsByCycle(unMatchedCycleForReceipts)
-    const unMatchedCycleForOriginalTxsData = await compareOriginalTxsCountByCycles(
-      lastSyncedCycle + 1,
-      cycleToSyncTo
-    )
-    console.log(
-      `Check originalTxsData data between ${lastSyncedCycle + 1} and ${cycleToSyncTo}`,
-      'unMatchedCycleForOriginalTxsData',
-      unMatchedCycleForOriginalTxsData
-    )
-    if (unMatchedCycleForOriginalTxsData.length > 0)
-      await downloadOriginalTxsDataByCycle(unMatchedCycleForOriginalTxsData)
-    toggleDataSyncing()
-    updateLastSyncedCycle(cycleToSyncTo)
-    Receipt.cleanReceiptsMap(cycleToSyncTo)
-    OriginalTxData.cleanOldOriginalTxsMap(cycleToSyncTo)
-    if (config.verbose) console.log('lastSyncedCycle', lastSyncedCycle)
-  }
 }
 
 // TODO: We can have compareWithOldReceiptsData and compareReceiptsCountByCycles to be the same function, needs a bit of refactor

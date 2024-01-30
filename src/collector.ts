@@ -15,7 +15,6 @@ import {
   downloadAndSyncGenesisAccounts,
   needSyncing,
   toggleNeedSyncing,
-  updateLastSyncedCycle,
   downloadReceiptsBetweenCycles,
   compareWithOldOriginalTxsData,
   downloadOriginalTxsDataBetweenCycles,
@@ -151,9 +150,6 @@ export const checkAndSyncData = async (): Promise<void> => {
       lastStoredCycleCount
     )
     toggleNeedSyncing()
-    let lastSyncedCycle = totalCyclesToSync - 5
-    if (lastSyncedCycle < -1) lastSyncedCycle = 0
-    updateLastSyncedCycle(lastSyncedCycle)
   }
 }
 
