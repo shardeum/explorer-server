@@ -9,3 +9,52 @@
     grid-template-columns: 1fr;
   }
 }
+
+.CardDetail {
+  border: border(gray);
+  border-radius: borderRadius(8);
+  margin-bottom: spacing(16);
+  box-shadow: shadow(shadow1);
+  background-color: color(white);
+
+  .header {
+    @include fontStyle(small, semi-bold);
+    color: color(gray-800);
+    margin: spacing(8) spacing(16);
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    padding: spacing(8) spacing(16);
+
+    .customColorPicker {
+      height: 1.5em;
+      width: 1.5em;
+      overflow: hidden;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      margin-left: spacing(8);
+    }
+
+    .customColorPicker input[type='color'] {
+      position: absolute;
+      height: 4em;
+      width: 4em;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+  }
+}

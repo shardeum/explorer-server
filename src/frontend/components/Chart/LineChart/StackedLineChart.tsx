@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
 import { useRouter } from 'next/router'
+import { CycleLineMarker } from '../../../dashboard/ChartDetail/ChartDetail'
+
+declare module 'highcharts' {
+  interface Chart {
+    customVerticalLines: SVGElement[]
+  }
+}
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts)
@@ -27,12 +34,54 @@ interface StackedLineChartProps {
   data: SeriesData[]
   height?: number
   name?: string
+  cycleMarkers: CycleLineMarker[]
 }
 
 export const StackedLineChart: React.FC<StackedLineChartProps> = (props: StackedLineChartProps) => {
   const router = useRouter()
+  const chartComponentRef = useRef<HighchartsReact.RefObject>(null)
 
-  const { title, centerTitle, subTitle, data, height = 300, name } = props
+  const { title, centerTitle, subTitle, data, height = 300, name, cycleMarkers } = props
+
+  useEffect(() => {
+    const chart = chartComponentRef.current?.chart
+    if (chart) {
+      chart.customVerticalLines?.forEach((line) => line.destroy())
+      chart.customVerticalLines = []
+
+      cycleMarkers.forEach((marker) => {
+        if (typeof marker.cycle === 'number') {
+          const point = chart.series[0].data.find((dp) => dp.options['cycle'] === marker.cycle)
+
+          if (point) {
+            const position = point.plotX
+            const topPosition = chart.plotTop
+            const bottomPosition = chart.plotTop + chart.plotHeight
+
+            let pathArray: Highcharts.SVGPathArray = []
+            if (position) {
+              pathArray = [
+                ['M', position, topPosition],
+                ['L', position, bottomPosition],
+              ]
+            }
+            const line = chart.renderer
+              .path(pathArray)
+              .attr({
+                'stroke-width': 2,
+                stroke: marker.color,
+                zIndex: 3,
+              })
+              .add()
+
+            if (line) {
+              chart.customVerticalLines.push(line)
+            }
+          }
+        }
+      })
+    }
+  }, [cycleMarkers])
 
   const option = {
     title: {
@@ -153,5 +202,5 @@ export const StackedLineChart: React.FC<StackedLineChartProps> = (props: Stacked
     },
   }
 
-  return <HighchartsReact highcharts={Highcharts} options={option} />
+  return <HighchartsReact highcharts={Highcharts} options={option} ref={chartComponentRef} />
 }
