@@ -23,8 +23,6 @@ export interface CycleLineMarker {
 }
 
 export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
-  const router = useRouter()
-  const isDeveloperMode = router.query.mode === 'developer'
   const [markers, setMarkers] = useState<CycleLineMarker[]>([
     { cycle: 0, color: '#E61414' },
     { cycle: 0, color: '#24CC24' },
