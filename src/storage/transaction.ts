@@ -1046,7 +1046,10 @@ export async function queryTransactionCountByCycles(
   })
 }
 
-export async function queryInternalTransactionCountByCycles(start, end) {
+export async function queryInternalTransactionCountByCycles(
+  start,
+  end
+): Promise<{ cycle: number; internalTXType: number; count: number }[]> {
   let transactions = []
   try {
     const sql = `
