@@ -75,14 +75,22 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
     ))
   }
 
+  const router = useRouter()
+  const isDeveloperMode = router.query.mode === 'developer'
+
   return (
     <>
-      <div className={styles.CardDetail}>
-        <div className={styles.header}>User Cycle Markers </div>
-        <hr />
-        <div className={styles.content}>{renderSelectionBoxes()}</div>
-      </div>
-      <Spacer space="4" />
+      {isDeveloperMode && (
+        <>
+          <div className={styles.CardDetail}>
+            <div className={styles.header}>User Cycle Markers </div>
+            <hr />
+            <div className={styles.content}>{renderSelectionBoxes()}</div>
+          </div>
+          <Spacer space="4" />
+        </>
+      )}
+
       <div className={styles.ChartDetail}>
         <div className={styles.item}>
           <StackedLineChart
