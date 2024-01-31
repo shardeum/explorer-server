@@ -21,10 +21,12 @@ export function convertTransactionStatsToSeriesData(transactionStats: Transactio
   ]
 
   transactionStats.forEach((stat) => {
-    seriesData[0].data.push({ x: stat.timestamp * 1000, y: stat.totalTxs, cycle: stat.cycle })
-    seriesData[1].data.push({ x: stat.timestamp * 1000, y: stat.totalInternalTxs, cycle: stat.cycle })
-    seriesData[2].data.push({ x: stat.timestamp * 1000, y: stat.totalStakeTxs, cycle: stat.cycle })
-    seriesData[3].data.push({ x: stat.timestamp * 1000, y: stat.totalUnstakeTxs, cycle: stat.cycle })
+    const timestampMillis = stat.timestamp * 1000
+
+    seriesData[0].data.push({ x: timestampMillis, y: stat.totalTxs, cycle: stat.cycle })
+    seriesData[1].data.push({ x: timestampMillis, y: stat.totalInternalTxs, cycle: stat.cycle })
+    seriesData[2].data.push({ x: timestampMillis, y: stat.totalStakeTxs, cycle: stat.cycle })
+    seriesData[3].data.push({ x: timestampMillis, y: stat.totalUnstakeTxs, cycle: stat.cycle })
   })
 
   return seriesData

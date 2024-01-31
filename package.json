@@ -57,6 +57,7 @@
     "fastify": "4.20.0",
     "helmet": "3.21.1",
     "highcharts": "10.3.2",
+    "highcharts-boost": "^0.1.7",
     "highcharts-react-official": "3.1.0",
     "human-standard-token-abi": "2.0.0",
     "lodash": "4.17.21",

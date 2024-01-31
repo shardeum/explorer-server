@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Highcharts from 'highcharts/highstock'
-import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
+import HighchartsBoost from 'highcharts/modules/boost'
 
 if (typeof Highcharts === 'object') {
-  HighchartsExporting(Highcharts)
+  HighchartsBoost(Highcharts)
 }
 
 interface DataPoint {
@@ -37,6 +37,40 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
       timestampToCycle.set(point.x, point.cycle)
     })
   })
+
+  const [selectedRange, setSelectedRange] = useState('week')
+
+  const getPlotOptions = (): object => {
+    if (selectedRange === 'week') {
+      return {
+        series: {
+          animation: false,
+          marker: {
+            enabled: false,
+          },
+          boostThreshold: 1,
+          findNearestPointBy: 'xy',
+          dataGrouping: {
+            enabled: true,
+            forced: true,
+            units: [['day', [1]]],
+            approximation: 'sum',
+          },
+        },
+      }
+    } else {
+      return {
+        series: {
+          boostThreshold: 1,
+          findNearestPointBy: 'xy',
+          dataGrouping: {
+            enabled: false,
+          },
+        },
+      }
+    }
+  }
+
   const option = {
     title: {
       text: title,
@@ -56,16 +90,11 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
     series: data.map((row) => ({
       ...row,
       data: row.data.map((point: DataPoint) => [point.x, point.y]),
+      showInNavigator: true,
     })),
-    plotOptions: {
-      series: {
-        stacking: null,
-        findNearestPointBy: 'xy',
-        dataGrouping: {
-          enabled: false,
-        },
-      },
-    },
+    boost: {},
+
+    plotOptions: getPlotOptions(),
     legend: {
       enabled: true,
       layout: 'horizontal',
@@ -76,6 +105,13 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
       type: 'datetime',
       gridLineWidth: 0,
       labels: {},
+      events: {
+        setExtremes: function (e) {
+          const totalRange = e.max - e.min
+          const oneWeek = 7 * 24 * 3600 * 1000 // one week in milliseconds
+          setSelectedRange(totalRange >= oneWeek ? 'week' : '')
+        },
+      },
     },
     yAxis: {
       title: {
@@ -101,7 +137,9 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
           tooltipContent += `<span>${seriesName}: <b>${dataPoint.y}</b></span><br />`
         })
 
-        tooltipContent += `<span>Cycle Number: <b>${cycle}</b></span><br />`
+        if (selectedRange !== 'week') {
+          tooltipContent += `<span>Cycle Number: <b>${cycle}</b></span><br />`
+        }
 
         return tooltipContent
       },
@@ -116,7 +154,6 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
       spacingTop: 20,
       height: height,
       zoomType: 'x',
-      type: 'spline',
     },
     credits: {
       enabled: false,
