@@ -1,7 +1,16 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
-import { AccountType, AccountSearchType, WrappedEVMAccount, Account, Token, ContractType, ContractInfo } from '../types'
+import {
+  AccountType,
+  AccountSearchType,
+  WrappedEVMAccount,
+  Account,
+  Token,
+  ContractType,
+  ContractInfo,
+  AccountCopy,
+} from '../types'
 import { bytesToHex } from '@ethereumjs/util'
 import { getContractInfo } from '../class/TxDecoder'
 
@@ -9,8 +18,6 @@ type DbAccount = Account & {
   account: string
   contractInfo: string
 }
-
-export { type Account, type Token } from '../types'
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
@@ -315,20 +322,7 @@ export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: s
   return tokens
 }
 
-/** An account object from an HTTP API call */
-type RawAccount = {
-  accountId: string
-  cycleNumber: number
-  data: {
-    accountType: AccountType
-    ethAddress: string
-    account: WrappedEVMAccount
-  }
-  timestamp: number
-  hash: string
-}
-
-export async function processAccountData(accounts: RawAccount[]): Promise<Account[]> {
+export async function processAccountData(accounts: AccountCopy[]): Promise<Account[]> {
   console.log('accounts size', accounts.length)
   if (accounts && accounts.length <= 0) return []
   const bucketSize = 1000
@@ -351,7 +345,8 @@ export async function processAccountData(accounts: RawAccount[]): Promise<Accoun
       account: account.data,
       hash: account.hash,
       accountType,
-    } as unknown as Account
+      isGlobal: account.isGlobal,
+    } as Account
     if (
       accountType === AccountType.Account ||
       accountType === AccountType.ContractStorage ||

@@ -5,6 +5,8 @@ import {
   AccountType,
   Transaction,
   TokenTx,
+  Account,
+  Token,
   TransactionType,
   TransactionSearchType,
   WrappedEVMAccount,
@@ -14,10 +16,8 @@ import {
   ContractInfo,
 } from '../types'
 import Web3 from 'web3'
-import * as Account from './account'
+import * as AccountDB from './account'
 import { decodeTx, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
-
-export { type Transaction } from '../types'
 
 export const ERC20_METHOD_DIC = {
   '0xa9059cbb': 'transfer',
@@ -152,12 +152,12 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
   console.log('transactions size', transactions.length)
   if (transactions && transactions.length <= 0) return
   const bucketSize = 1000
-  const combineAccounts: Account.Account[] = []
+  const combineAccounts: Account[] = []
   const existingAccounts: string[] = [] // To save perf on querying from the db again and again, save the existing account that is queried once in memory
   let combineTransactions: Transaction[] = []
   let combineTokenTransactions: TokenTx[] = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2: TokenTx[] = [] // For TransactionType (ERC1155)
-  let combineTokens: Account.Token[] = [] // For Tokens owned by an address
+  let combineTokens: Token[] = [] // For Tokens owned by an address
   for (const transaction of transactions) {
     if (isReceiptData(transaction.data)) {
       const txObj: Transaction = {
@@ -203,7 +203,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
           if (existingAccounts.includes(addressToCreate)) {
             continue
           }
-          const accountExist = await Account.queryAccountByAccountId(
+          const accountExist = await AccountDB.queryAccountByAccountId(
             addressToCreate.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
           )
           if (config.verbose) console.log('addressToCreate', addressToCreate, accountExist)
@@ -230,7 +230,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
         }
       }
       for (const tx of txs) {
-        const accountExist = await Account.queryAccountByAccountId(
+        const accountExist = await AccountDB.queryAccountByAccountId(
           tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
         )
         let contractInfo = {} as ContractInfo
@@ -271,17 +271,17 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
       combineTokenTransactions2 = []
     }
     if (combineTokens.length >= bucketSize) {
-      await Account.bulkInsertTokens(combineTokens)
+      await AccountDB.bulkInsertTokens(combineTokens)
       combineTokens = []
     }
   }
   if (combineAccounts.length > 0) {
     let limit = bucketSize
     let j = limit
-    let accountsToSave: Account.Account[]
+    let accountsToSave: Account[]
     for (let i = 0; i < combineAccounts.length; i = j) {
       accountsToSave = combineAccounts.slice(i, limit)
-      await Account.bulkInsertAccounts(accountsToSave)
+      await AccountDB.bulkInsertAccounts(accountsToSave)
       j = limit
       limit += bucketSize
     }
@@ -289,7 +289,7 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
   if (combineTransactions.length > 0) await bulkInsertTransactions(combineTransactions)
   if (combineTokenTransactions.length > 0) await bulkInsertTokenTransactions(combineTokenTransactions)
   if (combineTokenTransactions2.length > 0) await bulkInsertTokenTransactions(combineTokenTransactions2)
-  if (combineTokens.length > 0) await Account.bulkInsertTokens(combineTokens)
+  if (combineTokens.length > 0) await AccountDB.bulkInsertTokens(combineTokens)
 }
 
 export const getWeb3 = function (): Promise<Web3> {

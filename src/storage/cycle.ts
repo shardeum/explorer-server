@@ -7,8 +7,6 @@ import { cleanOldOriginalTxsMap } from './originalTxData'
 
 export let Collection: unknown
 
-export { type Cycle } from '../types'
-
 type DbCycle = Cycle & {
   cycleRecord: string
 }

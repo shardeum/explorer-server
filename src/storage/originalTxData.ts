@@ -327,5 +327,5 @@ export function cleanOldOriginalTxsMap(timestamp: number): void {
       originalTxsMap.delete(key)
     }
   }
-  if (config.verbose) console.log('Clean old originalTxs map!', timestamp, originalTxsMap.size)
+  if (config.verbose) console.log('Clean Old OriginalTxs Map', timestamp, originalTxsMap)
 }

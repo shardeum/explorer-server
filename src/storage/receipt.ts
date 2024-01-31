@@ -1,9 +1,12 @@
 import { config } from '../config'
-import * as Account from './account'
-import * as Transaction from './transaction'
+import * as AccountDB from './account'
+import * as TransactionDB from './transaction'
 import {
   AccountType,
   TokenTx,
+  Account,
+  Token,
+  Transaction,
   TransactionType,
   WrappedAccount,
   WrappedEVMAccount,
@@ -63,11 +66,11 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
   if (receipts && receipts.length <= 0) return
   const bucketSize = 1000
   let combineReceipts: Receipt[] = []
-  let combineAccounts1: Account.Account[] = []
-  let combineTransactions: Transaction.Transaction[] = []
+  let combineAccounts1: Account[] = []
+  let combineTransactions: Transaction[] = []
   let combineTokenTransactions: TokenTx[] = [] // For TransactionType (Internal ,ERC20, ERC721)
   let combineTokenTransactions2: TokenTx[] = [] // For TransactionType (ERC1155)
-  let combineTokens: Account.Token[] = [] // For Tokens owned by an address
+  let combineTokens: Token[] = [] // For Tokens owned by an address
   const contractAccountsIdToDecode = []
   for (const receiptObj of receipts) {
     const { accounts, cycle, tx, appReceiptData, timestamp } = receiptObj
@@ -100,7 +103,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
         hash: account.hash,
         accountType,
         isGlobal: account.isGlobal,
-      } as Account.Account
+      } as Account
       if (
         accountType === AccountType.Account ||
         accountType === AccountType.ContractStorage ||
@@ -113,15 +116,15 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           'account' in accObj.account &&
           bytesToHex(Uint8Array.from(Object.values(accObj.account.account.codeHash))) !== EOA_CodeHash
         ) {
-          const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
+          const accountExist = await AccountDB.queryAccountByAccountId(accObj.accountId)
           if (config.verbose) console.log('accountExist', accountExist)
           if (!accountExist) {
-            await Account.insertAccount(accObj)
+            await AccountDB.insertAccount(accObj)
             // Decode contract accounts at the end and update the account
             contractAccountsIdToDecode.push(accObj.accountId)
           } else {
             if (accountExist.timestamp < accObj.timestamp) {
-              await Account.updateAccount(accObj.accountId, accObj)
+              await AccountDB.updateAccount(accObj.accountId, accObj)
             }
           }
           continue
@@ -152,13 +155,13 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           combineAccounts1.push(accObj)
         }
       } else {
-        const accountExist = await Account.queryAccountByAccountId(accObj.accountId)
+        const accountExist = await AccountDB.queryAccountByAccountId(accObj.accountId)
         if (config.verbose) console.log('accountExist', accountExist)
         if (!accountExist) {
           combineAccounts1.push(accObj)
         } else {
           if (accountExist.timestamp < accObj.timestamp) {
-            await Account.updateAccount(accObj.accountId, accObj)
+            await AccountDB.updateAccount(accObj.accountId, accObj)
           }
         }
       }
@@ -187,7 +190,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
-        const txObj: Transaction.Transaction = {
+        const txObj: Transaction = {
           txId: tx.txId,
           cycle: cycle,
           blockNumber: parseInt(txReceipt.data.readableReceipt.blockNumber),
@@ -206,14 +209,14 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
         }
         let newTx = true
-        const transactionExist = await Transaction.queryTransactionByTxId(tx.txId)
+        const transactionExist = await TransactionDB.queryTransactionByTxId(tx.txId)
         if (config.verbose) console.log('transactionExist', transactionExist)
         if (!transactionExist) {
-          if (txObj.nominee) await Transaction.insertTransaction(txObj)
+          if (txObj.nominee) await TransactionDB.insertTransaction(txObj)
           else combineTransactions.push(txObj)
         } else {
           if (transactionExist.timestamp < txObj.timestamp) {
-            await Transaction.insertTransaction(txObj)
+            await TransactionDB.insertTransaction(txObj)
           }
           newTx = false
         }
@@ -222,7 +225,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           if (acc === ZERO_ETH_ADDRESS) continue
           if (!combineAccounts1.some((a) => a.ethAddress === acc)) {
             const addressToCreate = acc
-            const accountExist = await Account.queryAccountByAccountId(
+            const accountExist = await AccountDB.queryAccountByAccountId(
               addressToCreate.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
             )
             if (config.verbose) console.log('addressToCreate', addressToCreate, accountExist)
@@ -247,9 +250,9 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           }
         }
         for (const tx of txs) {
-          let accountExist: Account.Account | null = null
+          let accountExist: Account | null = null
           if (tx.tokenType !== TransactionType.EVM_Internal)
-            accountExist = await Account.queryAccountByAccountId(
+            accountExist = await AccountDB.queryAccountByAccountId(
               tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
             )
           let contractInfo = {} as ContractInfo
@@ -277,41 +280,41 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
       }
     }
     if (combineAccounts1.length >= bucketSize) {
-      await Account.bulkInsertAccounts(combineAccounts1)
+      await AccountDB.bulkInsertAccounts(combineAccounts1)
       combineAccounts1 = []
     }
     if (combineTransactions.length >= bucketSize) {
-      await Transaction.bulkInsertTransactions(combineTransactions)
+      await TransactionDB.bulkInsertTransactions(combineTransactions)
       combineTransactions = []
     }
     if (combineTokenTransactions.length >= bucketSize) {
-      await Transaction.bulkInsertTokenTransactions(combineTokenTransactions)
+      await TransactionDB.bulkInsertTokenTransactions(combineTokenTransactions)
       combineTokenTransactions = []
     }
     if (combineTokenTransactions2.length >= bucketSize) {
-      await Transaction.bulkInsertTokenTransactions(combineTokenTransactions2)
+      await TransactionDB.bulkInsertTokenTransactions(combineTokenTransactions2)
       combineTokenTransactions2 = []
     }
     if (combineTokens.length >= bucketSize) {
-      await Account.bulkInsertTokens(combineTokens)
+      await AccountDB.bulkInsertTokens(combineTokens)
       combineTokens = []
     }
   }
   if (combineReceipts.length > 0) await bulkInsertReceipts(combineReceipts)
-  if (combineAccounts1.length > 0) await Account.bulkInsertAccounts(combineAccounts1)
-  if (combineTransactions.length > 0) await Transaction.bulkInsertTransactions(combineTransactions)
+  if (combineAccounts1.length > 0) await AccountDB.bulkInsertAccounts(combineAccounts1)
+  if (combineTransactions.length > 0) await TransactionDB.bulkInsertTransactions(combineTransactions)
   if (combineTokenTransactions.length > 0)
-    await Transaction.bulkInsertTokenTransactions(combineTokenTransactions)
+    await TransactionDB.bulkInsertTokenTransactions(combineTokenTransactions)
   if (combineTokenTransactions2.length > 0)
-    await Transaction.bulkInsertTokenTransactions(combineTokenTransactions2)
-  if (combineTokens.length > 0) await Account.bulkInsertTokens(combineTokens)
+    await TransactionDB.bulkInsertTokenTransactions(combineTokenTransactions2)
+  if (combineTokens.length > 0) await AccountDB.bulkInsertTokens(combineTokens)
   if (contractAccountsIdToDecode.length > 0) {
     for (const accountId of contractAccountsIdToDecode) {
-      const accObj = await Account.queryAccountByAccountId(accountId)
+      const accObj = await AccountDB.queryAccountByAccountId(accountId)
       const { contractInfo, contractType } = await getContractInfo(accObj.ethAddress)
       accObj.contractInfo = contractInfo as ContractInfo
       accObj.contractType = contractType
-      await Account.insertAccount(accObj)
+      await AccountDB.insertAccount(accObj)
     }
   }
 }
