@@ -4,10 +4,14 @@ import { LineChart, StackedLineChart } from '../../components'
 
 import styles from './ChartDetail.module.scss'
 import { TransactionStats } from '../../../stats/transactionStats'
-import { convertTransactionStatsToSeriesData } from '../../utils/transformChartData'
+import {
+  convertTransactionStatsToSeriesData,
+  convertValidatorStatsToSeriesData,
+} from '../../utils/transformChartData'
+import { ValidatorStats } from '../../../stats/validatorStats'
 
 export interface ChartDetailProps {
-  validatorStats: number[][]
+  validatorStats: ValidatorStats[]
   transactionStats: TransactionStats[]
 }
 
@@ -15,9 +19,9 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
   return (
     <div className={styles.ChartDetail}>
       <div className={styles.item}>
-        <LineChart
+        <StackedLineChart
           title="ACTIVE VALIDATORS HISTORY IN LAST 1000 CYCLES"
-          data={data.validatorStats}
+          data={convertValidatorStatsToSeriesData(data.validatorStats)}
           name="Validators"
         />
       </div>

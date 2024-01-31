@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { ContentLayout, LineStockChart } from '../components'
+import { ContentLayout, StackedLineStockChart } from '../components'
 
 import styles from './ValidatorLineChart.module.scss'
 import { useStats } from '../api'
+import { convertValidatorStatsToSeriesData } from '../utils/transformChartData'
 
 export const ValidatorLineChart: React.FC = () => {
   const height = 600
@@ -18,13 +19,14 @@ export const ValidatorLineChart: React.FC = () => {
         {loading ? (
           <div>Loading...</div>
         ) : (
-          <LineStockChart
+          <StackedLineStockChart
             title="Active Validators per Cycle Chart"
             centerTitle
             subTitle="Click and drag in the plot area to zoom in"
             height={height}
-            data={validatorStats}
+            data={convertValidatorStatsToSeriesData(validatorStats)}
             name="Validators"
+            groupData={false}
           />
         )}
       </ContentLayout>

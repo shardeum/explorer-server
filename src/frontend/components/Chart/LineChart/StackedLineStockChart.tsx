@@ -26,6 +26,7 @@ interface StackedLineChartProps {
   data: SeriesData[]
   height?: number
   name?: string
+  groupData?: boolean
 }
 
 export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: StackedLineChartProps) => {
@@ -38,10 +39,10 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
     })
   })
 
-  const [selectedRange, setSelectedRange] = useState('week')
+  const [selectedRange, setSelectedRange] = useState(props.groupData ? 'week' : '')
 
   const getPlotOptions = (): object => {
-    if (selectedRange === 'week') {
+    if (selectedRange === 'week' && props.groupData) {
       return {
         series: {
           animation: false,
@@ -109,7 +110,9 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
         setExtremes: function (e) {
           const totalRange = e.max - e.min
           const oneWeek = 7 * 24 * 3600 * 1000 // one week in milliseconds
-          setSelectedRange(totalRange >= oneWeek ? 'week' : '')
+          if (props.groupData) {
+              setSelectedRange(totalRange >= oneWeek ? 'week' : '')
+          }
         },
       },
     },

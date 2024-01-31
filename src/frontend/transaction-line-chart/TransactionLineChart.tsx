@@ -26,6 +26,7 @@ export const TransactionLineChart: React.FC = () => {
             height={height}
             data={convertTransactionStatsToSeriesData(transactionStats)}
             name="Transactions"
+            groupData
           />
         )}
       </ContentLayout>
