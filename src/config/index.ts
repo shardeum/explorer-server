@@ -25,14 +25,14 @@ export const config = {
   },
   distributorInfo: {
     ip: process.env.DISTRIBUTOR_IP || '127.0.0.1',
-    port: process.env.DISTRIBUTOR_PORT || '6000',
+    port: process.env.DISTRIBUTOR_PORT || '6100',
     publicKey:
       process.env.DISTRIBUTOR_PUBLIC_KEY ||
       '758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
   },
   rpcUrl: process.env.RPC_URL || 'http://localhost:8080',
   apiUrl: '',
-  verbose: true,
+  verbose: false,
   genesisSHMSupply: 100000000,
   dbPath: process.env.DB_PATH?.replace(/\/+$/, '') || '.', // remove
   rateLimit: 100,
