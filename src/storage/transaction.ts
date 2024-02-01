@@ -95,7 +95,7 @@ export async function insertTokenTransaction(tokenTx: TokenTx): Promise<void> {
   }
 }
 
-export async function bulkInsertTokenTransactions<C>(tokenTxs: TokenTx[]): Promise<void> {
+export async function bulkInsertTokenTransactions(tokenTxs: TokenTx[]): Promise<void> {
   try {
     const fields = Object.keys(tokenTxs[0]).join(', ')
     const placeholders = Object.keys(tokenTxs[0]).fill('?').join(', ')

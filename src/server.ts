@@ -26,9 +26,7 @@ import {
   Transaction as TransactionInterface,
   OriginalTxDataInterface,
   TransactionSearchType,
-  TransactionType,
   TxMethodFilter,
-  InternalTx,
   WrappedDataReceipt,
 } from './types'
 import * as utils from './utils'

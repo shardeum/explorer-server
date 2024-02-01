@@ -29,7 +29,7 @@ type DbReceipt = Receipt & {
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
-export let receiptsMap: Map<string, number> = new Map()
+export const receiptsMap: Map<string, number> = new Map()
 
 export async function insertReceipt(receipt: Receipt): Promise<void> {
   try {
