@@ -7,10 +7,17 @@
     width: 100%;
   }
 
+  .titleWrapper{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
   .title {
     @include fontStyle(heading, semi-bold);
     margin-bottom: spacing(8);
     color: color(gray-800);
+    display: inline-block;
   }
 
   .box {

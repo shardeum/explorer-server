@@ -5,13 +5,22 @@ import { Icon } from '../../components'
 import { useSearchHook } from '../../components/SearchBar/useSearchHook'
 
 import styles from './SearchBox.module.scss'
+import NetworkMode from '../NetworkMode/NetworkMode'
+import { Modes } from '../../types/modes'
 
-export const SearchBox: React.FC<Record<string, never>> = () => {
+interface SearchBoxProps {
+  mode: string | undefined
+}
+
+export const SearchBox: React.FC<SearchBoxProps> = ({ mode }) => {
   const { search, setSearch, onSearch } = useSearchHook()
 
   return (
     <div className={styles.SearchBox}>
-      <h4 className={styles.title}>The Shardeum Betanet Explorer</h4>
+      <div className={styles.titleWrapper}>
+        <h4 className={styles.title}>The Shardeum Betanet Explorer</h4>
+        <NetworkMode mode={mode as Modes} />
+      </div>
       <div className={styles.box}>
         <input
           className={styles.input}

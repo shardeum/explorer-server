@@ -1,0 +1,60 @@
+.modeContainer {
+  --ring-shadow-color: transparent;
+
+  position: relative;
+  display: inline-block;
+  margin-left: 12px;
+
+  .modeCircle {
+    width: 20px;
+    height: 20px;
+    background-color: var( --ring-shadow-color);
+    border: 4px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    animation: pulse 3s infinite, ring-grow 3s infinite;
+  }
+
+  .tooltip {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes ring-grow {
+    0% {
+      box-shadow: 0 0 0 0 var(--ring-shadow-color);
+    }
+    100% {
+      box-shadow: 0 0 0 8px transparent;
+    }
+  }
+}

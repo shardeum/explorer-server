@@ -12,13 +12,14 @@ import { AccountSearchType, TransactionSearchType } from '../../types'
 
 import { LatestTransactions } from '../LatestTransaction'
 import { LatestCycle } from '../LatestCycle'
+import NetworkMode from '../NetworkMode/NetworkMode'
 
 export const Dashboard: React.FC = () => {
   const { data: cycles } = useCycle({ count: 10 })
   const { transactions, totalRewardTxs, totalStakeTxs, totalUnstakeTxs, totalTransactions } = useTransaction({
     count: 10,
     txType: TransactionSearchType.StakeReceipt,
-    totalStakeData: true
+    totalStakeData: true,
   })
 
   const { totalAccounts, totalContracts } = useAccount({ count: 10, type: AccountSearchType.CA })
@@ -41,7 +42,7 @@ export const Dashboard: React.FC = () => {
     <div className={styles.Dashboard}>
       <Spacer space="32" />
       <session>
-        <SearchBox />
+        <SearchBox mode={cycles[0]?.cycleRecord['mode']} />
       </session>
       <Spacer space="48" />
       <session>
