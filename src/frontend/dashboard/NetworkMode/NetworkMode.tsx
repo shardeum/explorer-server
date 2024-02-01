@@ -15,31 +15,35 @@ interface ModeData {
 const modeData: Record<Modes, ModeData> = {
   [Modes.Processing]: {
     color: '#10c90e',
-    tooltipContent: 'Processing',
+    tooltipContent: 'Processing: The network processes application transactions. Nodes can be rotated.',
   },
   [Modes.Safety]: {
     color: '#e74c3c',
-    tooltipContent: 'Safety',
+    tooltipContent: 'Safety: Only protocol transactions are processed.',
   },
   [Modes.Forming]: {
     color: '#3498db',
-    tooltipContent: 'Forming',
+    tooltipContent:
+      'Forming: The network allows nodes to join, sync, and go active until a minimum number of active nodes is achieved.',
   },
   [Modes.Recovery]: {
     color: '#f39c12',
-    tooltipContent: 'Recovery',
+    tooltipContent:
+      'Recovery: The network stops processing application transactions and nodes stop syncing, but still handle protocol data.',
   },
   [Modes.Restore]: {
     color: '#8e44ad',
-    tooltipContent: 'Restore',
+    tooltipContent: 'Restore: Nodes sync data from Archivers and other nodes, going active once synced.',
   },
   [Modes.Shutdown]: {
     color: '#d35400',
-    tooltipContent: 'Shutdown',
+    tooltipContent:
+      'Shutdown: All transactions stop being processed and nodes exit the network after a short period.',
   },
   [Modes.Restart]: {
     color: '#27ae60',
-    tooltipContent: 'Restart',
+    tooltipContent:
+      'Restart: The network allows nodes to join without syncing or going active until a minimum total node count is reached.',
   },
 }
 
