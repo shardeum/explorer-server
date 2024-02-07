@@ -1,10 +1,15 @@
 import { Transaction, TokenTx, TransactionType, OriginalTxData } from '../../types'
 
 export const showTxMethod = (tx: Transaction | TokenTx | OriginalTxData): string => {
-  const data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt.data : null
+  console.log('tx', tx)
+  let data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt.data : null
 
-  const methodCode = data && data.length > 10 ? data.substring(0, 10) : null
+  let methodCode = data && data.length > 10 ? data.substring(0, 10) : null
 
+  if (!methodCode) {
+    data = 'originalTxData' in tx ? tx.originalTxData?.readableReceipt.data : null
+    methodCode = data && data.length > 10 ? data.substring(0, 10) : null
+  }
   // `ERC_TOKEN_METHOD_DIC` is only an object without methods, so object
   // injection is probably okay here
   /* eslint-disable security/detect-object-injection */
@@ -19,9 +24,11 @@ export const showTxMethod = (tx: Transaction | TokenTx | OriginalTxData): string
     : 'wrappedEVMAccount' in tx && tx?.wrappedEVMAccount?.readableReceipt.to
     ? methodCode !== null && ERC_TOKEN_METHOD_DIC[methodCode]
       ? ERC_TOKEN_METHOD_DIC[methodCode]
-      : 'Transfer'
+      : methodCode
     : 'originalTxData' in tx && tx?.originalTxData?.readableReceipt?.to
-    ? 'Transfer'
+    ? methodCode !== null && ERC_TOKEN_METHOD_DIC[methodCode]
+      ? ERC_TOKEN_METHOD_DIC[methodCode]
+      : methodCode
     : 'Contract'
   /* eslint-enable security/detect-object-injection */
 }

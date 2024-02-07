@@ -587,9 +587,8 @@ export async function queryTransactions(
     }
 
     transactions.forEach((transaction: DbTokenTx | DbTransaction) => {
-      if ('transactionType' in transaction && transaction.transactionType)
-        deserializeDbTransaction(transaction)
-      else if ('tokenType' in transaction && transaction.tokenType) deserializeDbToken(transaction)
+      if ('transactionType' in transaction) deserializeDbTransaction(transaction)
+      else if ('tokenType' in transaction) deserializeDbToken(transaction)
     })
 
     if (config.verbose) console.log('transactions', transactions)
