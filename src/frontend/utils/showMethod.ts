@@ -2,17 +2,14 @@ import { Transaction, TokenTx, TransactionType, OriginalTxData } from '../../typ
 
 export const showTxMethod = (tx: Transaction | TokenTx | OriginalTxData): string => {
   console.log('tx', tx)
-  let data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt.data : null
+  let data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt?.data : null
 
   let methodCode = data && data.length > 10 ? data.substring(0, 10) : null
 
-  if (!methodCode) {
-    data = 'originalTxData' in tx ? tx.originalTxData?.readableReceipt.data : null
+  if (methodCode === null) {
+    data = 'originalTxData' in tx ? tx.originalTxData?.readableReceipt?.data : null
     methodCode = data && data.length > 10 ? data.substring(0, 10) : null
   }
-  // `ERC_TOKEN_METHOD_DIC` is only an object without methods, so object
-  // injection is probably okay here
-  /* eslint-disable security/detect-object-injection */
   return 'tokenEvent' in tx && tx?.tokenEvent
     ? tx.tokenEvent
     : 'wrappedEVMAccount' in tx && tx?.wrappedEVMAccount?.readableReceipt.from.length === 64
@@ -21,16 +18,21 @@ export const showTxMethod = (tx: Transaction | TokenTx | OriginalTxData): string
     ? 'Stake'
     : 'transactionType' in tx && tx?.transactionType && tx?.transactionType === TransactionType.UnstakeReceipt
     ? 'Unstake'
-    : 'wrappedEVMAccount' in tx && tx?.wrappedEVMAccount?.readableReceipt.to
-    ? methodCode !== null && ERC_TOKEN_METHOD_DIC[methodCode]
-      ? ERC_TOKEN_METHOD_DIC[methodCode]
-      : methodCode
+    : 'wrappedEVMAccount' in tx
+    ? tx?.wrappedEVMAccount?.readableReceipt?.to
+      ? methodCode === null
+        ? 'Transfer'
+        : ERC_TOKEN_METHOD_DIC[methodCode]
+        ? ERC_TOKEN_METHOD_DIC[methodCode]
+        : methodCode
+      : 'Contract Creation'
     : 'originalTxData' in tx && tx?.originalTxData?.readableReceipt?.to
-    ? methodCode !== null && ERC_TOKEN_METHOD_DIC[methodCode]
+    ? methodCode === null
+      ? 'Transfer'
+      : ERC_TOKEN_METHOD_DIC[methodCode]
       ? ERC_TOKEN_METHOD_DIC[methodCode]
       : methodCode
-    : 'Contract'
-  /* eslint-enable security/detect-object-injection */
+    : 'Contract Creation'
 }
 
 export const ERC_TOKEN_METHOD_DIC = {
