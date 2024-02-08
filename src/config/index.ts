@@ -30,7 +30,7 @@ export const config = {
       process.env.DISTRIBUTOR_PUBLIC_KEY ||
       '758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
   },
-  rpcUrl: process.env.RPC_URL || 'http://localhost:8080',
+  rpcUrl: process.env.RPC_URL || 'http://127.0.0.1:8080',
   apiUrl: '',
   verbose: false,
   genesisSHMSupply: 100000000,

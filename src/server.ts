@@ -175,7 +175,7 @@ const start = async (): Promise<void> => {
   server.get('/api/cycleinfo', async (_request, reply) => {
     const err = utils.validateTypes(_request.query as object, {
       count: 's?',
-      cycle: 's?',
+      cycleNumber: 's?',
       to: 's?',
       from: 's?',
       marker: 's?',
@@ -870,8 +870,6 @@ const start = async (): Promise<void> => {
       txId: 's?',
       startCycle: 's?',
       endCycle: 's?',
-      from: 's?',
-      to: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -989,7 +987,6 @@ const start = async (): Promise<void> => {
       endCycle: 's?',
       decode: 's?',
       pending: 's?',
-      txType: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -1191,7 +1188,7 @@ const start = async (): Promise<void> => {
     let totalPages = 0
     let totalLogs = 0
     let logs
-    const supportedQueryParams = ['address', 'topics', 'fromBlock', 'toBlock', 'startCycle', 'endCycle']
+    const supportedQueryParams = ['address', 'topics', 'fromBlock', 'toBlock', 'blockHash']
     let topics = []
     if (query.topics) {
       try {
@@ -1207,7 +1204,7 @@ const start = async (): Promise<void> => {
     const transactions: TransactionInterface[] = []
     if (query.count) {
       const count: number = parseInt(query.count)
-      //max 1000 logs
+      // max 1000 logs
       if (count > 1000) {
         reply.send({ success: false, error: 'The count number is too big.' })
         return
@@ -1216,15 +1213,13 @@ const start = async (): Promise<void> => {
         return
       }
       logs = await Log.queryLogs(0, count)
-      totalLogs = await Log.queryLogCount(0, 0, query.type)
-    } else if (Object.keys(query).some((key) => supportedQueryParams.includes(key))) {
-      const address: string = query.address ? query.address.toLowerCase() : ''
-
+      totalLogs = await Log.queryLogCount(query.type)
+    } else if (query.startCycle || query.endCycle) {
       let startCycle: number
       let endCycle: number
-      if (query.startCycle && query.endCycle) {
-        startCycle = parseInt(query.startCycle)
-        endCycle = parseInt(query.endCycle)
+      if (query.startCycle || query.endCycle) {
+        startCycle = query.startCycle ? parseInt(query.startCycle) : 0
+        endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
         if (startCycle < 0 || Number.isNaN(startCycle)) {
           reply.send({ success: false, error: 'Invalid start cycle number' })
           return
@@ -1235,23 +1230,59 @@ const start = async (): Promise<void> => {
         }
         const count = startCycle - endCycle
         if (count > 100) {
+          reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
+          return
+        }
+      }
+      totalLogs = await Log.queryLogCountBetweenCycles(startCycle, endCycle)
+      if (query.page) {
+        const page: number = parseInt(query.page)
+        if (page <= 0 || Number.isNaN(page)) {
+          reply.send({ success: false, error: 'Invalid page number' })
+          return
+        }
+        // checking totalPages first
+        totalPages = Math.ceil(totalLogs / itemsPerPage)
+        if (page > totalPages) {
+          reply.send({ success: false, error: 'Page no is greater than the totalPage' })
+          return
+        }
+        logs = await Log.queryLogsBetweenCycles((page - 1) * itemsPerPage, itemsPerPage, startCycle, endCycle)
+      }
+    } else if (Object.keys(query).some((key) => supportedQueryParams.includes(key))) {
+      const address: string = query.address ? query.address.toLowerCase() : undefined
+      const blockHash: string = query.blockHash ? query.blockHash.toLowerCase() : undefined
+      if (address && address.length !== 42) {
+        reply.send({ success: false, error: 'The address is not correct!' })
+        return
+      }
+      if (blockHash && blockHash.length !== 66) {
+        reply.send({ success: false, error: 'The block hash is not correct!' })
+        return
+      }
+      let fromBlock: number
+      let toBlock: number
+      if (query.fromBlock || query.toBlock) {
+        fromBlock = query.fromBlock ? parseInt(query.fromBlock) : 0
+        toBlock = query.toBlock ? parseInt(query.toBlock) : fromBlock
+        if (fromBlock < 0 || Number.isNaN(fromBlock)) {
+          reply.send({ success: false, error: 'Invalid start block number' })
+          return
+        }
+        if (toBlock < 0 || Number.isNaN(toBlock)) {
+          reply.send({ success: false, error: 'Invalid end block number' })
+          return
+        }
+        const count = fromBlock - toBlock
+        if (count > 1000) {
           reply.send({
             success: false,
-            error: `Exceed maximum limit of 100 cycles`,
+            error: `Exceed maximum limit of 1000 blocks`,
           })
           return
         }
       }
-      totalLogs = await Log.queryLogCount(
-        startCycle,
-        endCycle,
-        query.type,
-        address,
-        topics,
-        query.fromBlock,
-        query.toBlock
-      )
-
+      totalLogs = await Log.queryLogCount(address, topics, fromBlock, toBlock, query.blockHash, query.type)
       if (query.page) {
         const page: number = parseInt(query.page)
         if (page <= 0 || Number.isNaN(page)) {
@@ -1269,13 +1300,11 @@ const start = async (): Promise<void> => {
         logs = await Log.queryLogs(
           (page - 1) * itemsPerPage,
           itemsPerPage,
-          startCycle,
-          endCycle,
-          query.type,
           address,
           topics,
-          query.fromBlock,
-          query.toBlock
+          fromBlock,
+          toBlock,
+          query.type
         )
         if (query.type === 'txs') {
           for (let i = 0; i < logs.length; i++) {
@@ -1287,7 +1316,7 @@ const start = async (): Promise<void> => {
               )
               transactions.push(success[0])
             }
-            /* prettier-ignore */ if (config.verbose) console.log(logs[i].txHash, transactions) // eslint-disable-line security/detect-object-injection
+            /* prettier-ignore */ if (CONFIG.verbose) console.log(logs[i].txHash, transactions) // eslint-disable-line security/detect-object-injection
           }
         }
       }
