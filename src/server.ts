@@ -122,6 +122,7 @@ interface RequestQuery {
   blockHash: string
   decode: string // For originalTxsData, reply the query result by decoding the data
   pending: string // For pending txs (AllExceptInternalTx) for pending txs page
+  countOnly: string // true to return only the count of the transactions
 }
 
 let txHashQueryCache = new Map()
@@ -461,6 +462,7 @@ const start = async (): Promise<void> => {
       txFrom: 's?',
       txTo: 's?',
       nominee: 's?',
+      countOnly: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
@@ -829,12 +831,13 @@ const start = async (): Promise<void> => {
       if (blockHash && blockHash.length !== 66) {
         return reply.send({ success: false, error: 'invalid block hash' })
       }
-      // totalTransactions = await Transaction.queryTransactionCountByBlock(blockNumber, blockHash)
-      transactions = await Transaction.queryTransactionsByBlock(blockNumber, blockHash)
-      const res: TransactionResponse = {
-        success: true,
-        // totalTransactions,
-        transactions,
+      const res: TransactionResponse = { success: true }
+      if (query.countOnly === 'true') {
+        totalTransactions = await Transaction.queryTransactionCountByBlock(blockNumber, blockHash)
+        res.totalTransactions = totalTransactions
+      } else {
+        transactions = await Transaction.queryTransactionsByBlock(blockNumber, blockHash)
+        res.transactions = transactions
       }
       reply.send(res)
       return
