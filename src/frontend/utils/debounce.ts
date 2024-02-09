@@ -1,7 +1,7 @@
-export function debounce(func, wait) {
+export function debounce(func, wait): (...args: any[]) => void {
   let timeout
   return function executedFunction(...args) {
-    const later = () => {
+    const later = (): void => {
       clearTimeout(timeout)
       func(...args)
     }
