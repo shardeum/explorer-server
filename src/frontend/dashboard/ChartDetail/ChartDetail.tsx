@@ -9,6 +9,7 @@ import {
   convertValidatorStatsToSeriesData,
 } from '../../utils/transformChartData'
 import { ValidatorStats } from '../../../stats/validatorStats'
+import { useRouter } from 'next/router'
 
 export interface ChartDetailProps {
   validatorStats: ValidatorStats[]
@@ -16,6 +17,8 @@ export interface ChartDetailProps {
 }
 
 export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
+  const router = useRouter()
+  const isDeveloperMode = router.query.mode === 'developer'
   return (
     <div className={styles.ChartDetail}>
       <div className={styles.item}>
@@ -28,7 +31,7 @@ export const ChartDetail: React.FC<ChartDetailProps> = (data) => {
       <div className={styles.item}>
         <StackedLineChart
           title="TOTAL TRANSACTION HISTORY IN LAST 1000 CYCLES"
-          data={convertTransactionStatsToSeriesData(data.transactionStats)}
+          data={convertTransactionStatsToSeriesData(data.transactionStats, isDeveloperMode)}
           name="Transactions"
         />
       </div>

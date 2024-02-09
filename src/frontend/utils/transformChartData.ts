@@ -13,8 +13,11 @@ interface SeriesData {
   zIndex: number
 }
 
-export function convertTransactionStatsToSeriesData(transactionStats: TransactionStats[]): SeriesData[] {
-  const seriesData: SeriesData[] = [
+export function convertTransactionStatsToSeriesData(
+  transactionStats: TransactionStats[],
+  isDeveloperMode: boolean
+): SeriesData[] {
+  let seriesData: SeriesData[] = [
     { name: 'Total Txs', data: [], zIndex: 10 },
     { name: 'Total Internal', data: [], zIndex: 9 },
     { name: 'Stake', data: [], zIndex: 8 },
@@ -52,27 +55,11 @@ export function convertTransactionStatsToSeriesData(transactionStats: Transactio
     seriesData[14].data.push({ x: timestampMillis, y: stat.totalPenaltyTxs, cycle: stat.cycle })
   })
 
-  return seriesData
-}
-
-export function convertValidatorStatsToSeriesData(validatorStats: ValidatorStats[]): SeriesData[] {
-  const seriesData: SeriesData[] = [
-    { name: 'Active', data: [], zIndex: 5 },
-    { name: 'Activated', data: [], zIndex: 4 },
-    { name: 'Syncing', data: [], zIndex: 3 },
-    { name: 'Removed', data: [], zIndex: 2 },
-    { name: 'Apoped', data: [], zIndex: 1 },
-  ]
-
-  validatorStats.forEach((stat) => {
-    const timestampMillis = stat.timestamp * 1000
-
-    seriesData[0].data.push({ x: timestampMillis, y: stat.active, cycle: stat.cycle })
-    seriesData[1].data.push({ x: timestampMillis, y: stat.activated, cycle: stat.cycle })
-    seriesData[2].data.push({ x: timestampMillis, y: stat.syncing, cycle: stat.cycle })
-    seriesData[3].data.push({ x: timestampMillis, y: stat.removed, cycle: stat.cycle })
-    seriesData[4].data.push({ x: timestampMillis, y: stat.apoped, cycle: stat.cycle })
-  })
+  if (!isDeveloperMode) {
+    seriesData = seriesData.filter((series) =>
+      ['Total Txs', 'Unstake', 'Stake', 'Total Internal'].includes(series.name)
+    )
+  }
 
   return seriesData
 }
