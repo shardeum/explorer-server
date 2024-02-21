@@ -56,6 +56,8 @@ export interface TokenTx {
   // references another tx
   txId?: string
   txHash: string
+
+  internalTXType?: InternalTXType
 }
 
 export enum InternalTXType {
