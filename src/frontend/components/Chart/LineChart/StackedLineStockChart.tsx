@@ -17,6 +17,7 @@ interface SeriesData {
   name: string
   data: DataPoint[]
   zIndex: number
+  tooltip?: string
 }
 
 interface StackedLineChartProps {
@@ -101,6 +102,12 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
       layout: 'horizontal',
       align: 'center',
       verticalAlign: 'bottom',
+      labelFormatter: function () {
+        const series = this as Highcharts.Series
+        const tooltipText = series.userOptions.tooltip || ''
+        return `<span title="${tooltipText}">${series.name}</span>`
+      },
+      useHTML: true,
     },
     xAxis: {
       type: 'datetime',
@@ -111,7 +118,7 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
           const totalRange = e.max - e.min
           const oneWeek = 7 * 24 * 3600 * 1000 // one week in milliseconds
           if (props.groupData) {
-              setSelectedRange(totalRange >= oneWeek ? 'week' : '')
+            setSelectedRange(totalRange >= oneWeek ? 'week' : '')
           }
         },
       },

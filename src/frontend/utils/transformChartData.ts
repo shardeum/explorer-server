@@ -11,6 +11,7 @@ interface SeriesData {
   name: string
   data: DataPoint[]
   zIndex: number
+  tooltip?: string
 }
 
 export function convertTransactionStatsToSeriesData(
@@ -18,10 +19,10 @@ export function convertTransactionStatsToSeriesData(
   isDeveloperMode: boolean
 ): SeriesData[] {
   let seriesData: SeriesData[] = [
-    { name: 'Total Txs', data: [], zIndex: 10 },
-    { name: 'Total Internal', data: [], zIndex: 9 },
-    { name: 'Stake', data: [], zIndex: 8 },
-    { name: 'Unstake', data: [], zIndex: 7 },
+    { name: 'Total Txs', data: [], zIndex: 10, tooltip: 'Count of all transactions' },
+    { name: 'Total Internal Txs', data: [], zIndex: 9, tooltip: 'Count of all internal transactions' },
+    { name: 'Stake', data: [], zIndex: 8, tooltip: 'Count of all validator stake transactions' },
+    { name: 'Unstake', data: [], zIndex: 7, tooltip: 'Count of all validator unstake transactions' },
     { name: 'Set Global Code Bytes', data: [], zIndex: 6 },
     { name: 'Init Network', data: [], zIndex: 5 },
     { name: 'Node Reward', data: [], zIndex: 4 },
@@ -66,11 +67,26 @@ export function convertTransactionStatsToSeriesData(
 
 export function convertValidatorStatsToSeriesData(validatorStats: ValidatorStats[]): SeriesData[] {
   const seriesData: SeriesData[] = [
-    { name: 'Active', data: [], zIndex: 5 },
-    { name: 'Activated', data: [], zIndex: 4 },
-    { name: 'Syncing', data: [], zIndex: 3 },
-    { name: 'Removed', data: [], zIndex: 2 },
-    { name: 'Apoped', data: [], zIndex: 1 },
+    { name: 'Active', data: [], zIndex: 5, tooltip: 'Count of all currently active validators' },
+    {
+      name: 'Activated',
+      data: [],
+      zIndex: 4,
+      tooltip: 'Count of all validators that have been activated in a cycle',
+    },
+    { name: 'Syncing', data: [], zIndex: 3, tooltip: 'Count of all validators that are currently syncing' },
+    {
+      name: 'Removed',
+      data: [],
+      zIndex: 2,
+      tooltip: 'Count of all validators that have been removed in a cycle',
+    },
+    {
+      name: 'Apoped',
+      data: [],
+      zIndex: 1,
+      tooltip: 'Count of all validators that have been apoped in a cycle',
+    },
   ]
 
   validatorStats.forEach((stat) => {

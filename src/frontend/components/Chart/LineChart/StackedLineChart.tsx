@@ -25,6 +25,7 @@ interface SeriesData {
   name: string
   data: DataPoint[]
   zIndex: number
+  tooltip?: string
 }
 
 interface StackedLineChartProps {
@@ -108,6 +109,12 @@ export const StackedLineChart: React.FC<StackedLineChartProps> = (props: Stacked
     },
     legend: {
       enabled: true,
+      labelFormatter: function () {
+        const series = this as Highcharts.Series
+        const tooltipText = series.userOptions.tooltip || ''
+        return `<span title="${tooltipText}">${series.name}</span>`
+      },
+      useHTML: true,
     },
     xAxis: {
       type: 'datetime',
