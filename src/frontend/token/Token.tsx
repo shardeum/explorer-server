@@ -49,7 +49,7 @@ export const Token: React.FC = () => {
       key: 'ethAddress',
       value: 'Address',
       render: (val: unknown) => (
-        <AnchorLink href={`/token/${id}/?a=${val}`} label={val as unknown as string} size="small" />
+        <AnchorLink href={`/account/${val}`} label={val as unknown as string} size="small" />
       ),
     },
     {
