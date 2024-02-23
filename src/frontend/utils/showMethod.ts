@@ -1,7 +1,6 @@
 import { Transaction, TokenTx, TransactionType, OriginalTxData } from '../../types'
 
 export const showTxMethod = (tx: Transaction | TokenTx | OriginalTxData): string => {
-  console.log('tx', tx)
   let data = 'wrappedEVMAccount' in tx ? tx.wrappedEVMAccount?.readableReceipt?.data : null
 
   let methodCode = data && data.length > 10 ? data.substring(0, 10) : null

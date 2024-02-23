@@ -138,7 +138,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
             </div>
           </div>
           <div className={styles.item}>
-            <div className={styles.title}>Type:</div>
+            <div className={styles.title}>Method:</div>
             <div className={styles.value}>
               <Chip title={showTxMethod(transaction)} color="info" className={styles.chip} />
             </div>
