@@ -90,6 +90,13 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
           render: (val: string) => parseInt(val),
         },
         {
+          key: 'wrappedEVMAccount.readableReceipt.from',
+          value: 'From',
+          render: (val: string | TransactionType) => (
+            <AnchorLink href={`/account/${val}`} label={val as string} size="small" ellipsis width={150} />
+          ),
+        },
+        {
           key: 'wrappedEVMAccount.readableReceipt',
           value: 'To',
           render: (val: ReadableReceipt) =>
