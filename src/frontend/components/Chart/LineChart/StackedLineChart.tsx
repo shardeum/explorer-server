@@ -103,8 +103,16 @@ export const StackedLineChart: React.FC<StackedLineChartProps> = (props: Stacked
     series: data,
     plotOptions: {
       series: {
+        cursor: 'pointer',
         stacking: null,
         findNearestPointBy: 'xy',
+        point: {
+          events: {
+            click: function () {
+              window.open(`/cycle/${this.cycle}`, '_blank')
+            },
+          },
+        },
       },
     },
     legend: {

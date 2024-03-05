@@ -58,6 +58,15 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
             units: [['day', [1]]],
             approximation: 'sum',
           },
+          cursor: 'pointer',
+          point: {
+            events: {
+              click: function () {
+                const cycle = timestampToCycle.get(this.x) || 0
+                window.open(`/cycle/${cycle}`, '_blank')
+              },
+            },
+          },
         },
       }
     } else {
@@ -67,6 +76,15 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
           findNearestPointBy: 'xy',
           dataGrouping: {
             enabled: false,
+          },
+          cursor: 'pointer',
+          point: {
+            events: {
+              click: function () {
+                const cycle = timestampToCycle.get(this.x) || 0
+                window.open(`/cycle/${cycle}`, '_blank')
+              },
+            },
           },
         },
       }
