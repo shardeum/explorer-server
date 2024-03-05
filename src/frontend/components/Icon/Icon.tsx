@@ -9,6 +9,7 @@ import Account from './svgs/account.svg'
 import Contract from './svgs/contract.svg'
 import Cycle from './svgs/cycle.svg'
 import Node from './svgs/nodes.svg'
+import Standby from './svgs/blocks-group-outline-badged-svgrepo-com.svg'
 import Reward from './svgs/reward.svg'
 import Transaction from './svgs/transaction.svg'
 import ArrowLeft from './svgs/arrow_left.svg'
@@ -41,6 +42,7 @@ export const iconTypes = {
   contract: Contract,
   cycle: Cycle,
   node: Node,
+  standby: Standby,
   reward: Reward,
   transaction: Transaction,
   arrow_left: ArrowLeft,

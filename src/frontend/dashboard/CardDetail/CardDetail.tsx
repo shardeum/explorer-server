@@ -8,6 +8,7 @@ import styles from './CardDetail.module.scss'
 export interface CardDetailProps {
   totalCycles: number
   totalNodes: number
+  totalStandby: number
   totalTransactions: number
   totalRewardTxs: number
   totalStakeTxs: number
@@ -43,6 +44,16 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
             <p>{data?.totalNodes?.toLocaleString('en-US')}</p>
           </div>
         </div>
+        <hr />
+        <div className={styles.item}>
+          <div className={styles.icon}>
+            <Icon name="standby" size="medium" color="primary" />
+          </div>
+          <div>
+            <p className={styles.title}>Stanby Nodes</p>
+            <p>{data?.totalStandby?.toLocaleString('en-US')}</p>
+          </div>
+        </div>
       </div>
       <div className={styles.column}>
         <Link href="/account">
@@ -68,8 +79,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
             </div>
           </div>
         </Link>
-      </div>
-      <div className={styles.column}>
+        <hr />
         <Link href="/transaction">
           <div className={styles.item}>
             <div className={styles.icon}>
@@ -81,8 +91,8 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
             </div>
           </div>
         </Link>
-
-        <hr />
+      </div>
+      <div className={styles.column}>
         <Link href="/transaction">
           <div className={styles.item}>
             <div className={styles.icon}>
@@ -96,8 +106,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
             </div>
           </div>
         </Link>
-      </div>
-      <div className={styles.column}>
+        <hr />
         <Link href="/account">
           <div className={styles.item}>
             <div className={styles.icon}>
@@ -109,7 +118,6 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
             </div>
           </div>
         </Link>
-
         <hr />
         <Link href="/transaction">
           <div className={styles.item}>

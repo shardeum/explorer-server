@@ -35,6 +35,7 @@ export const Dashboard: React.FC = () => {
       key: row?.cycleRecord?.counter ?? -1,
       value: moment(row?.cycleRecord?.start * 1000).calendar(),
       activeNodes: row?.cycleRecord?.active || 0,
+      standbyNodes: row?.cycleRecord?.standby || 0,
     }
   })
 
@@ -49,6 +50,7 @@ export const Dashboard: React.FC = () => {
         <CardDetail
           totalCycles={cyclesList[0]?.key}
           totalNodes={cyclesList[0]?.activeNodes}
+          totalStandby={cyclesList[0]?.standbyNodes}
           totalAccounts={totalAccounts}
           totalContracts={totalContracts}
           totalTransactions={totalTransactions}
