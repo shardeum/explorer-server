@@ -505,7 +505,16 @@ export const getContractInfo = async (
     if (config.verbose) console.log('Token Name', contractInfo.name)
     contractInfo.symbol = await Token.methods.symbol().call()
     contractInfo.totalSupply = String(await Token.methods.totalSupply().call())
-    contractInfo.decimals = String(await Token.methods.decimals().call())
+    // Primary method: Fetch the decimals using the contract's ABI call
+    /* prettier-ignore */ if (config.verbose) console.log(`Attempting to fetch decimals for contract at address: ${contractAddress} using ABI call.`)
+    try {
+      contractInfo.decimals = String(await Token.methods.decimals().call())
+      /* prettier-ignore */ if (config.verbose) console.log(`Successfully fetched decimals for contract at address: ${contractAddress}. Decimals: ${contractInfo.decimals}`)
+    } catch (error) {
+      console.error('Error fetching decimals directly from contract:', error)
+      /* prettier-ignore */ if (config.verbose) console.log(`Unable to fetch decimals for contract at address: ${contractAddress}. Leaving as null.`)
+      contractInfo.decimals = null
+    }
     foundCorrectContract = true
     contractType = ContractType.ERC_20
     // await sleep(200); // Awaiting a bit to refresh the service points of the validator

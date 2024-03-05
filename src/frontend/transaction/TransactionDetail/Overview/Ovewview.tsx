@@ -27,9 +27,24 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
       items.length > 0 &&
       (items[0].tokenType === TransactionType.EVM_Internal || items[0].tokenType === TransactionType.ERC_20)
     ) {
+      // Determine the presence of different event types
+      const hasApproval = items.some((item) => item.tokenEvent === 'Approval')
+      const hasTransfer = items.some((item) => item.tokenEvent === 'Transfer')
+
+      // Determine the title text based on the event types present
+      let titleText = ''
+      if (hasApproval && hasTransfer) {
+        titleText = 'ERC-20 Tokens Approved and Transferred:'
+      } else if (hasApproval) {
+        titleText = 'ERC-20 Tokens Approved:'
+      } else if (hasTransfer) {
+        titleText = 'ERC-20 Tokens Transferred:'
+      } else {
+        titleText = 'Miscellaneous ERC-20 Token Events:'
+      }
       return (
         <div className={styles.item}>
-          <div className={styles.title}>ERC-20 Tokens Transferred :</div>
+          <div className={styles.title}>{titleText}</div>
           <div className={styles.value}>
             <div className={styles.card}>
               {items.map((item, index) => (
@@ -44,7 +59,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                     {item.tokenTo}
                   </Link>
                   <span>For</span>
-                  <div>{calculateTokenValue(item, item.tokenType, null, true)}&nbsp;</div>
+                  <div>{calculateTokenValue(item, item.tokenType, undefined, true)}&nbsp;</div>
                   <Link href={`/account/${item.contractAddress}`} className={styles.anchor}>
                     {item.tokenType === TransactionType.EVM_Internal
                       ? 'SHM'

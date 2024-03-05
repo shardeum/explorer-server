@@ -31,7 +31,7 @@ export const calculateTokenValue = (
       const decimalsValue = tokenTx.contractInfo.decimals ? parseInt(tokenTx.contractInfo.decimals) : 18
 
       return tokenTx.tokenValue === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        ? round(utils.formatUnits(tokenTx.tokenValue, 0))
+        ? 'unlimited'
         : fullValue
         ? utils.formatUnits(tokenTx.tokenValue, decimalsValue)
         : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
