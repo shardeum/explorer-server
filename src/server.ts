@@ -90,8 +90,6 @@ if (config.env == envEnum.DEV) {
 interface RequestQuery {
   page: string
   count: string
-  from: string
-  to: string
   cycleNumber: string
   txId: string
   txHash: string
@@ -123,6 +121,7 @@ interface RequestQuery {
   decode: string // For originalTxsData, reply the query result by decoding the data
   pending: string // For pending txs (AllExceptInternalTx) for pending txs page
   countOnly: string // true to return only the count of the transactions
+  tally: string // true to return the list of total count in each cycle
 }
 
 let txHashQueryCache = new Map()
@@ -177,8 +176,8 @@ const start = async (): Promise<void> => {
     const err = utils.validateTypes(_request.query as object, {
       count: 's?',
       cycleNumber: 's?',
-      to: 's?',
-      from: 's?',
+      start: 's?',
+      end: 's?',
       marker: 's?',
     })
     if (err) {
@@ -203,9 +202,9 @@ const start = async (): Promise<void> => {
       }
       const cycle = await Cycle.queryCycleByCounter(cycleNumber)
       if (cycle) cycles = [cycle]
-    } else if (query.to && query.from) {
-      const from = parseInt(query.from)
-      const to = parseInt(query.to)
+    } else if (query.start) {
+      const from = parseInt(query.start)
+      const to = query.end ? parseInt(query.end) : from
       if (!(from >= 0 && to >= from) || Number.isNaN(from) || Number.isNaN(to)) {
         console.log('Invalid start and end counters for cycleinfo')
         reply.send({
@@ -214,8 +213,12 @@ const start = async (): Promise<void> => {
         })
         return
       }
+      const count = to - from
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
+        return
+      }
       cycles = await Cycle.queryCycleRecordsBetween(from, to)
-      /* prettier-ignore */ if (config.verbose)  console.log('cycles', cycles);
     } else if (query.marker) {
       const cycle = await Cycle.queryCycleByMarker(query.marker)
       if (cycle) {
@@ -300,15 +303,20 @@ const start = async (): Promise<void> => {
         }
         accounts = await Account.queryAccounts((page - 1) * itemsPerPage, itemsPerPage, type)
       }
-    } else if (query.startCycle && query.endCycle) {
-      const startCycle: number = parseInt(query.startCycle)
-      const endCycle: number = parseInt(query.endCycle)
+    } else if (query.startCycle) {
+      const startCycle = parseInt(query.startCycle)
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
       if (startCycle < 0 || Number.isNaN(startCycle)) {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      if (endCycle < 0 || Number.isNaN(endCycle)) {
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
         reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = endCycle - startCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
         return
       }
       totalAccounts = await Account.queryAccountCountBetweenCycles(startCycle, endCycle)
@@ -468,7 +476,7 @@ const start = async (): Promise<void> => {
       reply.send({ success: false, error: err })
       return
     }
-    /* prettier-ignore */ if (config.verbose)  console.log('Request', _request.query);
+    /* prettier-ignore */ if (config.verbose) console.log('Request', _request.query);
     const query = _request.query as RequestQuery
     const itemsPerPage = 10
     let totalPages = 0
@@ -499,22 +507,20 @@ const start = async (): Promise<void> => {
         TransactionSearchType.AllExceptInternalTx
       )
     } else if (query.startCycle) {
-      const startCycle: number = parseInt(query.startCycle)
+      const startCycle = parseInt(query.startCycle)
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
       if (startCycle < 0 || Number.isNaN(startCycle)) {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      let endCycle = startCycle + 100
-      if (query.endCycle) {
-        endCycle = parseInt(query.endCycle)
-        if (endCycle < 0 || Number.isNaN(endCycle)) {
-          reply.send({ success: false, error: 'Invalid end cycle number' })
-          return
-        }
-        if (endCycle - startCycle > 100) {
-          reply.send({ success: false, error: 'The cycle range is too big. Max cycle range is 100 cycles.' })
-          return
-        }
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
+        reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = endCycle - startCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
+        return
       }
       totalTransactions = await Transaction.queryTransactionCountBetweenCycles(
         startCycle,
@@ -667,10 +673,10 @@ const start = async (): Promise<void> => {
       const account = query.txFrom
         ? { address: query.txFrom.toLowerCase(), txMethod: TxMethodFilter.TxFrom }
         : query.txTo
-        ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
-        : query.nominee
-        ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
-        : null
+          ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
+          : query.nominee
+            ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
+            : null
       let page: number
       if (query.page) {
         page = parseInt(query.page)
@@ -873,16 +879,17 @@ const start = async (): Promise<void> => {
       txId: 's?',
       startCycle: 's?',
       endCycle: 's?',
+      tally: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
       return
     }
-    /* prettier-ignore */ if (config.verbose)  console.log('Request', _request.query);
+    /* prettier-ignore */ if (config.verbose) console.log('Request', _request.query);
     const query = _request.query as RequestQuery
     const itemsPerPage = 10
     let totalPages = 0
-    let totalReceipts = 0
+    let totalReceipts: number | { receipts: number; cycle: number }[] = 0
     let receipts
     if (query.count) {
       const count: number = parseInt(query.count)
@@ -896,21 +903,26 @@ const start = async (): Promise<void> => {
       }
       receipts = await Receipt.queryReceipts(0, count)
     } else if (query.startCycle) {
-      const startCycle: number = parseInt(query.startCycle)
+      const startCycle = parseInt(query.startCycle)
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
       if (startCycle < 0 || Number.isNaN(startCycle)) {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      let endCycle
-      if (query.endCycle) {
-        endCycle = parseInt(query.endCycle)
-        if (endCycle < 0 || Number.isNaN(endCycle)) {
-          reply.send({ success: false, error: 'Invalid end cycle number' })
-          return
-        }
-      } else endCycle = await Cycle.queryCycleCount()
-      console.log('endCycle', endCycle, 'startCycle', startCycle)
-      totalReceipts = await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle)
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
+        reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = endCycle - startCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
+        return
+      }
+      if (query.tally === 'true') {
+        totalReceipts = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
+        return reply.send({ success: true, totalReceipts })
+      }
+      totalReceipts = await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle) as number
       const res: ReceiptResponse = {
         success: true,
         totalReceipts,
@@ -990,16 +1002,17 @@ const start = async (): Promise<void> => {
       endCycle: 's?',
       decode: 's?',
       pending: 's?',
+      tally: 's?',
     })
     if (err) {
       reply.send({ success: false, error: err })
       return
     }
-    /* prettier-ignore */ if (config.verbose)  console.log('Request', _request.query);
+    /* prettier-ignore */ if (config.verbose) console.log('Request', _request.query);
     const query = _request.query as RequestQuery
     const itemsPerPage = 10
     let totalPages = 0
-    let totalOriginalTxs = 0
+    let totalOriginalTxs: number | { originalTxsData: number; cycle: number }[] = 0
     let originalTxs: OriginalTxDataInterface[] | number
     if (query.count) {
       const count: number = parseInt(query.count)
@@ -1013,22 +1026,24 @@ const start = async (): Promise<void> => {
       }
       originalTxs = await OriginalTxData.queryOriginalTxsData(0, count)
     } else if (query.startCycle) {
-      const startCycle: number = parseInt(query.startCycle)
+      const startCycle = parseInt(query.startCycle)
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
       if (startCycle < 0 || Number.isNaN(startCycle)) {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      let endCycle = startCycle + 100
-      if (query.endCycle) {
-        endCycle = parseInt(query.endCycle)
-        if (endCycle < 0 || Number.isNaN(endCycle)) {
-          reply.send({ success: false, error: 'Invalid end cycle number' })
-          return
-        }
-        if (endCycle - startCycle > 100) {
-          reply.send({ success: false, error: 'The cycle range is too big. Max cycle range is 100 cycles.' })
-          return
-        }
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
+        reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = endCycle - startCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
+        return
+      }
+      if (query.tally === 'true') {
+        totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCountByCycles(startCycle, endCycle)
+        return reply.send({ success: true, totalOriginalTxs })
       }
       totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount(null, startCycle, endCycle)
       if (query.page) {
@@ -1217,25 +1232,21 @@ const start = async (): Promise<void> => {
       }
       logs = await Log.queryLogs(0, count)
       totalLogs = await Log.queryLogCount(query.type)
-    } else if (query.startCycle || query.endCycle) {
-      let startCycle: number
-      let endCycle: number
-      if (query.startCycle || query.endCycle) {
-        startCycle = query.startCycle ? parseInt(query.startCycle) : 0
-        endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
-        if (startCycle < 0 || Number.isNaN(startCycle)) {
-          reply.send({ success: false, error: 'Invalid start cycle number' })
-          return
-        }
-        if (endCycle < 0 || Number.isNaN(endCycle)) {
-          reply.send({ success: false, error: 'Invalid end cycle number' })
-          return
-        }
-        const count = startCycle - endCycle
-        if (count > 100) {
-          reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
-          return
-        }
+    } else if (query.startCycle) {
+      const startCycle = parseInt(query.startCycle)
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
+      if (startCycle < 0 || Number.isNaN(startCycle)) {
+        reply.send({ success: false, error: 'Invalid start cycle number' })
+        return
+      }
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
+        reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = endCycle - startCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
+        return
       }
       totalLogs = await Log.queryLogCountBetweenCycles(startCycle, endCycle)
       if (query.page) {
@@ -1377,19 +1388,20 @@ const start = async (): Promise<void> => {
       } else {
         validatorStats = await ValidatorStats.queryLatestValidatorStats(count)
       }
-    } else if (query.startCycle && query.endCycle) {
+    } else if (query.startCycle) {
       const startCycle = parseInt(query.startCycle)
-      const endCycle = parseInt(query.endCycle)
-      if (
-        !(startCycle >= 0 && endCycle >= startCycle) ||
-        Number.isNaN(startCycle) ||
-        Number.isNaN(endCycle)
-      ) {
-        console.log('Invalid start and end counters for cycleinfo')
-        reply.send({
-          success: false,
-          error: 'Invalid startCycle and endCycle counter for cycleinfo',
-        })
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
+      if (startCycle < 0 || Number.isNaN(startCycle)) {
+        reply.send({ success: false, error: 'Invalid start cycle number' })
+        return
+      }
+      if (endCycle < 0 || Number.isNaN(endCycle)) {
+        reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = startCycle - endCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
         return
       }
       validatorStats = await ValidatorStats.queryValidatorStatsBetween(startCycle, endCycle)
@@ -1457,19 +1469,20 @@ const start = async (): Promise<void> => {
       } else {
         transactionStats = await TransactionStats.queryLatestTransactionStats(count)
       }
-    } else if (query.startCycle && query.endCycle) {
+    } else if (query.startCycle) {
       const startCycle = parseInt(query.startCycle)
-      const endCycle = parseInt(query.endCycle)
-      if (
-        !(startCycle >= 0 && endCycle >= startCycle) ||
-        Number.isNaN(startCycle) ||
-        Number.isNaN(endCycle)
-      ) {
-        console.log('Invalid start and end counters for cycleinfo')
-        reply.send({
-          success: false,
-          error: 'Invalid startCycle and endCycle counter for cycleinfo',
-        })
+      const endCycle = query.endCycle ? parseInt(query.endCycle) : startCycle
+      if (startCycle < 0 || Number.isNaN(startCycle)) {
+        reply.send({ success: false, error: 'Invalid start cycle number' })
+        return
+      }
+      if (endCycle < 0 || Number.isNaN(endCycle)) {
+        reply.send({ success: false, error: 'Invalid end cycle number' })
+        return
+      }
+      const count = startCycle - endCycle
+      if (count > 100) {
+        reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
         return
       }
       transactionStats = await TransactionStats.queryTransactionStatsBetween(startCycle, endCycle)

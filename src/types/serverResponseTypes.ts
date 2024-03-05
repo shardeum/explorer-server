@@ -24,7 +24,7 @@ export type ReceiptResponse = {
   success: boolean
   receipts?: unknown
   totalPages?: number
-  totalReceipts?: number
+  totalReceipts?: number | { receipts: number; cycle: number }[]
 }
 
 export type OriginalTxResponse = {
