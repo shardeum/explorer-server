@@ -1395,11 +1395,11 @@ const start = async (): Promise<void> => {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      if (endCycle < 0 || Number.isNaN(endCycle)) {
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
         reply.send({ success: false, error: 'Invalid end cycle number' })
         return
       }
-      const count = startCycle - endCycle
+      const count = endCycle - startCycle
       if (count > 100) {
         reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
         return
@@ -1476,11 +1476,11 @@ const start = async (): Promise<void> => {
         reply.send({ success: false, error: 'Invalid start cycle number' })
         return
       }
-      if (endCycle < 0 || Number.isNaN(endCycle)) {
+      if (endCycle < 0 || Number.isNaN(endCycle) || endCycle < startCycle) {
         reply.send({ success: false, error: 'Invalid end cycle number' })
         return
       }
-      const count = startCycle - endCycle
+      const count = endCycle - startCycle
       if (count > 100) {
         reply.send({ success: false, error: `Exceed maximum limit of 100 cycles` })
         return

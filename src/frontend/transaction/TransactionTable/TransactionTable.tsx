@@ -85,11 +85,6 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
     ) {
       tHeader = [
         {
-          key: 'wrappedEVMAccount.readableReceipt.nonce',
-          value: 'Nonce',
-          render: (val: string) => parseInt(val),
-        },
-        {
           key: 'wrappedEVMAccount.readableReceipt.from',
           value: 'From',
           render: (val: string | TransactionType) => (
@@ -112,6 +107,11 @@ export const TransactionTable: React.FC<ITransactionTable> = (props) => {
                 width={150}
               />
             )),
+        },
+        {
+          key: 'wrappedEVMAccount.readableReceipt.nonce',
+          value: 'Nonce',
+          render: (val: string) => parseInt(val),
         },
         {
           key: 'wrappedEVMAccount.readableReceipt.value',
