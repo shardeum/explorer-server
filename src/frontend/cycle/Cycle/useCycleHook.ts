@@ -35,7 +35,7 @@ export const useCycleHook = (): CycleHookResult => {
     async function fetchData(): Promise<void> {
       const { counter, to, from } = await getLatestCounter()
 
-      const data = await api.get(`${PATHS.CYCLE}?from=${from}&to=${to}`)
+      const data = await api.get(`${PATHS.CYCLE}?start=${from}&to=${to}`)
 
       setCycles((data?.data?.cycles as Cycle[]) || [])
       setTotalCycle(counter)

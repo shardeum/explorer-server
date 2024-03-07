@@ -6,13 +6,13 @@ import { isDeepStrictEqual } from 'util'
 import { writeFileSync } from 'fs'
 crypto.init(config.hashKey)
 
-const API_SERVER_URL = 'http://127.0.0.1:6001'
+const API_SERVER_URL = 'http:/127.0.0.1:6001'
 
 const startCycle = 10000
 const endCycle = 10200
-const saveToFile = true
+const saveToFile = false
 
-const data_type: any = DataType.ORIGINALTX // DataType.RECEIPT // DataType.CYCLE // DataType.ORIGINALTX
+const data_type: any = DataType.RECEIPT // DataType.RECEIPT // DataType.CYCLE // DataType.ORIGINALTX
 const api_url = data_type === DataType.RECEIPT ? 'receipt' : data_type === DataType.CYCLE ? 'cycleinfo' : 'originalTx'
 
 const runProgram = async (): Promise<void> => {
@@ -21,7 +21,7 @@ const runProgram = async (): Promise<void> => {
     let api_responses: any = []
     let nextEnd = startCycle + limit
     for (let i = startCycle; i < endCycle;) {
-        console.log(i, nextEnd)
+        console.log(`Start Cycle ${i} End Cycle ${nextEnd}`)
         const distributor_data = data_type === DataType.CYCLE ? {
             start: i,
             end: nextEnd
@@ -55,7 +55,7 @@ const runProgram = async (): Promise<void> => {
         i = nextEnd + 1
         nextEnd += limit
     }
-    console.log(distributor_responses.length, api_responses.length)
+    console.log('DISTRIBUTOR RESPONSES', distributor_responses.length, 'API SERVER RESPONSES', api_responses.length)
     console.log(isDeepStrictEqual(distributor_responses, api_responses))
     // console.dir(responses, { depth: null })
     // save to file
