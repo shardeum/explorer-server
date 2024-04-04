@@ -22,7 +22,7 @@ The Explorer server uses Fastify.js for its backend implementation, while the Us
 npm install
 ```
 
-> Add `archvier` info and `rpc` server info in the `src/config/index.ts`, the latest archiver public key can be found on archiver_ip/archivers, ie http://45.56.123.96:4000/archivers for 1.9.0
+> Add `archiver` info and `rpc` server info in the `src/config/index.ts`, the latest archiver public key can be found on archiver_ip/archivers, ie http://45.56.123.96:4000/archivers for 1.9.0
 
 2. Compile the update:
 
