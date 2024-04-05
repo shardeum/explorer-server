@@ -77,9 +77,9 @@ export const decodeTx = async (
   }
 
   if (!newTx && config.indexData.decodeTokenTransfer) {
-    // Check if there is any tokenTx for this txId; if found, return empty result to skip decoding
+    // Check if there is any tokenTx with this txId; if found, return empty result to skip decoding
     const tokenTxs = await queryTokenTxByTxId(tx.txId)
-    if (!tokenTxs || tokenTxs.length > 0) {
+    if (tokenTxs.length > 0) {
       return {
         txs,
         accs,

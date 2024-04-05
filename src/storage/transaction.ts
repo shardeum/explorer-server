@@ -1411,7 +1411,7 @@ export async function queryTransactionsByBlock(
   return transactions
 }
 
-export async function queryTokenTxByTxId(txId: string): Promise<DbTokenTx[] | null> {
+export async function queryTokenTxByTxId(txId: string): Promise<DbTokenTx[] | []> {
   try {
     const sql = `SELECT * FROM tokenTxs WHERE txId=?`
     const tokenTxs: DbTokenTx[] = await db.all(sql, [txId])
@@ -1420,7 +1420,7 @@ export async function queryTokenTxByTxId(txId: string): Promise<DbTokenTx[] | nu
   } catch (e) {
     console.log(e)
   }
-  return null
+  return []
 }
 
 function deserializeDbTransaction(transaction: DbTransaction): void {
