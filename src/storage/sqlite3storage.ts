@@ -9,30 +9,6 @@ export async function init(): Promise<void> {
   console.log('Database initialized.')
 }
 
-/**
- * Close the Database Connections Gracefully
- */
-export async function closeDatabase(): Promise<void> {
-  try {
-    console.log('Terminating Database/Indexer Connections...')
-    await new Promise<void>((resolve, reject) => {
-      db.close((err) => {
-        if (err) {
-          console.error('Error closing Database Connection.')
-          reject(err)
-        } else {
-          console.log('Database connection closed.')
-          resolve()
-        }
-      })
-    })
-  } catch (err) {
-    console.error('Error thrown in closeDatabase() function: ')
-    console.error(err)
-  }
-}
-
-
 export async function runCreate(createStatement: string): Promise<void> {
   await run(createStatement)
 }
@@ -63,6 +39,29 @@ export async function get<T>(sql: string, params: unknown[] | object = []): Prom
       }
     })
   })
+}
+
+/**
+ * Close the Database Connections Gracefully
+ */
+export async function close(): Promise<void> {
+  try {
+    console.log('Terminating Database/Indexer Connections...')
+    await new Promise<void>((resolve, reject) => {
+      db.close((err) => {
+        if (err) {
+          console.error('Error closing Database Connection.')
+          reject(err)
+        } else {
+          console.log('Database connection closed.')
+          resolve()
+        }
+      })
+    })
+  } catch (err) {
+    console.error('Error thrown in closeDatabase() function: ')
+    console.error(err)
+  }
 }
 
 export async function all<T>(sql: string, params: unknown[] | object = []): Promise<T[]> {

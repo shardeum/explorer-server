@@ -26,6 +26,7 @@ const start = async (): Promise<void> => {
   await Storage.initializeDB()
 
   await StatsStorage.initializeStatsDB()
+  Storage.addExitListeners()
   let lastCheckedCycleForValidators = -1
   let lastCheckedCycleForTxs = -1
   let lastCheckedCycleForCoinStats = -1

@@ -25,7 +25,6 @@ import { validateData } from './class/validateData'
 import { DistributorSocketCloseCodes } from './types'
 import { config as CONFIG, DISTRIBUTOR_URL } from './config'
 import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
-import { closeDatabase } from './storage/sqlite3storage'
 // config variables
 
 if (process.env.PORT) {
@@ -222,6 +221,7 @@ const start = async (): Promise<void> => {
   let retry = 0
   crypto.init(hashKey)
   await Storage.initializeDB()
+  Storage.addExitListeners(ws)
 
   await checkAndSyncData()
   setupCollectorSocketServer()
@@ -241,11 +241,3 @@ const start = async (): Promise<void> => {
 }
 
 start()
-
-process.on('SIGINT', async () => {
-  console.log('Received SIGINT signal. Closing all connections gracefully...')
-  ws?.close()
-  await closeDatabase()
-  process.exit(0)
-})
-

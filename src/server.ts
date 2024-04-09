@@ -18,7 +18,6 @@ import * as Log from './storage/log'
 import * as Receipt from './storage/receipt'
 import * as Transaction from './storage/transaction'
 import * as OriginalTxData from './storage/originalTxData'
-import { closeDatabase } from './storage/sqlite3storage'
 import {
   AccountSearchType,
   AccountType,
@@ -143,6 +142,7 @@ const start = async (): Promise<void> => {
     logger: false,
     pluginTimeout: 120_000,
   })
+  Storage.addExitListeners(server)
 
   await server.register(FastifyWebsocket)
   await server.register(fastifyCors)
@@ -1570,15 +1570,6 @@ const start = async (): Promise<void> => {
       console.log('Shardeum explorer server is listening on port:', CONFIG.port.server)
     }
   )
-  
-  process.on('SIGINT', async () => {
-    console.log('Received SIGINT signal. Closing all connections gracefully...')
-    server?.close()
-    await closeDatabase()
-    process.exit(0)
-  })
-  
-
 }
 
 start()

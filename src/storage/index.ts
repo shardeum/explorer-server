@@ -1,4 +1,6 @@
 import * as db from './sqlite3storage'
+import WebSocket from 'ws'
+import { FastifyInstance } from 'fastify'
 
 export const initializeDB = async (): Promise<void> => {
   await db.init()
@@ -77,4 +79,23 @@ export const initializeDB = async (): Promise<void> => {
   await db.runCreate(
     'CREATE INDEX if not exists `originalTxsData2_idx` ON `originalTxsData2` (`txHash`, `txId`, `cycle` DESC, `timestamp` DESC, `transactionType`)'
   )
+}
+
+export const closeDatabase = async (): Promise<void> => {
+  await db.close()
+}
+
+export const addExitListeners = (server?: WebSocket | FastifyInstance): void => {
+  process.on('SIGINT', async () => {
+    console.log('Exiting on SIGINT')
+    if (server) server.close()
+    await closeDatabase()
+    process.exit(0)
+  })
+  process.on('SIGTERM', async () => {
+    console.log('Exiting on SIGTERM')
+    if (server) server.close()
+    await closeDatabase()
+    process.exit(0)
+  })
 }

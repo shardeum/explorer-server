@@ -1,13 +1,12 @@
 import fastifyRateLimit from '@fastify/rate-limit'
 import FastifyWebsocket, { SocketStream } from '@fastify/websocket'
 import * as crypto from 'crypto'
-import Fastify from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
 import { config } from './config'
 import { setupCollectorListener } from './logSubscription/CollectorListener'
 import { evmLogSubscriptionHandler } from './logSubscription/Handler'
 import { removeLogSubscriptionBySocketId } from './logSubscription/SocketManager'
 import * as Storage from './storage'
-import { closeDatabase } from './storage/sqlite3storage'
 
 console.log(process.argv)
 const port = process.argv[2]
@@ -25,7 +24,7 @@ const start = async (): Promise<void> => {
   const server = Fastify({
     logger: true,
   })
-
+  Storage.addExitListeners(server)
   // Register plugins and middleware
   await server.register(FastifyWebsocket, {
     errorHandler: (error, connection, request, reply) => {
@@ -61,13 +60,6 @@ const start = async (): Promise<void> => {
       console.log('Log server is listening on port:', config.port.log_server)
     }
   )
-
-  process.on('SIGINT', async () => {
-    console.log('Received SIGINT signal. Closing all connections gracefully...')
-    server?.close()
-    await closeDatabase()
-    process.exit(0)
-  })
 }
 
 const evmLogSubscriptionController = (connection: SocketStream): void => {

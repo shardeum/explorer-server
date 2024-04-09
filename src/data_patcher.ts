@@ -23,6 +23,7 @@ const start = async (): Promise<void> => {
   crypto.init(config.hashKey)
   await Storage.initializeDB()
   await StatsStorage.initializeStatsDB()
+  Storage.addExitListeners()
 
   let totalCyclesToSync = 0
   const response = await DataSync.queryFromDistributor(DataSync.DataType.TOTALDATA, {})
@@ -44,6 +45,7 @@ const start = async (): Promise<void> => {
   await StatsFunctions.patchStatsBetweenCycles(startCycle, totalCyclesToSync)
   console.log('Stats Patched!')
 
+  await Storage.closeDatabase()
   console.log('Patching done! from cycle', startCycle, 'to cycle', totalCyclesToSync)
 }
 
