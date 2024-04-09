@@ -1,18 +1,25 @@
 # Shardeum Explorer
 
-Shardeum Explorer serves as a comprehensive Data Collector, Indexer, and API Server for the Shardeum Network. It operates by collecting data from the archiver server, indexing it for efficient search capabilities, and providing APIs and a Web Interface for easy access to this information.
+Shardeum Explorer serves as a comprehensive Data Collector, Indexer, and API Server for the Shardeum Network. It operates by collecting data from the distributor, indexing it for efficient search capabilities, and providing APIs and a Web Interface for easy access to this information.
 
 ## Server Components
-Shardeum Explorer consists of four different servers:
 
-- [Collector](./src/collector.ts): Responsible for gathering data from the archiver server.
+Shardeum Explorer consists of three componenets:
+
+- [Collector](./src/collector.ts): Responsible for gathering data from the distributor.
 - [API and UI Server](./src/server.ts): Provides APIs and a User Interface for accessing indexed data.
-- RPC Data Collector: Collects data through Remote Procedure Calls (RPC).
 - [Data Stats Aggregator](./src/aggregator.ts): Aggregates statistical data for analysis and reporting.
 
-The Explorer server uses Fastify.js for its backend implementation, while the User Interface is developed using NextJS. For data storage, we are using `sqlite` for now. 
+The Explorer server uses Fastify.js for its backend implementation, while the User Interface is developed using NextJS. For data storage, we are using `sqlite`.
 
-> The default port for Shardeum Explorer is set to `6001`.
+## Requirements
+
+> Before starting the explorer, be sure that the distributor and rpc services are up and running. Shardeum Explorer uses the distributor to collect data and the rpc service to decode the contract information.
+
+If you are running a local Shardeum Network, you can start the distributor and rpc services with the following repos:
+
+- Distributor Repo: https://gitlab.com/shardus/relayer/distributor
+- RPC Repo: https://gitlab.com/shardeum/json-rpc-server
 
 ## How to start Shardeum Explorer
 
@@ -22,7 +29,7 @@ The Explorer server uses Fastify.js for its backend implementation, while the Us
 npm install
 ```
 
-> Add `archiver` info and `rpc` server info in the `src/config/index.ts`, the latest archiver public key can be found on archiver_ip/archivers, ie http://45.56.123.96:4000/archivers for 1.9.0
+> Update the `distributorInfo`, `collectorInfo` and `rpcUrl` info in the `src/config/index.ts` file. If you're testing for a local network, you can use the default values. If you're starting for a testnet or prod network, update the values accordingly. (Be sure that your collectorInfo is in the subscriber list of the distributor.)
 
 2. Compile the update:
 
@@ -36,7 +43,7 @@ npm run prepare
 npm run collector << OR >> pm2 start --name explorer-collector  npm -- run collector
 ```
 
-4. Start the API and UI server. This can be run in multiple instances:
+4. Start the API and UI server. The default port of the server is `6001`. We can change the port by providing the port number as an argument. We can start multiple instances of the server by providing different port numbers.
 
 ```bash
 npm run server << OR >> pm2 start --name explorer-server npm -- run server <port>
@@ -64,12 +71,12 @@ npm run flush
 
 Usage endpoints are provided to track and manage usage statistics for each endpoint in the explorer server API. Key points regarding usage endpoints:
 
-- Usage endpoints require a security key (default: *ceba96f6eafd2ea59e68a0b0d754a939*) this should be a secret key in the production servers provided by the env var **USAGE_ENDPOINTS_KEY**
-   - The security key can be used in the x-usage-key HTTP header in the related requests, incorrect or invalid keys will result in a 403 error
+- Usage endpoints require a security key (default: _ceba96f6eafd2ea59e68a0b0d754a939_) this should be a secret key in the production servers provided by the env var **USAGE_ENDPOINTS_KEY**
+  - The security key can be used in the x-usage-key HTTP header in the related requests, incorrect or invalid keys will result in a 403 error
 - The usage endpoints are:
-    - POST *<host:port>/usage/enable*       **Enable the usage and start saving usage data**
-    - POST *<host:port>/usage/disable*      **Disable the usage and reset usage data**
-    - GET *<host:port>/usage/metrics*       **Provide usage data in the JSON format**
+  - POST _<host:port>/usage/enable_ **Enable the usage and start saving usage data**
+  - POST _<host:port>/usage/disable_ **Disable the usage and reset usage data**
+  - GET _<host:port>/usage/metrics_ **Provide usage data in the JSON format**
 
 # Contributing
 
