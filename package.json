@@ -9,7 +9,6 @@
     "collector": "npm run prepare && node dist/collector.js",
     "aggregator": "npm run prepare && node dist/aggregator.js",
     "log_server": "npm run prepare && node dist/log_server.js",
-    "data_patcher": "node dist/data_patcher.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

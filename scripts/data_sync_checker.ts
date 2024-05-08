@@ -8,8 +8,8 @@ crypto.init(config.hashKey)
 
 const API_SERVER_URL = 'http:/127.0.0.1:6001'
 
-const startCycle = 10000
-const endCycle = 10200
+const startCycle = 0
+const endCycle = 0
 const saveToFile = false
 
 const data_type: any = DataType.RECEIPT // DataType.RECEIPT // DataType.CYCLE // DataType.ORIGINALTX
