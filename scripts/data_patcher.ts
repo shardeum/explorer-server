@@ -2,11 +2,11 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import * as crypto from '@shardus/crypto-utils'
-import * as Storage from './storage'
-import * as DataSync from './class/DataSync'
-import * as StatsStorage from './stats'
-import * as StatsFunctions from './class/StatsFunctions'
-import { config } from './config'
+import * as Storage from '../src/storage'
+import * as DataSync from '../src/class/DataSync'
+import * as StatsStorage from '../src/stats'
+import * as StatsFunctions from '../src/class/StatsFunctions'
+import { config } from '../src/config'
 
 let startCycle = 0
 
