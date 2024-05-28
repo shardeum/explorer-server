@@ -1,8 +1,10 @@
 import { CoinStats } from './coinStats'
 import { TransactionStats } from './transactionStats'
 import { ValidatorStats } from './validatorStats'
+import { NodeStats } from './nodeStats'
 import { config } from '../config/index'
 import { Utils as StringUtils } from '@shardus/types'
+import { Metadata } from './metadata'
 
 /***
 This is the copied code from 'storage/sqlite3storage.ts'
@@ -65,7 +67,7 @@ export async function all<T>(sql: string, params = []): Promise<T[]> {
 }
 
 export function extractValues(
-  object: CoinStats | ValidatorStats | TransactionStats
+  object: CoinStats | ValidatorStats | TransactionStats | NodeStats | Metadata
 ): (string | number | boolean)[] {
   try {
     const inputs = []
