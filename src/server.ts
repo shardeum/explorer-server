@@ -10,6 +10,7 @@ import * as usage from './middleware/usage'
 import * as StatsStorage from './stats'
 import * as CoinStats from './stats/coinStats'
 import * as TransactionStats from './stats/transactionStats'
+import * as NodeStats from './stats/nodeStats'
 import * as ValidatorStats from './stats/validatorStats'
 import * as Storage from './storage'
 import * as Account from './storage/account'
@@ -1572,6 +1573,24 @@ const start = async (): Promise<void> => {
     res.totalReceipts = await Receipt.queryReceiptCount()
     res.totalOriginalTxs = await OriginalTxData.queryOriginalTxDataCount()
     reply.send(res)
+  })
+
+  server.get<{ Params: { nodePubKey: string } }>('/api/nodeStats/:nodePubKey', async (_request, reply) => {
+    try {
+      const res: NodeStats.NodeStats = await NodeStats.getNodeStatsByAddress(_request.params.nodePubKey)
+      if (res) {
+        reply.send(res)
+      }
+      reply.status(404).send({
+        success: false,
+        error: 'Node stats not found for provided node address',
+      })
+    } catch (e) {
+      reply.status(500).send({
+        success: false,
+        error: e.message,
+      })
+    }
   })
 
   server.listen(
