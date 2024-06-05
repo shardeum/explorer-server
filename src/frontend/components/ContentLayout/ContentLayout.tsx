@@ -7,7 +7,7 @@ import { Icon } from '../Icon'
 
 import styles from './ContentLayout.module.scss'
 import { Breadcrumb } from '../Breadcrumb'
-import ReactTooltip from 'react-tooltip'
+import ClientOnlyTooltip from '../ClientOnlyTooltip'
 
 interface ContentLayoutProps {
   className?: string
@@ -46,7 +46,7 @@ export const ContentLayout: React.FC<ContentLayoutProps> = ({
           </Button>
         )}
         {breadcrumbItems && breadcrumbItems.length > 0 && <Breadcrumb items={breadcrumbItems || []} />}
-        <ReactTooltip effect="solid" backgroundColor="#6610f2" id="back" />
+        <ClientOnlyTooltip effect="solid" backgroundColor="#6610f2" id="back" />
       </div>
       <div className={styles.titleWrapper}>
         {typeof title === 'string' ? <div className={styles.title}>{title}</div> : title}

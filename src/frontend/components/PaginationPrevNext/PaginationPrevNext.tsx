@@ -5,7 +5,7 @@ import { Button } from '../Button'
 import { Icon } from '../Icon'
 
 import styles from './PaginationPrevNext.module.scss'
-import ReactTooltip from 'react-tooltip'
+import ClientOnlyTooltip from '../ClientOnlyTooltip'
 
 export interface PaginationPrevNextProps {
   page: number | string
@@ -40,8 +40,8 @@ export const PaginationPrevNext: React.FC<PaginationPrevNextProps> = (props) => 
       >
         <Icon name="arrow_right" size="small" color="black" />
       </Button>
-      <ReactTooltip effect="solid" backgroundColor="#6610f2" id="prev" />
-      <ReactTooltip effect="solid" backgroundColor="#6610f2" id="nex" />
+      <ClientOnlyTooltip id="prev" backgroundColor="#6610f2" effect="solid" />
+      <ClientOnlyTooltip id="next" backgroundColor="#6610f2" effect="solid" />
     </div>
   )
 }
