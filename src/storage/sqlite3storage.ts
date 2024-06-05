@@ -2,6 +2,7 @@ import sqlite3Lib from 'sqlite3'
 const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 import { config } from '../config/index'
+import { Utils as StringUtils } from '@shardus/types'
 
 export async function init(): Promise<void> {
   db = new sqlite3.Database(`${config.dbPath}/db.sqlite3`)
@@ -82,7 +83,7 @@ export function extractValues(object: object): string[] {
   try {
     const inputs: string[] = []
     for (let value of Object.values(object)) {
-      if (typeof value === 'object') value = JSON.stringify(value)
+      if (typeof value === 'object') value = StringUtils.safeStringify(value)
       inputs.push(value)
     }
     return inputs
@@ -98,7 +99,7 @@ export function extractValuesFromArray(arr: object[]): string[] {
     const inputs: string[] = []
     for (const object of arr) {
       for (let value of Object.values(object)) {
-        if (typeof value === 'object') value = JSON.stringify(value)
+        if (typeof value === 'object') value = StringUtils.safeStringify(value)
         inputs.push(value)
       }
     }

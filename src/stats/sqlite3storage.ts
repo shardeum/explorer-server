@@ -2,6 +2,7 @@ import { CoinStats } from './coinStats'
 import { TransactionStats } from './transactionStats'
 import { ValidatorStats } from './validatorStats'
 import { config } from '../config/index'
+import { Utils as StringUtils } from '@shardus/types'
 
 /***
 This is the copied code from 'storage/sqlite3storage.ts'
@@ -69,7 +70,7 @@ export function extractValues(
   try {
     const inputs = []
     for (let value of Object.values(object)) {
-      if (typeof value === 'object') value = JSON.stringify(value)
+      if (typeof value === 'object') value = StringUtils.safeStringify(value)
       inputs.push(value)
     }
     return inputs
@@ -83,7 +84,7 @@ export function extractValuesFromArray(arr: object[]): string[] {
     const inputs = []
     for (const object of arr) {
       for (let value of Object.values(object)) {
-        if (typeof value === 'object') value = JSON.stringify(value)
+        if (typeof value === 'object') value = StringUtils.safeStringify(value)
         inputs.push(value)
       }
     }

@@ -13,6 +13,7 @@ import {
 } from '../types'
 import { bytesToHex } from '@ethereumjs/util'
 import { getContractInfo } from '../class/TxDecoder'
+import { Utils as StringUtils } from '@shardus/types'
 
 type DbAccount = Account & {
   account: string
@@ -58,7 +59,7 @@ export async function updateAccount(_accountId: string, account: Partial<Account
     await db.run(sql, {
       $cycle: account.cycle,
       $timestamp: account.timestamp,
-      $account: account.account && JSON.stringify(account.account),
+      $account: account.account && StringUtils.safeStringify(account.account),
       $hash: account.hash,
       $accountId: account.accountId,
     })
@@ -174,8 +175,8 @@ export async function queryAccounts(
       accounts = await db.all(sql, [AccountType.Account])
     }
     accounts.forEach((account: DbAccount) => {
-      if (account.account) account.account = JSON.parse(account.account)
-      if (account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+      if (account.account) account.account = StringUtils.safeJsonParse(account.account)
+      if (account.contractInfo) account.contractInfo = StringUtils.safeJsonParse(account.contractInfo)
     })
   } catch (e) {
     console.log(e)
@@ -188,8 +189,8 @@ export async function queryAccountByAccountId(accountId: string): Promise<Accoun
   try {
     const sql = `SELECT * FROM accounts WHERE accountId=?`
     const account: DbAccount = await db.get(sql, [accountId])
-    if (account) account.account = JSON.parse(account.account)
-    if (account && account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+    if (account) account.account = StringUtils.safeJsonParse(account.account)
+    if (account && account.contractInfo) account.contractInfo = StringUtils.safeJsonParse(account.contractInfo)
     if (config.verbose) console.log('Account accountId', account)
     return account as Account
   } catch (e) {
@@ -205,8 +206,8 @@ export async function queryAccountByAddress(
   try {
     const sql = `SELECT * FROM accounts WHERE accountType=? AND ethAddress=? ORDER BY accountType ASC LIMIT 1`
     const account: DbAccount = await db.get(sql, [accountType, address])
-    if (account) account.account = JSON.parse(account.account)
-    if (account && account.contractInfo) account.contractInfo = JSON.parse(account.contractInfo)
+    if (account) account.account = StringUtils.safeJsonParse(account.account)
+    if (account && account.contractInfo) account.contractInfo = StringUtils.safeJsonParse(account.contractInfo)
     if (config.verbose) console.log('Account Address', account)
     return account as Account
   } catch (e) {
@@ -243,8 +244,8 @@ export async function queryAccountsBetweenCycles(
     const sql = `SELECT * FROM accounts WHERE cycle BETWEEN ? AND ? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
     accounts = await db.all(sql, [startCycleNumber, endCycleNumber])
     accounts.forEach((account: DbAccount) => {
-      if (account.account) (account as Account).account = JSON.parse(account.account) as WrappedEVMAccount
-      if (account.contractInfo) (account as Account).contractInfo = JSON.parse(account.contractInfo)
+      if (account.account) (account as Account).account = StringUtils.safeJsonParse(account.account) as WrappedEVMAccount
+      if (account.contractInfo) (account as Account).contractInfo = StringUtils.safeJsonParse(account.contractInfo)
     })
   } catch (e) {
     console.log(e)
@@ -332,7 +333,7 @@ export async function processAccountData(accounts: AccountCopy[]): Promise<Accou
 
   for (const account of accounts) {
     try {
-      if (typeof account.data === 'string') account.data = JSON.parse(account.data)
+      if (typeof account.data === 'string') account.data = StringUtils.safeJsonParse(account.data)
     } catch (e) {
       console.log('Error in parsing account data', account.data)
       continue
