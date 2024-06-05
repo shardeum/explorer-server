@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styles from './NetworkMode.module.scss'
 import ReactTooltip from 'react-tooltip'
 import { Modes } from '../../types/modes'
+import ClientOnlyTooltip from '../../components/ClientOnlyTooltip'
 
 interface ModeComponentProps {
   mode: Modes | undefined
@@ -51,7 +52,8 @@ const getColorAndTooltip = (mode: Modes | undefined): ModeData => {
   if (mode) {
     return modeData[mode as Modes]
   }
-  return { color: '', tooltipContent: '' }
+  // Provide default values for color and tooltipContent when mode is undefined
+  return { color: '#cccccc', tooltipContent: 'No mode selected' }
 }
 
 const NetworkMode: React.FC<ModeComponentProps> = ({ mode }) => {
@@ -75,7 +77,7 @@ const NetworkMode: React.FC<ModeComponentProps> = ({ mode }) => {
         data-tip={tooltipContent}
         data-for="tooltip"
       ></div>
-      <ReactTooltip id="tooltip" place="top" type="dark" effect="solid" />
+      <ClientOnlyTooltip id="tooltip" backgroundColor="#6610f2" effect="solid" />
     </div>
   )
 }
