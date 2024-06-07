@@ -54,6 +54,7 @@ import { Utils as StringUtils } from '@shardus/types'
 //import { config } from './config/index'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
+crypto.setCustomStringifier(StringUtils.safeStringify, 'shardus_safeStringify')
 
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT

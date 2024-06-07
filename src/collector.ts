@@ -170,7 +170,7 @@ const connectToDistributor = (): void => {
     subscriptionType: DistributorFirehoseEvent,
     timestamp: Date.now(),
   }
-  const signedObject = StringUtils.safeJsonParse(crypto.stringify({ collectorInfo, sender: CONFIG.collectorInfo.publicKey }))
+  const signedObject = StringUtils.safeJsonParse(StringUtils.safeStringify({ collectorInfo, sender: CONFIG.collectorInfo.publicKey }))
   crypto.signObj(signedObject, CONFIG.collectorInfo.secretKey, CONFIG.collectorInfo.publicKey)
   const queryString = encodeURIComponent(StringUtils.safeStringify(signedObject))
   console.log('--> Query String:', queryString)
@@ -221,6 +221,7 @@ const connectToDistributor = (): void => {
 const start = async (): Promise<void> => {
   let retry = 0
   crypto.init(hashKey)
+  crypto.setCustomStringifier(StringUtils.safeStringify, 'shardus_safeStringify')
   await Storage.initializeDB()
   Storage.addExitListeners(ws)
 
