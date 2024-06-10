@@ -2,6 +2,7 @@
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { config } from '../config/index'
+import { Utils as StringUtils } from '@shardus/types'
 
 export interface Log<L = object> {
   cycle: number
@@ -178,7 +179,7 @@ export async function queryLogs(
     logs = await db.all(sql + sqlQueryExtension, inputs)
     if (logs.length > 0) {
       logs.forEach((log: DbLog) => {
-        if (log.log) (log as Log).log = JSON.parse(log.log)
+        if (log.log) (log as Log).log = StringUtils.safeJsonParse(log.log)
       })
     }
   } catch (e) {
@@ -218,7 +219,7 @@ export async function queryLogsBetweenCycles(
     logs = await db.all(sql, [startCycleNumber, endCycleNumber])
     if (logs.length > 0) {
       logs.forEach((log: DbLog) => {
-        if (log.log) (log as Log).log = JSON.parse(log.log)
+        if (log.log) (log as Log).log = StringUtils.safeJsonParse(log.log)
       })
     }
   } catch (e) {

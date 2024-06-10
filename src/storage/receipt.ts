@@ -18,6 +18,7 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
 import { bytesToHex } from '@ethereumjs/util'
 import { forwardReceiptData } from '../logSubscription/CollectorSocketconnection'
+import { Utils as StringUtils } from '@shardus/types'
 
 type DbReceipt = Receipt & {
   tx: string
@@ -440,11 +441,12 @@ export async function queryReceiptCountBetweenCycles(start: number, end: number)
 }
 
 function deserializeDbReceipt(receipt: DbReceipt): void {
-  if (receipt.tx) receipt.tx = JSON.parse(receipt.tx)
-  if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = JSON.parse(receipt.beforeStateAccounts)
-  if (receipt.accounts) receipt.accounts = JSON.parse(receipt.accounts)
-  if (receipt.appReceiptData) receipt.appReceiptData = JSON.parse(receipt.appReceiptData)
-  if (receipt.appliedReceipt) receipt.appliedReceipt = JSON.parse(receipt.appliedReceipt)
+  if (receipt.tx) receipt.tx = StringUtils.safeJsonParse(receipt.tx)
+  if (receipt.beforeStateAccounts)
+    receipt.beforeStateAccounts = StringUtils.safeJsonParse(receipt.beforeStateAccounts)
+  if (receipt.accounts) receipt.accounts = StringUtils.safeJsonParse(receipt.accounts)
+  if (receipt.appReceiptData) receipt.appReceiptData = StringUtils.safeJsonParse(receipt.appReceiptData)
+  if (receipt.appliedReceipt) receipt.appliedReceipt = StringUtils.safeJsonParse(receipt.appliedReceipt)
 }
 
 export function cleanOldReceiptsMap(timestamp: number): void {

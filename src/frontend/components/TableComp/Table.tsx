@@ -19,7 +19,6 @@ interface ITableBody<T> {
   row: T
 }
 
-
 export function Table<T = unknown>({ columns, data }: ITableProps<T>): ReactNode {
   return (
     <div className={styles.Table}>
@@ -32,19 +31,19 @@ export function Table<T = unknown>({ columns, data }: ITableProps<T>): ReactNode
           </tr>
         </thead>
         <tbody>
-          {data && data.map((row, index) => (
-            <tr key={index}>
-              {columns.map((col: IColumnProps<T>) => (
-                <TableBodyItem<T> col={col} row={row} key={col.key} />
-              ))}
-            </tr>
-          ))}
+          {data &&
+            data.map((row, index) => (
+              <tr key={index}>
+                {columns.map((col: IColumnProps<T>) => (
+                  <TableBodyItem<T> col={col} row={row} key={col.key} />
+                ))}
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
   )
 }
-
 
 export function TableHeaderItem({ value }: { value: string | ReactNode }): ReactNode {
   return <th>{typeof value === 'string' ? <span>{value}</span> : value}</th>

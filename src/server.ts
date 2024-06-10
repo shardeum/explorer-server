@@ -50,9 +50,11 @@ import {
 import { decodeEVMRawTxData } from './utils/decodeEVMRawTx'
 import path from 'path'
 import fs from 'fs'
+import { Utils as StringUtils } from '@shardus/types'
 //import { config } from './config/index'
 
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')
+crypto.setCustomStringifier(StringUtils.safeStringify, 'shardus_safeStringify')
 
 if (process.env.PORT) {
   CONFIG.port.server = process.env.PORT
@@ -151,6 +153,20 @@ const start = async (): Promise<void> => {
     timeWindow: '1 minute',
     allowList: ['127.0.0.1', 'localhost'],
   })
+  server.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    try {
+      const jsonString = typeof body === 'string' ? body : body.toString('utf8')
+      done(null, StringUtils.safeJsonParse(jsonString))
+    } catch (err) {
+      err.statusCode = 400
+      done(err, undefined)
+    }
+  })
+
+  server.setReplySerializer((payload) => {
+    return StringUtils.safeStringify(payload)
+  })
+
   server
     .register(fastifyNextjs, {
       dev: CONFIG.env !== 'production',
@@ -674,10 +690,10 @@ const start = async (): Promise<void> => {
       const account = query.txFrom
         ? { address: query.txFrom.toLowerCase(), txMethod: TxMethodFilter.TxFrom }
         : query.txTo
-          ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
-          : query.nominee
-            ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
-            : null
+        ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
+        : query.nominee
+        ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
+        : null
       let page: number
       if (query.page) {
         page = parseInt(query.page)
@@ -923,7 +939,7 @@ const start = async (): Promise<void> => {
         totalReceipts = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
         return reply.send({ success: true, totalReceipts })
       }
-      totalReceipts = await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle) as number
+      totalReceipts = (await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle)) as number
       const res: ReceiptResponse = {
         success: true,
         totalReceipts,

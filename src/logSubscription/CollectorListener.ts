@@ -4,6 +4,7 @@ import { IndexedLogs, extractLogsFromReceipts } from './CollectorDataParser'
 import { getLogSocketClient, logSubscriptionMap } from './SocketManager'
 import { Cycle, Receipt } from '../types'
 import { CycleDataWsEvent, ReceiptDataWsEvent } from './CollectorSocketconnection'
+import { Utils as StringUtils } from '@shardus/types'
 
 export const setupCollectorListener = async (): Promise<void> => {
   const socket = socketClient.connect(`http://${config.host}:${config.port.collector}`, {
@@ -23,7 +24,7 @@ export const setupCollectorListener = async (): Promise<void> => {
 
 const cycleDataHandler = async (data: Cycle[]): Promise<void> => {
   /*prettier-ignore*/ console.log('Received archived cycle data, valid? ', data && data[0] && data[0].cycleRecord && data[0].cycleRecord.counter)
-  console.log(`Cycle data: ${JSON.stringify(data, null, 2)}`)
+  console.log(`Cycle data: ${StringUtils.safeStringify(data)}`)
 }
 
 const receiptDataHandler = async (data: Receipt[]): Promise<void> => {

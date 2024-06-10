@@ -1,4 +1,5 @@
 import * as utils from '../utils'
+import { Utils as StringUtils } from '@shardus/types'
 
 interface CacheRecordPerCycle<T> {
   lastUpdatedCycle: number
@@ -25,7 +26,9 @@ export const coinStatsCacheRecord: CacheRecordPerCycle<any> = {
       return new Error(err)
     }
     console.log(
-      `Updating coin stats cache for cycle ${latestCycleNumber}, cache data: ${JSON.stringify(data)}`
+      `Updating coin stats cache for cycle ${latestCycleNumber}, cache data: ${StringUtils.safeStringify(
+        data
+      )}`
     )
     this.lastUpdatedCycle = latestCycleNumber
     this.data = data

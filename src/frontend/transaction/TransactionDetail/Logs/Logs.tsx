@@ -32,26 +32,20 @@ export const Logs: React.FC<LogsProps> = ({ transaction }) => {
                   {log.topics &&
                     log.topics.map((topic: string, index: number) => (
                       <div className={styles.row} key={index}>
-                        <div className={styles.smallbox}>
-                          {index}
-                        </div>
+                        <div className={styles.smallbox}>{index}</div>
                         <Dropdown
                           items={['Dec', 'Hex']}
                           apperance="outlined"
                           buttonClassName={styles.dropdown}
                         />
-                        <div className={styles.link}>
-                          {topic}
-                        </div>
+                        <div className={styles.link}>{topic}</div>
                       </div>
                     ))}
                 </div>
               </div>
               <div className={styles.item}>
                 <div className={styles.title}>Data</div>
-                <div className={styles.link}>
-                  {log.data}
-                </div>
+                <div className={styles.link}>{log.data}</div>
               </div>
             </div>
           </div>

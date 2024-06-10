@@ -6,6 +6,7 @@ import * as cycle from './storage/cycle'
 import * as receipt from './storage/receipt'
 import * as crypto from '@shardus/crypto-utils'
 import * as originalTxData from './storage/originalTxData'
+import { Utils as StringUtils } from '@shardus/types'
 import {
   downloadTxsDataAndCycles,
   compareWithOldReceiptsData,
@@ -169,9 +170,11 @@ const connectToDistributor = (): void => {
     subscriptionType: DistributorFirehoseEvent,
     timestamp: Date.now(),
   }
-  const signedObject = JSON.parse(crypto.stringify({ collectorInfo, sender: CONFIG.collectorInfo.publicKey }))
+  const signedObject = StringUtils.safeJsonParse(
+    StringUtils.safeStringify({ collectorInfo, sender: CONFIG.collectorInfo.publicKey })
+  )
   crypto.signObj(signedObject, CONFIG.collectorInfo.secretKey, CONFIG.collectorInfo.publicKey)
-  const queryString = encodeURIComponent(JSON.stringify(signedObject))
+  const queryString = encodeURIComponent(StringUtils.safeStringify(signedObject))
   console.log('--> Query String:', queryString)
   const URL = `${DISTRIBUTOR_URL}?data=${queryString}`
   ws = new WebSocket(URL)
@@ -186,7 +189,7 @@ const connectToDistributor = (): void => {
   ws.on('message', (data: string) => {
     try {
       if (verbose) console.log('Received FIREHOSE data from Distributor:', data)
-      validateData(JSON.parse(data))
+      validateData(StringUtils.safeJsonParse(data))
     } catch (e) {
       console.log('Error in processing received data!', e)
     }
@@ -220,6 +223,7 @@ const connectToDistributor = (): void => {
 const start = async (): Promise<void> => {
   let retry = 0
   crypto.init(hashKey)
+  crypto.setCustomStringifier(StringUtils.safeStringify, 'shardus_safeStringify')
   await Storage.initializeDB()
   Storage.addExitListeners(ws)
 

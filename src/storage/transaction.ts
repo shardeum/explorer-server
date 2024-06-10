@@ -18,6 +18,7 @@ import {
 import Web3 from 'web3'
 import * as AccountDB from './account'
 import { decodeTx, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
+import { Utils as StringUtils } from '@shardus/types'
 
 export const ERC20_METHOD_DIC = {
   '0xa9059cbb': 'transfer',
@@ -70,7 +71,8 @@ export async function updateTransaction(_txId: string, transaction: Partial<Tran
     const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, txHash = $txHash WHERE txId = $txId `
     await db.run(sql, {
       $cycle: transaction.cycle,
-      $wrappedEVMAccount: transaction.wrappedEVMAccount && JSON.stringify(transaction.wrappedEVMAccount),
+      $wrappedEVMAccount:
+        transaction.wrappedEVMAccount && StringUtils.safeStringify(transaction.wrappedEVMAccount),
       $txHash: transaction.txHash,
       $txId: transaction.txId,
     })
@@ -611,8 +613,9 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
     const transaction: DbTransaction = await db.get(sql, [txId])
     if (transaction) {
       if (transaction.wrappedEVMAccount)
-        transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-      if (transaction.originalTxData) transaction.originalTxData = JSON.parse(transaction.originalTxData)
+        transaction.wrappedEVMAccount = StringUtils.safeJsonParse(transaction.wrappedEVMAccount)
+      if (transaction.originalTxData)
+        transaction.originalTxData = StringUtils.safeJsonParse(transaction.originalTxData)
     }
     if (detail) {
       const sql = `SELECT * FROM tokenTxs WHERE txId=?`
@@ -1426,10 +1429,10 @@ export async function queryTokenTxByTxId(txId: string): Promise<DbTokenTx[] | []
 }
 
 function deserializeDbTransaction(transaction: DbTransaction): void {
-  transaction.wrappedEVMAccount = JSON.parse(transaction.wrappedEVMAccount)
-  transaction.originalTxData = JSON.parse(transaction.originalTxData)
+  transaction.wrappedEVMAccount = StringUtils.safeJsonParse(transaction.wrappedEVMAccount)
+  transaction.originalTxData = StringUtils.safeJsonParse(transaction.originalTxData)
 }
 
 function deserializeDbToken(transaction: DbTokenTx): void {
-  transaction.contractInfo = JSON.parse(transaction.contractInfo)
+  transaction.contractInfo = StringUtils.safeJsonParse(transaction.contractInfo)
 }
