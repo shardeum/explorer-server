@@ -27,26 +27,27 @@ api.interceptors.response.use(
 )
 
 api.interceptors.response.use(
-  response => {
+  (response) => {
     if (response.data && typeof response.data === 'string') {
-      response.data = JSON.parse(response.data, bigIntReviver);
+      response.data = JSON.parse(response.data, bigIntReviver)
     } else if (response.data) {
       // If axios already parsed it
-      response.data = JSON.parse(JSON.stringify(response.data), bigIntReviver);
+      response.data = JSON.parse(JSON.stringify(response.data), bigIntReviver)
     }
-    return response;
+    return response
   },
-  error => {
-    console.log(error);
-    return Promise.reject(error);
+  (error) => {
+    console.log(error)
+    return Promise.reject(error)
   }
-);
+)
 
-function bigIntReviver(key, value) {
-  if (typeof value === 'object' && value !== null && 'dataType' in value && value.dataType === 'bi') {
-      return value.value;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function bigIntReviver(key, value): any {
+  if (value?.dataType === 'bi') {
+    return value.value
   }
-  return value;
+  return value
 }
 
 export { api }

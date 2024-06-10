@@ -11,7 +11,7 @@ import styles from './Header.module.scss'
 export const Header: React.FC<Record<string, never>> = () => {
   const router = useRouter()
 
-  const isHomePage = router.pathname === '/';
+  const isHomePage = router.pathname === '/'
 
   const { isTablet, isMobile } = useLayoutBreakpoint()
 
@@ -82,7 +82,7 @@ export const Header: React.FC<Record<string, never>> = () => {
           <div className={styles.name}>Shardeum Explorer</div>
         </Link>
         <ul className={styles.list}>
-          {!isHomePage && <SearchBar/>}
+          {!isHomePage && <SearchBar />}
           {navLinks.map((item) => (
             <li key={item.key} className={styles.list_item}>
               {item?.render ? item?.render() : <Link href={item.key}>{item.value}</Link>}

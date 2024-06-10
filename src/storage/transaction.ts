@@ -71,7 +71,8 @@ export async function updateTransaction(_txId: string, transaction: Partial<Tran
     const sql = `UPDATE transactions SET result = $result, cycle = $cycle, wrappedEVMAccount = $wrappedEVMAccount, txHash = $txHash WHERE txId = $txId `
     await db.run(sql, {
       $cycle: transaction.cycle,
-      $wrappedEVMAccount: transaction.wrappedEVMAccount && StringUtils.safeStringify(transaction.wrappedEVMAccount),
+      $wrappedEVMAccount:
+        transaction.wrappedEVMAccount && StringUtils.safeStringify(transaction.wrappedEVMAccount),
       $txHash: transaction.txHash,
       $txId: transaction.txId,
     })
@@ -613,7 +614,8 @@ export async function queryTransactionByTxId(txId: string, detail = false): Prom
     if (transaction) {
       if (transaction.wrappedEVMAccount)
         transaction.wrappedEVMAccount = StringUtils.safeJsonParse(transaction.wrappedEVMAccount)
-      if (transaction.originalTxData) transaction.originalTxData = StringUtils.safeJsonParse(transaction.originalTxData)
+      if (transaction.originalTxData)
+        transaction.originalTxData = StringUtils.safeJsonParse(transaction.originalTxData)
     }
     if (detail) {
       const sql = `SELECT * FROM tokenTxs WHERE txId=?`

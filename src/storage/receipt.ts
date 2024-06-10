@@ -442,7 +442,8 @@ export async function queryReceiptCountBetweenCycles(start: number, end: number)
 
 function deserializeDbReceipt(receipt: DbReceipt): void {
   if (receipt.tx) receipt.tx = StringUtils.safeJsonParse(receipt.tx)
-  if (receipt.beforeStateAccounts) receipt.beforeStateAccounts = StringUtils.safeJsonParse(receipt.beforeStateAccounts)
+  if (receipt.beforeStateAccounts)
+    receipt.beforeStateAccounts = StringUtils.safeJsonParse(receipt.beforeStateAccounts)
   if (receipt.accounts) receipt.accounts = StringUtils.safeJsonParse(receipt.accounts)
   if (receipt.appReceiptData) receipt.appReceiptData = StringUtils.safeJsonParse(receipt.appReceiptData)
   if (receipt.appliedReceipt) receipt.appliedReceipt = StringUtils.safeJsonParse(receipt.appliedReceipt)

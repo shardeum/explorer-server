@@ -1,16 +1,16 @@
-import React from 'react';
-import { useSearchHook } from './useSearchHook';
-import styles from './SearchBar.module.scss';
-import { Icon } from '../Icon';
+import React from 'react'
+import { useSearchHook } from './useSearchHook'
+import styles from './SearchBar.module.scss'
+import { Icon } from '../Icon'
 
 export const SearchBar: React.FC<Record<string, never>> = () => {
   const { search, setSearch, onSearch } = useSearchHook()
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    onSearch();
-    setSearch(''); 
-  };
+    event.preventDefault()
+    onSearch()
+    setSearch('')
+  }
 
   return (
     <form onSubmit={handleSearch} className={styles.SearchBar}>
@@ -23,5 +23,5 @@ export const SearchBar: React.FC<Record<string, never>> = () => {
         onChange={(event) => setSearch(event.target.value)}
       />
     </form>
-  );
+  )
 }

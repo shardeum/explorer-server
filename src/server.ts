@@ -690,10 +690,10 @@ const start = async (): Promise<void> => {
       const account = query.txFrom
         ? { address: query.txFrom.toLowerCase(), txMethod: TxMethodFilter.TxFrom }
         : query.txTo
-          ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
-          : query.nominee
-            ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
-            : null
+        ? { address: query.txTo.toLowerCase(), txMethod: TxMethodFilter.TxTo }
+        : query.nominee
+        ? { address: query.nominee.toLowerCase(), txMethod: TxMethodFilter.Nominee }
+        : null
       let page: number
       if (query.page) {
         page = parseInt(query.page)
@@ -939,7 +939,7 @@ const start = async (): Promise<void> => {
         totalReceipts = await Receipt.queryReceiptCountByCycles(startCycle, endCycle)
         return reply.send({ success: true, totalReceipts })
       }
-      totalReceipts = await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle) as number
+      totalReceipts = (await Receipt.queryReceiptCountBetweenCycles(startCycle, endCycle)) as number
       const res: ReceiptResponse = {
         success: true,
         totalReceipts,
