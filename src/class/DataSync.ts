@@ -65,6 +65,9 @@ export const queryFromDistributor = async (type: DataType, queryParameters: any)
         'Content-Type': 'application/json',
       },
       timeout: 30000,
+      transformResponse: (res) => {
+        return StringUtils.safeJsonParse(res)
+      },
     })
     return response
   } catch (e) {
