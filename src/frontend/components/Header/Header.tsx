@@ -30,7 +30,7 @@ export const Header: React.FC<Record<string, never>> = () => {
           <TopBarDropdown
             label=""
             options={[
-              { key: 'https://shardeum.org/betanet', value: 'Shardeum Betanet' },
+              { key: 'https://shardeum.org/atomium/', value: 'Shardeum Atomium' },
               { key: 'https://docs.shardeum.org/node/run/validator', value: 'Run a validator node' },
             ]}
           />

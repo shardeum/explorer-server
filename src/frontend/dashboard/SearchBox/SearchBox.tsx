@@ -18,7 +18,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ mode }) => {
   return (
     <div className={styles.SearchBox}>
       <div className={styles.titleWrapper}>
-        <h4 className={styles.title}>The Shardeum Betanet Explorer</h4>
+        <h4 className={styles.title}>The Shardeum Atomium Explorer</h4>
         <NetworkMode mode={mode as Modes} />
       </div>
       <div className={styles.box}>
