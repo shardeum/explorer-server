@@ -211,7 +211,9 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt?.stakeInfo?.stake
             ) {
-              const stakeAmountBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake.toString())
+              const stakeAmountBN = new BN(
+                current.wrappedEVMAccount.readableReceipt.stakeInfo.stake.toString()
+              ) // changed to accomodate BigInt instead of Hex string
               return sum.add(stakeAmountBN)
             } else {
               return sum
@@ -223,7 +225,9 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt?.stakeInfo?.stake
             ) {
-              const unStakeAmountBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake.toString())
+              const unStakeAmountBN = new BN(
+                current.wrappedEVMAccount.readableReceipt.stakeInfo.stake.toString()
+              )
               return sum.add(unStakeAmountBN)
             } else {
               return sum
