@@ -211,7 +211,9 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt?.stakeInfo?.stake
             ) {
-              const stakeAmountBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake, 16)
+              const stakeAmountBN = new BN(
+                current.wrappedEVMAccount.readableReceipt.stakeInfo.stake.toString()
+              ) // changed to accomodate BigInt instead of Hex string
               return sum.add(stakeAmountBN)
             } else {
               return sum
@@ -223,7 +225,9 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt?.stakeInfo?.stake
             ) {
-              const unStakeAmountBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.stake, 16)
+              const unStakeAmountBN = new BN(
+                current.wrappedEVMAccount.readableReceipt.stakeInfo.stake.toString()
+              )
               return sum.add(unStakeAmountBN)
             } else {
               return sum
@@ -235,7 +239,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt?.stakeInfo?.reward
             ) {
-              const rewardBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.reward, 16)
+              const rewardBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.reward.toString())
               return sum.add(rewardBN)
             } else {
               return sum
@@ -247,7 +251,7 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
               'readableReceipt' in current.wrappedEVMAccount &&
               current.wrappedEVMAccount.readableReceipt?.stakeInfo?.penalty
             ) {
-              const penaltyBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.penalty, 16)
+              const penaltyBN = new BN(current.wrappedEVMAccount.readableReceipt.stakeInfo.penalty.toString())
               return sum.add(penaltyBN)
             } else {
               return sum
