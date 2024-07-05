@@ -6,7 +6,7 @@ import web3 from 'web3'
 import { Chip, Icon } from '../../../components'
 import { Item } from './Item'
 
-import { Transaction, TransactionType } from '../../../../types'
+import { TokenType, Transaction, TransactionType } from '../../../../types'
 import { showTxMethod } from '../../../utils/showMethod'
 
 import styles from './Ovewview.module.scss'
@@ -25,7 +25,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
     if (
       items &&
       items.length > 0 &&
-      (items[0].tokenType === TransactionType.EVM_Internal || items[0].tokenType === TransactionType.ERC_20)
+      (items[0].tokenType === TokenType.EVM_Internal || items[0].tokenType === TokenType.ERC_20)
     ) {
       // Determine the presence of different event types
       const hasApproval = items.some((item) => item.tokenEvent === 'Approval')
@@ -61,7 +61,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
                   <span>For</span>
                   <div>{calculateTokenValue(item, item.tokenType, undefined, true)}&nbsp;</div>
                   <Link href={`/account/${item.contractAddress}`} className={styles.anchor}>
-                    {item.tokenType === TransactionType.EVM_Internal
+                    {item.tokenType === TokenType.EVM_Internal
                       ? 'SHM'
                       : item.contractInfo.name || item.contractAddress}
                   </Link>
@@ -77,7 +77,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
   const renderErc721Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
-    if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_721) {
+    if (items && items.length > 0 && items[0].tokenType === TokenType.ERC_721) {
       return (
         <div className={styles.item}>
           <div className={styles.title}>ERC-721 Tokens Transferred :</div>
@@ -104,7 +104,7 @@ export const Ovewview: React.FC<OvewviewProps> = ({ transaction }) => {
   const renderErc1155Tokens = (): JSX.Element | undefined => {
     const items = transaction?.tokenTxs
 
-    if (items && items.length > 0 && items[0].tokenType === TransactionType.ERC_1155) {
+    if (items && items.length > 0 && items[0].tokenType === TokenType.ERC_1155) {
       return (
         <div className={styles.item}>
           <div className={styles.title}>ERC-1155 Tokens Transferred :</div>

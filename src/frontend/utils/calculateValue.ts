@@ -1,6 +1,6 @@
 import web3 from 'web3'
 import { utils } from 'ethers'
-import { TokenTx, TransactionType } from '../../types'
+import { TokenTx, TokenType, TransactionType } from '../../types'
 import BN from 'bn.js'
 import { fromWeiNoTrailingComma } from './fromWeiNoTrailingComma'
 
@@ -22,12 +22,12 @@ export const calculateFullValue = (value: string | BN): string => {
 
 export const calculateTokenValue = (
   tokenTx: TokenTx,
-  txType: TransactionType,
+  txType: TransactionType | TokenType,
   tokenId = false,
   fullValue = true
 ): string => {
   try {
-    if (txType === TransactionType.ERC_20 || txType === TransactionType.EVM_Internal) {
+    if (txType === TokenType.ERC_20 || txType === TokenType.EVM_Internal) {
       const decimalsValue = tokenTx.contractInfo.decimals ? parseInt(tokenTx.contractInfo.decimals) : 18
 
       return tokenTx.tokenValue === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -37,13 +37,13 @@ export const calculateTokenValue = (
         : roundTokenValue(utils.formatUnits(tokenTx.tokenValue, decimalsValue))
 
       // : round(web3.utils.fromWei(tokenTx.tokenValue, "ether"));
-    } else if (txType === TransactionType.ERC_721) {
+    } else if (txType === TokenType.ERC_721) {
       return tokenTx.tokenEvent === 'Approval For All'
         ? tokenTx.tokenValue === '0x0000000000000000000000000000000000000000000000000000000000000001'
           ? 'True'
           : 'False'
         : shortTokenValue(web3.utils.hexToNumberString(tokenTx.tokenValue))
-    } else if (txType === TransactionType.ERC_1155) {
+    } else if (txType === TokenType.ERC_1155) {
       return tokenTx.tokenEvent === 'Approval For All'
         ? tokenTx.tokenValue === '0x0000000000000000000000000000000000000000000000000000000000000001'
           ? 'True'
