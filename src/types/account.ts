@@ -2,7 +2,7 @@ import { Account as EVMAccount } from '@ethereumjs/util'
 import { TxReceipt } from '@ethereumjs/vm/dist/types'
 import { ReadableReceipt } from './receipt'
 import { NetworkParameters } from '.'
-import { ContractInfo, TokenTx, TransactionType } from './transaction'
+import { ContractInfo, TokenTx, TokenType } from './transaction'
 
 export interface AccountCopy {
   accountId: string
@@ -30,7 +30,7 @@ export interface Token {
   ethAddress: string
   contractAddress: string
   tokenValue: string
-  tokenType: TransactionType
+  tokenType: TokenType
 }
 
 export enum ContractType {

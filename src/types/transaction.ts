@@ -26,11 +26,7 @@ export enum TransactionType {
   NodeRewardReceipt = 1,
   StakeReceipt = 2,
   UnstakeReceipt = 3,
-  EVM_Internal = 4,
-  ERC_20 = 5,
-  ERC_721 = 6,
-  ERC_1155 = 7,
-  InternalTxReceipt = 8,
+  InternalTxReceipt = 4,
 }
 
 export interface ContractInfo {
@@ -48,7 +44,7 @@ export interface TokenTx {
   tokenFrom: string
   tokenTo: string
   tokenValue: string
-  tokenType: TransactionType
+  tokenType: TokenType
   tokenEvent: string
   tokenOperator?: string | null
   transactionFee: string
@@ -58,6 +54,13 @@ export interface TokenTx {
   txHash: string
 
   internalTXType?: InternalTXType
+}
+
+export enum TokenType {
+  EVM_Internal = 0,
+  ERC_20 = 1,
+  ERC_721 = 2,
+  ERC_1155 = 3,
 }
 
 export enum InternalTXType {
