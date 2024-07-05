@@ -115,6 +115,18 @@ export enum TransactionSearchType {
   InternalTxReceipt = 10,
   AllExceptInternalTx = 11, // Receipt + NodeRewardReceipt + StakeReceipt + UnstakeReceipt (exclude InternalTxReceipt)
   Pending = 12, // Pending Txs (AllExceptInternalTx) from originTxsData
+  InitNetwork = 13,         // ----
+  NodeReward = 14,          //    |
+  ChangeConfig = 15,        //    |
+  ApplyChangeConfig = 16,   //    |
+  SetCertTime = 17,         //    |
+  Stake = 18,               //    | --> INTERNAL TRANSACTION TYPES
+  Unstake = 19,             //    |
+  InitRewardTimes = 20,     //    |
+  ClaimReward = 21,         //    |
+  ChangeNetworkParam = 22,  //    |
+  ApplyNetworkParam = 23,   //    |
+  Penalty = 24,             // ----    
 }
 
 export interface Log {
