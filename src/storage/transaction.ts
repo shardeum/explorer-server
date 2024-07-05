@@ -253,7 +253,6 @@ export async function processTransactionData(transactions: RawTransaction[]): Pr
             timestamp: txObj.timestamp,
             transactionFee: txObj.wrappedEVMAccount.amountSpent ?? '0',
             contractInfo,
-            internalTXType: txObj.internalTXType,
           }
           if (tx.tokenType === TokenType.ERC_1155) {
             combineTokenTransactions2.push(obj)
