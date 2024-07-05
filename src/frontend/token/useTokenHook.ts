@@ -5,10 +5,9 @@ import {
   AccountSearchType,
   TransactionSearchType,
   Token,
-  TransactionType,
+  TokenType,
   TokenTx,
 } from '../../types'
-
 interface detailProps {
   id: string
   address?: string
@@ -116,11 +115,11 @@ export const useTokenHook = ({ id, address }: detailProps): TokenHookResult => {
         setTransactions(transactions)
         if (transactions.length > 0) {
           const tokenType =
-            transactions[0].tokenType === TransactionType.ERC_20
+            transactions[0].tokenType === TokenType.ERC_20
               ? TransactionSearchType.ERC_20
-              : transactions[0].tokenType === TransactionType.ERC_721
+              : transactions[0].tokenType === TokenType.ERC_721
               ? TransactionSearchType.ERC_721
-              : transactions[0].tokenType === TransactionType.ERC_1155
+              : transactions[0].tokenType === TokenType.ERC_1155
               ? TransactionSearchType.ERC_1155
               : TransactionSearchType.AllExceptInternalTx
           setTransactionType(tokenType)
