@@ -21,7 +21,12 @@ export const initializeDB = async (): Promise<void> => {
   )
   // await db.runCreate('Drop INDEX if exists `transactions_hash_id`');
   await db.runCreate('CREATE INDEX if not exists `transactions_hash_id` ON `transactions` (`txHash`, `txId`)')
-  await db.runCreate('CREATE INDEX if not exists `transactions_txType` ON `transactions` (`transactionType`)')
+  await db.runCreate(
+    'CREATE INDEX if not exists `transactions_transactionType` ON `transactions` (`transactionType`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `transactions_internalTXType` ON `transactions` (`internalTXType`)'
+  )
   await db.runCreate('CREATE INDEX if not exists `transactions_txFrom` ON `transactions` (`txFrom`)')
   await db.runCreate('CREATE INDEX if not exists `transactions_txTo` ON `transactions` (`txTo`)')
   await db.runCreate('CREATE INDEX if not exists `transactions_nominee` ON `transactions` (`nominee`)')
@@ -77,7 +82,7 @@ export const initializeDB = async (): Promise<void> => {
   )
   // await db.runCreate('Drop INDEX if exists `originalTxData2_idx`');
   await db.runCreate(
-    'CREATE INDEX if not exists `originalTxsData2_idx` ON `originalTxsData2` (`txHash`, `txId`, `cycle` DESC, `timestamp` DESC, `transactionType`)'
+    'CREATE INDEX if not exists `originalTxsData2_idx` ON `originalTxsData2` (`txHash`, `txId`, `cycle` DESC, `timestamp` DESC, `transactionType`, `internalTXType)'
   )
 }
 
