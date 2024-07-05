@@ -390,6 +390,9 @@ export async function queryTransactionCount(
           const sql = `SELECT COUNT(*) FROM tokenTxs WHERE contractAddress=? AND NOT tokenType=?`
           transactions = await db.get(sql, [address, TokenType.EVM_Internal])
         }
+      } else if (isInternalTxSearchType(txType)[0]) {
+        const sql = `SELECT COUNT(*) FROM transactions WHERE internalTXType=? AND (txFrom=? OR txTo=? OR nominee=?)`
+        transactions = await db.get(sql, [isInternalTxSearchType(txType)[1], address, address, address])
       }
     } else if (txType || txType === TransactionSearchType.All) {
       if (txType === TransactionSearchType.All) {
@@ -437,6 +440,9 @@ export async function queryTransactionCount(
             : TokenType.ERC_1155
         const sql = `SELECT COUNT(*) FROM tokenTxs WHERE tokenType=?`
         transactions = await db.get(sql, [ty])
+      } else if (isInternalTxSearchType(txType)[0]) {
+        const sql = `SELECT COUNT(*) FROM transactions WHERE internalTXType=?`
+        transactions = await db.get(sql, [isInternalTxSearchType(txType)[1]])
       }
     } else {
       const sql = `SELECT COUNT(*) FROM transactions`
@@ -538,6 +544,9 @@ export async function queryTransactions(
           const sql = `SELECT * FROM tokenTxs WHERE contractAddress=? AND NOT (tokenType=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
           transactions = await db.all(sql, [address, TokenType.EVM_Internal])
         }
+      } else if (isInternalTxSearchType(txType)[0]) {
+        const sql = `SELECT * FROM transactions WHERE internalTXType=? AND (txFrom=? OR txTo=? OR nominee=?) ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+        transactions = await db.all(sql, [isInternalTxSearchType(txType)[1], address, address, address])
       }
     } else if (txType) {
       if (txType === TransactionSearchType.AllExceptInternalTx) {
@@ -588,6 +597,9 @@ export async function queryTransactions(
             : TokenType.ERC_1155
         const sql = `SELECT * FROM tokenTxs WHERE tokenType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
         transactions = await db.all(sql, [ty])
+      } else if (isInternalTxSearchType(txType)[0]) {
+        const sql = `SELECT * FROM transactions WHERE internalTXType=? ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
+        transactions = await db.all(sql, [isInternalTxSearchType(txType)[1]])
       }
     } else {
       const sql = `SELECT * FROM transactions ORDER BY cycle DESC, timestamp DESC LIMIT ${limit} OFFSET ${skip}`
@@ -1435,4 +1447,35 @@ function deserializeDbTransaction(transaction: DbTransaction): void {
 
 function deserializeDbToken(transaction: DbTokenTx): void {
   transaction.contractInfo = StringUtils.safeJsonParse(transaction.contractInfo)
+}
+
+function isInternalTxSearchType(type: TransactionSearchType): [boolean, InternalTXType | null] {
+  switch (type) {
+    case TransactionSearchType.InitNetwork:
+      return [true, InternalTXType.InitNetwork]
+    case TransactionSearchType.NodeReward:
+      return [true, InternalTXType.NodeReward]
+    case TransactionSearchType.ChangeConfig:
+      return [true, InternalTXType.ChangeConfig]
+    case TransactionSearchType.ApplyChangeConfig:
+      return [true, InternalTXType.ApplyChangeConfig]
+    case TransactionSearchType.SetCertTime:
+      return [true, InternalTXType.SetCertTime]
+    case TransactionSearchType.Stake:
+      return [true, InternalTXType.Stake]
+    case TransactionSearchType.Unstake:
+      return [true, InternalTXType.Unstake]
+    case TransactionSearchType.InitRewardTimes:
+      return [true, InternalTXType.InitRewardTimes]
+    case TransactionSearchType.ClaimReward:
+      return [true, InternalTXType.ClaimReward]
+    case TransactionSearchType.ChangeNetworkParam:
+      return [true, InternalTXType.ChangeNetworkParam]
+    case TransactionSearchType.ApplyNetworkParam:
+      return [true, InternalTXType.ApplyNetworkParam]
+    case TransactionSearchType.Penalty:
+      return [true, InternalTXType.Penalty]
+    default:
+      return [false, null]
+  }
 }
