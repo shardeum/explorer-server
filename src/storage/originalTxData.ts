@@ -88,12 +88,16 @@ export async function processOriginalTxData(
     }
     if (!config.indexData.indexOriginalTxData) continue
     try {
+      let txHash = '0x' + originalTxData.txId
+      let transactionType = TransactionType.InternalTxReceipt
+      let internalTXType = null
       if (originalTxData.originalTxData.tx.raw) {
         // EVM Tx
         const txObj = getTransactionObj(originalTxData.originalTxData.tx)
         /* prettier-ignore */ if (config.verbose) console.log('txObj', txObj)
         if (txObj) {
-          let transactionType = TransactionType.Receipt
+          transactionType = TransactionType.Receipt
+          txHash = bytesToHex(txObj.hash())
           if (isStakingEVMTx(txObj)) {
             const internalTxData: InternalTx = getStakeTxBlobFromEVMTx(txObj) as InternalTx
             /* prettier-ignore */ if (config.verbose) console.log('internalTxData', internalTxData)
@@ -105,31 +109,20 @@ export async function processOriginalTxData(
               } else console.log('Unknown staking evm tx type', internalTxData)
             }
           }
-          combineOriginalTxsData2.push({
-            txId: originalTxData.txId,
-            timestamp: originalTxData.timestamp,
-            cycle: originalTxData.cycle,
-            txHash: bytesToHex(txObj.hash()),
-            transactionType,
-            internalTXType: originalTxData.originalTxData.tx.isInternalTx
-              ? originalTxData.originalTxData.tx.internalTXType
-              : null,
-          })
         } else {
           console.log('Unable to get txObj from EVM raw tx', originalTxData.originalTxData.tx.raw)
         }
-      } else {
-        combineOriginalTxsData2.push({
-          txId: originalTxData.txId,
-          timestamp: originalTxData.timestamp,
-          cycle: originalTxData.cycle,
-          txHash: '0x' + originalTxData.txId,
-          transactionType: TransactionType.InternalTxReceipt,
-          internalTXType: originalTxData.originalTxData.tx.isInternalTx
-            ? originalTxData.originalTxData.tx.internalTXType
-            : null,
-        })
+      } else if (originalTxData.originalTxData.tx.isInternalTx) {
+        internalTXType = originalTxData.originalTxData.tx.internalTXType
       }
+      combineOriginalTxsData2.push({
+        txId: originalTxData.txId,
+        timestamp: originalTxData.timestamp,
+        cycle: originalTxData.cycle,
+        txHash,
+        transactionType,
+        internalTXType,
+      })
     } catch (e) {
       console.log('Error in processing original Tx data', originalTxData.txId, e)
     }
