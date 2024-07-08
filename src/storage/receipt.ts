@@ -13,6 +13,7 @@ import {
   Receipt,
   ContractInfo,
   TokenType,
+  InternalTXType,
 } from '../types'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
@@ -199,6 +200,13 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
+        const internalTXType = txReceipt.data.readableReceipt.internalTx
+          ? txReceipt.data.readableReceipt.internalTx.internalTXType
+          : transactionType === TransactionType.StakeReceipt
+          ? InternalTXType.Stake
+          : transactionType === TransactionType.UnstakeReceipt
+          ? InternalTXType.Unstake
+          : null
         const txObj: Transaction = {
           txId: tx.txId,
           cycle: cycle,
@@ -213,9 +221,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
             ? txReceipt.data.readableReceipt.to
             : txReceipt.data.readableReceipt.contractAddress,
           originalTxData: tx.originalTxData || {},
-          internalTXType: txReceipt.data.readableReceipt.internalTx
-            ? txReceipt.data.readableReceipt.internalTx.internalTXType
-            : null,
+          internalTXType,
         }
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
