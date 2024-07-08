@@ -104,8 +104,10 @@ export async function processOriginalTxData(
             if (internalTxData) {
               if (internalTxData.internalTXType === InternalTXType.Stake) {
                 transactionType = TransactionType.StakeReceipt
+                internalTXType = InternalTXType.Stake
               } else if (internalTxData.internalTXType === InternalTXType.Unstake) {
                 transactionType = TransactionType.UnstakeReceipt
+                internalTXType = InternalTXType.Unstake
               } else console.log('Unknown staking evm tx type', internalTxData)
             }
           }
