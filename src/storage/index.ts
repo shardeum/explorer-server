@@ -25,6 +25,18 @@ export const initializeDB = async (): Promise<void> => {
   await db.runCreate('CREATE INDEX if not exists `transactions_txFrom` ON `transactions` (`txFrom`)')
   await db.runCreate('CREATE INDEX if not exists `transactions_txTo` ON `transactions` (`txTo`)')
   await db.runCreate('CREATE INDEX if not exists `transactions_nominee` ON `transactions` (`nominee`)')
+
+  //composite transaction indices
+  await db.runCreate(
+    'CREATE INDEX if not exists `idx_transactions_txFrom_txTo` ON `transactions` (`txFrom`, `txTo`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `idx_transactions_txFrom_nominee` ON `transactions` (`txFrom`, `nominee`)'
+  )
+  await db.runCreate(
+    'CREATE INDEX if not exists `idx_transactions_common_query` ON `transactions` (`txFrom`, `txTo`, `nominee`, `transactionType`)'
+  )
+
   await db.runCreate(
     'CREATE INDEX if not exists `transactions_cycle_timestamp` ON `transactions` (`cycle` DESC, `timestamp` DESC)'
   )
