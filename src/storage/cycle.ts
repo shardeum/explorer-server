@@ -110,9 +110,9 @@ export async function queryLatestCycleRecords(count: number): Promise<Cycle[]> {
   return []
 }
 
-export async function queryCycleRecordsBetween(start: number, end: number): Promise<Cycle[]> {
+export async function queryCycleRecordsBetween(start: number, end: number, order = 'DESC'): Promise<Cycle[]> {
   try {
-    const sql = `SELECT * FROM cycles WHERE counter BETWEEN ? AND ? ORDER BY counter DESC`
+    const sql = `SELECT * FROM cycles WHERE counter BETWEEN ? AND ? ORDER BY counter ${order}`
     const cycles: DbCycle[] = await db.all(sql, [start, end])
     if (cycles.length > 0) {
       cycles.forEach((cycleRecord: DbCycle) => {

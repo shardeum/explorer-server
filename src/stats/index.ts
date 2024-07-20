@@ -42,4 +42,27 @@ export const initializeStatsDB = async (): Promise<void> => {
   await db.runCreate(
     'CREATE INDEX if not exists `coin_stats_idx` ON `coin_stats` (`cycle` DESC, `timestamp` DESC)'
   )
+
+  await db.runCreate(
+    `CREATE TABLE IF NOT EXISTS node_stats (
+      nodeAddress STRING NOT NULL UNIQUE PRIMARY KEY,
+      nominator STRING NOT NULL,
+      nodeId STRING,
+      currentState STRING NOT NULL,
+      totalStandbyTime NUMBER NOT NULL,
+      totalActiveTime NUMBER NOT NULL,
+      totalSyncTime NUMBER NOT NULL,
+      timestamp BIGINT NOT NULL
+    )`
+  )
+
+  await db.runCreate('CREATE INDEX if not exists `node_stats_idx` ON `node_stats` (`nodeId`)')
+
+  // metadata table to store the last cycle number for which stats have been processed
+  await db.runCreate(
+    `CREATE TABLE IF NOT EXISTS metadata (
+      type STRING NOT NULL UNIQUE PRIMARY KEY,
+      cycleNumber NUMBER NOT NULL
+    )`
+  )
 }

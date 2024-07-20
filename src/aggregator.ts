@@ -6,6 +6,7 @@ import * as StatsStorage from './stats'
 import * as CoinStats from './stats/coinStats'
 import * as TransactionStats from './stats/transactionStats'
 import * as ValidatorStats from './stats/validatorStats'
+import * as Metadata from './stats/metadata'
 import * as Storage from './storage'
 import * as Cycle from './storage/cycle'
 import * as StatsFunctions from './class/StatsFunctions'
@@ -32,6 +33,7 @@ const start = async (): Promise<void> => {
   let lastCheckedCycleForValidators = -1
   let lastCheckedCycleForTxs = -1
   let lastCheckedCycleForCoinStats = -1
+
   const waitCycleForStats = 5 // Calculate transactions count per Cycle after 5 cycles
 
   const lastStoredValidators = await ValidatorStats.queryLatestValidatorStats(1)
@@ -42,6 +44,9 @@ const start = async (): Promise<void> => {
 
   const lastStoredCoinStats = await CoinStats.queryLatestCoinStats(1)
   if (lastStoredCoinStats.length > 0) lastCheckedCycleForCoinStats = lastStoredCoinStats[0].cycle
+
+  let lastCheckedCycleForNodeStats = await Metadata.getLastStoredCycleNumber(Metadata.MetadataType.NodeStats)
+  console.log('lastCheckedCycleForNodeStats', lastCheckedCycleForNodeStats)
 
   console.log('lastCheckedCycleForValidators', lastCheckedCycleForValidators)
   if (measure_time) start_time = process.hrtime()
@@ -70,6 +75,12 @@ const start = async (): Promise<void> => {
     if (latestCycleCounter - waitCycleForStats > lastCheckedCycleForCoinStats) {
       StatsFunctions.recordCoinStats(latestCycleCounter - waitCycleForStats, lastCheckedCycleForCoinStats)
       lastCheckedCycleForCoinStats = latestCycleCounter - waitCycleForStats
+    }
+
+    if (latestCycleCounter > lastCheckedCycleForNodeStats) {
+      await StatsFunctions.recordNodeStats(latestCycleCounter, lastCheckedCycleForNodeStats)
+      lastCheckedCycleForNodeStats = latestCycleCounter
+      StatsFunctions.insertOrUpdateMetadata(Metadata.MetadataType.NodeStats, lastCheckedCycleForNodeStats)
     }
   })
 }
