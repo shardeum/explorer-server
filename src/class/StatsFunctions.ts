@@ -1,6 +1,8 @@
 import * as CoinStats from '../stats/coinStats'
 import * as TransactionStats from '../stats/transactionStats'
 import * as ValidatorStats from '../stats/validatorStats'
+import * as NodeStats from '../stats/nodeStats'
+import * as Metadata from '../stats/metadata'
 import * as Cycle from '../storage/cycle'
 import * as Transaction from '../storage/transaction'
 import { InternalTXType, TransactionSearchType, TransactionType } from '../types'
@@ -8,6 +10,13 @@ import BN from 'bn.js'
 import BigNumber from 'decimal.js'
 import { CycleRecord } from '@shardus/types/build/src/p2p/CycleCreatorTypes'
 import { config } from '../config/index'
+import { JoinRequest, JoinedConsensor } from '@shardus/types/build/src/p2p/JoinTypes'
+
+interface NodeState {
+  state: string
+  id?: string
+  nominator?: string
+}
 
 export const insertValidatorStats = async (cycleRecord: CycleRecord): Promise<void> => {
   const validatorsInfo: ValidatorStats.ValidatorStats = {
@@ -301,8 +310,212 @@ export const recordCoinStats = async (latestCycle: number, lastStoredCycle: numb
   }
 }
 
+// Update NodeStats record based on new status
+export function updateNodeStats(
+  nodeStats: NodeStats.NodeStats,
+  newState: NodeState,
+  currentTimestamp: number
+): NodeStats.NodeStats {
+  const timeStampDiff = currentTimestamp - nodeStats.timestamp
+  switch (nodeStats.currentState) {
+    case 'standbyAdd':
+      if (newState.state == 'standbyRefresh' || newState.state == 'joinedConsensors') {
+        nodeStats.totalStandbyTime += timeStampDiff
+      } else {
+        /* prettier-ignore */ if (config.verbose) console.log(`Unknown state transition from standbyAdd to ${newState.state}`)
+      }
+      break
+
+    case 'standbyRefresh':
+      if (newState.state == 'joinedConsensors') {
+        nodeStats.totalStandbyTime += timeStampDiff
+      } else {
+        /* prettier-ignore */ if (config.verbose) console.log(`Unknown state transition from standbyRefresh to ${newState.state}`)
+      }
+      break
+
+    case 'activated':
+      if (newState.state == 'removed' || newState.state == 'apoptosized') {
+        nodeStats.totalActiveTime += timeStampDiff
+      } else {
+        /* prettier-ignore */ if (config.verbose) console.log(`Unknown state transition from activated to ${newState.state}`)
+      }
+      break
+
+    case 'joinedConsensors':
+    case 'startedSyncing':
+    case 'finishedSyncing':
+      // eslint-disable-next-line no-case-declarations
+      const validStates: string[] = ['startedSyncing', 'finishedSyncing', 'activated']
+      if (validStates.includes(newState.state)) {
+        nodeStats.totalSyncTime += timeStampDiff
+      } else {
+        /* prettier-ignore */ if (config.verbose) console.log(`Unknown state transition from ${nodeStats.currentState} to ${newState.state}`)
+      }
+      break
+    default:
+      break
+  }
+
+  // Update current state and add nodedId if it exists
+  nodeStats.currentState = newState.state
+  nodeStats.timestamp = currentTimestamp
+  if (newState.nominator) {
+    nodeStats.nominator = newState.nominator
+  }
+  if (newState.id) {
+    nodeStats.nodeId = newState.id
+  }
+  return nodeStats
+}
+
+export const recordNodeStats = async (latestCycle: number, lastStoredCycle: number): Promise<void> => {
+  try {
+    const statesToIgnore = ['activatedPublicKeys', 'standbyRefresh', 'lost', 'refuted']
+    const bucketSize = 100
+    let startCycle = lastStoredCycle + 1
+    let endCycle = startCycle + bucketSize
+    while (startCycle <= latestCycle) {
+      if (endCycle > latestCycle) endCycle = latestCycle
+      /* prettier-ignore */ if (config.verbose) console.log(`recordNodeStats: processing nodeStats for cycles from ${startCycle} to ${endCycle}`)
+
+      const cycles = await Cycle.queryCycleRecordsBetween(startCycle, endCycle, 'ASC')
+      /* prettier-ignore */ if (config.verbose) console.log('recordNodeStats: fetched cycle records', cycles)
+
+      if (cycles.length > 0) {
+        for (const cycle of cycles) {
+          const pubKeyToStateMap = new Map<string, NodeState>()
+          const IdToStateMap = new Map<string, string>()
+
+          Object.keys(cycle.cycleRecord).forEach((key) => {
+            // eslint-disable-next-line security/detect-object-injection
+            const value = cycle.cycleRecord[key]
+            if (
+              Array.isArray(value) &&
+              !key.toLowerCase().includes('archivers') &&
+              !statesToIgnore.includes(key)
+            ) {
+              // pre-Id states containing complex object list
+              if (key == 'joinedConsensors') {
+                value.forEach((item: JoinedConsensor) => {
+                  pubKeyToStateMap.set(item['address'], { state: 'joinedConsensors', id: item['id'] })
+                })
+              } else if (key == 'standbyAdd') {
+                value.forEach((item: JoinRequest) => {
+                  pubKeyToStateMap.set(item['nodeInfo']['address'], {
+                    state: 'standbyAdd',
+                    nominator: item?.appJoinData?.stakeCert?.nominator,
+                  })
+                })
+
+                // post-Id states
+              } else if (key == 'startedSyncing') {
+                value.forEach((item: string) => {
+                  IdToStateMap.set(item, 'startedSyncing')
+                })
+              } else if (key == 'finishedSyncing') {
+                value.forEach((item: string) => {
+                  IdToStateMap.set(item, 'finishedSyncing')
+                })
+              } else if (key == 'removed') {
+                value.forEach((item: string) => {
+                  if (item != 'all') IdToStateMap.set(item, 'removed')
+                })
+              } else if (key == 'activated') {
+                value.forEach((item: string) => {
+                  IdToStateMap.set(item, 'activated')
+                })
+
+                // pre-Id states containing simple string list
+              } else {
+                /* prettier-ignore */ if (config.verbose) console.log(`Unknown state type detected: ${key}`)
+                value.forEach((item: string) => {
+                  pubKeyToStateMap.set(item, { state: key })
+                })
+              }
+            }
+          })
+
+          /* prettier-ignore */ if (config.verbose) console.log(`pubKeyToStateMap for cycle ${cycle.counter}:`, pubKeyToStateMap)
+          /* prettier-ignore */ if (config.verbose) console.log(`IdToStateMap for cycle ${cycle.counter}:`, IdToStateMap)
+          const updatedNodeStatsCombined: NodeStats.NodeStats[] = []
+          // Iterate over pubKeyToStateMap
+          for (const [nodeKey, nodeState] of pubKeyToStateMap) {
+            const existingNodeStats: NodeStats.NodeStats = await NodeStats.getNodeStatsByAddress(nodeKey)
+            if (existingNodeStats) {
+              /* prettier-ignore */ if (config.verbose) console.log(`existingNodeStats: `, existingNodeStats)
+              // node statistics exists, update node statistics record
+              const updatedNodeStats = updateNodeStats(existingNodeStats, nodeState, cycle.cycleRecord.start)
+              /* prettier-ignore */ if (config.verbose) console.log(`updatedNodeStats: `, updatedNodeStats)
+              updatedNodeStatsCombined.push(updatedNodeStats)
+              await NodeStats.insertOrUpdateNodeStats(updatedNodeStats)
+            } else {
+              const nodeStats: NodeStats.NodeStats = {
+                nodeAddress: nodeKey,
+                nominator: nodeState.nominator ?? null,
+                nodeId: nodeState.id,
+                currentState: nodeState.state,
+                totalStandbyTime: 0,
+                totalActiveTime: 0,
+                totalSyncTime: 0,
+                timestamp: cycle.cycleRecord.start,
+              }
+              /* prettier-ignore */ if (config.verbose) console.log('Adding new node stats:', nodeStats)
+              updatedNodeStatsCombined.push(nodeStats)
+              await NodeStats.insertOrUpdateNodeStats(nodeStats)
+            }
+          }
+
+          // Iterate over nodeStatus Map
+          for (const [nodeId, nodeState] of IdToStateMap) {
+            const existingNodeStats: NodeStats.NodeStats = await NodeStats.getNodeStatsById(nodeId)
+            if (existingNodeStats) {
+              /* prettier-ignore */ if (config.verbose) console.log(`existingNodeStats: `, existingNodeStats)
+              // node statistics exists, update node statistics record
+              const updatedNodeStats = updateNodeStats(
+                existingNodeStats,
+                { state: nodeState },
+                cycle.cycleRecord.start
+              )
+              /* prettier-ignore */ if (config.verbose) console.log(`updatedNodeStats: `, updatedNodeStats)
+              await NodeStats.insertOrUpdateNodeStats(updatedNodeStats)
+              updatedNodeStatsCombined.push(updatedNodeStats)
+            } else {
+              console.warn(
+                `Node statistics record not found for node with Id: ${nodeId} and state ${nodeState}`
+              )
+            }
+          }
+          pubKeyToStateMap.clear()
+          IdToStateMap.clear()
+
+          // Update node stats for shutdown mode
+          if (cycle.cycleRecord.mode == 'shutdown') {
+            NodeStats.updateAllNodeStates(cycle.cycleRecord.start)
+          }
+        }
+      } else {
+        console.error(`Failed to fetch cycleRecords between ${startCycle} and ${endCycle}`)
+      }
+      await insertOrUpdateMetadata(Metadata.MetadataType.NodeStats, endCycle)
+      startCycle = endCycle + 1
+      endCycle = endCycle + bucketSize
+    }
+  } catch (error) {
+    console.error(`Error in recordNodeStats: ${error}`)
+  }
+}
+
 export const patchStatsBetweenCycles = async (startCycle: number, endCycle: number): Promise<void> => {
   await recordOldValidatorsStats(endCycle, startCycle - 1)
   await recordTransactionsStats(endCycle, startCycle - 1)
   await recordCoinStats(endCycle, startCycle - 1)
+  await recordNodeStats(endCycle, startCycle - 1)
+}
+
+export async function insertOrUpdateMetadata(
+  type: Metadata.MetadataType,
+  latestCycleNumber: number
+): Promise<void> {
+  await Metadata.insertOrUpdateMetadata({ type, cycleNumber: latestCycleNumber })
 }

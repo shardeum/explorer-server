@@ -12,6 +12,8 @@ import {
   WrappedEVMAccount,
   Receipt,
   ContractInfo,
+  TokenType,
+  InternalTXType,
 } from '../types'
 import * as db from './sqlite3storage'
 import { extractValues, extractValuesFromArray } from './sqlite3storage'
@@ -69,8 +71,8 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
   let combineReceipts: Receipt[] = []
   let combineAccounts1: Account[] = []
   let combineTransactions: Transaction[] = []
-  let combineTokenTransactions: TokenTx[] = [] // For TransactionType (Internal ,ERC20, ERC721)
-  let combineTokenTransactions2: TokenTx[] = [] // For TransactionType (ERC1155)
+  let combineTokenTransactions: TokenTx[] = [] // For TokenType ( EVM_Internal, ERC20, ERC721 )
+  let combineTokenTransactions2: TokenTx[] = [] // For TokenType ( ERC1155)
   let combineTokens: Token[] = [] // For Tokens owned by an address
   const contractAccountsIdToDecode = []
   for (const receiptObj of receipts) {
@@ -198,6 +200,13 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
           : (-1 as TransactionType)
 
       if (transactionType !== (-1 as TransactionType)) {
+        const internalTXType = txReceipt.data.readableReceipt.internalTx
+          ? txReceipt.data.readableReceipt.internalTx.internalTXType
+          : transactionType === TransactionType.StakeReceipt
+          ? InternalTXType.Stake
+          : transactionType === TransactionType.UnstakeReceipt
+          ? InternalTXType.Unstake
+          : null
         const txObj: Transaction = {
           txId: tx.txId,
           cycle: cycle,
@@ -212,9 +221,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
             ? txReceipt.data.readableReceipt.to
             : txReceipt.data.readableReceipt.contractAddress,
           originalTxData: tx.originalTxData || {},
-          internalTXType: txReceipt.data.readableReceipt.internalTx
-            ? txReceipt.data.readableReceipt.internalTx.internalTXType
-            : null,
+          internalTXType,
         }
         if (txReceipt.data.readableReceipt.stakeInfo) {
           txObj.nominee = txReceipt.data.readableReceipt.stakeInfo.nominee
@@ -262,7 +269,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
         }
         for (const tx of txs) {
           let accountExist: Account | null = null
-          if (tx.tokenType !== TransactionType.EVM_Internal)
+          if (tx.tokenType !== TokenType.EVM_Internal)
             accountExist = await AccountDB.queryAccountByAccountId(
               tx.contractAddress.slice(2).toLowerCase() + '0'.repeat(24) //Search by Shardus address
             )
@@ -280,7 +287,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
               transactionFee: txObj.wrappedEVMAccount.amountSpent, // Maybe provide with actual token transfer cost
               contractInfo,
             }
-            if (tx.tokenType === TransactionType.ERC_1155) {
+            if (tx.tokenType === TokenType.ERC_1155) {
               combineTokenTransactions2.push(obj)
             } else {
               combineTokenTransactions.push(obj)
