@@ -49,6 +49,7 @@ export const config = {
   },
   DISTRIBUTOR_RECONNECT_INTERVAL: 10_000, // in ms
   CONNECT_TO_DISTRIBUTOR_MAX_RETRY: 10,
+  storeReceiptBeforeStates: false,
 }
 
 export const DISTRIBUTOR_URL = `http://${config.distributorInfo.ip}:${config.distributorInfo.port}`
