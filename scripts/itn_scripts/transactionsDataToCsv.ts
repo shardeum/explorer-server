@@ -136,9 +136,7 @@ const transactionsDataWriter = csvWriter.createObjectCsvWriter({
     { id: 'value_decimal', title: 'value_decimal' },
     { id: 'amountSpent_decimal', title: 'amountSpent_decimal' },
     { id: 'rewardAmount', title: 'rewardAmount' },
-    { id: 'rewardAmount_decimal', title: 'rewardAmount_decimal' },
     { id: 'penaltyAmount', title: 'penaltyAmount' },
-    { id: 'penaltyAmount_decimal', title: 'penaltyAmount_decimal' },
     { id: 'violationType', title: 'violationType' },
     { id: 'internalTXType', title: 'internalTXType' },
   ],
@@ -253,17 +251,13 @@ const transformTransaction = (tx: Transaction): any => {
       calculateFullValue(tx.wrappedEVMAccount['readableReceipt']?.['value']),
     amountSpent_decimal:
       tx.wrappedEVMAccount?.['amountSpent'] && calculateFullValue(tx.wrappedEVMAccount?.['amountSpent']),
-    penaltyAmount:
-      tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount'],
-    penaltyAmount_decimal:
-      tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount'] &&
-      calculateFullValue(tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount']),
     rewardAmount:
-      tx.wrappedEVMAccount['readableReceipt']?.['rewardAmount'],
-    rewardAmount_decimal:
       tx.wrappedEVMAccount['readableReceipt']?.['rewardAmount'] &&
-      calculateFullValue(tx.wrappedEVMAccount['readableReceipt']?.['rewardAmount']),
-    violationType:
+      bigIntToHex(tx.wrappedEVMAccount['readableReceipt']?.['rewardAmount']),
+    penaltyAmount:
+      tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount'] &&
+      bigIntToHex(tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount']),
+      violationType:
       tx.wrappedEVMAccount['readableReceipt']?.['internalTX']?.['violationType'],
     internalTXType: tx.internalTXType
   }
