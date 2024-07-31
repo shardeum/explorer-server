@@ -17,6 +17,7 @@ const header = [
   { id: 'eventName', title: 'eventname' },
   { id: 'cycleMarker', title: 'cycleMarker' },
   { id: 'counter', title: 'counter' },
+  { id: 'mode', title: 'mode' },
   { id: 'timestampEpoch', title: 'timestamp_epoch' },
   { id: 'publicKey', title: 'publickey' },
   { id: 'id', title: 'id' },
@@ -39,6 +40,7 @@ interface CsvCycleRecord {
   eventName: string
   cycleMarker: string
   counter: number
+  mode: string
   timestampEpoch: number
   publicKey?: string
   id?: string
@@ -139,6 +141,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item.publicKey,
             id: item.id,
@@ -151,6 +154,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item.nodeInfo.address,
             externalIp: item.nodeInfo.externalIp,
@@ -164,6 +168,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             id: item,
           })
@@ -175,6 +180,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item,
           })
