@@ -135,6 +135,10 @@ const transactionsDataWriter = csvWriter.createObjectCsvWriter({
     // ( readableReceipt ) <--
     { id: 'value_decimal', title: 'value_decimal' },
     { id: 'amountSpent_decimal', title: 'amountSpent_decimal' },
+    { id: 'rewardAmount', title: 'rewardAmount' },
+    { id: 'penaltyAmount', title: 'penaltyAmount' },
+    { id: 'violationType', title: 'violationType' },
+    { id: 'internalTXType', title: 'internalTXType' },
   ],
 })
 
@@ -247,13 +251,22 @@ const transformTransaction = (tx: Transaction): any => {
       calculateFullValue(tx.wrappedEVMAccount['readableReceipt']?.['value']),
     amountSpent_decimal:
       tx.wrappedEVMAccount?.['amountSpent'] && calculateFullValue(tx.wrappedEVMAccount?.['amountSpent']),
+    rewardAmount:
+      tx.wrappedEVMAccount['readableReceipt']?.['rewardAmount'] &&
+      bigIntToHex(tx.wrappedEVMAccount['readableReceipt']?.['rewardAmount']),
+    penaltyAmount:
+      tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount'] &&
+      bigIntToHex(tx.wrappedEVMAccount['readableReceipt']?.['penaltyAmount']),
+      violationType:
+      tx.wrappedEVMAccount['readableReceipt']?.['internalTX']?.['violationType'],
+    internalTXType: tx.internalTXType
   }
 }
 
 async function processData(): Promise<void> {
   const startTimestamp = getLastProcessedTimestamp() + 1
   const endTimestamp = await getMaximumTimestamp()
-  console.log('Processing cycles from', startTimestamp, 'to', endTimestamp)
+  console.log('Processing transactions from', startTimestamp, 'to', endTimestamp)
   await fetchAndWritetransactions(startTimestamp, endTimestamp).catch(console.error)
   saveLastProcessedTimestamp(endTimestamp)
   copyFileIfExists()

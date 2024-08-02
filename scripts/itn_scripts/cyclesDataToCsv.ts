@@ -17,11 +17,13 @@ const header = [
   { id: 'eventName', title: 'eventname' },
   { id: 'cycleMarker', title: 'cycleMarker' },
   { id: 'counter', title: 'counter' },
+  { id: 'mode', title: 'mode' },
   { id: 'timestampEpoch', title: 'timestamp_epoch' },
   { id: 'publicKey', title: 'publickey' },
   { id: 'id', title: 'id' },
   { id: 'externalIp', title: 'externalIp' },
   { id: 'externalPort', title: 'externalPort' },
+  { id: 'nominator', title: 'nominator' },
 ]
 
 interface Metadata {
@@ -39,11 +41,13 @@ interface CsvCycleRecord {
   eventName: string
   cycleMarker: string
   counter: number
+  mode: string
   timestampEpoch: number
   publicKey?: string
   id?: string
   externalIp?: string
   externalPort?: number
+  nominator?: string | null
 }
 
 const idStates = ['startedSyncing', 'finishedSyncing', 'activated', 'removed', 'apoptosized']
@@ -139,9 +143,11 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item.publicKey,
             id: item.id,
+            nominator: null,
           })
         })
       } else if (key == 'standbyAdd') {
@@ -151,10 +157,12 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item.nodeInfo.address,
             externalIp: item.nodeInfo.externalIp,
             externalPort: item.nodeInfo.externalPort,
+            nominator: item?.appJoinData?.stakeCert?.nominator ?? null,
           })
         })
       } else if (idStates.includes(key)) {
@@ -164,8 +172,10 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             id: item,
+            nominator: null,
           })
         })
       } else if (pubKeyStates.includes(key)) {
@@ -175,8 +185,10 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             eventName: key,
             cycleMarker: cycleRecord.cycleMarker,
             counter: cycleRecord.counter,
+            mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item,
+            nominator: null,
           })
         })
       } else {
