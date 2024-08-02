@@ -77,6 +77,11 @@ Usage endpoints are provided to track and manage usage statistics for each endpo
   - POST _<host:port>/usage/enable_ **Enable the usage and start saving usage data**
   - POST _<host:port>/usage/disable_ **Disable the usage and reset usage data**
   - GET _<host:port>/usage/metrics_ **Provide usage data in the JSON format**
+  
+## Health Check
+
+GET `/is-alive` this endpoint returns 200 if the server is running.
+GET `/is-healthy` currently the same as `/is-alive` but will be expanded
 
 # Contributing
 
