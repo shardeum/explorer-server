@@ -23,6 +23,7 @@ const header = [
   { id: 'id', title: 'id' },
   { id: 'externalIp', title: 'externalIp' },
   { id: 'externalPort', title: 'externalPort' },
+  { id: 'nominator', title: 'nominator' },
 ]
 
 interface Metadata {
@@ -46,6 +47,7 @@ interface CsvCycleRecord {
   id?: string
   externalIp?: string
   externalPort?: number
+  nominator?: string | null
 }
 
 const idStates = ['startedSyncing', 'finishedSyncing', 'activated', 'removed', 'apoptosized']
@@ -145,6 +147,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item.publicKey,
             id: item.id,
+            nominator: null,
           })
         })
       } else if (key == 'standbyAdd') {
@@ -159,6 +162,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             publicKey: item.nodeInfo.address,
             externalIp: item.nodeInfo.externalIp,
             externalPort: item.nodeInfo.externalPort,
+            nominator: item?.appJoinData?.stakeCert?.nominator ?? null,
           })
         })
       } else if (idStates.includes(key)) {
@@ -171,6 +175,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             id: item,
+            nominator: null,
           })
         })
       } else if (pubKeyStates.includes(key)) {
@@ -183,6 +188,7 @@ function transformCycleRecord(cycleRecord: Cycle, csvCycleRecords: CsvCycleRecor
             mode: cycleRecord.cycleRecord.mode,
             timestampEpoch: cycleRecord.cycleRecord.start,
             publicKey: item,
+            nominator: null,
           })
         })
       } else {
