@@ -58,10 +58,10 @@ export const Pagination: React.FC<PaginationProps> = (props) => {
       >
         <Icon name="arrow_left" color={currentPage === 1 ? 'disabled' : 'black'} />
       </Button>
-      {paginationRange.map((pageNumber) => {
+      {paginationRange.map((pageNumber, index) => {
         if (pageNumber === DOTS) {
           return (
-            <div className={styles.label} key={pageNumber}>
+            <div className={styles.label} key={`dots-${index}`}>
               &#8230;
             </div>
           )

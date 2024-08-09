@@ -42,11 +42,11 @@ export const Dashboard: React.FC = () => {
   return (
     <div className={styles.Dashboard}>
       <Spacer space="32" />
-      <session>
-        <SearchBox mode={cycles[0]?.cycleRecord['mode']} />
-      </session>
+      <div>
+      <SearchBox mode={cycles[0]?.cycleRecord['mode']} />
+      </div>
       <Spacer space="48" />
-      <session>
+      <section>
         <CardDetail
           totalCycles={cyclesList[0]?.key}
           totalNodes={cyclesList[0]?.activeNodes}
@@ -60,18 +60,18 @@ export const Dashboard: React.FC = () => {
           totalSHM={totalSHM}
           totalStakedSHM={totalStakedSHM}
         />
-      </session>
+      </section>
       <Spacer space="48" />
       <section>
         <ChartDetail validatorStats={validatorStats} transactionStats={transactionStats} />
       </section>
       <Spacer space="48" />
-      <session>
+      <section>
         <div className={styles.tableGrid}>
           <LatestCycle cycles={cycles} />
           <LatestTransactions transactions={transactions} />
         </div>
-      </session>
+      </section>
       <Spacer space="48" />
     </div>
   )
