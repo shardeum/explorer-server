@@ -31,7 +31,7 @@ export const Header: React.FC<Record<string, never>> = () => {
             label=""
             options={[
               { key: 'https://shardeum.org/betanet', value: 'Shardeum Betanet' },
-              { key: 'https://docs.shardeum.org/node/run/validator', value: 'Run a validator node' },
+              { key: 'https://docs.shardeum.org/docs/node/run/validator', value: 'Run a validator node' },
             ]}
           />
         )
