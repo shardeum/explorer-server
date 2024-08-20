@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import ReactTooltip from 'react-tooltip'
+import ClientOnlyTooltip from '../ClientOnlyTooltip'
 
 import { Icon, iconTypes } from '../Icon'
 import { Spacer } from '../Spacer'
@@ -71,7 +71,7 @@ export const Footer: React.FC = () => {
               <Icon name={social.iconName as keyof typeof iconTypes} color="black" />
             </a>
           ))}
-          <ReactTooltip effect="solid" backgroundColor="#6610f2" id="fsb" />
+          <ClientOnlyTooltip effect="solid" backgroundColor="#6610f2" id="fsb" />
         </div>
       </div>
     </div>
