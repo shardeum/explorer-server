@@ -24,10 +24,10 @@ import { Utils as StringUtils } from '@shardus/types'
 
 type DbReceipt = Receipt & {
   tx: string
-  beforeStateAccounts: string
-  accounts: string
+  beforeStates: string
+  afterStates: string
   appReceiptData: string | null
-  appliedReceipt: string
+  signedReceipt: string
 }
 
 export const EOA_CodeHash = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
@@ -76,7 +76,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
   let combineTokens: Token[] = [] // For Tokens owned by an address
   const contractAccountsIdToDecode = []
   for (const receiptObj of receipts) {
-    const { accounts, cycle, tx, appReceiptData, timestamp, appliedReceipt } = receiptObj
+    const { afterStates, cycle, tx, appReceiptData, timestamp } = receiptObj
     if (receiptsMap.has(tx.txId) && receiptsMap.get(tx.txId) === timestamp) {
       continue
     }
@@ -88,12 +88,12 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
     receiptsMap.set(tx.txId, tx.timestamp)
 
     // If the receipt is a challenge, then skip updating its accounts data or transaction data
-    if (
-      appliedReceipt &&
-      appliedReceipt.confirmOrChallenge &&
-      appliedReceipt.confirmOrChallenge.message === 'challenge'
-    )
-      continue
+    // if (
+    //   appliedReceipt &&
+    //   appliedReceipt.confirmOrChallenge &&
+    //   appliedReceipt.confirmOrChallenge.message === 'challenge'
+    // )
+    //   continue
     // Forward receipt data to LogServer
     await forwardReceiptData([receiptObj])
     // Receipts size can be big, better to save per 100
@@ -103,7 +103,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
     }
     if (!config.indexData.indexReceipt) continue
     const storageKeyValueMap = {}
-    for (const account of accounts) {
+    for (const account of afterStates) {
       const accountType = account.data.accountType as AccountType
       const accObj = {
         accountId: account.accountId,
@@ -448,12 +448,11 @@ export async function queryReceiptCountBetweenCycles(start: number, end: number)
 }
 
 function deserializeDbReceipt(receipt: DbReceipt): void {
-  if (receipt.tx) receipt.tx = StringUtils.safeJsonParse(receipt.tx)
-  if (receipt.beforeStateAccounts)
-    receipt.beforeStateAccounts = StringUtils.safeJsonParse(receipt.beforeStateAccounts)
-  if (receipt.accounts) receipt.accounts = StringUtils.safeJsonParse(receipt.accounts)
-  if (receipt.appReceiptData) receipt.appReceiptData = StringUtils.safeJsonParse(receipt.appReceiptData)
-  if (receipt.appliedReceipt) receipt.appliedReceipt = StringUtils.safeJsonParse(receipt.appliedReceipt)
+  receipt.tx &&= StringUtils.safeJsonParse(receipt.tx)
+  receipt.afterStates &&= StringUtils.safeJsonParse(receipt.afterStates)
+  receipt.beforeStates &&= StringUtils.safeJsonParse(receipt.beforeStates)
+  receipt.signedReceipt &&= StringUtils.safeJsonParse(receipt.signedReceipt)
+  receipt.appReceiptData &&= StringUtils.safeJsonParse(receipt.appReceiptData)
 }
 
 export function cleanOldReceiptsMap(timestamp: number): void {

@@ -4,7 +4,7 @@ import { ReadableReceipt } from './receipt'
 import { NetworkParameters } from '.'
 import { ContractInfo, TokenTx, TokenType } from './transaction'
 
-export interface AccountCopy {
+export interface AccountsCopy {
   accountId: string
   data: any // Todo: Create a type of different accounts
   timestamp: number

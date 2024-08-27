@@ -9,7 +9,7 @@ import {
   Token,
   ContractType,
   ContractInfo,
-  AccountCopy,
+  AccountsCopy,
 } from '../types'
 import { bytesToHex } from '@ethereumjs/util'
 import { getContractInfo } from '../class/TxDecoder'
@@ -327,7 +327,7 @@ export async function queryTokenHolders(skip = 0, limit = 10, contractAddress: s
   return tokens
 }
 
-export async function processAccountData(accounts: AccountCopy[]): Promise<Account[]> {
+export async function processAccountData(accounts: AccountsCopy[]): Promise<Account[]> {
   console.log('accounts size', accounts.length)
   if (accounts && accounts.length <= 0) return []
   const bucketSize = 1000
