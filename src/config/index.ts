@@ -3,6 +3,11 @@ export const envEnum = {
   PROD: 'production',
 }
 
+export enum explorerMode {
+  WS = 'WS',
+  MQ = 'MQ',
+}
+
 export const config = {
   env: process.env.SHARDEUM_EXPLORER_MODE || envEnum.DEV, //default to safe if no env is set
   host: process.env.HOST || '127.0.0.1',
@@ -49,6 +54,7 @@ export const config = {
   },
   DISTRIBUTOR_RECONNECT_INTERVAL: 10_000, // in ms
   CONNECT_TO_DISTRIBUTOR_MAX_RETRY: 10,
+  explorerMode: process.env.EXPLORER_MODE || explorerMode.WS.toString(),
 }
 
 export const DISTRIBUTOR_URL = `http://${config.distributorInfo.ip}:${config.distributorInfo.port}`

@@ -24,8 +24,13 @@ import {
 import { sleep } from './utils'
 import { validateData } from './class/validateData'
 import { DistributorSocketCloseCodes } from './types'
-import { config as CONFIG, DISTRIBUTOR_URL } from './config'
+import { config as CONFIG, DISTRIBUTOR_URL, explorerMode } from './config'
 import { setupCollectorSocketServer } from './logSubscription/CollectorSocketconnection'
+
+import RMQCyclesConsumer from './collectors/rmq/cycles'
+import RMQOriginalTxsConsumer from './collectors/rmq/original_txs'
+import RMQReceiptsConsumer from './collectors/rmq/receipts'
+
 // config variables
 
 if (process.env.PORT) {
@@ -34,6 +39,10 @@ if (process.env.PORT) {
 let ws: WebSocket
 let reconnecting = false
 let connected = false
+
+let rmqCyclesConsumer: RMQCyclesConsumer
+let rmqTransactionsConsumer: RMQOriginalTxsConsumer
+let rmqReceiptsConsumer: RMQReceiptsConsumer
 
 const { hashKey, patchData, verbose, DISTRIBUTOR_RECONNECT_INTERVAL, CONNECT_TO_DISTRIBUTOR_MAX_RETRY } =
   CONFIG
@@ -219,6 +228,33 @@ const connectToDistributor = (): void => {
   }
 }
 
+const startExplorerInMQMode = async (): Promise<void> => {
+  console.log(`Starting Explorer in RMQ mode`)
+  rmqCyclesConsumer = new RMQCyclesConsumer()
+  rmqTransactionsConsumer = new RMQOriginalTxsConsumer()
+  rmqReceiptsConsumer = new RMQReceiptsConsumer()
+
+  rmqCyclesConsumer.start()
+  rmqTransactionsConsumer.start()
+  rmqReceiptsConsumer.start()
+
+  // add signal listeners
+  process.on('SIGTERM', async () => {
+    console.log(`Initiated RabbitMQ connections cleanup`)
+    await rmqCyclesConsumer.cleanUp()
+    await rmqTransactionsConsumer.cleanUp()
+    await rmqReceiptsConsumer.cleanUp()
+    console.log(`Completed RabbitMQ connections cleanup`)
+  })
+  process.on('SIGINT', async () => {
+    console.log(`Initiated RabbitMQ connections cleanup`)
+    await rmqCyclesConsumer.cleanUp()
+    await rmqTransactionsConsumer.cleanUp()
+    await rmqReceiptsConsumer.cleanUp()
+    console.log(`Completed RabbitMQ connections cleanup`)
+  })
+}
+
 // Setup Log Directory
 const start = async (): Promise<void> => {
   let retry = 0
@@ -229,19 +265,23 @@ const start = async (): Promise<void> => {
 
   await checkAndSyncData()
   setupCollectorSocketServer()
-  try {
-    while (!connected) {
-      connectToDistributor()
-      retry++
-      await sleep(DISTRIBUTOR_RECONNECT_INTERVAL)
-      if (!connected && retry > CONNECT_TO_DISTRIBUTOR_MAX_RETRY) {
-        throw Error(`Cannot connect to the Distributor @ ${DISTRIBUTOR_URL}`)
+
+  if (CONFIG.explorerMode === explorerMode.MQ) {
+    startExplorerInMQMode()
+  } else {
+    try {
+      while (!connected) {
+        connectToDistributor()
+        retry++
+        await sleep(DISTRIBUTOR_RECONNECT_INTERVAL)
+        if (!connected && retry > CONNECT_TO_DISTRIBUTOR_MAX_RETRY) {
+          throw Error(`Cannot connect to the Distributor @ ${DISTRIBUTOR_URL}`)
+        }
       }
+    } catch (e) {
+      console.log('error while starting explorer in WS mode', e)
     }
-  } catch (e) {
-    console.log(e)
   }
-  return
 }
 
 start()
