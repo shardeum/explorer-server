@@ -49,7 +49,8 @@ const { hashKey, patchData, verbose, DISTRIBUTOR_RECONNECT_INTERVAL, CONNECT_TO_
 
 const DistributorFirehoseEvent = 'FIREHOSE'
 
-export const checkAndSyncData = async (): Promise<void> => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const checkAndSyncData = async (): Promise<Function> => {
   let lastStoredReceiptCount = await receipt.queryReceiptCount()
   let lastStoredOriginalTxDataCount = await originalTxData.queryOriginalTxDataCount()
   let lastStoredCycleCount = await cycle.queryCycleCount()
@@ -136,36 +137,40 @@ export const checkAndSyncData = async (): Promise<void> => {
   if (patchData && totalOriginalTxsToSync > lastStoredOriginalTxDataCount) toggleNeedSyncing()
   if (!needSyncing && totalCyclesToSync > lastStoredCycleCount) toggleNeedSyncing()
 
-  await downloadAndSyncGenesisAccounts() // To sync accounts data that are from genesis accounts/accounts data that the network start with
+  const syncData = async(): Promise<void> => {
+    await downloadAndSyncGenesisAccounts() // To sync accounts data that are from genesis accounts/accounts data that the network start with
 
-  if (needSyncing) {
-    console.log(
-      lastStoredReceiptCount,
-      totalReceiptsToSync,
-      lastStoredCycleCount,
-      totalCyclesToSync,
-      lastStoredOriginalTxDataCount,
-      totalOriginalTxsToSync
-    )
-    // Sync receipts and originalTxsData data first if there is old data
-    if (lastStoredReceiptCycle > 0 && totalCyclesToSync > lastStoredReceiptCycle) {
-      await downloadReceiptsBetweenCycles(lastStoredReceiptCycle, totalCyclesToSync)
-      lastStoredReceiptCount = await receipt.queryReceiptCount()
+    if (needSyncing) {
+      console.log(
+        lastStoredReceiptCount,
+        totalReceiptsToSync,
+        lastStoredCycleCount,
+        totalCyclesToSync,
+        lastStoredOriginalTxDataCount,
+        totalOriginalTxsToSync
+      )
+      // Sync receipts and originalTxsData data first if there is old data
+      if (lastStoredReceiptCycle > 0 && totalCyclesToSync > lastStoredReceiptCycle) {
+        await downloadReceiptsBetweenCycles(lastStoredReceiptCycle, totalCyclesToSync)
+        lastStoredReceiptCount = await receipt.queryReceiptCount()
+      }
+      if (lastStoredOriginalTxDataCycle > 0 && totalCyclesToSync > lastStoredOriginalTxDataCycle) {
+        await downloadOriginalTxsDataBetweenCycles(lastStoredOriginalTxDataCycle, totalCyclesToSync)
+        lastStoredOriginalTxDataCount = await originalTxData.queryOriginalTxDataCount()
+      }
+      await downloadTxsDataAndCycles(
+        totalReceiptsToSync,
+        lastStoredReceiptCount,
+        totalOriginalTxsToSync,
+        lastStoredOriginalTxDataCount,
+        totalCyclesToSync,
+        lastStoredCycleCount
+      )
+      toggleNeedSyncing()
     }
-    if (lastStoredOriginalTxDataCycle > 0 && totalCyclesToSync > lastStoredOriginalTxDataCycle) {
-      await downloadOriginalTxsDataBetweenCycles(lastStoredOriginalTxDataCycle, totalCyclesToSync)
-      lastStoredOriginalTxDataCount = await originalTxData.queryOriginalTxDataCount()
-    }
-    await downloadTxsDataAndCycles(
-      totalReceiptsToSync,
-      lastStoredReceiptCount,
-      totalOriginalTxsToSync,
-      lastStoredOriginalTxDataCount,
-      totalCyclesToSync,
-      lastStoredCycleCount
-    )
-    toggleNeedSyncing()
   }
+
+  return syncData
 }
 
 const attemptReconnection = (): void => {
@@ -263,7 +268,7 @@ const start = async (): Promise<void> => {
   await Storage.initializeDB()
   Storage.addExitListeners(ws)
 
-  await checkAndSyncData()
+  const syncData = await checkAndSyncData()
   setupCollectorSocketServer()
 
   if (CONFIG.explorerMode === explorerMode.MQ) {
@@ -282,6 +287,8 @@ const start = async (): Promise<void> => {
       console.log('error while starting explorer in WS mode', e)
     }
   }
+
+  await syncData()
 }
 
 start()
