@@ -220,12 +220,6 @@ export const downloadTxsDataAndCycles = async (
   let endReceipt = startReceipt + MAX_RECEIPTS_PER_REQUEST
   let endCycle = startCycle + MAX_CYCLES_PER_REQUEST
   let endOriginalTxData = startOriginalTxData + MAX_ORIGINAL_TXS_PER_REQUEST
-  let patchData = config.patchData
-  if (startReceipt === 0 || startOriginalTxData === 0) patchData = true // This means we don't have any data yet, so sync txs data as well
-  if (!patchData) {
-    completeForReceipt = true
-    completeForOriginalTxData = true
-  }
   while (!completeForReceipt || !completeForCycle || !completeForOriginalTxData) {
     if (
       endReceipt >= totalReceiptsToSync ||
@@ -245,10 +239,6 @@ export const downloadTxsDataAndCycles = async (
         if (totalCyclesToSync < res.data.totalCycles) {
           completeForCycle = false
           totalCyclesToSync = res.data.totalCycles
-        }
-        if (!patchData) {
-          completeForReceipt = true
-          completeForOriginalTxData = true
         }
         console.log(
           'totalReceiptsToSync',

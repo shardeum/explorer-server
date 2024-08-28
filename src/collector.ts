@@ -44,7 +44,7 @@ let rmqCyclesConsumer: RMQCyclesConsumer
 let rmqTransactionsConsumer: RMQOriginalTxsConsumer
 let rmqReceiptsConsumer: RMQReceiptsConsumer
 
-const { hashKey, patchData, verbose, DISTRIBUTOR_RECONNECT_INTERVAL, CONNECT_TO_DISTRIBUTOR_MAX_RETRY } =
+const { hashKey, verbose, DISTRIBUTOR_RECONNECT_INTERVAL, CONNECT_TO_DISTRIBUTOR_MAX_RETRY } =
   CONFIG
 
 const DistributorFirehoseEvent = 'FIREHOSE'
@@ -87,7 +87,7 @@ export const checkAndSyncData = async (): Promise<Function> => {
     lastStoredOriginalTxDataCount
   )
   // Make sure the data that saved are authentic by comparing receipts count of last 10 cycles for receipts data, originalTxs count of last 10 cycles for originalTxData data and 10 last cycles for cycles data
-  if (patchData && lastStoredReceiptCount > 0) {
+  if (lastStoredReceiptCount > 0) {
     const lastStoredReceiptInfo = await receipt.queryLatestReceipts(1)
     if (lastStoredReceiptInfo && lastStoredReceiptInfo.length > 0)
       lastStoredReceiptCycle = lastStoredReceiptInfo[0].cycle
@@ -99,7 +99,7 @@ export const checkAndSyncData = async (): Promise<Function> => {
     }
     lastStoredReceiptCycle = receiptResult.matchedCycle
   }
-  if (patchData && lastStoredOriginalTxDataCount > 0) {
+  if (lastStoredOriginalTxDataCount > 0) {
     const lastStoredOriginalTxDataInfo = await originalTxData.queryOriginalTxsData(1)
     if (lastStoredOriginalTxDataInfo && lastStoredOriginalTxDataInfo.length > 0)
       lastStoredOriginalTxDataCycle = lastStoredOriginalTxDataInfo[0].cycle
@@ -121,7 +121,7 @@ export const checkAndSyncData = async (): Promise<Function> => {
 
     lastStoredCycleCount = cycleResult.cycle
   }
-  if (patchData && (lastStoredReceiptCount > 0 || lastStoredOriginalTxDataCount > 0)) {
+  if (lastStoredReceiptCount > 0 || lastStoredOriginalTxDataCount > 0) {
     if (lastStoredReceiptCount > totalReceiptsToSync) {
       throw Error(
         'The existing db has more receipts data than the network data! Clear the DB and start the server again!'
@@ -133,8 +133,8 @@ export const checkAndSyncData = async (): Promise<Function> => {
       )
     }
   }
-  if (patchData && totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
-  if (patchData && totalOriginalTxsToSync > lastStoredOriginalTxDataCount) toggleNeedSyncing()
+  if (totalReceiptsToSync > lastStoredReceiptCount) toggleNeedSyncing()
+  if (totalOriginalTxsToSync > lastStoredOriginalTxDataCount) toggleNeedSyncing()
   if (!needSyncing && totalCyclesToSync > lastStoredCycleCount) toggleNeedSyncing()
 
   const syncData = async(): Promise<void> => {
