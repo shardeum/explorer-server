@@ -15,8 +15,9 @@ export type Proposal = {
 export type SignedReceipt = {
   proposal: Proposal
   proposalHash: string // Redundant, may go
-  applyTimestamp: number
   signaturePack: Signature[]
+  voteOffsets: number[]
+  sign?: Signature
 }
 
 /**
