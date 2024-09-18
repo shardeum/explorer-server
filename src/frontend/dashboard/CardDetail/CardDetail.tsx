@@ -50,7 +50,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
             <Icon name="standby" size="medium" color="primary" />
           </div>
           <div>
-            <p className={styles.title}>Stanby Nodes</p>
+            <p className={styles.title}>Standby Nodes</p>
             <p>{data?.totalStandby?.toLocaleString('en-US')}</p>
           </div>
         </div>
@@ -125,7 +125,7 @@ export const CardDetail: React.FC<CardDetailProps> = (data) => {
               <Icon name="reward" size="medium" color="primary" />
             </div>
             <div>
-              <p className={styles.title}>Total Stake SHM</p>
+              <p className={styles.title}>Total Staked SHM</p>
               <p>{data?.totalStakedSHM?.toLocaleString('en-US')}</p>
             </div>
           </div>
