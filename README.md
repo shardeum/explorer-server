@@ -18,8 +18,8 @@ The Explorer server uses Fastify.js for its backend implementation, while the Us
 
 If you are running a local Shardeum Network, you can start the distributor and rpc services with the following repos:
 
-- Distributor Repo: https://gitlab.com/shardus/relayer/distributor
-- RPC Repo: https://gitlab.com/shardeum/json-rpc-server
+- Distributor Repo: https://github.com/shardeum/relayer-distributor
+- RPC Repo: https://github.com/shardeum/json-rpc-server
 
 ## How to start Shardeum Explorer
 
