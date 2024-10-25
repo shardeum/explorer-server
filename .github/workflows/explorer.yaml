@@ -3,10 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - dev-docker-pipeline
 
 jobs:
   build-and-push:
