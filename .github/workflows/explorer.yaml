@@ -24,9 +24,6 @@ jobs:
           sed -i 's|apiUrl: .*$|apiUrl: "https://devnet-apac-explorer.workloads.shardeum.org",|' src/config/index.ts
           sed -i 's|GTM_Id: .*$|GTM_Id: "GTM-xxx",|' src/config/index.ts
 
-          # Commit the changes
-          git commit -am "Applied inline patch for config updates"
-
       # Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         env:
