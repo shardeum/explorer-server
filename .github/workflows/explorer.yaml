@@ -1,0 +1,51 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Apply inline patch
+      - name: Apply patch changes
+        run: |
+          # Remove the .env.development file
+          git rm .env.development
+
+          # Update src/config/index.ts based on the provided patch
+          sed -i 's|apiUrl: .*$|apiUrl: "https://devnet-apac-explorer.workloads.shardeum.org",|' src/config/index.ts
+          sed -i 's|GTM_Id: .*$|GTM_Id: "GTM-xxx",|' src/config/index.ts
+
+          # Commit the changes
+          git commit -am "Applied inline patch for config updates"
+
+      # Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}  
+        run: echo "${CR_PAT}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Build Docker image
+      - name: Build Docker image
+        env:
+          SHORT_SHA: ${{ github.sha }}
+        run: |
+          docker build -t ghcr.io/shardeum/shardeum-explorer:${SHORT_SHA::7} .
+
+      # Push Docker image to GitHub Container Registry
+      - name: Push Docker image
+        env:
+          SHORT_SHA: ${{ github.sha }}
+        run: |
+          docker push ghcr.io/shardeum/shardeum-explorer:${SHORT_SHA::7}
