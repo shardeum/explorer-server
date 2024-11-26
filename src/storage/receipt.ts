@@ -80,7 +80,7 @@ export async function processReceiptData(receipts: Receipt[], saveOnlyNewData = 
     if (receiptsMap.has(tx.txId) && receiptsMap.get(tx.txId) === timestamp) {
       continue
     }
-    let modifiedReceiptObj = {
+    const modifiedReceiptObj = {
       ...receiptObj,
       beforeStates: config.storeReceiptBeforeStates ? receiptObj.beforeStates : [],
     }

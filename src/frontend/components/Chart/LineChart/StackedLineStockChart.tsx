@@ -36,7 +36,9 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
   const timestampToCycle = new Map<number, number>()
   data.forEach((series) => {
     series.data.forEach((point) => {
-      timestampToCycle.set(point.x, point.cycle)
+      if (point.x && point.cycle) {
+        timestampToCycle.set(point.x, point.cycle)
+      }
     })
   })
 
@@ -109,7 +111,9 @@ export const StackedLineStockChart: React.FC<StackedLineChartProps> = (props: St
     },
     series: data.map((row) => ({
       ...row,
-      data: row.data.map((point: DataPoint) => [point.x, point.y]),
+      data: row.data
+        .filter((point: DataPoint) => point.x != null && point.y != null)
+        .map((point: DataPoint) => [point.x, point.y]),
       showInNavigator: true,
     })),
     boost: {},

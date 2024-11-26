@@ -149,9 +149,10 @@ export const StackedLineChart: React.FC<StackedLineChartProps> = (props: Stacked
         this.series.chart.series.forEach((series) => {
           if (!series.visible) return
           const seriesName = series.name
-          const dataPoint = series.data.find((point) => point.x === timestamp)
-          cycle = dataPoint.cycle
+          const dataPoint = series.data.find((point) => point && point.x != null && point.x === timestamp)
+
           if (dataPoint) {
+            cycle = dataPoint.cycle || 0
             tooltipContent += `<span>${seriesName}: <b>${dataPoint.y}</b></span><br />`
           }
         })
