@@ -345,6 +345,7 @@ export async function processAccountData(accounts: AccountsCopy[]): Promise<Acco
     const accountType = account.data.accountType
     const accObj = {
       accountId: account.accountId,
+      ethAddress: account.accountId,
       cycle: account.cycleNumber,
       timestamp: account.timestamp,
       account: account.data,
