@@ -54,6 +54,7 @@ export enum AccountType {
   StakeReceipt,
   UnstakeReceipt,
   InternalTxReceipt,
+  SecureAccount,
 }
 
 export enum AccountSearchType {
