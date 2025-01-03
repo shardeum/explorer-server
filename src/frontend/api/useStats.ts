@@ -20,6 +20,7 @@ export const useStats = (query: {
   fetchCoinStats?: boolean
   transactionResponseType?: string | undefined
   validatorResponseType?: string | undefined
+  refreshEnabled?: boolean
 }): StatsResult => {
   const {
     validatorStatsCount,
@@ -27,6 +28,7 @@ export const useStats = (query: {
     fetchCoinStats,
     transactionResponseType,
     validatorResponseType,
+    refreshEnabled,
   } = query
 
   // set query paths to `null` if we shouldn't fetch them
@@ -38,13 +40,28 @@ export const useStats = (query: {
     : null
   const coinStatsQuery = fetchCoinStats ? `${PATHS.STATS_COIN}` : null
 
+  const swrOptions = {
+    refreshInterval: !refreshEnabled ? 0 : undefined,
+    revalidateOnFocus: refreshEnabled,
+    revalidateOnReconnect: refreshEnabled,
+  }
+
   // get responses
-  const validatorStatsResponse = useSWR<{ validatorStats: ValidatorStats[] }>(validatorStatsQuery, fetcher)
+  const validatorStatsResponse = useSWR<{ validatorStats: ValidatorStats[] }>(
+    validatorStatsQuery,
+    fetcher,
+    swrOptions
+  )
   const transactionStatsResponse = useSWR<{ transactionStats: TransactionStats[] }>(
     transactionStatsQuery,
-    fetcher
+    fetcher,
+    swrOptions
   )
-  const coinStatsResponse = useSWR<{ totalSupply: number; totalStaked: number }>(coinStatsQuery, fetcher)
+  const coinStatsResponse = useSWR<{ totalSupply: number; totalStaked: number }>(
+    coinStatsQuery,
+    fetcher,
+    swrOptions
+  )
 
   // get values
   const validatorStats =
