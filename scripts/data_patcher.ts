@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import * as Storage from '../src/storage'
 import * as DataSync from '../src/class/DataSync'
 import * as StatsStorage from '../src/stats'

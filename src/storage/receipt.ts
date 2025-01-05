@@ -20,7 +20,7 @@ import { extractValues, extractValuesFromArray } from './sqlite3storage'
 import { decodeTx, getContractInfo, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
 import { bytesToHex } from '@ethereumjs/util'
 import { forwardReceiptData } from '../logSubscription/CollectorSocketconnection'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 type DbReceipt = Receipt & {
   tx: string

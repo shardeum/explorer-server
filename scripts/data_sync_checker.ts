@@ -1,5 +1,5 @@
 import axios from 'axios'
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import { config } from '../src/config'
 import { queryFromDistributor, DataType } from '../src/class/DataSync'
 import { isDeepStrictEqual } from 'util'

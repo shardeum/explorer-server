@@ -2,7 +2,7 @@ import sqlite3Lib from 'sqlite3'
 const sqlite3 = sqlite3Lib.verbose()
 let db: sqlite3Lib.Database
 import { config } from '../config/index'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 export async function init(): Promise<void> {
   db = new sqlite3.Database(`${config.dbPath}/db.sqlite3`)

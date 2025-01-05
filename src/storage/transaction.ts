@@ -19,7 +19,7 @@ import {
 import Web3 from 'web3'
 import * as AccountDB from './account'
 import { decodeTx, ZERO_ETH_ADDRESS } from '../class/TxDecoder'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 export const ERC20_METHOD_DIC = {
   '0xa9059cbb': 'transfer',

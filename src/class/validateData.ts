@@ -1,4 +1,4 @@
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import * as utils from '../utils'
 import { config as CONFIG } from '../config'
 import { insertOrUpdateCycle } from '../storage/cycle'

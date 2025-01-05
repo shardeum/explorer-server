@@ -3,7 +3,7 @@ import { TransactionStats } from './transactionStats'
 import { ValidatorStats } from './validatorStats'
 import { NodeStats } from './nodeStats'
 import { config } from '../config/index'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 import { Metadata } from './metadata'
 
 /***

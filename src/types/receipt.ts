@@ -1,6 +1,6 @@
 import { AccountsCopy } from './account'
 import { Log } from './transaction'
-import { Signature } from '@shardus/crypto-utils'
+import { Signature } from '@shardeum-foundation/lib-crypto-utils'
 
 export type Proposal = {
   applied: boolean
