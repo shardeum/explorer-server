@@ -4,9 +4,9 @@ dotenv.config()
 import * as Storage from './storage'
 import * as cycle from './storage/cycle'
 import * as receipt from './storage/receipt'
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import * as originalTxData from './storage/originalTxData'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 import {
   downloadTxsDataAndCycles,
   compareWithOldReceiptsData,

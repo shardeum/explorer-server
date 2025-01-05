@@ -4,7 +4,7 @@ import { IndexedLogs, extractLogsFromReceipts } from './CollectorDataParser'
 import { getLogSocketClient, logSubscriptionMap } from './SocketManager'
 import { Cycle, Receipt } from '../types'
 import { CycleDataWsEvent, ReceiptDataWsEvent } from './CollectorSocketconnection'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 export const setupCollectorListener = async (): Promise<void> => {
   const socket = socketClient.connect(`http://${config.host}:${config.port.collector}`, {

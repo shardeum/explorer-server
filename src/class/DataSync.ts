@@ -5,9 +5,9 @@ import * as Cycle from '../storage/cycle'
 import * as Receipt from '../storage/receipt'
 import * as OriginalTxData from '../storage/originalTxData'
 import { config, DISTRIBUTOR_URL } from '../config'
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import { Cycle as CycleType } from '../types/cycle'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 export let needSyncing = false
 

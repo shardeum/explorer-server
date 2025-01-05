@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 
 import { useCycleDetail } from '../../api'
-import { P2P } from '@shardus/types'
+import { P2P } from '@shardeum-foundation/lib-types'
 
 import { ContentLayout, PaginationPrevNext } from '../../components'
 

@@ -8,9 +8,9 @@ import * as Transaction from '../storage/transaction'
 import { InternalTXType, TransactionSearchType, TransactionType } from '../types'
 import BN from 'bn.js'
 import BigNumber from 'decimal.js'
-import { CycleRecord } from '@shardus/types/build/src/p2p/CycleCreatorTypes'
+import { CycleRecord } from '@shardeum-foundation/lib-types/build/src/p2p/CycleCreatorTypes'
 import { config } from '../config/index'
-import { JoinRequest, JoinedConsensor } from '@shardus/types/build/src/p2p/JoinTypes'
+import { JoinRequest, JoinedConsensor } from '@shardeum-foundation/lib-types/build/src/p2p/JoinTypes'
 
 interface NodeState {
   state: string

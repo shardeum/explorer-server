@@ -1,5 +1,5 @@
 import * as utils from '../utils'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 interface CacheRecordPerCycle<T> {
   lastUpdatedCycle: number
