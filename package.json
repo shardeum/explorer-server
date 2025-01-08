@@ -1,6 +1,6 @@
 {
   "name": "@shardeum-foundation/explorer",
-  "version": "1.0.1-prerelease.0",
+  "version": "1.0.1-prerelease.1",
   "main": "dist/server.js",
   "scripts": {
     "server": "npm run prepare && node dist/server.js",
