@@ -57,7 +57,11 @@ const start = async (): Promise<void> => {
       console.log('End Time', end_time)
       start_time = process.hrtime()
     }
-    const latestCycleRecord = await Cycle.queryLatestCycleRecords(1)
+
+    const cycleToCheck = lastCheckedCycleForNodeStats + 1
+    console.log('cycleToCheck', cycleToCheck)
+
+    const latestCycleRecord = await Cycle.queryLatestCycleRecords(cycleToCheck)
     const latestCycleCounter = latestCycleRecord.length > 0 ? latestCycleRecord[0].counter : 0
     console.log('latestCycleCounter', latestCycleCounter)
     if (latestCycleCounter > lastCheckedCycleForValidators) {
