@@ -10,7 +10,7 @@ import styles from './Footer.module.scss'
 const resources = [
   { href: 'https://shardeum.org', label: 'About Shardeum' },
   { href: 'https://docs.shardeum.org', label: 'Shardeum Docs' },
-  { href: 'https://docs.shardeum.org/faucet/claim', label: 'Testnet SHM Claim' },
+  { href: 'https://docs.shardeum.org/docs/faucet/claim', label: 'Testnet SHM Claim' },
 ]
 
 const socials = [
