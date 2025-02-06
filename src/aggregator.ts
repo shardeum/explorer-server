@@ -24,6 +24,7 @@ if (process.env.PORT) {
 
 const measure_time = false
 let start_time
+let backFill = CONFIG.aggregatorBackFill || 10
 
 const start = async (): Promise<void> => {
   await Storage.initializeDB()
@@ -58,10 +59,7 @@ const start = async (): Promise<void> => {
       start_time = process.hrtime()
     }
 
-    const cycleToCheck = lastCheckedCycleForNodeStats + 1
-    console.log('cycleToCheck', cycleToCheck)
-
-    const latestCycleRecord = await Cycle.queryLatestCycleRecords(cycleToCheck)
+    const latestCycleRecord = await Cycle.queryLatestCycleRecords(1)
     const latestCycleCounter = latestCycleRecord.length > 0 ? latestCycleRecord[0].counter : 0
     console.log('latestCycleCounter', latestCycleCounter)
     if (latestCycleCounter > lastCheckedCycleForValidators) {
@@ -85,6 +83,18 @@ const start = async (): Promise<void> => {
       await StatsFunctions.recordNodeStats(latestCycleCounter, lastCheckedCycleForNodeStats)
       lastCheckedCycleForNodeStats = latestCycleCounter
       StatsFunctions.insertOrUpdateMetadata(Metadata.MetadataType.NodeStats, lastCheckedCycleForNodeStats)
+    }
+
+    if (latestCycleCounter % backFill === 0) {
+      console.log(`Cycle is a multiple of ${backFill}. Checking for empty transaction stats...`)
+      const emptyTxStats = await TransactionStats.queryEmptyTransactionStats(latestCycleCounter, backFill)
+      const missingCycles = emptyTxStats.map((stat) => stat.cycle)
+
+      if (missingCycles.length) {
+        await StatsFunctions.recordMissingTransactionStats(missingCycles)
+      } else {
+        console.log('No missing transaction stats found in the look-back range.')
+      }
     }
   })
 }
