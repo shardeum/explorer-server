@@ -55,7 +55,10 @@ export const config = {
   CONNECT_TO_DISTRIBUTOR_MAX_RETRY: 10,
   explorerMode: process.env.EXPLORER_MODE || explorerMode.WS.toString(),
   storeReceiptBeforeStates: false,
-  aggregatorBackFill: 20,
+  aggregatorBackFill: {
+    interval: 25,
+    amount: 50,
+  },
 }
 
 export const DISTRIBUTOR_URL = `http://${config.distributorInfo.ip}:${config.distributorInfo.port}`

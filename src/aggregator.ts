@@ -24,7 +24,8 @@ if (process.env.PORT) {
 
 const measure_time = false
 let start_time
-let backFill = CONFIG.aggregatorBackFill || 10
+const backFillInterval = CONFIG.aggregatorBackFill.interval || 50
+const backFillAmount = CONFIG.aggregatorBackFill.amount || 50
 
 const start = async (): Promise<void> => {
   await Storage.initializeDB()
@@ -85,9 +86,12 @@ const start = async (): Promise<void> => {
       StatsFunctions.insertOrUpdateMetadata(Metadata.MetadataType.NodeStats, lastCheckedCycleForNodeStats)
     }
 
-    if (latestCycleCounter % backFill === 0) {
-      console.log(`Cycle is a multiple of ${backFill}. Checking for empty transaction stats...`)
-      const emptyTxStats = await TransactionStats.queryEmptyTransactionStats(latestCycleCounter, backFill)
+    if (latestCycleCounter % backFillInterval === 0) {
+      console.log(`Cycle is a multiple of ${backFillInterval}. Checking for empty transaction stats...`)
+      const emptyTxStats = await TransactionStats.queryEmptyTransactionStats(
+        latestCycleCounter,
+        backFillAmount
+      )
       const missingCycles = emptyTxStats.map((stat) => stat.cycle)
 
       if (missingCycles.length) {
