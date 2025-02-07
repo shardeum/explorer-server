@@ -192,6 +192,138 @@ export const recordTransactionsStats = async (
   }
 }
 
+export const recordMissingTransactionStats = async (missingCycles: number[]): Promise<void> => {
+  if (!missingCycles.length) {
+    console.log('No missing cycles provided.')
+    return
+  }
+
+  const combineTransactionStats: TransactionStats.TransactionStats[] = []
+
+  for (const cycleNumber of missingCycles) {
+    const cycle = await Cycle.queryCycleByCounter(cycleNumber)
+    if (!cycle) {
+      console.log(`No cycle record found for cycle ${cycleNumber}`)
+      continue
+    }
+
+    const transactions = await Transaction.queryTransactionCountByCycles(cycleNumber, cycleNumber)
+    const stakeTransactions = await Transaction.queryTransactionCountByCycles(
+      cycleNumber,
+      cycleNumber,
+      TransactionSearchType.StakeReceipt
+    )
+    const unstakeTransactions = await Transaction.queryTransactionCountByCycles(
+      cycleNumber,
+      cycleNumber,
+      TransactionSearchType.UnstakeReceipt
+    )
+    const internalTransactions = await Transaction.queryTransactionCountByCycles(
+      cycleNumber,
+      cycleNumber,
+      TransactionSearchType.InternalTxReceipt
+    )
+    const granularInternalTransactions = await Transaction.queryInternalTransactionCountByCycles(
+      cycleNumber,
+      cycleNumber
+    )
+
+    // Filter results for the current cycle (in case the query returns an array).
+    const txsCycle = transactions.filter((a: { cycle: number }) => a.cycle === cycleNumber)
+    const internalTxsCycle = internalTransactions.filter((a: { cycle: number }) => a.cycle === cycleNumber)
+    const stakeTxsCycle = stakeTransactions.filter((a: { cycle: number }) => a.cycle === cycleNumber)
+    const unstakeTxsCycle = unstakeTransactions.filter((a: { cycle: number }) => a.cycle === cycleNumber)
+
+    // Initialize counts for the granular internal transactions.
+    const granularInternalTxCounts = {
+      totalSetGlobalCodeBytesTxs: 0,
+      totalInitNetworkTxs: 0,
+      totalNodeRewardTxs: 0,
+      totalChangeConfigTxs: 0,
+      totalApplyChangeConfigTxs: 0,
+      totalSetCertTimeTxs: 0,
+      totalStakeTxs: 0,
+      totalUnstakeTxs: 0,
+      totalInitRewardTimesTxs: 0,
+      totalClaimRewardTxs: 0,
+      totalChangeNetworkParamTxs: 0,
+      totalApplyNetworkParamTxs: 0,
+      totalPenaltyTxs: 0,
+    }
+
+    // Process each granular internal transaction.
+    granularInternalTransactions
+      .filter(({ cycle: c }) => c === cycleNumber)
+      .forEach(({ internalTXType, count }) => {
+        switch (internalTXType) {
+          case InternalTXType.SetGlobalCodeBytes:
+            granularInternalTxCounts.totalSetGlobalCodeBytesTxs += count
+            break
+          case InternalTXType.InitNetwork:
+            granularInternalTxCounts.totalInitNetworkTxs += count
+            break
+          case InternalTXType.NodeReward:
+            granularInternalTxCounts.totalNodeRewardTxs += count
+            break
+          case InternalTXType.ChangeConfig:
+            granularInternalTxCounts.totalChangeConfigTxs += count
+            break
+          case InternalTXType.ApplyChangeConfig:
+            granularInternalTxCounts.totalApplyChangeConfigTxs += count
+            break
+          case InternalTXType.SetCertTime:
+            granularInternalTxCounts.totalSetCertTimeTxs += count
+            break
+          case InternalTXType.Stake:
+            granularInternalTxCounts.totalStakeTxs += count
+            break
+          case InternalTXType.Unstake:
+            granularInternalTxCounts.totalUnstakeTxs += count
+            break
+          case InternalTXType.InitRewardTimes:
+            granularInternalTxCounts.totalInitRewardTimesTxs += count
+            break
+          case InternalTXType.ClaimReward:
+            granularInternalTxCounts.totalClaimRewardTxs += count
+            break
+          case InternalTXType.ChangeNetworkParam:
+            granularInternalTxCounts.totalChangeNetworkParamTxs += count
+            break
+          case InternalTXType.ApplyNetworkParam:
+            granularInternalTxCounts.totalApplyNetworkParamTxs += count
+            break
+          case InternalTXType.Penalty:
+            granularInternalTxCounts.totalPenaltyTxs += count
+            break
+        }
+      })
+
+    // Combine all stats into one object for this cycle.
+    combineTransactionStats.push({
+      cycle: cycleNumber,
+      totalTxs: txsCycle.length > 0 ? txsCycle[0].transactions : 0,
+      totalInternalTxs: internalTxsCycle.length > 0 ? internalTxsCycle[0].transactions : 0,
+      totalStakeTxs: stakeTxsCycle.length > 0 ? stakeTxsCycle[0].transactions : 0,
+      totalUnstakeTxs: unstakeTxsCycle.length > 0 ? unstakeTxsCycle[0].transactions : 0,
+      ...granularInternalTxCounts,
+      timestamp: cycle.cycleRecord.start,
+    })
+  }
+
+  if (combineTransactionStats.length > 0) {
+    if (config.verbose) {
+      console.log(
+        'Reinserting transaction stats for cycles:',
+        combineTransactionStats.map((stat) => stat.cycle)
+      )
+    }
+    await TransactionStats.bulkInsertTransactionsStats(combineTransactionStats)
+  } else {
+    console.log('No missing transaction stats to update.')
+  }
+}
+
+
 export const recordCoinStats = async (latestCycle: number, lastStoredCycle: number): Promise<void> => {
   const bucketSize = 50
   let startCycle = lastStoredCycle + 1

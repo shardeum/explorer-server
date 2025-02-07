@@ -93,3 +93,23 @@ export async function queryTransactionStatsBetween(
     console.log(e)
   }
 }
+
+
+export async function queryEmptyTransactionStats(currentCycle: number, lookBack: number): Promise<TransactionStats[]> {
+  try {
+    const startCycle = currentCycle - lookBack;
+    const sql = `SELECT * FROM transactions WHERE totalTxs = 0 AND cycle BETWEEN ? AND ?`;
+    const emptyTxStats: TransactionStats[] = await db.all(sql, [startCycle, currentCycle]);
+    if (config.verbose) {
+      console.log(
+        `Empty TransactionStats records found between cycles ${startCycle} and ${currentCycle}:`,
+        emptyTxStats
+      );
+    }
+    return emptyTxStats;
+  } catch (e) {
+    console.error('Error querying empty transaction stats:', e);
+    return [];
+  }
+}
+
