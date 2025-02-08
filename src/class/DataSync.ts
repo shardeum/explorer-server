@@ -567,7 +567,7 @@ export async function downloadOriginalTxsDataByCycle(
   }
 }
 
-export const downloadCyclcesBetweenCycles = async (
+export const downloadCyclesBetweenCycles = async (
   startCycle: number,
   totalCyclesToSync: number,
   saveOnlyNewData = false

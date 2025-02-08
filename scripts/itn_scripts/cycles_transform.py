@@ -19,7 +19,7 @@ job.init(args['JOB_NAME'], args)
 
 base_path = 's3://shardeumdb/'
 
-subfolders = ['beta1.9.3-explorer/','beta1.9.7_26Feb24/','dapp1.5.6-explorer/','dapp1.6.1-explorer/','dapp1.7.1-explorer/','sphinx1.0-explorer/','sphnix2.0-explorer/','sphnix3.0-explorer/','beta1.10.3/']  
+subfolders = ['beta1.9.3-explorer/','beta1.9.7_26Feb24/','dapp1.5.6-explorer/','dapp1.6.1-explorer/','dapp1.7.1-explorer/','sphinx1.0-explorer/','sphinx2.0-explorer/','sphinx3.0-explorer/','beta1.10.3/']  
 
 
 for subfolder in subfolders:

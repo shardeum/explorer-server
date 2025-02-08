@@ -87,7 +87,7 @@ for subfolder,file in zip(subfolders,filename):
         for stakeitr in stake:
             df[stakeitr] = df.apply(lambda row: extract_stake_component(row, stakeitr), axis=1)
             
-        df = df.drop(['wrappedEVMAccount','readable_receipt','stakeInfo','logs','originTxData'], axis=1)
+        df = df.drop(['wrappedEVMAccount','readable_receipt','stakeInfo','logs','originalTxData'], axis=1)
         
         df['data'] = df['data'].str.slice(0, 65534)
         
